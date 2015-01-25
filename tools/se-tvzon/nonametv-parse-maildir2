@@ -99,7 +99,7 @@ foreach my $dir (@folders) {
   foreach my $message ($folder->messages) {
     # Flag for delete
     if($message->label( 'flagged' )) {
-    #    next; # Skip
+        next; # Skip
     }
     #next unless $message->isMultipart;
 
