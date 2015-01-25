@@ -1,0 +1,604 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../../lib";
+
+use Mail::Box;
+use Mail::Box::Manager;
+use MIME::Base64;
+
+use File::Temp qw/tempdir/;
+use File::Copy qw/move copy/;
+use File::Basename;
+
+use Getopt::Long;
+use Digest::MD5;
+use Data::Dumper;
+
+use Encode qw/decode/;
+
+use NonameTV;
+use NonameTV::DataStore;
+use NonameTV::Factory qw/CreateFileStore CreateDataStore/;
+use NonameTV::Log qw/d p w f SetVerbosity StartLogSection EndLogSection/;
+
+my $opt = { manual => 0,
+            test => 0,
+	    verbose => 0,
+	    quiet => 0,
+            };
+
+my $res = GetOptions( $opt, qw/manual test verbose/ );
+
+$opt->{verbose} = 1 if $opt->{manual};
+
+SetVerbosity( $opt->{verbose}, $opt->{quiet} );
+
+if( not $res ) {
+  print << 'EOHELP';
+ [--manual] [--test] [--verbose]
+
+Extract files from mails in a maildir and store them using
+NonameTV::FileStore.
+
+  --manual  Ask the user which Importer to use if the information
+            cannot be derived from the message.
+
+  --test    Run the importer in test-mode.
+
+EOHELP
+
+  exit 1;
+}
+
+my $ds = CreateDataStore();
+
+my $root = "/home/jnylen/maildir/.Projects/";
+my @folders = qw(		 NonameTV-Data.MTV
+                 		 NonameTV-Data.Mezzo
+                 		 NonameTV-Data.HighTV
+                 		 NonameTV-Data.EBS
+                 		 NonameTV-Data.WildTV
+                 		 NonameTV-Data.Euronews
+                 		 NonameTV-Data.TV8Norge
+                 		 NonameTV-Data.PokerChannel
+                 		 NonameTV-Data.Gospel
+		 NonameTV-Data.RTL2
+		 NonameTV-Data.DWDE
+		 NonameTV-Data.HaC
+		 NonameTV-Data.ETVMedia
+		 NonameTV-Data.VisjonNorge
+		 NonameTV-Data.Disney
+		 NonameTV-Data.Turner
+		 NonameTV-Data.DMB
+		 NonameTV-Data.PPS
+		 NonameTV-Data.ServusTV
+        );
+
+# Flag messages AFTER they have been processed. Then I normally
+# only have to move the message to the correct folder.
+
+my $tmpdir = tempdir( CLEANUP => 1 );
+
+my $mgr = Mail::Box::Manager->new;
+
+StartLogSection( "nonametv-parse-maildir", 0 );
+
+foreach my $dir (@folders) {
+  my $folder = $mgr->open( "$root.$dir",
+                           access => 'rw',
+                           extract => 'ALWAYS' );
+
+  foreach my $message ($folder->messages) {
+    # Flag for delete
+    if($message->label( 'flagged' )) {
+        next; # Skip
+    }
+    #next unless $message->isMultipart;
+
+    # Use Encode::MIME::Header
+    my $subject = decode( 'MIME-Header', $message->get( 'Subject' ) ) || '';
+    my $from = $message->get( 'From' );
+
+    d "Processing $from - $subject";
+
+    if( process_parts( $message, $dir, $from, $subject ) ) {
+      $message->label( 'flagged' => 1 );
+      d "Processing succeeded.";
+    }
+    else {
+      d "Processing failed.";
+    }
+  }
+}
+
+$mgr->closeAllFolders;
+
+EndLogSection( "nonametv-parse-maildir" );
+
+sub process_parts
+{
+  my( $part, $dir, $from, $subject ) = @_;
+
+  my $type = $part->get('Content-Type');
+#  return 0 if $type eq "text/plain";
+
+  if($part->isMultipart)
+  {
+    my $count = 0;
+    foreach my $child ($part->parts)
+    {
+      $count += process_parts( $child, $dir, $from, $subject );
+    }
+    return $count;
+  }
+  else
+  {
+    my $disp = $part->body->disposition;
+    my $name = decode( 'MIME-Header',
+		       $part->body->dispositionFilename ) || 'noname';
+    my $size = $part->body->size;
+
+    my $channel = guess_channel( $dir, $from, $subject, $name, $type, $size );
+
+    if( (not defined $channel) and $opt->{manual} )
+    {
+      print "$name ($size bytes): ";
+      $channel = <STDIN>;
+      $channel =~ tr/\n\r //d;
+      $channel = undef if $channel eq "";
+    }
+
+    if( not defined $channel ) {
+      d "$name skipped.";
+      return 0;
+    }
+
+    my $chd = $ds->sa->Lookup( 'channels', {xmltvid => $channel} );
+
+    die "Unknown channel $channel" if not defined $chd;
+
+    p "Adding file $name for $channel";
+
+    my $fs = GetFileStore( $chd->{grabber} );
+    my ($content);
+
+    # Channels you only want it decoded, not fucked up
+    #$channel eq "rtl2.de" or $channel eq "historytv.se" or
+    #       $channel eq "historytv.no" or $channel eq "historytv.dk" or
+    #       $channel eq "historytv.eu" or $channel eq "crimeandinvestigation.eu" or
+    #       $channel eq "sonyentertainment.tv" or $channel eq "axntv.de" or $channel eq "animax.tv" or
+    #       $channel eq "familytv.de" or $channel eq "dasneue.tv" or $channel eq "tnt-tv.dk
+    if($name =~ /\.xml$/i) {
+        $content = decode_base64($part->body);
+    } else {
+        $content = $part->decoded->string;
+    }
+
+
+    #print Dumper($content);
+    $fs->AddFile( $channel, $name, \$content );
+  }
+
+  return $opt->{test} ? 0 : 1;
+}
+
+sub guess_channel
+{
+  my( $dir, $from, $subject, $filename, $type, $size ) = @_;
+
+  if( $dir =~ /Disney/ ) {
+    # The Disney filenames are very unreliable.
+    if( $filename =~ /\bxd/i ) {
+      return "xd.disneychannel.se";
+    }
+    if( $filename =~ /\bdxd/i ) {
+      return "xd.disneychannel.se";
+    }
+    elsif( $filename =~ /playhouse/i ) {
+      return "junior.disney.se";
+    }
+    elsif( $filename =~ /junior/i ) {
+      return "junior.disney.se";
+    }
+    elsif( $filename =~ /disney\s*channel/i ) {
+      return "disneychannel.se";
+    }
+    elsif( $filename eq "noname" ) {
+      return undef;
+    }
+    elsif( $subject =~ /playhouse/i ) {
+      return "junior.disney.se";
+    }
+    elsif( $subject =~ /junior/i ) {
+      return "junior.disney.se";
+    }
+    elsif( $subject =~ /disney\s*channel/i ) {
+      return "disneychannel.se";
+    }
+
+    return undef;
+  }
+
+  if( $dir =~ /SBSTV/ and $filename =~ /\.xml$/i ) {
+    # Kanal 5
+    if( $subject =~ /kanal 5/i ) {
+          return "kanal5.se";
+    }
+    elsif( $subject =~ /kanal5/i ) {
+          return "kanal5.se";
+    }
+    # Kanal 9
+    elsif( $subject =~ /kanal 9/i ) {
+          return "kanal9.se";
+    }
+    elsif( $subject =~ /kanal9/i ) {
+          return "kanal9.se";
+    }
+    # TV 11 (taken over from TV4 from 1st June)
+    elsif( $subject =~ /tv 11/i ) {
+          return "tv11.sbstv.se";
+    }
+    elsif( $subject =~ /tv11/i ) {
+    	  return "tv11.sbstv.se";
+    }
+    elsif( $subject =~ /kanal 11/i ) {
+          return "tv11.sbstv.se";
+    }
+    elsif( $subject =~ /kanal11/i ) {
+          return "tv11.sbstv.se";
+    }
+
+
+  }
+
+  if( $dir =~ /GlobalListings/ ) {
+    return "hd.natgeo.se" if $filename =~ /^ng\s*swe\s*hd\b/i;
+
+	# Nat geo wild sends in XLS format
+    return "wild.natgeo.se" if $filename =~ /^ngwscan\s*\b/i;
+
+	# History Channel
+	if($filename =~ /\.xml$/i) {
+        return "historytv.se"  if $filename =~ /his.eur.swe/i;
+        return "historytv.no"  if $filename =~ /his.eur.nor/i;
+        return "historytv.dk"  if $filename =~ /his.eur.dan/i;
+        return "historytv.eu"  if $filename =~ /his.eur.eng/i;
+        return "crimeandinvestigation.eu"  if $filename =~ /cai.eng/i;
+    }
+
+    return "natgeotv.com" if $filename =~ /^ngscan/i and $filename =~ /\.xls$/i;
+
+	# Travel Channel
+    return "travelchanneltv.se" if $filename =~ /^travel/i;
+
+    # E! Entertainment
+    return "se.eonline.com" if $filename =~ /^e\s*swe\b/i;
+    return "dk.eonline.com" if $filename =~ /^e\s*dan\b/i;
+    return "no.eonline.com" if $filename =~ /^e\s*nor\b/i;
+    return "eu.eonline.com" if $filename =~ /^e\s*eng\b/i;
+    return "de.eonline.com"  if $filename =~ /^eent\.ger\b/i and $filename =~ /\.xls$/i;
+
+    # FOX TV Norway
+    return "foxtv.no"       if $filename =~ /^fox\s+norway/i;
+    return "foxtv.se"       if $filename =~ /^fox\s+sweden/i and $filename =~ /\.xml$/i;
+
+    # H2
+    if($filename =~ /h2\s+europe/i and $filename =~ /\.xml$/i) {
+        return "h2.historytv.se"  if $filename =~ /swe/i;
+        return "h2.historytv.no"  if $filename =~ /nor/i;
+        return "h2.historytv.dk"  if $filename =~ /dan/i;
+    }
+
+    # Benelux schedules for Universal
+    return "13thstreet.nl" if $filename =~ /^13\.Ben\.Dut/i;
+    return "en.13thstreet.nl" if $filename =~ /^13\.Ben\.Eng/i;
+    return "syfy.nl" if $filename =~ /^Syfy\.Ben\.Dut/i;
+    return "en.syfy.nl" if $filename =~ /^Syfy\.Ben\.Eng/i;
+ }
+
+ if( $dir =~ /Turner/ ) {
+    # Word files
+	return "cartoonnetwork.se" if $filename =~ /^cn\s*nordic\s+\(swe\)\s*\b/i;
+	return "boomerangtv.se" if $filename =~ /^boomerang\s*nordic\s*\(swe\)\s*\b/i;
+
+	return "cartoonnetwork.no" if $filename =~ /^cn\s*nordic\s+\(nor\)\s*\b/i;
+    return "boomerangtv.no" if $filename =~ /^boomerang\s*nordic\s*\(nor\)\s*\b/i;
+
+    return "cartoonnetwork.dk" if $filename =~ /^cn\s*nordic\s+\(dan\)\s*\b/i;
+    return "boomerangtv.dk" if $filename =~ /^boomerang\s*nordic\s*\(dan\)\s*\b/i;
+
+    return "tcmeurope.com" if $filename =~ /^tcm\s*nordic\s*\(eng\)\s*\b/i;
+    return "se.tcmeurope.com" if $filename =~ /^tcm\s*nordic\s*\(swe\)\s*\b/i;
+    return "no.tcmeurope.com" if $filename =~ /^tcm\s*nordic\s*\(nor\)\s*\b/i;
+    return "dk.tcmeurope.com" if $filename =~ /^tcm\s*nordic\s*\(dan\)\s*\b/i;
+
+	# Excel (XLS)
+	if( $filename =~ /\.xls$/i ) {
+		# CNN
+		if( $filename =~ /cnn/i ) {
+		    return "cnn.com" if $filename =~ /\(in\s+cet\)/i;
+		}
+
+		# Cartoon network ENGLISH
+        return "cartoonnetwork.com" if $filename =~ /^cn\s*nordic/i;
+        return "cartoonnetwork.nl" if $filename =~ /^cn\s*dutch/i and $filename =~ /combo/i;
+	}
+
+	# XML Germany
+	if( $filename =~ /\.xml$/i and $filename =~ /mediapress/i ) {
+	    return "cartoonnetwork.de" if $filename =~ /^CN_/i;
+	    return "boomerangtv.de" if $filename =~ /^Boomerang_/i;
+	    return "tnt-serie.de" if $filename =~ /^TNTSerie_/i;
+	    return "tnt-film.de" if $filename =~ /^TNT_/i;
+	    return "tnt-glitz.tv" if $filename =~ /^Glitz_/i;
+	}
+
+	# XML Nordic (Nonstop)
+	if( $filename =~ /\.xml$/i ) {
+	    return "tnt-tv.dk" if $filename =~ /^TNT/i and $filename =~ /Danish/i;
+	    return "tnt-tv.se" if $filename =~ /^TNT/i and $filename =~ /Swedish/i;
+	    return "tnt-tv.no" if $filename =~ /^TNT/i and $filename =~ /Norwegian/i;
+	    return "star.nonstop.tv" if $filename =~ /^Star/i and $filename =~ /Swedish/i;
+	}
+
+	# Word Nordic (Nonstop)
+	if( $filename =~ /\.doc$/i ) {
+	    return "showtime.nonstop.tv" if $filename =~ /^SHO/i and $filename =~ /SWE/i;
+	    return "silver.nonstop.tv"   if $filename =~ /^SIL/i and $filename =~ /SWE/i;
+	    return "no.showtime.nonstop.tv" if $filename =~ /^SHO/i and $filename =~ /NOR/i;
+        return "no.silver.nonstop.tv"   if $filename =~ /^SIL/i and $filename =~ /NOR/i;
+        return "dk.showtime.nonstop.tv" if $filename =~ /^SHO/i and $filename =~ /DAN/i;
+        return "dk.silver.nonstop.tv"   if $filename =~ /^SIL/i and $filename =~ /DAN/i;
+        return "fi.showtime.nonstop.tv" if $filename =~ /^SHO/i and $filename =~ /FIN/i;
+        return "fi.silver.nonstop.tv"   if $filename =~ /^SIL/i and $filename =~ /FIN/i;
+	}
+  }
+
+ if( $dir =~ /Kanal10/ and $filename =~ /\.doc$/i ) {
+     return "kanal10.se";
+ }
+
+ if( $dir =~ /France24/ and $filename =~ /\.zip$/i ) {
+     return "france24.com" if $filename =~ /ANGL/i;
+     return "france24.com" if $filename =~ /ENGL/i;
+     return "ar.france24.com" if $filename =~ /ARAB/i;
+     return "fr.france24.com" if $filename =~ /FRAN/i;
+ }
+
+ if( $dir =~ /Euronews/ and $filename =~ /\.xlsx$/i ) {
+      return "euronews.com";
+ }
+
+ if( $dir =~ /Gmail/ ) {
+
+     # XLS
+     if($filename =~ /\.xls$/i) {
+        return "privatespice.com" if $filename =~ /^private/i;
+        return "protv.ro" if $from =~ /\@protv.ro/i;
+     }
+
+     # Word
+     if($filename =~ /\.doc$/i) {
+        return "brazzerstveurope.com" if $filename =~ /^brazzers/i;
+     }
+ }
+
+ if( $dir =~ /Playboy/ and $filename =~ /\.doc$/i ) {
+     return "europe.playboytv.com" if $filename =~ /^playboy/i;
+     return "adultchannel.co.uk" if $filename =~ /^the\s*adult/i;
+     return "privatespice.com" if $filename =~ /^private/i;
+     return "brazzerstveurope.com" if $filename =~ /^brazzers/i;
+     return "viasat.spice.com" if $filename =~ /^spice\s*viasat/i;
+ }
+
+ if( $dir =~ /Hustler/ and $filename =~ /\.xls$/i ) {
+     return "europe.bluehustler.com" if $filename =~ /^blue.*gmt.*\b/i;
+     return "europe.hustlertv.com" if $filename =~ /^hustler.*gmt.*\b/i;
+     return "europe.daringtv.com" if $filename =~ /^daring.*gmt.*\b/i;
+     return "europe.daringtv.com" if $filename =~ /^private.*gmt.*\b/i;
+ }
+
+ if( $dir =~ /MTV/ ) {
+
+    # excel (XLSX)
+    if($filename =~ /\.xlsx$/i) {
+    	return "classic.vh1.se" if $filename =~ /vh1.*euro.*classic/i;
+
+    	if($filename =~ /^mtv.*live/i) {
+    	    return "hd.mtv.se" if $filename =~ /listings/i;
+    	}
+    }
+
+    # excel (XLS)
+    if($filename =~ /\.xls$/i) {
+        return "classic.vh1.se" if $filename =~ /vh1.*euro.*classic/i;
+
+        if($filename =~ /^mtv.*live/i) {
+    	    return "hd.mtv.se" if $filename =~ /listings/i;
+    	}
+    }
+ }
+
+ if( $dir =~ /YaS/ and $filename =~ /\.xls$/i ) {
+     return "nauticalchannel.net" if $filename =~ /nc/i;
+ }
+
+ if( $dir =~ /Motors/ and $filename =~ /\.xls$/i ) {
+     return "motorstv.com" if $filename =~ /pgms/i and $filename !~ /french/i;
+ }
+
+ if( $dir =~ /TravelChannel/ and $filename =~ /\.xls$/i ) {
+     return "travelchanneltv.se" if $filename =~ /^epg\s*\b/i;
+ }
+
+ if( $dir =~ /PokerChannel/ and $filename =~ /\.xlsx$/i ) {
+     return "ginx.tv";
+ }
+
+ if( $dir =~ /Fatstone/ and $filename =~ /\.xlsx$/i ) {
+     return "fatstone.tv";
+ }
+
+if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
+     return "foxtv.se" if $filename =~ /^fox\s+sweden/i;
+ }
+
+ if( $dir =~ /LifestyleTV/ and $filename =~ /\.xls|.xlsx$/i ) {
+     return "lifestyletv.se";
+ }
+
+ if( $dir =~ /TVChile/ and $filename =~ /\.xls|.xlsx$/i ) {
+     return "tvchile.cl";
+ }
+
+ if( $dir =~ /TV8Norge/ and $filename =~ /\.xls|.xlsx$/i ) {
+      return "ostfold.tv8norge.no" if $filename =~ /tv8ostfold/i;
+      return "buskerud.tv8norge.no" if $filename =~ /tv8buskerud/i;
+      return "romerike.tv8norge.no" if $filename =~ /tv8romerike/i;
+      return "oslo.tv8norge.no" if $filename =~ /tv8oslo/i;
+      return "follo.tv8norge.no" if $filename =~ /tv8follo/i;
+      return "ab.tv8norge.no" if $filename =~ /tv8ab/i;
+  }
+
+ if( $dir =~ /FuelTV/ and $filename =~ /epg/i ) {
+     return "fuel.tv";
+ }
+
+ if( $dir =~ /GodTV/ and $filename =~ /\.xlsx$/i ) {
+     return "god.tv";
+ }
+
+ if( $dir =~ /LuxeTV/ and $filename =~ /\.xls$/i ) {
+     return "luxe.tv" if $filename =~ /\d\.xls$/i;
+ }
+
+ if( $dir =~ /Mezzo/ ) {
+    if($filename =~ /\.xls$/i) {
+        return "hd.mezzo.tv" if $filename =~ /hd/i; # import mezzo live hd channel
+        return "mezzo.tv" if $filename !~ /hd/i; # dont import mezzo live hd channel
+    } elsif($filename =~ /\.xlsx$/i) {
+        return "hd.mezzo.tv" if $filename =~ /hd/i; # import mezzo live hd channel
+        return "mezzo.tv" if $filename !~ /hd/i; # dont import mezzo live hd channel
+    }
+ }
+
+ if( $dir =~ /HighTV/ and $filename =~ /\.xls$/i ) {
+     return "hightv.tv" if $filename =~ /epg/i;
+ }
+
+ if( $dir =~ /EBS/ and $filename =~ /\.xls$/i ) {
+         return "bbcentertainment.com" if $filename =~ /entertainment\s+scandi/i;
+         return "bbchd.com" if $filename =~ /hd\s+scandi/i;
+         return "bbchd.com" if $subject =~ /bbc\s+hd\s+scandi/i;
+         return "bbcknowledge.com" if $filename =~ /knowledge\s+scandi/i;
+         return "bbclifestyle.com" if $filename =~ /lifestyle\s+scandi/i;
+ #        return "cbeebies.com" if $filename =~ /cbeebies\s+scandi/i;
+ }
+
+ if( $dir =~ /WildTV/ and $filename =~ /\.zip|.xml/i ) {
+ 	return "wildtv.ca";
+ }
+
+ if( $dir =~ /RTL2/ and $filename =~ /\.xml$/i ) {
+  	return "rtl2.de"; # ÅÄÖ becomes ? in their mails.
+ }
+
+ if( $dir =~ /Gospel/ and $filename =~ /\.xls$/i ) {
+   	return "gospel.tv";
+ }
+
+ if( $dir =~ /VisjonNorge/ and $filename =~ /\.xls$/i ) {
+    return "visjonnorge.com";
+ }
+
+ if( $dir =~ /CNBC/ and $filename =~ /\.xml/i ) {
+   	return "europe.cnbc.com";
+ }
+
+ if( $dir =~ /DWDE/ and $filename =~ /\.xls|.xlsx$/i ) {
+    return "dw.de" if $filename =~ /Europa/i;
+    return "asien.dw.de" if $filename =~ /Asien/i and $filename !~ /Afrika/i;
+    return "english.dw.de" if $filename =~ /English/i;
+    return "la.dw.de" if $filename =~ /Latino/i;
+    return "amerika.dw.de" if $filename =~ /Amerika/i;
+ }
+
+ if( $dir =~ /HaC/ and $filename =~ /\.xls|.xlsx$/i ) {
+     return "horseandcountry.tv";
+ }
+
+ if( $dir =~ /ETVMedia/ ) {
+    # Channel 1 Russia
+    if( $filename =~ /\d{8}_\d{8}/i and $filename =~ /\.rtf$/i ) {
+       return "1tvrus.com";
+    }
+
+    # TBN
+    if( $filename =~ /TBN/i ) {
+    #   return "tbn.org";
+    }
+
+    if( $subject =~ /WFC/i and $filename =~ /\.(xls|xlsx|txt)$/i ) {
+        return "wfc.tv";
+    }
+
+    if( ( $subject =~ /fashiontv/i or $from =~ /\@ftv.com/i ) and $filename =~ /\.xlsx$/i ) {
+        return "ftv.com" if $filename =~ /hotbird/i;
+        return "hd.ftv.com" if $filename =~ /eurobird/i;
+    }
+ }
+
+ if( $dir =~ /DMB/ ) {
+    # Sony Entertainment TV, Gmbh.
+    if($filename =~ /\.xml$/i or $filename =~ /\.xls$/i) {
+        return "axntv.de" if $filename =~ /^AXN-/i;
+        return "animax.tv" if $filename =~ /^AAX-/i;
+        return "sonyentertainment.tv" if $filename =~ /^SEN-/i;
+    }
+
+    # ITV
+    if($filename =~ /\.xml$/i) {
+        return "familytv.de" if $filename =~ /^FamilyTV_/i;
+        return "dasneue.tv" if $filename =~ /^DasNeueTV_/i;
+    }
+ }
+
+ if( $dir =~ /PPS/ ) {
+    return "disneychannel.de" if $filename =~ /\.(xml|zip)$/i;
+ }
+
+ if( $dir =~ /ServusTV/ and $filename =~ /\.xml$/i and $filename =~ /struppi/i ) {
+    return "servustv.de" if $filename =~ /DE/i;
+    return "servustv.com" if $filename !~ /DE/i;
+ }
+
+ if ( $dir =~ /OKGoteborg/ and $filename =~ /\.doc$/i ) {
+    return "oppnakanalengoteborg.se";
+ }
+
+  return undef;
+}
+
+my $filestores = {};
+
+sub GetFileStore {
+  my( $importer ) = @_;
+
+  if( not defined $filestores->{$importer} ) {
+    $filestores->{$importer} = CreateFileStore( $importer );
+  }
+
+  return $filestores->{$importer}
+}
+
+sub md5sum {
+  my( $file ) = @_;
+  open(FILE, $file) or die "Can't open '$file': $!";
+  binmode(FILE);
+
+  return Digest::MD5->new->addfile(*FILE)->hexdigest;
+}

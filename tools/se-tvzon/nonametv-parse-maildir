@@ -73,28 +73,7 @@ my @folders = qw(NonameTV-Data.GlobalListings
 		 NonameTV-Data.Gmail
 		 NonameTV-Data.Playboy
 		 NonameTV-Data.Hustler
-		 NonameTV-Data.YaS
-		 NonameTV-Data.MTV
-		 NonameTV-Data.Mezzo
-		 NonameTV-Data.HighTV
-		 NonameTV-Data.EBS
-		 NonameTV-Data.WildTV
-		 NonameTV-Data.Euronews
-		 NonameTV-Data.TV8Norge
-		 NonameTV-Data.PokerChannel
-		 NonameTV-Data.Gospel
-		 NonameTV-Data.RTL2
-		 NonameTV-Data.DWDE
-		 NonameTV-Data.HaC
-		 NonameTV-Data.ETVMedia
-		 NonameTV-Data.VisjonNorge
-		 NonameTV-Data.Disney
-		 NonameTV-Data.Turner
-		 NonameTV-Data.DMB
-		 NonameTV-Data.PPS
-		 NonameTV-Data.OKGoteborg
-		 NonameTV-Data.ServusTV
-        );
+		 NonameTV-Data.YaS);
 
 # Flag messages AFTER they have been processed. Then I normally
 # only have to move the message to the correct folder.
@@ -115,7 +94,7 @@ foreach my $dir (@folders) {
     if($message->label( 'flagged' )) {
         next; # Skip
     }
-    next unless $message->isMultipart;
+    #next unless $message->isMultipart;
 
     # Use Encode::MIME::Header
     my $subject = decode( 'MIME-Header', $message->get( 'Subject' ) ) || '';
@@ -280,13 +259,14 @@ sub guess_channel
     return "wild.natgeo.se" if $filename =~ /^ngwscan\s*\b/i;
 
 	# History Channel
-	if($filename =~ /\.xml$/i) {
-        return "historytv.se"  if $filename =~ /his.eur.swe/i;
-        return "historytv.no"  if $filename =~ /his.eur.nor/i;
-        return "historytv.dk"  if $filename =~ /his.eur.dan/i;
-        return "historytv.eu"  if $filename =~ /his.eur.eng/i;
-        return "crimeandinvestigation.eu"  if $filename =~ /cai.eng/i;
+	if($filename =~ /\.xml$/i and ($filename =~ /his.eur./ or $filename =~ /history\s+europe/i)) {
+        return "historytv.se"  if $filename =~ /swe/i;
+        return "historytv.no"  if $filename =~ /nor/i;
+        return "historytv.dk"  if $filename =~ /dan/i;
+        return "historytv.eu"  if $filename =~ /eng/i;
     }
+
+    return "crimeandinvestigation.eu"  if $filename =~ /cai.eng/i and $filename =~ /\.xml$/i;
 
     return "natgeotv.com" if $filename =~ /^ngscan/i and $filename =~ /\.xls$/i;
 
@@ -299,6 +279,7 @@ sub guess_channel
     return "no.eonline.com" if $filename =~ /^e\s*nor\b/i;
     return "eu.eonline.com" if $filename =~ /^e\s*eng\b/i;
     return "de.eonline.com"  if $filename =~ /^eent\.ger\b/i and $filename =~ /\.xls$/i;
+    return "de.eonline.com"  if $filename =~ /^e\s*ger\b/i and $filename =~ /\.xls$/i;
 
     # FOX TV Norway
     return "foxtv.no"       if $filename =~ /^fox\s+norway/i;
