@@ -88,7 +88,7 @@ sub ImportContentFile
       return;
   }
 
-  $year =+ 2000;
+  $year += 2000;
 
   my $batchid = $chd->{xmltvid} . "_" . $year . "-".$week;
 

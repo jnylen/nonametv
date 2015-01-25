@@ -63,9 +63,27 @@ sub ApproveContent {
 }
 
 sub FilterContent {
-  my( $self, $cref, $chd ) = @_;
+  my $self = shift;
+  my( $cref, $chd ) = @_;
 
-  return( $cref, undef );
+  my $doc = ParseXml( $cref );
+
+  if( not defined $doc ) {
+    return (undef, "ParseXml failed" );
+  }
+
+  # Remove childs
+  my $grabber_info = $chd->{grabber_info};
+
+  my $ns = $doc->find( "//program" );
+
+  if( $ns->size() == 0 ) {
+    return (undef, "No data found" );
+  }
+
+  my $str = $doc->toString(1);
+
+  return (\$str, undef);
 }
 
 sub ContentExtension {

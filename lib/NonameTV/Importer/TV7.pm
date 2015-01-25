@@ -107,6 +107,8 @@ sub ImportContent
         my $epdesc    = $pgm->findvalue( 'episodeShortdesc' );
         my $desc      = $epdesc || $shortdesc;
 
+        $starttime =~ s/\./:/;
+
         my $ce = {
               title       	 => norm($title),
               start_time  	 => $starttime,
