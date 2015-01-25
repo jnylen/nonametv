@@ -70,7 +70,7 @@ sub ImportContentFile {
   if( $file =~ /\.xml$/i ) {
     $self->ImportXML( $file, $chd );
   } elsif( $file =~ /\.xls$/i ){
-    $self->ImportXLS( $file, $chd );
+  #  $self->ImportXLS( $file, $chd );
   }
 
   return;
@@ -152,10 +152,13 @@ sub ImportXML
 
         if(my($season, $episode2) = ($ce->{description} =~ /Staffel\s+(\d+),\s+Episode\s+(\d+)/i)) {
             $ce->{episode} = sprintf( "%d . %d .", $season-1, $episode2-1 ) if $season ne "" and $season > 0;
+            $ce->{description} =~ s/Staffel\s+(\d+),\s+Episode\s+(\d+)//i;
         } elsif(my($season2, $episode3) = ($ce->{description} =~ /(\d+)\s*\s+Staffel\s*\s+Episode\s+(\d+)/i)) {
             $ce->{episode} = sprintf( "%d . %d .", $season2-1, $episode3-1 ) if $season2 ne "" and $season2 > 0;
+            $ce->{description} =~ s/(\d+)\s*\s+Staffel\s*\s+Episode\s+(\d+)//i;
         } elsif(my($season3, $episode4) = ($ce->{description} =~ /Staffel\s+(\d+),\s+(\d+)\s*/i)) {
             $ce->{episode} = sprintf( "%d . %d .", $season3-1, $episode4-1 ) if $season3 ne "" and $season3 > 0;
+            $ce->{description} =~ s/Staffel\s+(\d+),\s+(\d+)\s*//i;
         } elsif($episode and $episode ne "") {
             if($episodeco ne "") {
                 $ce->{episode} = sprintf( " . %d/%d .", $episode-1, $episodeco );
@@ -163,6 +166,10 @@ sub ImportXML
                 $ce->{episode} = sprintf( " . %d .", $episode-1 );
             }
         }
+
+        # remove punct.and
+        $ce->{description} = norm($ce->{description}) if defined($ce->{description});
+        $ce->{description} =~ s/^\.// if defined($ce->{description});
 
         if($year =~ /(\d\d\d\d)/) {
             $ce->{production_date} = "$1-01-01";

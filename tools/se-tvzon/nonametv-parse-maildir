@@ -297,6 +297,15 @@ sub guess_channel
     return "en.13thstreet.nl" if $filename =~ /^13\.Ben\.Eng/i;
     return "syfy.nl" if $filename =~ /^Syfy\.Ben\.Dut/i;
     return "en.syfy.nl" if $filename =~ /^Syfy\.Ben\.Eng/i;
+
+    # Russia Today
+    return "international.rt.com" if $filename =~ /^RTINT/i;
+    return "russia.rt.com" if $filename =~ /^RTRUS/i;
+
+    # Sky News
+    return "international.skynews.com" if $filename =~ /^SKYNI/i and $filename =~ /\.xls$/i);
+    return "international.skynews.com" if $filename =~ /^SKYH/i and $filename =~ /\.xls$/i);
+    return "international.skynews.com" if $subject =~ /^Sky News International/i and $filename =~ /\.xls$/i);
  }
 
  if( $dir =~ /Turner/ ) {

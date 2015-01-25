@@ -57,3 +57,5 @@ tools/nonametv-import Nonstop $1 $2 $3
 tools/nonametv-import NonstopDOC $1 $2 $3
 tools/nonametv-import OKG $1 $2 $3
 tools/nonametv-import ServusTV $1 $2 $3
+tools/nonametv-import RussiaToday $1 $2 $3
+tools/nonametv-import SkyNews $1 $2 $3

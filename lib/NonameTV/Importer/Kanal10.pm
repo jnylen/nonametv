@@ -84,18 +84,12 @@ sub ImportContentFile
   my $date = undef;
   my @ces;
   my $description;
-  my $year;
+  my ($week, $year) = ($file =~ /\-(\d\d)(\d\d)/);
+  $year += 2000;
 
   foreach my $div ($ns->get_nodelist) {
 
     my( $text ) = norm( $div->findvalue( '.' ) );
-    
-    # Get year from Program.versikt :year:
-    if( isYear( $text ) ) { # the line with the date in format 'Programöversikt 2011'
-        $year = ParseYear( $text );
-        progress("Kanal10: Year is $year");
-    }
-    
 
     if( isDate( $text ) ) { # the line with the date in format 'Måndag 11 Juli'
 
@@ -140,10 +134,10 @@ sub ImportContentFile
 
       	
         
-        my $d = norm($desc);
-        if((not defined $d) or ($d eq "")) {
-        	$d = norm($title);
-        }
+        #my $d = norm($desc);
+        #if((not defined $d) or ($d eq "")) {
+        	my $d = norm($title);
+        #}
        
       # Episode
       if($d) {
@@ -157,6 +151,8 @@ sub ImportContentFile
   			( $ep, $eps ) = ($d =~ /\bdel\s+(\d+)\((\d+)\)/ );
   			$ce->{episode} = sprintf( " . %d/%d . ", $ep-1, $eps ) 
     		if defined $eps;
+    		$title =~ s/del\s+(\d+)\((\d+)\)//i if defined $eps;
+    		$title =~ s/del\s+(\d+)//i if defined $ep;
     		
     		
       }

@@ -173,6 +173,7 @@ sub ImportContent
     my $year	 = norm($sc->findvalue( './jaarvanuitgave'    ));
     my $dir		 = norm($sc->findvalue( './producer'));
     my $subtitle = norm($sc->findvalue( './episodetitle'));
+    my $image = norm($sc->findvalue( './image'));
 
 
 	my $ce = {
@@ -221,6 +222,10 @@ sub ImportContent
     }
 
     $ce->{actors} = join( ";", grep( /\S/, @actors ) );
+
+    if($image ne "") {
+        $ce->{fanart} = $image;
+    }
 
 	# Add Programme
 	$dsh->AddCE( $ce );

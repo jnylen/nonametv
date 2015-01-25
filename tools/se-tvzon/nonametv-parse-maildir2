@@ -92,10 +92,14 @@ foreach my $dir (@folders) {
                            access => 'rw',
                            extract => 'ALWAYS' );
 
+  my $dir_pretty = $dir;
+  $dir_pretty =~ s/NonameTV-Data\.//i;
+  p "Running through $dir_pretty";
+
   foreach my $message ($folder->messages) {
     # Flag for delete
     if($message->label( 'flagged' )) {
-        next; # Skip
+    #    next; # Skip
     }
     #next unless $message->isMultipart;
 
@@ -311,10 +315,10 @@ sub guess_channel
     return "cartoonnetwork.dk" if $filename =~ /^cn\s*nordic\s+\(dan\)\s*\b/i;
     return "boomerangtv.dk" if $filename =~ /^boomerang\s*nordic\s*\(dan\)\s*\b/i;
 
-    return "tcmeurope.com" if $filename =~ /^tcm\s*nordic\s*\(eng\)\s*\b/i;
-    return "se.tcmeurope.com" if $filename =~ /^tcm\s*nordic\s*\(swe\)\s*\b/i;
-    return "no.tcmeurope.com" if $filename =~ /^tcm\s*nordic\s*\(nor\)\s*\b/i;
-    return "dk.tcmeurope.com" if $filename =~ /^tcm\s*nordic\s*\(dan\)\s*\b/i;
+    return "tcmeurope.com" if $filename =~ /^tcm\s*nordic/i and $filename =~ /eng/i;
+    return "se.tcmeurope.com" if $filename =~ /^tcm\s*nordic/i and $filename =~ /swe/i;
+    return "no.tcmeurope.com" if $filename =~ /^tcm\s*nordic/i and $filename =~ /\(NOR\)/i and $filename !~ /dan/ and $filename !~ /\.xls$/i;
+    return "dk.tcmeurope.com" if $filename =~ /^tcm\s*nordic/i and $filename =~ /dan/i;
 
 	# Excel (XLS)
 	if( $filename =~ /\.xls$/i ) {
@@ -329,7 +333,7 @@ sub guess_channel
 	}
 
 	# XML Germany
-	if( $filename =~ /\.xml$/i and $filename =~ /mediapress/i ) {
+	if( $filename =~ /\.xml$/i ) {
 	    return "cartoonnetwork.de" if $filename =~ /^CN_/i;
 	    return "boomerangtv.de" if $filename =~ /^Boomerang_/i;
 	    return "tnt-serie.de" if $filename =~ /^TNTSerie_/i;
