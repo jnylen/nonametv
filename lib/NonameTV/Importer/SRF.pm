@@ -111,6 +111,9 @@ sub ImportContent {
       my ($org_title) = $programme->findvalue ('./ORGTITEL');
       my ($cast) = $programme->findvalue ('./PERSONEN');
 
+      my $season = $programme->findvalue( './SEASON' );
+      my $episode = $programme->findvalue( './FOLGENR' );
+
       my $ce = {
 #        channel_id => $chd->{id},
         start_time => $time,
@@ -118,6 +121,7 @@ sub ImportContent {
       };
 
       my ($subtitle) = $programme->findvalue ('./UNTERTITEL');
+      my ($subtitle_org) = $programme->findvalue ('./ZUSATZTITEL');
       if( $subtitle ){
         $ce->{subtitle} = $subtitle;
       }
@@ -209,7 +213,17 @@ sub ImportContent {
 
 
 
-      $ce->{original_title} = norm(normLatin1($org_title)) if $org_title;
+      $ce->{original_title} = norm(normLatin1($org_title)) if $org_title and $org_title ne $title;
+      $ce->{original_subtitle} = norm(normLatin1($subtitle_org)) if $subtitle_org and $subtitle_org ne $subtitle;
+
+      # EPISODES
+      if($episode) {
+        if($season) {
+          $ce->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 );
+        } else {
+          $ce->{episode} = sprintf( " . %d . ", $episode-1 );
+        }
+      }
 
       $self->{datastorehelper}->AddProgramme( $ce );
     }
