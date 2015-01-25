@@ -84,6 +84,14 @@ sub ImportContent
             $title = $subtitle;
         }
 
+        # Program ID
+        my $prog_id = $sc->findvalue( './PROGRAM/@id' );
+
+        # This ones causes crashes
+        if($prog_id eq "") {
+            next;
+        }
+
         if ($title eq $subtitle) {
             $subtitle = "";
         } else {
@@ -205,6 +213,15 @@ sub ImportContent
     	$ce->{title} =~ s/Filmsommer://g;
     	$ce->{title} =~ s/Dokusommer://g;
     	$ce->{title} = norm($ce->{title});
+
+        # Sports
+        if($prog_id =~ /^MSP/i) {
+            $ce->{program_type} = "sports";
+        } elsif($prog_id =~ /^NNFA/i) {
+            $ce->{program_type} = "tvshow";
+            $ce->{category} = 'News';
+        }
+
         
         $dsh->AddProgramme( $ce );
 

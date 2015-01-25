@@ -91,7 +91,7 @@ sub ImportXLS
 
 						$columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
 						$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Titre/ );
-						$columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Horaire/ );
+						$columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Heure/ );
           
           	$columns{'Description'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Summary/ );
 
