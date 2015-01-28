@@ -59,3 +59,4 @@ tools/nonametv-import OKG $1 $2 $3
 tools/nonametv-import ServusTV $1 $2 $3
 tools/nonametv-import RussiaToday $1 $2 $3
 tools/nonametv-import SkyNews $1 $2 $3
+tools/nonametv-import DreiPlus $1 $2 $3

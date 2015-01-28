@@ -76,6 +76,7 @@ my @folders = qw(		 NonameTV-Data.MTV
 		 NonameTV-Data.DMB
 		 NonameTV-Data.PPS
 		 NonameTV-Data.ServusTV
+		 NonameTV-Data.DreiPlus
         );
 
 # Flag messages AFTER they have been processed. Then I normally
@@ -462,10 +463,8 @@ if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
  if( $dir =~ /TV8Norge/ and $filename =~ /\.xls|.xlsx$/i ) {
       return "ostfold.tv8norge.no" if $filename =~ /tv8ostfold/i;
       return "buskerud.tv8norge.no" if $filename =~ /tv8buskerud/i;
-      return "romerike.tv8norge.no" if $filename =~ /tv8romerike/i;
-      return "oslo.tv8norge.no" if $filename =~ /tv8oslo/i;
-      return "follo.tv8norge.no" if $filename =~ /tv8follo/i;
-      return "ab.tv8norge.no" if $filename =~ /tv8ab/i;
+      return "storby.tv8norge.no" if $filename =~ /tv8storby/i;
+
   }
 
  if( $dir =~ /FuelTV/ and $filename =~ /epg/i ) {
@@ -582,6 +581,12 @@ if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
 
  if ( $dir =~ /OKGoteborg/ and $filename =~ /\.doc$/i ) {
     return "oppnakanalengoteborg.se";
+ }
+
+ if( $dir =~ /DreiPlus/ and $filename =~ /\.(zip|xml)$/i ) {
+   return "3plus.tv" if $filename =~ /^dreiplus/i;
+   return "4plus.tv" if $filename =~ /^vierplus/i;
+   return "5plus.tv" if $filename =~ /^fuenfplus/i;
  }
 
   return undef;
