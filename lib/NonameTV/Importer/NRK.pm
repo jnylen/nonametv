@@ -217,6 +217,7 @@ sub ImportContent
         # Sports
         if($prog_id =~ /^MSP/i) {
             $ce->{program_type} = "sports";
+            $ce->{category} = 'Sports';
         } elsif($prog_id =~ /^NNFA/i) {
             $ce->{program_type} = "tvshow";
             $ce->{category} = 'News';
