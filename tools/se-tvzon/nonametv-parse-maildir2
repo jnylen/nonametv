@@ -77,6 +77,10 @@ my @folders = qw(		 NonameTV-Data.MTV
 		 NonameTV-Data.PPS
 		 NonameTV-Data.ServusTV
 		 NonameTV-Data.DreiPlus
+		 NonameTV-Data.Classica
+		 NonameTV-Data.HopeChannel
+		 NonameTV-Data.SSF
+		 NonameTV-Data.Discovery
         );
 
 # Flag messages AFTER they have been processed. Then I normally
@@ -587,6 +591,25 @@ if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
    return "3plus.tv" if $filename =~ /^dreiplus/i;
    return "4plus.tv" if $filename =~ /^vierplus/i;
    return "5plus.tv" if $filename =~ /^fuenfplus/i;
+ }
+
+ if( $dir =~ /Classica/ and $filename =~ /\.xlsx$/i ) {
+   return "classica.de";
+ }
+
+ if( $dir =~ /HopeChannel/ and $filename =~ /\.xml$/i ) {
+   return "hope-channel.de";
+ }
+
+ if( $dir =~ /SSF/ and $filename =~ /\.xlsx$/i ) {
+   return "ssfmedia.ch";
+ }
+
+ if( $dir =~ /Discovery/ and $filename =~ /\.(xml|zip)$/i ) {
+    return "dmax.discovery.de" if $filename =~ /^dmax/i;
+    return "tlc.discovery.de" if $filename =~ /^tlc/i;
+    return "animalplanet.discovery.de" if $filename =~ /^ap/i;
+    return "discovery.de" if $filename =~ /^dc/i;
  }
 
   return undef;

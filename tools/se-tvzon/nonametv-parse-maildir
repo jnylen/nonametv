@@ -370,8 +370,12 @@ sub guess_channel
 	}
   }
  
- if( $dir =~ /Kanal10/ and $filename =~ /\.doc$/i ) {
+ if( $dir =~ /Kanal10/ and $filename =~ /\.doc$/i and $from =~ /\@kanal10.se/i ) {
      return "kanal10.se";
+ }
+
+ if( $dir =~ /Kanal10/ and $filename =~ /\.xlsx$/i and $from =~ /\@kanal10.no/i ) {
+    return "kanal10.no";
  }
 
  if( $dir =~ /France24/ and $filename =~ /\.zip$/i ) {

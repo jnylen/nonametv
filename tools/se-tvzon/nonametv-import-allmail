@@ -5,6 +5,7 @@ tools/nonametv-import Discovery $1 $2 $3
 tools/nonametv-import DisneyChannel $1 $2 $3
 tools/nonametv-import DWDE $1 $2 $3
 tools/nonametv-import Kanal10 $1 $2 $3
+tools/nonametv-import Kanal10NO $1 $2 $3
 tools/nonametv-import Motors $1 $2 $3
 tools/nonametv-import Mtve_mail $1 $2 $3
 tools/nonametv-import NatGeoWild $1 $2 $3
@@ -60,3 +61,7 @@ tools/nonametv-import ServusTV $1 $2 $3
 tools/nonametv-import RussiaToday $1 $2 $3
 tools/nonametv-import SkyNews $1 $2 $3
 tools/nonametv-import DreiPlus $1 $2 $3
+tools/nonametv-import Classica $1 $2 $3
+tools/nonametv-import HopeChannel $1 $2 $3
+tools/nonametv-import SSF $1 $2 $3
+tools/nonametv-import DMAX $1 $2 $3
