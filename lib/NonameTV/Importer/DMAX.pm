@@ -180,15 +180,22 @@ sub ImportXML
 
         $ce->{title} = norm($xpc->findvalue( 's:titel/@termintitel' ));
 
-        my $title_org;
+        my ($season, $title_org, $folge, $staffel);
         $title_org = $xpc->findvalue( 's:titel/s:alias[@titelart="originaltitel"]/@aliastitel' );
-        $ce->{original_title} = norm($title_org) if $title_org and $ce->{title} ne norm($title_org) and norm($title_org) ne "";
+        if (defined $title_org) {
+            $season = ($title_org =~ /\(Season (\d+)\)/);
+            $title_org =~ s/\(Season (\d+)\)//g;
+            $ce->{original_title} = norm($title_org) if $title_org and $ce->{title} ne norm($title_org) and norm($title_org) ne "";
+        }
 
-        my ($folge, $staffel);
         my $subtitle = $xpc->findvalue( 's:titel/s:alias[@titelart="untertitel"]/@aliastitel' );
         my $subtitle_org = $xpc->findvalue( 's:titel/s:alias[@titelart="originaluntertitel"]/@aliastitel' );
         if( $subtitle ){
-          if( ( $folge, $staffel ) = ($subtitle =~ m|^Folge (\d+) \((\d+)\. Staffel\)$| ) ){
+          if( defined($season) and ( $folge ) = ($subtitle =~ m|^Episode (\d+)| ) ){
+            $ce->{episode} = ($season - 1) . ' . ' . ($folge - 1) . ' .';
+          } elsif( defined($season) and ( $folge ) = ($subtitle =~ m|^Eps\. (\d+)| ) ){
+            $ce->{episode} = ($season - 1) . ' . ' . ($folge - 1) . ' .';
+          } elsif( ( $folge, $staffel ) = ($subtitle =~ m|^Folge (\d+) \((\d+)\. Staffel\)$| ) ){
             $ce->{episode} = ($staffel - 1) . ' . ' . ($folge - 1) . ' .';
           } elsif( ( $folge, $staffel ) = ($subtitle =~ m|^Folge (\d+) \(Staffel (\d+)\)$| ) ){
             $ce->{episode} = ($staffel - 1) . ' . ' . ($folge - 1) . ' .';
