@@ -428,6 +428,8 @@ DK4,fakta,Documentary,
 DK4,fitness,sports,
 DK4,historie,History,
 DK4,lifestyle,Lifestyle,
+DMAX,serie,\N,series
+DMAX,sonstiges,\N,series
 DR,actionfilm,Action,movie
 DR,"ãkonomi",News,
 DR,"bã¸rn & ungdom",Children's/Youth,
@@ -458,6 +460,35 @@ DR,undervisning,Education,
 DR,ungdom,Youth,
 DR,"videnskab & teknologi",Tech,
 DR,økonomi,News,
+DreiPlus,abenteuer-action,Action/Adventure,
+DreiPlus,abenteuer-komödie,Adventure/Comedy,
+DreiPlus,action,Action,
+DreiPlus,action-abenteuer,Action/Adventure,
+DreiPlus,action-komödie,Action/Comedy,
+DreiPlus,action-thriller,Action/Thriller,
+DreiPlus,casting-show,\N,series
+DreiPlus,dokumentation,Documentary,
+DreiPlus,dokumentations-serie,Documentary,series
+DreiPlus,drama-romanze,Drama/Romance,
+DreiPlus,drama-thriller,Drama/Thriller,
+DreiPlus,dramaserie,Drama,series
+DreiPlus,esoterik-talkshow,Talkshow,series
+DreiPlus,fantasy-action,Fantasy/Action,
+DreiPlus,historien-drama,History/Drama,
+DreiPlus,jugendmagazin,\N,series
+DreiPlus,komödie,Comedy,
+DreiPlus,krankenhaus-serie,Medical,series
+DreiPlus,krimiserie,Crime,series
+DreiPlus,musik-castingshow,\N,series
+DreiPlus,reality-doku,Reality/Documentary,
+DreiPlus,"romantische komödie",Romance/Comedy,
+DreiPlus,"schweizer doku-soap",\N,series
+DreiPlus,"schweizer dokusoap",\N,series
+DreiPlus,"schweizer komödie",Comedy,
+DreiPlus,"science fiction-komödie",Sci-Fi/Comedy,
+DreiPlus,sitcom,Sitcom,series
+DreiPlus,teleshopping,Teleshopping,tvshow
+DreiPlus,thriller,Thriller,
 DreiSat_category,"chansons und lieder",Music,
 DreiSat_category,jazz,Music,
 DreiSat_category,kinderfiction,Kids,
@@ -680,15 +711,21 @@ Kanal5_xml,film,\N,movie
 Kanal5_xml,program,\N,series
 Kanal5_xml,series,\N,series
 Kanal5_xml,sport,\N,sports
+MTVde,"action series",Action,series
+MTVde,barneserie,Children's,series
 MTVde,barnprogram,Children's,series
+MTVde,børneserie,Children's,series
+MTVde,"children film",Children's,movie
 MTVde,"children series",Children's,series
 MTVde,comedy,Comedy,series
 MTVde,film,Movies,movie
+MTVde,kinderfilm,\N,movie
 MTVde,livsstil,Lifestyle,series
 MTVde,livsstilsprogram,Lifestyle,series
 MTVde,livsstilsserie,Lifestyle,series
 MTVde,movie,Movies,movie
 MTVde,"reality soap",Reality/Soap,series
+MTVde,reality-sarja,\N,series
 MTVde,reality-serie,Reality,series
 MTVde,serie,\N,series
 MTVde,series,\N,series
@@ -1092,6 +1129,7 @@ SonyDE_genre,sci-fi,Sci-Fi,
 SonyDE_genre,thriller,Thriller,
 SonyDE_type,fil,\N,movie
 SonyDE_type,movi,\N,movie
+SonyDE_type,seri,\N,series
 SonyDE_type,series,\N,series
 SRF,serie,\N,series
 SRF,"serie (animation)",Animation,series

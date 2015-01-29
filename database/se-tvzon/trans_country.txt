@@ -1,4 +1,5 @@
 Arte,afghanistan,AF
+Arte,ägypten,\N
 Arte,australien,AU
 Arte,belgien,BE
 Arte,bolivien,BO
@@ -23,11 +24,15 @@ Arte,israel,IL
 Arte,italien,IT
 Arte,japan,JP
 Arte,jugoslawien,MK
+Arte,kambodscha,\N
 Arte,kanada,CA
+Arte,kasachstan,\N
 Arte,korea,KR
+Arte,kroatien,\N
 Arte,lettland,\N
 Arte,luxemburg,LU
 Arte,madagaskar,MG
+Arte,makedonien,\N
 Arte,mexiko,MX
 Arte,neuseeland,\N
 Arte,niederlande,NL
@@ -37,14 +42,18 @@ Arte,philippinen,\N
 Arte,polen,PL
 Arte,portugal,PT
 Arte,rumänien,RO
+Arte,"russische föderation",\N
 Arte,russland,RU
 Arte,schweden,SE
 Arte,schweiz,CH
 Arte,serbien,RS
 Arte,slowenien,\N
 Arte,spanien,ES
+Arte,"sri lanka",\N
+Arte,südafrika,\N
 Arte,sudafrikasüdafrika,ZA
 Arte,südkorea,KR
+Arte,syrien,\N
 Arte,thailand,TH
 Arte,"tschechische republik",CZ
 Arte,türkei,TR
@@ -58,7 +67,9 @@ CarusMedia,ausatralien,AU
 CarusMedia,australien,AU
 CarusMedia,brd,DE
 CarusMedia,ch,CH
+CarusMedia,d,\N
 CarusMedia,deutschland,DE
+CarusMedia,f,\N
 CarusMedia,irland,IE
 CarusMedia,neuseeland,NZ
 CarusMedia,nor,NO
@@ -71,10 +82,12 @@ CMore,australien,AU
 CMore,belgium,BE
 CMore,canada,CA
 CMore,china,CH
+CMore,"czech republic",\N
 CMore,danmark,DK
 CMore,danmark/sverige,DK/SE
 CMore,denmark,DK
 CMore,england,GB
+CMore,erotik,\N
 CMore,espanja,ES
 CMore,finland,FI
 CMore,france,FR
@@ -90,6 +103,8 @@ CMore,israel,IL
 CMore,italy,IT
 CMore,japan,JP
 CMore,kanada,CA
+CMore,malaysia,\N
+CMore,netherlands,\N
 CMore,"new zealand",NZ
 CMore,norway,NO
 CMore,ranska,FR
@@ -111,6 +126,7 @@ CMore,"united kingdom",GB
 CMore,"united states",US
 CMore,unkari,HU
 CMore,usa,US
+DR,amerika,\N
 DR,argentina,\N
 DR,asien,\N
 DR,australien,AU
@@ -129,12 +145,16 @@ DR,grækenland,GR
 DR,holland,NL
 DR,"ikke geografisk bestemt",\N
 DR,"ikke placerbart på verdensdele",\N
+DR,indonesien,\N
 DR,iran,\N
 DR,irland,IE
 DR,island,\N
+DR,israel,\N
 DR,italien,IT
 DR,japan,JP
+DR,kina,\N
 DR,litauen,\N
+DR,marokko,\N
 DR,mellemøsten,\N
 DR,mexico,MX
 DR,"new zealand",\N
@@ -142,6 +162,7 @@ DR,"nordamerika udenfor usa",\N
 DR,norden,\N
 DR,norge,NO
 DR,polen,PL
+DR,qatar,\N
 DR,"restjugoslavien (serbien & monten.)",RS/ME
 DR,rusland,RU
 DR,"schweiz & lichtenstein",CH/LI
@@ -150,15 +171,20 @@ DR,storbritannien,GB
 DR,sverige,SE
 DR,syd-afika,\N
 DR,"sydafikanske republik, den",\N
+DR,sydamerika,\N
 DR,tjekkiet,\N
 DR,tyskland,DE
 DR,ukraine,\N
 DR,ungarn,\N
 DR,usa,US
+DR,vesteuropa,\N
+DR,"vestlige mellem-europa",\N
 DR,øst-asien,\N
 DR,"østlige europa",\N
 DR,østrig,AT
+FOXTV,finland,\N
 FOXTV,france,FR
+FOXTV,greece,\N
 FOXTV,null,\N
 FOXTV,"united kingdom",UK
 FOXTV,"united states",US
@@ -170,13 +196,16 @@ KFZ,ausatralien,AU
 KFZ,australien,AU
 KFZ,austria,\N
 KFZ,b,BE
+KFZ,belgien,\N
 KFZ,bg,BG
 KFZ,br,BR
 KFZ,brasilien,\N
 KFZ,brd,DE
 KFZ,c,\N
 KFZ,cdn,CA
+KFZ,"cdn, cdn",\N
 KFZ,ch,CH
+KFZ,co,\N
 KFZ,cs,\N
 KFZ,cz,CZ
 KFZ,d,DE
@@ -189,6 +218,7 @@ KFZ,f,FR
 KFZ,fin,FI
 KFZ,frankreich,\N
 KFZ,gb,GB
+KFZ,"gb, gb",\N
 KFZ,"großbritannien",\N
 KFZ,h,HU
 KFZ,hk,HK
@@ -202,6 +232,7 @@ KFZ,irland,IE
 KFZ,island,\N
 KFZ,italien,\N
 KFZ,j,JP
+KFZ,japan,\N
 KFZ,kanada,\N
 KFZ,kp,\N
 KFZ,kz,\N
@@ -209,6 +240,7 @@ KFZ,l,LU
 KFZ,lt,LT
 KFZ,m,MT
 KFZ,ma,MA
+KFZ,mal,\N
 KFZ,mex,MX
 KFZ,mongolei,\N
 KFZ,n,NO
@@ -221,7 +253,9 @@ KFZ,norwegen,NO
 KFZ,nz,NZ
 KFZ,österreich,\N
 KFZ,p,PT
+KFZ,peru,\N
 KFZ,pk,PK
+KFZ,pl,\N
 KFZ,portugal,PT
 KFZ,ra,AR
 KFZ,rc,\N
@@ -239,6 +273,7 @@ KFZ,tj,TJ
 KFZ,ua,UA
 KFZ,uk,UK
 KFZ,usa,US
+KFZ,"usa, usa",\N
 KFZ,vrc,CN
 KFZ,za,ZA
 Nonstop,australia,AU
@@ -297,6 +332,7 @@ PPS,usa,US
 RAI,alg,DZ
 RAI,aus,AU
 RAI,aut,AT
+RAI,"aveva bruciato una discoteca ed ucciso 22 pe",\N
 RAI,bel,\N
 RAI,bra,BR
 RAI,c,\N
@@ -311,6 +347,7 @@ RAI,ger,DE
 RAI,hgk,HR
 RAI,ind,IN
 RAI,irl,IE
+RAI,irn,\N
 RAI,isr,\N
 RAI,ita,IT
 RAI,jap,JP
@@ -318,14 +355,17 @@ RAI,mex,\N
 RAI,nor,NO
 RAI,nze,NZ
 RAI,ola,\N
+RAI,pol,\N
 RAI,rok,KR
 RAI,rt,\N
 RAI,rus,\N
 RAI,spa,ES
+RAI,su,\N
 RAI,sve,SE
 RAI,svi,CH
 RAI,taw,\N
 RAI,tha,TH
+RAI,tur,\N
 RAI,uk,GB
 RAI,usa,US
 RAI,yv,\N
@@ -333,10 +373,12 @@ SBSTV,-,\N
 SBSTV,amr,US
 SBSTV,austr,AU
 SBSTV,can,\N
+SBSTV,comedy,\N
 SBSTV,dansk,DK
 SBSTV,eng,GB
 SBSTV,fodbold,\N
 SBSTV,italiensk,\N
+SBSTV,"krimidokumentar,",\N
 SBSTV,norsk,NO
 SBSTV,spansk,\N
 SBSTV,svensk,\N
@@ -362,36 +404,49 @@ SonyDE,südafrika,\N
 SonyDE,südkorea,KR
 SonyDE,ungarn,HU
 SonyDE,usa,US
+SRF,ägypten,\N
 SRF,atlantik,\N
 SRF,australien,AU
 SRF,aut,AT
 SRF,belgien,BE
+SRF,brasilien,\N
+SRF,canada,\N
 SRF,ch,CH
+SRF,china,\N
+SRF,cssr,\N
 SRF,dänemark,DK
+SRF,ddr,\N
 SRF,"deutsche schweiz",CH
 SRF,deutschland,DE
 SRF,england,GB
 SRF,finnland,\N
 SRF,frankreich,FR
 SRF,"französische schweiz",\N
+SRF,gb,\N
 SRF,griechenland,GR
 SRF,grossbritannien,GB
 SRF,holland,NL
 SRF,hongkong,\N
+SRF,indien,\N
 SRF,iran,IR
 SRF,irland,IE
 SRF,israel,\N
 SRF,italien,IT
 SRF,japan,JP
 SRF,kanada,CA
+SRF,korea,\N
 SRF,luxemburg,LU
+SRF,mosambik,\N
 SRF,neuseeland,NZ
 SRF,niederlande,NL
 SRF,niger,\N
+SRF,nl,\N
 SRF,"nord- und südpazifik",\N
 SRF,norwegen,\N
 SRF,oesterreich,AT
 SRF,österreich,AT
+SRF,philippinen,\N
+SRF,polen,\N
 SRF,rumänien,\N
 SRF,russland,\N
 SRF,schweden,SE
@@ -399,14 +454,20 @@ SRF,schweiz,CH
 SRF,singapur,\N
 SRF,slowakei,\N
 SRF,spanien,ES
+SRF,südkorea,\N
 SRF,türkei,TR
 SRF,ungarn,\N
+SRF,urugay,\N
 SRF,usa,US
 TV2NO,amerikansk,US
+TV2NO,amerikansk/britisk,\N
 TV2NO,australsk,AU
 TV2NO,britisk,GB
+TV2NO,britisk-amerikansk,\N
 TV2NO,canadisk,CA
 TV2NO,dansk,DK
+TV2NO,finland,\N
+TV2NO,finsk,\N
 TV2NO,fransk,FR
 TV2NO,indisk,IN
 TV2NO,irsk,IE
@@ -420,6 +481,8 @@ TV2NO,polsk,\N
 TV2NO,spansk,ES
 TV2NO,svensk,SE
 TV2NO,tysk,DE
+TV2NO,østerisk,\N
+TV2NO,østerriksk,\N
 TVNorge,amerikansk,US
 TVNorge,australsk,AU
 TVNorge,britisk,GB
@@ -459,6 +522,7 @@ Viasat,my,MY
 Viasat,nl,NL
 Viasat,no,NO
 Viasat,nz,NZ
+Viasat,pe,\N
 Viasat,pr,\N
 Viasat,ro,RO
 Viasat,ru,RU

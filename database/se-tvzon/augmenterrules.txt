@@ -933,3 +933,11 @@
 1078,Tvdb,^.*$,program_type,series,\N,guess
 1077,TvdbNO,^.*$,program_type,series,\N,guess
 1076,TvdbDK,^.*$,program_type,series,\N,guess
+1084,TvdbDK,^.*$,program_type,series,\N,episodeseason
+1088,TvdbDE,^.*$,program_type,series,\N,guess
+1089,TvdbDE,^.*$,program_type,series,\N,guess
+1090,TvdbDE,^.*$,program_type,series,\N,guess
+1091,TvdbDE,^.*$,program_type,series,\N,guess
+1092,TvdbDE,^.*$,program_type,series,\N,guess
+1093,TvdbDE,^.*$,program_type,series,\N,guess
+1094,TvdbDE,^.*$,program_type,series,\N,guess
