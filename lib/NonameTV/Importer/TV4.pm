@@ -305,6 +305,8 @@ sub ImportContent
 
     $ce->{title} =~ s/\:$//;
 
+    $ce->{program_type} = 'series' if defined($ce->{episode});
+
     progress($date." ".$starttime." - ".$ce->{title});
     
     $dsh->AddProgramme( $ce );
