@@ -148,12 +148,6 @@ sub ImportContent
       guests       => norm($guests),
     };
 
-    if( defined( $episode ) and ($episode =~ /\S/) )
-    {
-      $ce->{episode} = norm($episode);
-      $ce->{program_type} = 'series';
-    }
-
     if(defined ( $directors ) and ($directors ne "")) {
       $ce->{program_type} = 'movie';
     }
@@ -197,13 +191,18 @@ sub ImportContent
 
     # image
     if(defined($image) and $image ne "") {
-        #static.tv2.no/presse/images/medium/GREYSANATOMY_Y9_186_019.jpg
+        #static.tv2.no/presse/images/medium/GREYSANATOMY_Y9_186_019.jpg => presse.tv2.no/presse/images/original/GREYSANATOMY_Y9_186_019.jpg
         $ce->{fanart} = $image;
         $ce->{fanart} =~ s/static\./presse\./;
         $ce->{fanart} =~ s/images\/medium/images\/original/;
     }
 
-
+    # episode
+    if( defined( $episode ) and ($episode =~ /\S/) )
+    {
+      $ce->{episode} = norm($episode);
+      $ce->{program_type} = 'series';
+    }
 
     $ce->{subtitle} = undef;
     progress("TV2_Norway: $chd->{xmltvid}: $start - $ce->{title}");
