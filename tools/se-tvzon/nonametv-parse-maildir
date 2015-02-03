@@ -89,6 +89,10 @@ foreach my $dir (@folders) {
                            access => 'rw',
                            extract => 'ALWAYS' );
 
+  my $dir_pretty = $dir;
+  $dir_pretty =~ s/NonameTV-Data\.//i;
+  p "Running through $dir_pretty";
+
   foreach my $message ($folder->messages) {
     # Flag for delete
     if($message->label( 'flagged' )) {
@@ -282,8 +286,9 @@ sub guess_channel
     return "de.eonline.com"  if $filename =~ /^eent\.ger\b/i and $filename =~ /\.xls$/i;
     return "de.eonline.com"  if $filename =~ /^e\s*ger\b/i and $filename =~ /\.xls$/i;
 
-    # FOX TV Norway
+    # FOX TV
     return "foxtv.no"       if $filename =~ /^fox\s+norway/i;
+    return "foxtv.no"       if $filename =~ /^fox\.cr\.nor/i;
     return "foxtv.se"       if $filename =~ /^fox\s+sweden/i and $filename =~ /\.xml$/i;
 
     # H2
