@@ -73,12 +73,6 @@ sub ImportContent
     }
 
     #
-    # end time
-    #
-    my $length = $sc->findvalue( 'length' );
-    my $end = $start->clone()->add(seconds => $length);
-
-    #
     # title, subtitle
     #
     my ($title, $org_title);
@@ -139,7 +133,6 @@ sub ImportContent
       subtitle     => norm($subtitle),
       description  => norm($desc),
       start_time   => $start->ymd("-") . " " . $start->hms(":"),
-      end_time     => $end->ymd("-") . " " . $end->hms(":"),
       directors    => norm($directors),
       actors       => norm($actors),
       writers      => norm($writers),
