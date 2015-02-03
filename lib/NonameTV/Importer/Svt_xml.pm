@@ -299,6 +299,10 @@ sub ImportXML
       {
         $ce->{episode} = sprintf( "%d . %d/%d .", $season-1, $episode-1, $of_episode );
       }
+      elsif( ($episode ne "0" and $episode ne "") and ( $season ne "0" and $season ne "") )
+      {
+        $ce->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 );
+      }
       elsif( ($episode ne "0" and $episode ne "") and ( $of_episode ne "0" and $of_episode ne "") )
       {
       	if( defined( $year ) and ($year =~ /(\d\d\d\d)/) ) {
@@ -306,10 +310,6 @@ sub ImportXML
       	} else {
         	$ce->{episode} = sprintf( ". %d/%d .", $episode-1, $of_episode );
         }
-      }
-      elsif( ($episode ne "0" and $episode ne "") and ( $season ne "0" and $season ne "") )
-      {
-        $ce->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 );
       }
       elsif( $episode ne "0" and $episode ne "" )
       {
