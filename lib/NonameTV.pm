@@ -29,12 +29,12 @@ BEGIN {
     @EXPORT_OK   = qw/MyGet expand_entities 
                       Html2Xml Htmlfile2Xml
                       Word2Xml Wordfile2Xml 
-		      File2Xml Content2Xml
-		      FindParagraphs
+		              File2Xml Content2Xml
+		              FindParagraphs
                       norm normLatin1 normUtf8
                       AddCategory AddCountry
                       ParseDescCatSwe FixProgrammeData
-		      ParseXml ParseXmltv ParseJson
+		              ParseXml ParseXmltv ParseJson
                       MonthNumber DayNumber
                       CompareArrays
                      /;
@@ -199,7 +199,6 @@ sub Htmlfile2Xml
 
   return Html2Xml( $html );
 }
-
 
 =item Word2Xml( $content )
 
@@ -945,7 +944,7 @@ sub MonthNumber {
     @months_8 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
   } elsif( $lang =~ /^ru$/ ){
     @months_1 = qw/jan feb mar apr may jun jul avg sep oct nov dec/;
-    @months_2 = qw/janvarja fevral marsh aprelja mai juin ijulja avgusta sentjabrja oktjabrja nojabrja dekabrja/;
+    @months_2 = qw/janvarja fevralja marsh aprelja mai juin ijulja avgusta sentjabrja oktjabrja nojabrja dekabrja/;
     @months_3 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_4 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_5 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
