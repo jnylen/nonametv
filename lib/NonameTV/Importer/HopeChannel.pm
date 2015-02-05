@@ -113,8 +113,10 @@ sub ImportXML
       channel_id => $chd->{id},
       title => norm($stitle),
       start_time => $date . " " . $starttime,
-      description => norm($desc),
     };
+
+#
+
 
     # Subtite
     if($subtitle ne "") {
