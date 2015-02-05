@@ -609,7 +609,7 @@ if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
     return "dmax.discovery.de" if $filename =~ /^dmax/i;
     return "tlc.discovery.de" if $filename =~ /^tlc/i;
     return "animalplanet.discovery.de" if $filename =~ /^ap/i;
-    return "discovery.de" if $filename =~ /^dc/i;
+    #return "discovery.de" if $filename =~ /^dc/i;
  }
 
   return undef;

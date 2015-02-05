@@ -1,3 +1,4 @@
 *~
 override.conf
 tools/se-tvzon/convert_jsontv/env/
+.env

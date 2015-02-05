@@ -30,6 +30,7 @@ def copy_to_channels(file_name)
     { :xmltvid => "hd.natgeo.de", :info => "NATIONAL GEOGRAPHIC HD" }, { :xmltvid => "passion.de", :info => "PASSION" },
     { :xmltvid => "romance-tv.de", :info => "ROMANCE TV" }, { :xmltvid => "crime.rtl.de", :info => "RTL Crime" },
     { :xmltvid => "crimehd.rtl.de", :info => "RTL Crime HD" }, { :xmltvid => "living.rtl.de", :info => "RTL LIVING" },
+    { :xmltvid => "discovery.de", :info => "Discovery Channel" }, { :xmltvid => "hd.discovery.de", :info => "Discovery Channel HD" },
 
     { :xmltvid => "3d.sky.de", :info => "SKY HD-3D" }, { :xmltvid => "action.sky.de", :info => "Sky Action" },
     { :xmltvid => "actionhd.sky.de", :info => "Sky Action HD" }, { :xmltvid => "atlantic.sky.de", :info => "SKY ATLANTIC" },
@@ -114,7 +115,7 @@ a.get('http://info.sky.de/inhalt/de/programm_info_presseexport_start.jsp') do |h
         end
       else
         File.open('/nonametv/skyde/' + file_name, 'wb'){ |f| f << Zlib::GzipReader.new(StringIO.new(a.get('http://info.sky.de' + link.href).body.to_s)).read }
-        puts "Added #{file_name}"
+        puts "Downloaded #{file_name}"
 
         # Channels
         copy_to_channels('/nonametv/skyde/' + file_name)
