@@ -54,6 +54,7 @@ sub ImportContentFile {
   my( $service_id, $usedesc ) = split( /:/, $chd->{grabber_info} );
 
   my $cref;
+  my $doc;
   if($filename =~ /\.gz$/i) {
       open FOO, "<:gzip", $filename or die $!;
 
@@ -63,29 +64,16 @@ sub ImportContentFile {
 
       close (FOO);
   } else {
-    $cref=`cat \"$filename\"`;
+      my $xml = XML::LibXML->new;
+      eval { $doc = $xml->parse_file($filename); };
+
+      if (not defined ($doc)) {
+        f ("$filename: Failed to parse.");
+        return 0;
+      }
   }
 
-
-  $cref =~ s|
-  ||g;
-
-  $cref =~ s| xmlns:MPExport='http://pgv.premiere.de/2004/XMLSchemaLIB/MedienportalExport'||;
-  $cref =~ s| xmlns:xsi='http://www.w3.org/2001/XMLSchema'||;
-  $cref =~ s| xmlns:schemaLocation='[^']+'||;
-
-  $cref =~ s| generierungsdatum='[^']+'| generierungsdatum=''|;
-
-
-  my $doc;
   my $currdate = "x";
-  my $xml = XML::LibXML->new;
-  eval { $doc = $xml->parse_string($cref); };
-
-  if (not defined ($doc)) {
-    f ("$filename: Failed to parse.");
-    return 0;
-  }
 
   # XPC
   my $xpc = XML::LibXML::XPathContext->new( );
