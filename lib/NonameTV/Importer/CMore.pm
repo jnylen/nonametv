@@ -48,7 +48,7 @@ sub Object2Url {
   my( $date ) = ($objectname =~ /_(.*)/);
 
 #  my $url = 'http://press.cmore.se/export/xml/' . $date . '/' . $date . '/?channelId=' . $chd->{grabber_info};
-  my $url = $self->{UrlRoot} . 'export/xml/' . $date . '/' . $date . '/?channelId=' . $chd->{grabber_info};
+  my $url = $self->{UrlRoot} . 'export/xml/' . $date . '/' . $date . '?channelId=' . $chd->{grabber_info};
 
   return( $url, undef );
 }
