@@ -594,7 +594,7 @@ if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
  }
 
  if( $dir =~ /Classica/ and $filename =~ /\.xlsx$/i ) {
-   return "classica.de";
+ #  return "classica.de";
  }
 
  if( $dir =~ /HopeChannel/ and $filename =~ /\.xml$/i ) {
