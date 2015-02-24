@@ -50,6 +50,7 @@ $channel_data{ "mtv" } = "mtv3.fi";
 $channel_data{ "nef" } = "nappula.nelonen.fi";
 $channel_data{ "nel" } = "nelonen.fi";
 $channel_data{ "nek" } = "prime.nelonen.fi";
+$channel_data{ "fri" } = "frii.sbs.fi";
 $channel_data{ "utp" } = "pro1.nelonen.fi";
 $channel_data{ "ur1" } = "pro2.nelonen.fi";
 $channel_data{ "r48" } = "puhe.radio.yle.fi";
