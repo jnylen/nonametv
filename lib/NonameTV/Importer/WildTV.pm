@@ -178,8 +178,18 @@ sub ImportXML
       title        => norm($title),
       start_time   => $start->hms(":"),
       end_time     => $end->hms(":"),
-      description  => norm($desc),
     };
+
+    $ce->{description} = norm($desc) if norm($desc) ne norm($title);
+
+    my( $t, $st ) = ($ce->{title} =~ /(.*)\: (.*)/);
+    if( defined( $st ) )
+    {
+      # This program is part of a series and it has a colon in the title.
+      # Assume that the colon separates the title from the subtitle.
+      $ce->{title} = $t;
+      $ce->{subtitle} = $st if $st ne $t;
+    }
 
     $dsh->AddProgramme( $ce );
 
