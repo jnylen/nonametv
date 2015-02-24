@@ -260,46 +260,11 @@ $channel_data{ "tv4film.boxer.se" } =
     "film.tv4.se" =>
 	[
           {
-             day => 'fr',
-             time => '2100-0100',
-          },
-          {
-             day => 'sa',
-          },
-          {
-             day => 'su',
-          },
-
-          {
-          	 day => 'mo',
-          	 time => '0000-0800',
-          },
+             day => 'all',
+             time => '1800-0600',
+          }
 	],
-    };
-
-$channel_data{ "tv4fakta.boxer.se" } =
-  {
-    "fakta.tv4.se" =>
-	[
-        {
-          day => 'mo',
-	  time => '0800-0100',
-        },
-        {
-          day => 'tu',
-        },
-        {
-          day => 'we',
-        },
-        {
-          day => 'th',
-        },
-        {
-          day => 'fr',
-	  time => '0000-2100',
-        },
-	],
-    };
+  };
 
 =pod
 
@@ -484,7 +449,6 @@ $channel_data{ "ch.nickcc.mtvnetworks.de" } =
 
 =pod
 
-<<<<<<< HEAD
 NRK3 and NRK Super TV shares the same slot so the programmes dont overlap.for
 
 =cut
@@ -504,45 +468,6 @@ $channel_data{ "nrk3super.nrk.no" } =
         },
       ],
   };
-
-=pod
-
-Viva Germany / Comedy Central. The share the same channel and do not overlap.
-
-=cut
-
-$channel_data{ "vivacc.mtvnetworks.de" } =
-  { 
-    "viva.de" => 
-      [ 
-        {
-          day => 'all',
-        },
-      ],
-    "comedycentral.de" =>
-      [
-        {
-          day => 'all',
-        },
-      ],
-  };
-
-$channel_data{ "ch.vivacc.mtvnetworks.de" } =
-  { 
-    "viva.ch" => 
-      [ 
-        {
-          day => 'all',
-        },
-      ],
-    "comedycentral.ch" =>
-      [
-        {
-          day => 'all',
-        },
-      ],
-  };
-
 
 
 =pod
