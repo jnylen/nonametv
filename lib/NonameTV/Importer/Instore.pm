@@ -251,7 +251,7 @@ sub create_dt
   {
     return undef;
   }
-  my( $day, $month, $year ) = split( '\/', $date );
+  my( $day, $month, $year ) = split( '\-', $date );
 
   # Remove the dot and everything after it.
   $time =~ s/\..*$//;
