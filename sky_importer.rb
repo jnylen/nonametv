@@ -31,6 +31,7 @@ def copy_to_channels(file_name)
     { :xmltvid => "romance-tv.de", :info => "ROMANCE TV" }, { :xmltvid => "crime.rtl.de", :info => "RTL Crime" },
     { :xmltvid => "crimehd.rtl.de", :info => "RTL Crime HD" }, { :xmltvid => "living.rtl.de", :info => "RTL LIVING" },
     { :xmltvid => "discovery.de", :info => "Discovery Channel" }, { :xmltvid => "hd.discovery.de", :info => "Discovery Channel HD" },
+    { :xmltvid => "classica.de", :info => "CLASSICA" },
 
     { :xmltvid => "3d.sky.de", :info => "SKY HD-3D" }, { :xmltvid => "action.sky.de", :info => "Sky Action" },
     { :xmltvid => "actionhd.sky.de", :info => "Sky Action HD" }, { :xmltvid => "atlantic.sky.de", :info => "SKY ATLANTIC" },
@@ -50,7 +51,7 @@ def copy_to_channels(file_name)
     { :xmltvid => "spiegel-geschichte.tv", :info => "SPIEGEL GESCHICHTE" }, { :xmltvid => "hd.spiegel-geschichte.tv", :info => "SPIEGEL GESCHICHTE HD" },
     { :xmltvid => "sportdigital.tv", :info => "SPORTDIGITAL.TV" }, { :xmltvid => "syfy.de", :info => "SCI FI" },
     { :xmltvid => "hd.syfy.de", :info => "SCI FI HD" }, { :xmltvid => "tnt-film.de", :info => "TNT FILM" },
-    { :xmltvid => "tnt-glitz.tv", :info => "TNT GLITZ" }, { :xmltvid => "hd.tnt-glitz.tv", :info => "TNT GLITZ HD" },
+    { :xmltvid => "hd.tnt-glitz.tv", :info => "TNT GLITZ HD" },
     { :xmltvid => "tnt-serie.de", :info => "TNT SERIE" }, { :xmltvid => "hd.tnt-serie.de", :info => "TNT SERIE HD" },
     { :xmltvid => "universalchannel.de", :info => "UNIVERSAL CHANNEL HD" },
     ]
@@ -92,7 +93,11 @@ a.get('http://info.sky.de/inhalt/de/programm_info_presseexport_start.jsp') do |h
 
   # Safety first - Grab all XML links
   begin
-    my_page.links_with(:href => /_xml\.gz/, :text => 'Download').each do |link|
+    xml_files = my_page.links_with(:href => /_xml\.gz/, :text => 'Download')
+
+    puts "Found #{xml_files.count} XML files"
+
+    xml_files.each do |link|
       # Download files to the folder
       file_name = Pathname.new(link.href).basename.to_s.gsub(/\.gz$/, ".xml").gsub(/(\d\d)(\d\d)_(\d\d)(\d\d)(\d\d)_xml/, "").gsub(/(\d\d)(\d\d)_xml/, "")
 
