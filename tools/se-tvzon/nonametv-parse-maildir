@@ -390,7 +390,7 @@ sub guess_channel
      return "fr.france24.com" if $filename =~ /FRAN/i;
  }
 
- if( $dir =~ /Euronews/ and $filename =~ /\.xlsx$/i ) {
+ if( $dir =~ /Euronews/ and $filename =~ /\.(xlsx|xls)$/i ) {
       return "euronews.com";
  }
 
@@ -416,7 +416,7 @@ sub guess_channel
      return "viasat.spice.com" if $filename =~ /^spice\s*viasat/i;
  }
  
- if( $dir =~ /Hustler/ and $filename =~ /\.xls$/i ) {
+ if( $dir =~ /Hustler/ and $filename =~ /\.(xls|xlsx)$/i ) {
      return "europe.bluehustler.com" if $filename =~ /^blue.*gmt.*\b/i;
      return "europe.hustlertv.com" if $filename =~ /^hustler.*gmt.*\b/i;
      return "europe.daringtv.com" if $filename =~ /^daring.*gmt.*\b/i;
