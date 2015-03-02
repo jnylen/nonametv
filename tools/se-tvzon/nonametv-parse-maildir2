@@ -498,12 +498,20 @@ if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
  }
 
  if( $dir =~ /EBS/ and $filename =~ /\.xls$/i ) {
-         return "bbcentertainment.com" if $filename =~ /entertainment\s+scandi/i;
-         return "bbchd.com" if $filename =~ /hd\s+scandi/i;
-         return "bbchd.com" if $subject =~ /bbc\s+hd\s+scandi/i;
-         return "bbcknowledge.com" if $filename =~ /knowledge\s+scandi/i;
-         return "bbclifestyle.com" if $filename =~ /lifestyle\s+scandi/i;
- #        return "cbeebies.com" if $filename =~ /cbeebies\s+scandi/i;
+    # ENT. (BRIT)
+    return "bbcentertainment.com" if $filename =~ /entertainment\s+scandi/i;
+    return "bbcentertainment.com" if $filename =~ /brit\s+scandi/i;
+
+    # HD
+    return "bbchd.com" if $filename =~ /hd\s+scandi/i;
+    return "bbchd.com" if $subject =~ /bbc\s+hd\s+scandi/i;
+
+    # KNOW. (EARTH)
+    return "bbcknowledge.com" if $filename =~ /knowledge\s+scandi/i;
+    return "bbcknowledge.com" if $filename =~ /earth\s+scandi/i;
+
+    # Lifestyle
+    return "bbclifestyle.com" if $filename =~ /lifestyle\s+scandi/i;
  }
 
  if( $dir =~ /WildTV/ and $filename =~ /\.zip|.xml/i ) {
