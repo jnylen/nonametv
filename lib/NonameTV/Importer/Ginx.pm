@@ -119,10 +119,6 @@ else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
   for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
 
     my $oWkS = $oBook->{Worksheet}[$iSheet];
-    if( $oWkS->{Name} !~ /EPG/ ){
-      progress( "Ginx: Skipping other sheet: $oWkS->{Name}" );
-      next;
-    }
 
     progress( "Ginx: Processing worksheet: $oWkS->{Name}" );
 
