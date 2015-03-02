@@ -547,6 +547,12 @@ sub ImportXML
 
      delete $ce->{original_title} if defined($ce->{original_title}) and $ce->{original_title} eq $ce->{title}; # Remove if they are the same
 
+     # Remove Film
+     if(defined($ce->{original_title})) {
+        $ce->{original_title} =~ s/^Film\s+//i;
+        $ce->{original_title} = norm($ce->{original_title});
+     }
+
      # Genre
      if(defined($genre) and $genre ne "") {
         my($program_type, $category ) = $ds->LookupCat( 'Venetsia', $genre );
