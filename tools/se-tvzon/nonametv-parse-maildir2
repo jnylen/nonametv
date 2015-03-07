@@ -346,16 +346,16 @@ sub guess_channel
 	    #return "tnt-glitz.tv" if $filename =~ /^Glitz_/i;
 	}
 
+
 	# XML Nordic (Nonstop)
 	if( $filename =~ /\.xml$/i ) {
-	    return "tnt-tv.dk" if $filename =~ /^TNT/i and $filename =~ /Danish/i;
-	    return "tnt-tv.se" if $filename =~ /^TNT/i and $filename =~ /Swedish/i;
-	    return "tnt-tv.no" if $filename =~ /^TNT/i and $filename =~ /Norwegian/i;
 	    return "star.nonstop.tv" if $filename =~ /^Star/i and $filename =~ /Swedish/i;
+	    return "fi.star.nonstop.tv" if $filename =~ /^Star/i and $filename =~ /Finnish/i;
 	}
 
-	# Word Nordic (Nonstop)
-	if( $filename =~ /\.doc$/i ) {
+    # XLS Nordic (Nonstop)
+    if( $filename =~ /\.(xls|xlsx)$/i ) {
+        # Nonstop
 	    return "showtime.nonstop.tv" if $filename =~ /^SHO/i and $filename =~ /SWE/i;
 	    return "silver.nonstop.tv"   if $filename =~ /^SIL/i and $filename =~ /SWE/i;
 	    return "no.showtime.nonstop.tv" if $filename =~ /^SHO/i and $filename =~ /NOR/i;
@@ -364,7 +364,10 @@ sub guess_channel
         return "dk.silver.nonstop.tv"   if $filename =~ /^SIL/i and $filename =~ /DAN/i;
         return "fi.showtime.nonstop.tv" if $filename =~ /^SHO/i and $filename =~ /FIN/i;
         return "fi.silver.nonstop.tv"   if $filename =~ /^SIL/i and $filename =~ /FIN/i;
-	}
+	    return "tnt-tv.dk" if $filename =~ /^TNT/i and $filename =~ /DAN/i;
+	    return "tnt-tv.se" if $filename =~ /^TNT/i and $filename =~ /SWE/i;
+	    return "tnt-tv.no" if $filename =~ /^TNT/i and $filename =~ /NOR/i;
+    }
   }
 
  if( $dir =~ /Kanal10/ and $filename =~ /\.doc$/i ) {

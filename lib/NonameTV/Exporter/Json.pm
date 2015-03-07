@@ -563,7 +563,8 @@ sub WriteEntry
       # Only add if it exists
       if( $system ){
         $d->{'episodeNum'} = { xmltv_ns =>  norm($entry->{episode}),
-        			     onscreen => $ep_text, $system => $inetref };
+        			     onscreen => $ep_text };
+        $d->{'episodeNum'}->{$system} = $inetref
       } else {
         $d->{'episodeNum'} = { xmltv_ns =>  norm($entry->{episode}),
       			     onscreen => $ep_text };
@@ -662,6 +663,7 @@ sub WriteEntry
         $system = 'themoviedb.org';
         $inetref = 'movie/' . $inetref;
     }
+
     # Only add if it exists
     if( $system and !defined $d->{'episodeNum'} and $entry->{url} =~ m|^http://www.themoviedb.org/| ){
         $d->{'episodeNum'} = { $system => $inetref };

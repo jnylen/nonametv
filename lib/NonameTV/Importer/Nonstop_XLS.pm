@@ -213,8 +213,6 @@ sub ImportXLS
       # Series
       $ce->{program_type} = "series" if defined($ce->{subtitle}) and $ce->{subtitle} ne "";
 
-
-
       $dsh->AddProgramme( $ce );
 
     } # next row
