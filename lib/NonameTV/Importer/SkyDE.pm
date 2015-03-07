@@ -229,6 +229,7 @@ sub ImportContentFile {
     # Some channels are VG:d and some are not
     if(defined($usedesc) and $usedesc eq "1") {
         $ce->{description} = norm($descr);
+        $ce->{description} =~ s/^(\d+)\. Staffel, Folge (\d+)\: //i; # Remove episode info from the description
     }
 
     $ds->AddProgrammeRaw( $ce );
