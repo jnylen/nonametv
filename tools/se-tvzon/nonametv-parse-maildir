@@ -395,7 +395,6 @@ sub guess_channel
  }
 
  if( $dir =~ /Gmail/ ) {
-
      # XLS
      if($filename =~ /\.xls$/i) {
         return "privatespice.com" if $filename =~ /^private/i;
@@ -405,6 +404,11 @@ sub guess_channel
      # Word
      if($filename =~ /\.doc$/i) {
         return "brazzerstveurope.com" if $filename =~ /^brazzers/i;
+     }
+
+     # XML
+     if($filename =~ /\.xml$/i) {
+        return "bibeltv.de" if $filename =~ /bibeltv/i;
      }
  }
  

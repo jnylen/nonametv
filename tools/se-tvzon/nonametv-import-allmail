@@ -66,3 +66,4 @@ tools/nonametv-import HopeChannel $1 $2 $3
 tools/nonametv-import SSF $1 $2 $3
 tools/nonametv-import DMAX $1 $2 $3
 tools/nonametv-import WildTV $1 $2 $3
+tools/nonametv-import BibelTV $1 $2 $3

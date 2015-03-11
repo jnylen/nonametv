@@ -210,6 +210,9 @@ foreach my $msg ($infolder->messages) {
   elsif( $fromaddr =~ /\@discovery.com/i ) {
     MoveMessage( $msg, "Discovery" );
   }
+  elsif( $fromaddr =~ /\@bibeltv.de/i ) {
+    MoveMessage( $msg, "Gmail" );
+  }
 }
 
 sub MoveMessage {
