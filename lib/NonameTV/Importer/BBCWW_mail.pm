@@ -49,9 +49,6 @@ sub new {
 
   $self->{FileStore} = $conf->{FileStore};
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
-  $self->{datastorehelper} = $dsh;
-  
   $self->{datastore}->{augment} = 1;
 
   return $self;
@@ -77,7 +74,13 @@ sub ImportXLS
   my $self = shift;
   my( $file, $chd ) = @_;
 
-  my $dsh = $self->{datastorehelper};
+  # Depending on what timezone
+  my $dsh = undef;
+  if($chd->{grabber_info} ne "") {
+    $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "UTC" );
+  } else {
+    $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
+  }
   my $ds = $self->{datastore};
 
   my %columns = ();
@@ -92,10 +95,20 @@ sub ImportXLS
   #for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
   foreach my $oWkS (@{$oBook->{Worksheet}}) {
 
-	# main worksheet is "Schedule" if thats not the right one, jump to "Hungary"
-	if( $oWkS->{Name} !~ /Schedule/ and $oWkS->{Name} !~ /Hungary/ and $oWkS->{Name} !~ /English/ ){
-          progress( "BBCWW: $chd->{xmltvid}: Skipping worksheet: $oWkS->{Name}" );
-          next;
+    # worksheets
+    if($chd->{grabber_info} eq "English") {
+        my $grabberino = $chd->{grabber_info};
+        # main worksheet is "$grabberino"
+        if( $oWkS->{Name} !~ /$grabberino/ or $oWkS->{Name} = ~ /Hungary/ ){
+              progress( "BBCWW: $chd->{xmltvid}: Skipping worksheet: $oWkS->{Name}" );
+              next;
+        }
+    } else {
+        # main worksheet is "Schedule" if thats not the right one, jump to "Hungary"
+        if( $oWkS->{Name} !~ /Schedule/ and $oWkS->{Name} !~ /Hungary/ and $oWkS->{Name} !~ /English/ ){
+              progress( "BBCWW: $chd->{xmltvid}: Skipping worksheet: $oWkS->{Name}" );
+              next;
+        }
     }
 
     #my $oWkS = $oBook->{Worksheet}[$iSheet];
@@ -132,9 +145,10 @@ sub ImportXLS
             $columns{'Ep No'}  = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Number/ );
             $columns{'Eps'}    = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episodes in/ );
 
-            $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ and $oWkS->{Cells}[$iR][$iC]->Value !~ /EET/ );
-            $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time/ and $oWkS->{Cells}[$iR][$iC]->Value !~ /EET/ ); # Dont set the time to EET
+            $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ and $oWkS->{Cells}[$iR][$iC]->Value !~ /EET/ and $oWkS->{Cells}[$iR][$iC]->Value !~ /IST/ );
+            $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time/ and $oWkS->{Cells}[$iR][$iC]->Value !~ /EET/ and $oWkS->{Cells}[$iR][$iC]->Value !~ /IST/ ); # Dont set the time to EET
             $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time \(CET\/CEST\)/ );
+            $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time \(UTC\)/ );
 
             $columns{'Year'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Production Year/ );
             $columns{'Director'}  = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Director/ );
@@ -162,6 +176,12 @@ sub ImportXLS
                 $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Finnish\)/ );
 			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis \(Finnish\)/ );
 			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(Finnish\)/ );
+			}elsif($chd->{sched_lang} eq "en") {
+                $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Programme Title$/ );
+			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /English Synopsis/ );
+			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Episode Title$/ );
+			}elsif($chd->{sched_lang} eq "nl") {
+			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Dutch Synopsis/ );
 			}
 
             $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
