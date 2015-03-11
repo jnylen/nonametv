@@ -549,7 +549,7 @@ if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
     return "amerika.dw.de" if $filename =~ /Amerika/i;
  }
 
- if( $dir =~ /HaC/ and $filename =~ /\.xls|.xlsx$/i ) {
+ if( $dir =~ /HaC/ and $filename =~ /\.xml$/i ) {
      return "horseandcountry.tv";
  }
 
