@@ -124,7 +124,7 @@ sub ImportContentFile {
       title       => norm($program->{"title"}),
       start_time  => $start->ymd("-") . " " . $start->hms(":"),
       end_time    => $stop->ymd("-") . " " . $stop->hms(":"),
-      description => $program->{"synopsis"},
+      description => norm($program->{"synopsis"}),
     };
 
     $ce->{subtitle} = norm($program->{"subtitle"}) if $program->{"subtitle"} ne "" and $program->{"title"} ne $program->{"title"};
