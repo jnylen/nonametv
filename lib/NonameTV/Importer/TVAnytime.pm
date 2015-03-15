@@ -86,9 +86,19 @@ sub ImportContentFile {
     $prog->{ "synopsis" } = $xpc->findvalue(".//Synopsis[attribute::length='short']", $node);
     $prog->{ "year" } = $xpc->findvalue(".//ReleaseInformation/ReleaseDate/Year", $node);
 
-    if(my($season, $episode, $of_episodes) = ($prog->{ "synopsis" } =~ /\(S(\d+),\s+Ep\s+(\d+)\/(\d+)\)/i)) {
+    # Grab subtitle from the title
+    my( $t, $st ) = ($prog->{ "title" } =~ /(.*)\: (.*)/);
+    if( defined( $st ) )
+    {
+        # This program is part of a series and it has a colon in the title.
+        # Assume that the colon separates the title from the subtitle.
+        $prog->{ "title" } = $t;
+        $prog->{ "subtitle" } = $st;
+    }
+
+    if(my($season, $episode, $failure, $of_episodes) = ($prog->{ "synopsis" } =~ /\(S(\d+),\s+Ep\s+(\d+)\/(| )(\d+)\)/i)) {
         $prog->{ "xmltv_episode" } = sprintf( "%d . %d/%d .", $season-1, $episode-1, $of_episodes );
-        $prog->{ "synopsis" } =~ s/\(S(\d+),\s+Ep\s+(\d+)\/(\d+)\)//i;
+        $prog->{ "synopsis" } =~ s/\(S(\d+),\s+Ep\s+(\d+)\/(| )(\d+)\)//i;
     } else {
         $prog->{ "xmltv_episode" } = "";
     }
