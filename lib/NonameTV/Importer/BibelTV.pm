@@ -85,7 +85,7 @@ sub ImportContentFile
 		$dsh->StartDate( $date , "06:00" );
 		$currdate = $date;
 
-		progress("WildTV: Date is: $date");
+		progress("BibelTV: Date is: $date");
 	}
 
     #
@@ -116,13 +116,12 @@ sub ImportContentFile
     my $desc = $sc->findvalue( './desc' );
 
 
-    progress("WildTV: $chd->{xmltvid}: $start - $title");
+    progress("BibelTV: $chd->{xmltvid}: $start - $title");
 
     my $ce = {
       channel_id   => $chd->{id},
       title        => norm($title),
       start_time   => $start->hms(":"),
-      description  => norm($desc),
     };
 
     $ce->{subtitle} = norm($subtitle) if norm($subtitle) ne norm($title);
