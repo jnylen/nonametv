@@ -38,6 +38,9 @@ sub new {
   # Silence
   $self->{SILENCE_DUPLICATE_SKIP} = 1;
 
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Stockholm" );
+  $self->{datastorehelper} = $dsh;
+
   # use augment
   $self->{datastore}->{augment} = 1;
 
@@ -96,7 +99,8 @@ sub ImportContentFile {
   # Batch
   my ($year, $month, $day) = ($filename =~ /(\d\d\d\d)(\d\d)(\d\d)/);
   my $batchid = $chd->{xmltvid} . "_" . $year . "-" . $month . "-" . $day;
-  $ds->StartBatch( $batchid , $chd->{id} );
+  $dsh->StartBatch( $batchid , $chd->{id} );
+
 
   # Programmes
   my $ns = $doc->findnodes( '//ScheduleEvent', $doc );
@@ -114,7 +118,12 @@ sub ImportContentFile {
 
     my $date = $start->ymd("-");
     if($date ne $currdate ) {
+      if( $currdate ne "x" ) {
+	    $dsh->EndBatch( 1 );
+      }
+
 	  $currdate = $date;
+	  $dsh->StartDate( $date , "06:00" );
       progress("TVAnytime: Date is: $date");
     }
 
@@ -122,8 +131,8 @@ sub ImportContentFile {
     {
       channel_id  => $chd->{id},
       title       => norm($program->{"title"}),
-      start_time  => $start->ymd("-") . " " . $start->hms(":"),
-      end_time    => $stop->ymd("-") . " " . $stop->hms(":"),
+      start_time  => $start->hms(":"),
+      end_time    => $stop->hms(":"),
       description => norm($program->{"synopsis"}),
     };
 
@@ -138,11 +147,11 @@ sub ImportContentFile {
     $ce->{program_type} = "series" if $program->{"xmltv_episode"} ne "";
 
     progress("TVAnytime: $chd->{xmltvid}: ".$ce->{start_time}." - ".$ce->{title});
-    $ds->AddProgrammeRaw( $ce );
+    $dsh->AddProgramme( $ce );
 
   }
 
-  $ds->EndBatch( 1 );
+  $dsh->EndBatch( 1 );
 
   return 1;
 }
