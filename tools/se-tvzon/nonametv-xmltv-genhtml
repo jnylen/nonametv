@@ -112,7 +112,7 @@ foreach my $channel (sort keys %channels)
 {
   print OUT << "EOD";
 <tr>
-	<th scope='row'><img src='http://xmltv.se/chanlogos/44x44/$channel.png' /></th>
+	<th scope='row'><img src='http://chanlogos.xmltv.se/44x44/$channel.png' /></th>
   <th scope='row'><a href='http://converter.xmltv.se/channel?x=$channel'>$channel</a></th>
 
 EOD
@@ -196,9 +196,9 @@ foreach my $channel (sort keys %channels)
   print OUT << "EOREC";
 <tr>
   <td>$channel</td>
-  <td><img src="http://xmltv.se/chanlogos/$channel.png"></td>
-  <td><img src="http://xmltv.se/chanlogos/44x44/$channel.png"></td>
-  <td><img src="http://xmltv.se/chanlogos/16x16/$channel.png"></td>
+  <td><img src="http://chanlogos.xmltv.se/$channel.png"></td>
+  <td><img src="http://chanlogos.xmltv.se/44x44/$channel.png"></td>
+  <td><img src="http://chanlogos.xmltv.se/16x16/$channel.png"></td>
 </tr>
 
 EOREC
