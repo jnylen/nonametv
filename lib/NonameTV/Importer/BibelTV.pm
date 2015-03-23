@@ -102,7 +102,7 @@ sub ImportContentFile
     #
     # subtitle
     #
-    my $subtitle = $sc->findvalue( './subtitle' );
+    my $subtitle = $sc->findvalue( './sub-title' );
     $subtitle =~ s/ amp / &amp; /g if $subtitle; # What the hell
 
     #
@@ -163,6 +163,12 @@ sub ImportContentFile
     # Episodes
     if(my($episode2) = ($sc->findvalue ('./episode-num') =~ /Folge\s+(\d+)/i)) {
         $ce->{episode} = sprintf( " . %d .", $episode2-1 );
+    }
+
+    # Genre
+    if(defined $genre and $genre ne "") {
+        my ( $program_type, $categ ) = $ds->LookupCat( "BibelTV", $genre );
+        AddCategory( $ce, $program_type, $categ );
     }
 
 

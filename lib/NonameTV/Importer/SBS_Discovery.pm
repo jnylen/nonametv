@@ -111,12 +111,11 @@ sub ImportXML
   ## END
 
   foreach my $row ($rows->get_nodelist) {
-    my $start = $self->create_dt( $row->findvalue( './/starttime/TIMEINSTANT/@full' ) );
-    #my $end = $self->create_dt( $row->findvalue( './/end/TIMEINSTANT/@full' ) );
+    my $start = $row->findvalue( './/starttime/TIMEINSTANT/@time' );
 
-    my $date = $start->ymd("-");
+    my $date = $row->findvalue( './/starttime/TIMEINSTANT/@date' );
     if($date ne $currdate ) {
-      $dsh->StartDate( $date , "06:00" );
+      $dsh->StartDate( $date , "00:00" );
       $currdate = $date;
 
       progress("SBS_Discovery: Date is: $date");
@@ -225,7 +224,7 @@ sub ImportXML
     }
 
     progress( "SBS_Discovery: $chd->{xmltvid}: $start - $title" );
-    $dsh->AddCE( $ce );
+    $dsh->AddProgramme( $ce );
   } # next row
 
   #  $column = undef;
