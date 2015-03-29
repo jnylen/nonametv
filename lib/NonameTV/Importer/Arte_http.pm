@@ -139,6 +139,10 @@ sub ImportContent( $$$ ) {
     my $ce = ();
     $ce->{channel_id} = $chd->{id};
     $ce->{start_time} = $self->parseTimestamp( $xpc->findvalue( 's:termin/@start' ) );
+    # skip programme if we can't parse the start_time
+    if( !defined( $ce->{start_time} ) ) {
+      next;
+    }
 #   endtime overlaps and misses alot
 #    $ce->{end_time} = $self->parseTimestamp( $xpc->findvalue( 's:termin/@ende' ) );
 
@@ -323,15 +327,22 @@ sub parseTimestamp( $ ){
     } else {
       $offset = 'Europe/Berlin';
     }
-    my $dt = DateTime->new ( 
-      year      => $year,
-      month     => $month,
-      day       => $day,
-      hour      => $hour,
-      minute    => $minute, 
-      second    => $second,
-      time_zone => $offset
-    );
+    my $dt;
+    eval {
+      $dt = DateTime->new ( 
+        year      => $year,
+        month     => $month,
+        day       => $day,
+        hour      => $hour,
+        minute    => $minute, 
+        second    => $second,
+        time_zone => $offset
+      );
+    };
+    if ($@){
+      w ("Could not convert time! Check for daylight saving time border. " . $year . "-" . $month . "-" . $day . " " . $hour . ":" . $minute);
+      return undef;
+    };
     $dt->set_time_zone( 'UTC' );
 
     return( $dt->ymd( '-' ) . ' ' . $dt->hms( ':' ) );
