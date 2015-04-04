@@ -103,6 +103,11 @@ sub ImportContentFile {
     my $title_org  = norm($xpc->findvalue( '@origTitel' ));
     my $start      = $self->parseTimestamp($xpc->findvalue( '@planungsDatum' ));
     my $start_time = $xpc->findvalue( '@eventAnfang' );
+
+    if( !defined( $start ) ) {
+          next;
+    }
+
     my $end        = $xpc->findvalue( '@eventEnde' );
     my $subtitle   = norm($xpc->findvalue( '@episodenTitel' ));
     my $subtitle_o = norm($xpc->findvalue( '@origEpisodenTitel' ));
@@ -253,19 +258,27 @@ sub parseTimestamp( $ ){
     if( !defined( $year )|| !defined( $hour ) ){
       w( "could not parse timestamp: $timestamp" );
     }
-    my $dt = DateTime->new (
-      year      => $year,
-      month     => $month,
-      day       => $day,
-      hour      => $hour,
-      minute    => $minute,
-      second    => $second,
-      time_zone => 'Europe/Berlin'
-    );
+    my $dt;
+    eval {
+        $dt = DateTime->new (
+          year      => $year,
+          month     => $month,
+          day       => $day,
+          hour      => $hour,
+          minute    => $minute,
+          second    => $second,
+          time_zone => 'Europe/Berlin'
+        );
+    };
+
+    if ($@){
+      w ("Could not convert time! Check for daylight saving time border. " . $year . "-" . $month . "-" . $day . " " . $hour . ":" . $minute);
+      return undef;
+    }
+
     $dt->set_time_zone( 'UTC' );
 
     return( $dt );
-
   } else {
     return undef;
   }
