@@ -1,51 +1,67 @@
 exporter-conax,episode_number,Folge,de
 exporter-conax,episode_number,episode,en
 exporter-conax,episode_number,epizoda,hr
+exporter-conax,episode_number,episode,pl
 exporter-conax,episode_number,Del,sv
 exporter-conax,episode_part,Teil,de
 exporter-conax,episode_part,part,en
 exporter-conax,episode_part,dio,hr
+exporter-conax,episode_part,part,pl
 exporter-conax,episode_part,Part,sv
 exporter-conax,episode_season,Staffel,de
 exporter-conax,episode_season,season,en
 exporter-conax,episode_season,sezona,hr
+exporter-conax,episode_season,season,pl
 exporter-conax,episode_season,"sÃ¤song",sv
 exporter-conax,of,von,de
 exporter-conax,of,of,en
 exporter-conax,of,od,hr
+exporter-conax,of,of,pl
 exporter-conax,of,av,sv
 exporter-dreampark,episode_number,episode,en
 exporter-dreampark,episode_number,epizoda,hr
+exporter-dreampark,episode_number,episode,pl
 exporter-dreampark,episode_number,Del,sv
 exporter-dreampark,episode_part,part,en
 exporter-dreampark,episode_part,dio,hr
+exporter-dreampark,episode_part,part,pl
 exporter-dreampark,episode_part,Part,sv
 exporter-dreampark,episode_season,season,en
 exporter-dreampark,episode_season,sezona,hr
+exporter-dreampark,episode_season,season,pl
 exporter-dreampark,episode_season,"sÃ¤song",sv
 exporter-dreampark,of,of,en
 exporter-dreampark,of,od,hr
+exporter-dreampark,of,of,pl
 exporter-dreampark,of,av,sv
 exporter-lysis,episode_number,episode,en
 exporter-lysis,episode_number,epizoda,hr
+exporter-lysis,episode_number,episode,pl
 exporter-lysis,episode_number,Del,sv
 exporter-lysis,episode_part,part,en
 exporter-lysis,episode_part,dio,hr
+exporter-lysis,episode_part,part,pl
 exporter-lysis,episode_part,Part,sv
 exporter-lysis,episode_season,season,en
 exporter-lysis,episode_season,sezona,hr
+exporter-lysis,episode_season,season,pl
 exporter-lysis,episode_season,"sÃ¤song",sv
 exporter-lysis,of,of,en
 exporter-lysis,of,od,hr
+exporter-lysis,of,of,pl
 exporter-lysis,of,av,sv
 exporter-rss,nowon,"Now on",en
 exporter-rss,nowon,"Trenutno na",hr
+exporter-rss,nowon,"Now on",pl
 exporter-rss,nowonchgroup,"Now on channels in group",en
 exporter-rss,nowonchgroup,"Trenutno na kanalima u grupi",hr
+exporter-rss,nowonchgroup,"Now on channels in group",pl
 exporter-rss,todayon,"Today on",en
 exporter-rss,todayon,"Danas na",hr
+exporter-rss,todayon,"Today on",pl
 exporter-rss,todayonchgroup,"Today on channels in group",en
 exporter-rss,todayonchgroup,"Danas na kanalima u grupi",hr
+exporter-rss,todayonchgroup,"Today on channels in group",pl
 exporter-xmltv,episode_number,Episode,ar
 exporter-xmltv,episode_number,Afsnit,da
 exporter-xmltv,episode_number,Folge,de
@@ -57,6 +73,7 @@ exporter-xmltv,episode_number,epizoda,hr
 exporter-xmltv,episode_number,Episode,it
 exporter-xmltv,episode_number,Aflevering,nl
 exporter-xmltv,episode_number,Episode,no
+exporter-xmltv,episode_number,Episode,pl
 exporter-xmltv,episode_number,Episode,ro
 exporter-xmltv,episode_number,Episode,ru
 exporter-xmltv,episode_number,epizoda,si
@@ -69,6 +86,7 @@ exporter-xmltv,episode_part,partie,fr
 exporter-xmltv,episode_part,dio,hr
 exporter-xmltv,episode_part,part,it
 exporter-xmltv,episode_part,deel,nl
+exporter-xmltv,episode_part,part,pl
 exporter-xmltv,episode_part,part,ro
 exporter-xmltv,episode_part,part,ru
 exporter-xmltv,episode_part,dio,si
@@ -84,6 +102,7 @@ exporter-xmltv,episode_season,sezona,hr
 exporter-xmltv,episode_season,season,it
 exporter-xmltv,episode_season,seizoen,nl
 exporter-xmltv,episode_season,sesong,no
+exporter-xmltv,episode_season,season,pl
 exporter-xmltv,episode_season,season,ro
 exporter-xmltv,episode_season,season,ru
 exporter-xmltv,episode_season,sezona,si
@@ -99,141 +118,204 @@ exporter-xmltv,of,od,hr
 exporter-xmltv,of,of,it
 exporter-xmltv,of,van,nl
 exporter-xmltv,of,av,no
+exporter-xmltv,of,of,pl
 exporter-xmltv,of,of,ro
 exporter-xmltv,of,of,ru
 exporter-xmltv,of,od,si
 exporter-xmltv,of,av,sv
 exporter-xmltv2,episode_number,episode,en
 exporter-xmltv2,episode_number,epizoda,hr
+exporter-xmltv2,episode_number,episode,pl
 exporter-xmltv2,episode_number,Del,sv
 exporter-xmltv2,episode_part,part,en
 exporter-xmltv2,episode_part,dio,hr
+exporter-xmltv2,episode_part,part,pl
 exporter-xmltv2,episode_part,Part,sv
 exporter-xmltv2,episode_season,season,en
 exporter-xmltv2,episode_season,sezona,hr
+exporter-xmltv2,episode_season,season,pl
 exporter-xmltv2,episode_season,"sÃ¤song",sv
 exporter-xmltv2,of,of,en
 exporter-xmltv2,of,od,hr
+exporter-xmltv2,of,of,pl
 exporter-xmltv2,of,av,sv
 listchannels,channel,Channel,en
 listchannels,channel,Kanal,hr
+listchannels,channel,Channel,pl
 listchannels,channel,Channel,sv
 listchannels,datasource,Source,en
 listchannels,datasource,Izvor,hr
+listchannels,datasource,Source,pl
 listchannels,datasource,Source,sv
 listchannels,footertext,"Put whatever you want here. It will be displayed on the bottom of the channel list.",en
 listchannels,footertext,,hr
+listchannels,footertext,"Put whatever you want here. It will be displayed on the bottom of the channel list.",pl
 listchannels,footertext,"Put whatever you want here. It will be displayed on the bottom of the channel list.",sv
 listchannels,headertext,"Put whatever you want here. It will be displayed on the top of the channel list.",en
 listchannels,headertext,"Rasporedi programa svih navedenih kanala nalaze se u <a href=""/xmltv/"">XMLTV</a> direktoriju. Za svaki dan i svaki kanal kreira se po jedan file.",hr
+listchannels,headertext,"Put whatever you want here. It will be displayed on the top of the channel list.",pl
 listchannels,headertext,"Put whatever you want here. It will be displayed on the top of the channel list.",sv
 listchannels,title,"This is the title of your channel listing page.",en
 listchannels,title,"Kanali za koje goNIX ima raspored emitiranja",hr
+listchannels,title,"This is the title of your channel listing page.",pl
 listchannels,title,"This is the title of your channel listing page.",sv
 listchannels,xmltvid,"XMLTV ID",en
 listchannels,xmltvid,"XMLTV ID",hr
+listchannels,xmltvid,"XMLTV ID",pl
 listchannels,xmltvid,"XMLTV ID",sv
 listepgservers,active,Active,en
 listepgservers,active,Aktivan,hr
+listepgservers,active,Active,pl
 listepgservers,addnewepgserver,"Add new EPG server",en
 listepgservers,addnewepgserver,"Dodaj novi EPG server",hr
+listepgservers,addnewepgserver,"Add new EPG server",pl
 listepgservers,description,Description,en
 listepgservers,description,Opis,hr
+listepgservers,description,Description,pl
 listepgservers,name,Name,en
 listepgservers,name,Ime,hr
+listepgservers,name,Name,pl
 listepgservers,title,"EPG servers",en
 listepgservers,title,"EPG serveri",hr
+listepgservers,title,"EPG servers",pl
 listnetworks,active,Active,en
 listnetworks,active,Aktivna,hr
+listnetworks,active,Active,pl
 listnetworks,description,Description,en
 listnetworks,description,Opis,hr
+listnetworks,description,Description,pl
 listnetworks,name,Name,en
 listnetworks,name,Ime,hr
+listnetworks,name,Name,pl
 listnetworks,title,"Networks on server",en
 listnetworks,title,"Mreže na serveru",hr
+listnetworks,title,"Networks on server",pl
 listnetworks,type,Type,en
 listnetworks,type,Tip,hr
+listnetworks,type,Type,pl
 listservices,active,Active,en
 listservices,active,Aktivan,hr
+listservices,active,Active,pl
 listservices,addnewservice,"Add new service",en
 listservices,addnewservice,"Dodaj novi servis",hr
+listservices,addnewservice,"Add new service",pl
 listservices,description,Description,en
 listservices,description,Opis,hr
+listservices,description,Description,pl
 listservices,nntvchannel,"Gonix channel",en
 listservices,nntvchannel,"Gonix kanal",hr
+listservices,nntvchannel,"Gonix channel",pl
 listservices,serviceid,"Service id",en
 listservices,serviceid,"Service id",hr
+listservices,serviceid,"Service id",pl
 listservices,servicename,"Operator service name",en
 listservices,servicename,"Naziv servisa kod operatera",hr
+listservices,servicename,"Operator service name",pl
 listservices,title,"Services on network",en
 listservices,title,"Servisi na mreži",hr
+listservices,title,"Services on network",pl
 listservices,tsid,"TS id",en
 listservices,tsid,"TS id",hr
+listservices,tsid,"TS id",pl
 listtses,active,Active,en
 listtses,active,Aktivan,hr
+listtses,active,Active,pl
 listtses,addnewts,"Add new TS",en
 listtses,addnewts,"Dodaj novi transportni stream",hr
+listtses,addnewts,"Add new TS",pl
 listtses,description,Description,en
 listtses,description,Opis,hr
+listtses,description,Description,pl
 listtses,nodvbcnetworks,"No DVB networks found on this server",en
 listtses,nodvbcnetworks,"Ovaj server ne poslužuje ni jednu DVB mrežu",hr
+listtses,nodvbcnetworks,"No DVB networks found on this server",pl
 listtses,title,"Transport streams on network",en
 listtses,title,"Transportni streamovi na mreži",hr
+listtses,title,"Transport streams on network",pl
 listtses,tsid,"TS id",en
 listtses,tsid,"TS id",hr
+listtses,tsid,"TS id",pl
 nowshowing,categories,categories,en
 nowshowing,categories,kategorije,hr
+nowshowing,categories,categories,pl
 nowshowing,headertext,"What's now showing on the channels?",en
 nowshowing,headertext,,hr
+nowshowing,headertext,"What's now showing on the channels?",pl
 nowshowing,nodata,"No data...",en
 nowshowing,nodata,"Nema podataka...",hr
+nowshowing,nodata,"No data...",pl
 nowshowing,nodatadesc,"No data found for this period.",en
 nowshowing,nodatadesc,"Nema podataka za ovaj period.",hr
+nowshowing,nodatadesc,"No data found for this period.",pl
 nowshowing,title,"Now showing",en
 nowshowing,title,"Trenutno na programu",hr
+nowshowing,title,"Now showing",pl
 programdetails,at,at,en
 programdetails,at,u,hr
+programdetails,at,at,pl
 programdetails,invchanid,"Invalid channel id",en
 programdetails,invchanid,"Neispravan id kanala",hr
+programdetails,invchanid,"Invalid channel id",pl
 programdetails,nochanspecified,"No channel specified",en
 programdetails,nochanspecified,"Nije određen kanal",hr
+programdetails,nochanspecified,"No channel specified",pl
 programdetails,noprogstartingat,"No program starting at",en
 programdetails,noprogstartingat,"Nema programa koji pocinje u",hr
+programdetails,noprogstartingat,"No program starting at",pl
 programdetails,notimespecified,"No time specified",en
 programdetails,notimespecified,"Nije određeno vrijeme",hr
+programdetails,notimespecified,"No time specified",pl
 programdetails,nowon,"Now on",en
 programdetails,nowon,"Trenutno na",hr
+programdetails,nowon,"Now on",pl
 programdetails,prgactors,Actors,en
 programdetails,prgactors,Glumci,hr
+programdetails,prgactors,Actors,pl
 programdetails,prgadapters,Adapters,en
 programdetails,prgadapters,Adapteri,hr
+programdetails,prgadapters,Adapters,pl
 programdetails,prgcategory,Category,en
 programdetails,prgcategory,Kategorija,hr
+programdetails,prgcategory,Category,pl
 programdetails,prgcommentators,Commentators,en
 programdetails,prgcommentators,Komentatori,hr
+programdetails,prgcommentators,Commentators,pl
 programdetails,prgdescription,Description,en
 programdetails,prgdescription,Opis,hr
+programdetails,prgdescription,Description,pl
 programdetails,prgdirectors,Directors,en
 programdetails,prgdirectors,Redatelji,hr
+programdetails,prgdirectors,Directors,pl
 programdetails,prgguests,Guests,en
 programdetails,prgguests,Gosti,hr
+programdetails,prgguests,Guests,pl
 programdetails,prgpresenters,Presenters,en
 programdetails,prgpresenters,Voditelji,hr
+programdetails,prgpresenters,Presenters,pl
 programdetails,prgproducers,Producers,en
 programdetails,prgproducers,Producenti,hr
+programdetails,prgproducers,Producers,pl
 programdetails,prgsubtitle,Subtitle,en
 programdetails,prgsubtitle,Podnaslov,hr
+programdetails,prgsubtitle,Subtitle,pl
 programdetails,prgtitle,Title,en
 programdetails,prgtitle,Naslov,hr
+programdetails,prgtitle,Title,pl
 programdetails,prgwriters,Writers,en
 programdetails,prgwriters,Pisci,hr
+programdetails,prgwriters,Writers,pl
 programdetails,progdetailsfor,"Program details for",en
 programdetails,progdetailsfor,"Detalji o programu za",hr
+programdetails,progdetailsfor,"Program details for",pl
 programdetails,starttime,"Start time",en
 programdetails,starttime,"Vrijeme početka",hr
+programdetails,starttime,"Start time",pl
 viewepg,description,Description,en
 viewepg,description,Opis,hr
+viewepg,description,Description,pl
 viewepg,name,Name,en
 viewepg,name,Ime,hr
+viewepg,name,Name,pl
 viewepg,title,Title,en
 viewepg,title,Naslov,hr
+viewepg,title,Title,pl
