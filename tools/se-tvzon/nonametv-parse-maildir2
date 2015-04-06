@@ -232,83 +232,6 @@ sub guess_channel
     return undef;
   }
 
-  if( $dir =~ /SBSTV/ and $filename =~ /\.xml$/i ) {
-    # Kanal 5
-    if( $subject =~ /kanal 5/i ) {
-          return "kanal5.se";
-    }
-    elsif( $subject =~ /kanal5/i ) {
-          return "kanal5.se";
-    }
-    # Kanal 9
-    elsif( $subject =~ /kanal 9/i ) {
-          return "kanal9.se";
-    }
-    elsif( $subject =~ /kanal9/i ) {
-          return "kanal9.se";
-    }
-    # TV 11 (taken over from TV4 from 1st June)
-    elsif( $subject =~ /tv 11/i ) {
-          return "tv11.sbstv.se";
-    }
-    elsif( $subject =~ /tv11/i ) {
-    	  return "tv11.sbstv.se";
-    }
-    elsif( $subject =~ /kanal 11/i ) {
-          return "tv11.sbstv.se";
-    }
-    elsif( $subject =~ /kanal11/i ) {
-          return "tv11.sbstv.se";
-    }
-
-
-  }
-
-  if( $dir =~ /GlobalListings/ ) {
-    return "hd.natgeo.se" if $filename =~ /^ng\s*swe\s*hd\b/i;
-
-	# Nat geo wild sends in XLS format
-    return "wild.natgeo.se" if $filename =~ /^ngwscan\s*\b/i;
-
-	# History Channel
-	if($filename =~ /\.xml$/i) {
-        return "historytv.se"  if $filename =~ /his.eur.swe/i;
-        return "historytv.no"  if $filename =~ /his.eur.nor/i;
-        return "historytv.dk"  if $filename =~ /his.eur.dan/i;
-        return "historytv.eu"  if $filename =~ /his.eur.eng/i;
-        return "crimeandinvestigation.eu"  if $filename =~ /cai.eng/i;
-    }
-
-    return "natgeotv.com" if $filename =~ /^ngscan/i and $filename =~ /\.xls$/i;
-
-	# Travel Channel
-    return "travelchanneltv.se" if $filename =~ /^travel/i;
-
-    # E! Entertainment
-    return "se.eonline.com" if $filename =~ /^e\s*swe\b/i;
-    return "dk.eonline.com" if $filename =~ /^e\s*dan\b/i;
-    return "no.eonline.com" if $filename =~ /^e\s*nor\b/i;
-    return "eu.eonline.com" if $filename =~ /^e\s*eng\b/i;
-    return "de.eonline.com"  if $filename =~ /^eent\.ger\b/i and $filename =~ /\.xls$/i;
-
-    # FOX TV Norway
-    return "foxtv.no"       if $filename =~ /^fox\s+norway/i;
-    return "foxtv.se"       if $filename =~ /^fox\s+sweden/i and $filename =~ /\.xml$/i;
-
-    # H2
-    if($filename =~ /h2\s+europe/i and $filename =~ /\.xml$/i) {
-        return "h2.historytv.se"  if $filename =~ /swe/i;
-        return "h2.historytv.no"  if $filename =~ /nor/i;
-        return "h2.historytv.dk"  if $filename =~ /dan/i;
-    }
-
-    # Benelux schedules for Universal
-    return "13thstreet.nl" if $filename =~ /^13\.Ben\.Dut/i;
-    return "en.13thstreet.nl" if $filename =~ /^13\.Ben\.Eng/i;
-    return "syfy.nl" if $filename =~ /^Syfy\.Ben\.Dut/i;
-    return "en.syfy.nl" if $filename =~ /^Syfy\.Ben\.Eng/i;
- }
-
  if( $dir =~ /Turner/ ) {
     # Word files
 	return "cartoonnetwork.se" if $filename =~ /^cn\s*nordic\s+\(swe\)\s*\b/i;
@@ -370,48 +293,8 @@ sub guess_channel
     }
   }
 
- if( $dir =~ /Kanal10/ and $filename =~ /\.doc$/i ) {
-     return "kanal10.se";
- }
-
- if( $dir =~ /France24/ and $filename =~ /\.zip$/i ) {
-     return "france24.com" if $filename =~ /ANGL/i;
-     return "france24.com" if $filename =~ /ENGL/i;
-     return "ar.france24.com" if $filename =~ /ARAB/i;
-     return "fr.france24.com" if $filename =~ /FRAN/i;
- }
-
  if( $dir =~ /Euronews/ and $filename =~ /\.(xls|xlsx)/i ) {
       return "euronews.com";
- }
-
- if( $dir =~ /Gmail/ ) {
-
-     # XLS
-     if($filename =~ /\.xls$/i) {
-        return "privatespice.com" if $filename =~ /^private/i;
-        return "protv.ro" if $from =~ /\@protv.ro/i;
-     }
-
-     # Word
-     if($filename =~ /\.doc$/i) {
-        return "brazzerstveurope.com" if $filename =~ /^brazzers/i;
-     }
- }
-
- if( $dir =~ /Playboy/ and $filename =~ /\.doc$/i ) {
-     return "europe.playboytv.com" if $filename =~ /^playboy/i;
-     return "adultchannel.co.uk" if $filename =~ /^the\s*adult/i;
-     return "privatespice.com" if $filename =~ /^private/i;
-     return "brazzerstveurope.com" if $filename =~ /^brazzers/i;
-     return "viasat.spice.com" if $filename =~ /^spice\s*viasat/i;
- }
-
- if( $dir =~ /Hustler/ and $filename =~ /\.xls$/i ) {
-     return "europe.bluehustler.com" if $filename =~ /^blue.*gmt.*\b/i;
-     return "europe.hustlertv.com" if $filename =~ /^hustler.*gmt.*\b/i;
-     return "europe.daringtv.com" if $filename =~ /^daring.*gmt.*\b/i;
-     return "europe.daringtv.com" if $filename =~ /^private.*gmt.*\b/i;
  }
 
  if( $dir =~ /MTV/ ) {
@@ -435,18 +318,6 @@ sub guess_channel
     }
  }
 
- if( $dir =~ /YaS/ and $filename =~ /\.xls$/i ) {
-     return "nauticalchannel.net" if $filename =~ /nc/i;
- }
-
- if( $dir =~ /Motors/ and $filename =~ /\.xls$/i ) {
-     return "motorstv.com" if $filename =~ /pgms/i and $filename !~ /french/i;
- }
-
- if( $dir =~ /TravelChannel/ and $filename =~ /\.xls$/i ) {
-     return "travelchanneltv.se" if $filename =~ /^epg\s*\b/i;
- }
-
  if( $dir =~ /PokerChannel/ and $filename =~ /\.xlsx$/i ) {
      return "ginx.tv";
  }
@@ -459,32 +330,12 @@ if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
      return "foxtv.se" if $filename =~ /^fox\s+sweden/i;
  }
 
- if( $dir =~ /LifestyleTV/ and $filename =~ /\.xls|.xlsx$/i ) {
-     return "lifestyletv.se";
- }
-
- if( $dir =~ /TVChile/ and $filename =~ /\.xls|.xlsx$/i ) {
-     return "tvchile.cl";
- }
-
  if( $dir =~ /TV8Norge/ and $filename =~ /\.xls|.xlsx$/i ) {
       return "ostfold.tv8norge.no" if $filename =~ /tv8ostfold/i;
       return "buskerud.tv8norge.no" if $filename =~ /tv8buskerud/i;
       return "storby.tv8norge.no" if $filename =~ /tv8storby/i;
 
   }
-
- if( $dir =~ /FuelTV/ and $filename =~ /epg/i ) {
-     return "fuel.tv";
- }
-
- if( $dir =~ /GodTV/ and $filename =~ /\.xlsx$/i ) {
-     return "god.tv";
- }
-
- if( $dir =~ /LuxeTV/ and $filename =~ /\.xls$/i ) {
-     return "luxe.tv" if $filename =~ /\d\.xls$/i;
- }
 
  if( $dir =~ /Mezzo/ ) {
     if($filename =~ /\.xls$/i) {
@@ -535,10 +386,6 @@ if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
 
  if( $dir =~ /VisjonNorge/ and $filename =~ /\.xls$/i ) {
     return "visjonnorge.com";
- }
-
- if( $dir =~ /CNBC/ and $filename =~ /\.xml/i ) {
-   	return "europe.cnbc.com";
  }
 
  if( $dir =~ /DWDE/ and $filename =~ /\.xls|.xlsx$/i ) {
