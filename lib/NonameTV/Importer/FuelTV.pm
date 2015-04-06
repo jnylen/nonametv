@@ -174,9 +174,12 @@ my $ref = ReadData ($file);
       $oWkC = $oWkS->{Cells}[$iR][$coltitle];
       next if( ! $oWkC );
       my $title = $oWkC->Value if( $oWkC->Value );
-      $title =~ s/&amp;/&/g;
-      $title =~ s/\(.*\)//g;
-      $title =~ s/\[.*\]//g;
+      if (defined($title)) {
+          $title =~ s/&amp;/&/g;
+          $title =~ s/\(.*\)//g;
+          $title =~ s/\[.*\]//g;
+      }
+
 
       
 
