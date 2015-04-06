@@ -253,6 +253,13 @@ sub ImportContent {
         # is a repeat from $previously shown date
         $desc = undef;
       }
+
+      # Add original title (mainly KiKA)
+      if(defined($desc) and $desc =~ /Originaltitel\:/i) {
+        my ($orgtitle) = ( $desc =~ /Originaltitel\: \"(.*?)\"/ );
+
+        $ce->{original_title} = norm($orgtitle) if defined($orgtitle);
+      }
     }
     if ($desc) {
       $ce->{description} = $desc;
