@@ -274,6 +274,8 @@ sub guess_channel
     return "crimeandinvestigation.eu"  if $filename =~ /ci europe english/i and $filename =~ /\.xml$/i;
 
     return "natgeotv.com" if $filename =~ /^ngscan/i and $filename =~ /\.xls$/i;
+    return "natgeotv.com" if $filename =~ /^ngswe_fin/i and $filename =~ /\.xls$/i;
+    #return "natgeo.dk" if $filename =~ /^ngden/i and $filename =~ /\.xls$/i;
     return "people.natgeo.dk" if $filename =~ /^ngppl\.den/i and $filename =~ /\.xls$/i;
 
 	# Travel Channel
@@ -316,6 +318,12 @@ sub guess_channel
     return "international.skynews.com" if $filename =~ /^SKYNI/i and $filename =~ /\.xls$/i;
     return "international.skynews.com" if $filename =~ /^SKYH/i and $filename =~ /\.xls$/i;
     return "international.skynews.com" if $subject =~ /^Sky News International/i and $filename =~ /\.xls$/i;
+
+    # Poland
+    return "crimeandinvestigation.pl" if $filename =~ /^CI\s+Polsat/i and $filename =~ /\.xml$/i;
+    return "h2.historytv.pl" if $filename =~ /^h2\s+europe\s+polish/i and $filename =~ /\.xml$/i;
+    return "historytv.pl" if $filename =~ /^history\.pol/i and $filename =~ /\.xml$/i;
+    return "lifetimetv.pl" if $filename =~ /^lifetime\s+poland/i and $filename =~ /\.xml$/i;
  }
  
  if( $dir =~ /Kanal10/ and $filename =~ /\.doc$/i and $from =~ /\@kanal10.se/i ) {
