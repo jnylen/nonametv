@@ -333,6 +333,16 @@ sub ImportXML
             	if($episode ne "") {
                 	$sentences[$i2] = "";
                 }
+            }elsif( my( $seasonerino, $eperino1, $ofepirino1 ) = ($sentences[$i2] =~ /^Kausi (\d+), (\d+)\/(\d+)\./i ) )
+            {
+            	$episode = $eperino1;
+            	$eps = $ofepirino1;
+            	$season = $seasonerino;
+
+            	# Only remove sentence if it could find a season
+            	if($eperino1 ne "") {
+                	$sentences[$i2] = "";
+                }
             }elsif( my( $episodetextnum3 ) = ($sentences[$i2] =~ /^Del (\d+)\./i ) )
             {
             	$episode = $episodetextnum3;
