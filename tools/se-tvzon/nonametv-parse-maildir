@@ -73,7 +73,8 @@ my @folders = qw(NonameTV-Data.GlobalListings
 		 NonameTV-Data.Gmail
 		 NonameTV-Data.Playboy
 		 NonameTV-Data.Hustler
-		 NonameTV-Data.YaS);
+		 NonameTV-Data.YaS
+		 NonameTV-Data.ATV);
 
 # Flag messages AFTER they have been processed. Then I normally
 # only have to move the message to the correct folder.
@@ -320,10 +321,12 @@ sub guess_channel
     return "international.skynews.com" if $subject =~ /^Sky News International/i and $filename =~ /\.xls$/i;
 
     # Poland
-    return "crimeandinvestigation.pl" if $filename =~ /^CI\s+Polsat/i and $filename =~ /\.xml$/i;
-    return "h2.historytv.pl" if $filename =~ /^h2\s+europe\s+polish/i and $filename =~ /\.xml$/i;
-    return "historytv.pl" if $filename =~ /^history\.pol/i and $filename =~ /\.xml$/i;
-    return "lifetimetv.pl" if $filename =~ /^lifetime\s+poland/i and $filename =~ /\.xml$/i;
+    return "crimeandinvestigation.pl"   if $filename =~ /^CI\s+Polsat/i and $filename =~ /\.xml$/i;
+    return "h2.historytv.pl"            if $filename =~ /^h2\s+europe\s+polish/i and $filename =~ /\.xml$/i;
+    return "historytv.pl"               if $filename =~ /^history\.pol/i and $filename =~ /\.xml$/i;
+    return "lifetimetv.pl"              if $filename =~ /^lifetime\s+poland/i and $filename =~ /\.xml$/i;
+    return "natgeo.pl"                  if $filename =~ /^NGpol/i and $filename =~ /\.xls$/i;
+    return "wild.natgeo.pl"             if $filename =~ /^NGWPol/i and $filename =~ /\.xls$/i;
  }
  
  if( $dir =~ /Kanal10/ and $filename =~ /\.doc$/i and $from =~ /\@kanal10.se/i ) {
@@ -421,6 +424,11 @@ if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
 
  if ( $dir =~ /OKGoteborg/ and $filename =~ /\.doc$/i ) {
     return "oppnakanalengoteborg.se";
+ }
+
+ if ( $dir =~ /ATV/ and $filename =~ /\.xml$/i ) {
+    return "atv.at" if $filename =~ /^ATV/i and $filename !~ /^ATV2/i;
+    return "atv2.at" if $filename =~ /^ATV2/i;
  }
 
   return undef;
