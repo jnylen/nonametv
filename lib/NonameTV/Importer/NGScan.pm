@@ -144,6 +144,12 @@ sub ImportXLS
 			    $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Finnish\)/ );
 			}
 
+            # Polish
+            if($chd->{sched_lang} eq "pl") {
+                $columns{'Title'}    = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series \(Polish\)/ );
+			    $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Polish\)/ );
+			}
+
             $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
           }
         }
