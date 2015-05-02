@@ -74,7 +74,8 @@ my @folders = qw(NonameTV-Data.GlobalListings
 		 NonameTV-Data.Playboy
 		 NonameTV-Data.Hustler
 		 NonameTV-Data.YaS
-		 NonameTV-Data.ATV);
+		 NonameTV-Data.ATV
+		 NonameTV-Data.KinoPolska);
 
 # Flag messages AFTER they have been processed. Then I normally
 # only have to move the message to the correct folder.
@@ -274,8 +275,8 @@ sub guess_channel
     return "crimeandinvestigation.eu"  if $filename =~ /cai.eng/i and $filename =~ /\.xml$/i;
     return "crimeandinvestigation.eu"  if $filename =~ /ci europe english/i and $filename =~ /\.xml$/i;
 
-    return "natgeotv.com" if $filename =~ /^ngscan/i and $filename =~ /\.xls$/i;
-    return "natgeotv.com" if $filename =~ /^ngswe_fin/i and $filename =~ /\.xls$/i;
+    return "natgeotv.com" if $filename =~ /^ngscan/i and $filename =~ /\.xls$/i and $filename =~ /^ngden/i;
+    return "natgeotv.com" if $filename =~ /^ngswe_fin/i and $filename =~ /\.xls$/i and $filename =~ /^ngden/i;
     #return "natgeo.dk" if $filename =~ /^ngden/i and $filename =~ /\.xls$/i;
     return "people.natgeo.dk" if $filename =~ /^ngppl\.den/i and $filename =~ /\.xls$/i;
 
@@ -349,6 +350,8 @@ sub guess_channel
      if($filename =~ /\.xls$/i) {
         return "privatespice.com" if $filename =~ /^private/i;
         return "protv.ro" if $from =~ /\@protv.ro/i;
+        return "xite.tv" if $from =~ /\@xite.nl/i;
+        return "xite.tv" if $filename =~ /^xite/i;
      }
 
      # Word
@@ -431,7 +434,32 @@ if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
     return "atv2.at" if $filename =~ /^ATV2/i;
  }
 
-  return undef;
+ if ( $dir =~ /KinoPolska/ and $filename =~ /\.xlsx$/i ) {
+    return "kinopolska.pl" if $filename =~ /Kino Polska/i and $filename !~ /International/i;
+    return "int.kinopolska.pl" if $filename =~ /Kino Polska International/i;
+    return "kinopolskamuzyka.pl" if $filename =~ /KPM/i and $filename !~ /INT/i;
+    return "int.kinopolskamuzyka.pl" if $filename =~ /KPM INT/i;
+
+    # GMT+2
+    if($filename =~ /GMT\+2/i) {
+        return "360tunebox.spi.pl" if $filename =~ /^360TuneBox/i;
+        return "docubox.spi.pl" if $filename =~ /^DocuBox/i;
+        return "erox.spi.pl" if $filename =~ /^Erox/i;
+        return "eroxxx.spi.pl" if $filename =~ /^Eroxxx/i;
+        return "fashionbox.spi.pl" if $filename =~ /^FashionBox/i;
+        return "fastandfun.spi.pl" if $filename =~ /^Fast&Fun/i;
+        return "fightbox.spi.pl" if $filename =~ /^FightBox/i;
+        return "filmboxbasic.spi.pl" if $filename =~ /^FilmBox_Basic/i and $filename =~ /CZ/i;
+        return "filmboxfamily.spi.pl" if $filename =~ /^FilmBox_Family/i and $filename =~ /CZ/i;
+        return "filmboxhd.spi.pl" if $filename =~ /^FilmBox_HD/i and $filename =~ /CZ/i;
+        return "filmboxplus.spi.pl" if $filename =~ /^FilmBox_Plus/i and $filename =~ /CZ/i;
+        return "filmboxpremium.spi.pl" if $filename =~ /^FilmBox_Premium/i and $filename =~ /CZ/i;
+    } else {
+        return "arthouse.spi.pl" if $filename =~ /^Arthouse/i and $filename =~ /EN/i;
+    }
+ }
+
+ return undef;
 }
 
 my $filestores = {};
