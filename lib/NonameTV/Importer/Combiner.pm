@@ -27,113 +27,6 @@ use warnings;
 
 my %channel_data;
 
-=pod 
-_Bakgrund:_Discovery Mix �r en s k promotion-kanal f�r Discoverys 5 tv-kanaler: Discovery, Animal Planet, Discovery Civilization, Discovery Sci-Trek och Discovery Travel & Adventure.
-
-Discovery Mix s�nder fr�n de olika Discoverykanalernas dagliga program. Discovery Mix plockar det program som visas p� respektive kanal vid en fastst�lld tidpunkt. Det �r en 5 minuters paus mellan varje kanalbyte och i tv� fall pauser p� 25 minuter.
-
-Kanalen s�nds bara hos Com Hem, som sk�ter bytet mellan inslagen fr�n de olika kanalerna enligt den tidtabell som Discovery lagt upp.
-
-_H�r �r tabl�n f�r Discovery Mix: _
-
-07.00-09.00 Animal Planet
-
-09.00-09.50 Discovery Travel & Adventure
-
-09.55-10.45 Discovery Sci-Trek
-
-10.50-11.40 Discovery Civilization
-
-11.45-12.35 Discovery Travel & Adventure
-
-PAUS
-
-13.00-15.00 Animal Planet
-
-15.00-15.50 Discovery Travel & Adventure
-
-15.55-16.45 Discovery Sci-Trek
-
-16.50-17.40 Discovery Civilization
-
-17.45-18.35 Discovery Travel & Adventure
-
-PAUS
-
-19.00-21.00 Animal Planet
-
-21.00-01.00 Discovery Channel
-
-=cut
-
-$channel_data{ "nordic.mix.discovery.com" } =
-  { 
-    "nordic.discovery.com" => 
-      [ 
-        {
-          day => 'all',
-          time => "2100-0100",
-        },
-      ],
-    "nordic.animalplanet.discovery.com" =>
-      [
-        {
-          day => 'all',
-          time => "0700-0900"
-        },
-        {
-          day => 'all',
-          time => "1300-1500"
-        },
-        {
-          day => 'all',
-          time => "1900-2100"
-        },
-      ],
-    "nordic.travel.discovery.com" =>
-      [
-        {
-          day => 'all',
-          time => "0900-0950",
-        },
-        {
-          day => 'all',
-          time => "1145-1235",
-        },
-        {
-          day => 'all',
-          time => "1500-1550"
-        },
-        {
-          day => 'all',
-          time => "1745-1835",
-        },
-
-      ],
-    "nordic.science.discovery.com" =>
-      [
-        {
-          day => 'all',
-          time => "0955-1045",
-        },
-        {
-          day => 'all',
-          time => "1555-1645"
-        },
-      ],
-    "nordic.civilisation.discovery.com" =>
-      [
-        {
-          day => 'all',
-          time => "1050-1140",
-        },
-        {
-          day => 'all',
-          time => "1650-1740"
-        },
-      ],
-  };
-
 =pod
 
 Barnkanalen och Kunskapskanalen sams�nder via DVB-T.
@@ -178,47 +71,6 @@ $channel_data{ "viasat-nature-nick.spa.se" } =
         {
           day => 'all',
 	  time => '0600-1800',
-        },
-      ],
-  };
-
-=pod
-
-Cartoon Network/TCM
-
-=cut
-
-$channel_data{ "cntcm.tv.gonix.net" } =
-  { 
-    "cartoonnetwork.tv.gonix.net" => 
-      [ 
-        {
-          day => 'all',
-	  time => '0500-2100',
-        },
-      ],
-    "tcm.tv.gonix.net" =>
-      [
-        {
-          day => 'all',
-	  time => '2100-0500',
-        },
-      ],
-  };
-
-=pod
-
-HustlerTV (switched)
-
-=cut
-
-$channel_data{ "hustlertvsw.tv.gonix.net" } =
-  { 
-    "hustlertv.tv.gonix.net" =>
-      [
-        {
-          day => 'all',
-	  time => '2200-0700',
         },
       ],
   };
@@ -449,7 +301,7 @@ $channel_data{ "ch.nickcc.mtvnetworks.de" } =
 
 =pod
 
-NRK3 and NRK Super TV shares the same slot so the programmes dont overlap.for
+NRK3 and NRK Super TV shares the same slot so the programmes dont overlap.
 
 =cut
 
@@ -472,7 +324,7 @@ $channel_data{ "nrk3super.nrk.no" } =
 
 =pod
 
-RBB branches out at 1930 to Berlin/Brandenburg specific schedules
+RBB Berlin
 
 =cut
 
@@ -491,18 +343,147 @@ $channel_data{ "berl.rbb-online.de" } =
         },
       ],
   };
-$channel_data{ "bra.rbb-online.de" } =
+
+=pod
+
+Nickelodeon DK 05:00-21:00, MTV Hits 21:00-05:00
+
+=cut
+
+$channel_data{ "nickdk-mtvhits.sat.viasat.dk" } =
   { 
-    "rbb.rbb-online.de" => 
+    "nickelodeon.dk" =>
       [ 
         {
           day => 'all',
+          time => '0500-2100',
         },
       ],
-    "rbbbra.rbb-online.de" =>
+    "hits.mtv.se" =>
       [
         {
           day => 'all',
+          time => '2100-0500',
+        },
+      ],
+  };
+
+=pod
+
+Nickelodeon NO 05:00-21:00, VH1 Classic 21:00-05:00
+
+=cut
+
+$channel_data{ "nickno-vh1classic.sat.viasat.no" } =
+  {
+    "nickelodeon.no" =>
+      [
+        {
+          day => 'all',
+          time => '0500-2100',
+        },
+      ],
+    "classic.vh1.se" =>
+      [
+        {
+          day => 'all',
+          time => '2100-0500',
+        },
+      ],
+  };
+
+=pod
+
+Disney Junior SE 06:00-19:00, Viasat Film Drama 19:00-06:00
+
+=cut
+
+$channel_data{ "disneyjuniorse-viasatfilmdramase.tvtogo.viasat.se" } =
+  {
+    "junior.disney.se" =>
+      [
+        {
+          day => 'all',
+          time => '0600-1900',
+        },
+      ],
+    "drama.film.viasat.se" =>
+      [
+        {
+          day => 'all',
+          time => '1900-0600',
+        },
+      ],
+  };
+
+=pod
+
+Nat Geo Wild 04:00-18:00, Viasat Film Action 18:00-00:00, Penthouse 1 00:00-04:00
+
+=cut
+
+$channel_data{ "ngwildse-viasatfilmactionse-penthouse1.sat.viasat.se" } =
+  {
+    "wild.natgeo.se" =>
+      [
+        {
+          day => 'all',
+          time => '0400-1800',
+        },
+      ],
+    "action.film.viasat.se" =>
+      [
+        {
+          day => 'all',
+          time => '1800-0000',
+        },
+      ],
+  };
+
+=pod
+
+Viasat Film Classic 04:00-00:00, Blue Hustler 00:00-04:00
+
+=cut
+
+$channel_data{ "viasatfilmclassicse-bluehustler.sat.viasat.se" } =
+  {
+    "classic.film.viasat.se" =>
+      [
+        {
+          day => 'all',
+          time => '0400-0000',
+        },
+      ],
+    "europe.bluehustler.com" =>
+      [
+        {
+          day => 'all',
+          time => '0000-0400',
+        },
+      ],
+  };
+
+=pod
+
+Nick Jr 06:00-18:00, VH1 18:00-06:00
+
+=cut
+
+$channel_data{ "nickjrse-vh1se.sat.viasat.se" } =
+  {
+    "nickjr.se" =>
+      [
+        {
+          day => 'all',
+          time => '0600-1800',
+        },
+      ],
+    "vh1.se" =>
+      [
+        {
+          day => 'all',
+          time => '1800-0600',
         },
       ],
   };
