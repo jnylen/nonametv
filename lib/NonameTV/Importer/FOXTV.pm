@@ -130,7 +130,6 @@ sub ImportXML
     my $yr = norm($row->findvalue( 'YearOfRelease' ));
     my $ep_desc  = norm($row->findvalue( 'episodesynopsis' ) );
     my $se_desc  = norm($row->findvalue( 'seasonsynopsis' ) );
-    my $pg_desc  = norm($row->findvalue( 'EPGSynopsis' ) );
     my $subtitle = norm($row->findvalue( 'EpisodeTitle' ) );
     my $ep_num   = norm($row->findvalue( 'EpisodeNumber' ) );
     my $se_num   = norm($row->findvalue( 'SeasonNumber' ) );
@@ -140,11 +139,15 @@ sub ImportXML
     my $actors = $row->findvalue( 'Actors' );
     $actors =~ s/, /;/g;
     $actors =~ s/;$//g;
+    $actors =~ s/,$//g;
     my $directors = $row->findvalue( 'Directors' );
     $directors =~ s/, /;/g;
     $directors =~ s/;$//g;
+    $directors =~ s/,$//g;
 
-    my $desc = $pg_desc || $ep_desc || $se_desc;
+    my $desc;
+    $desc = $ep_desc;
+    $desc = $se_desc if !defined($ep_desc) or norm($ep_desc) eq "" or norm($ep_desc) eq "null";
 
     my $ce = {
         channel_id => $chd->{id},
