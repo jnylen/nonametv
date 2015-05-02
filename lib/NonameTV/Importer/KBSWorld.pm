@@ -29,7 +29,7 @@ sub new {
   my $self  = $class->SUPER::new( @_ );
   bless ($self, $class);
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}  );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Asia/Seoul"  );
   $self->{datastorehelper} = $dsh;
 
   # Use augmenter, and get teh fabulous shit
@@ -60,7 +60,7 @@ sub FetchDataFromSite {
 
   my $mech = $self->{cc}->UserAgent();
 
-  my $response = $mech->post( "http://kbsworld.kbs.co.kr/schedule/down_schedule_.php", { 'wlang' => 'e', 'down_time_add' => '-8', 'start_date' => $datefirst, 'end_date' => $datelast, 'ftype' => 'xls' } );
+  my $response = $mech->post( "http://kbsworld.kbs.co.kr/schedule/down_schedule_.php", { 'wlang' => 'e', 'down_time_add' => '0', 'start_date' => $datefirst, 'end_date' => $datelast, 'ftype' => 'xls' } );
   my $content  = $response->decoded_content();
 
   return ($content, undef);
