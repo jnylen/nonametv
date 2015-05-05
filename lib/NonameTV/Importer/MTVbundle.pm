@@ -66,10 +66,10 @@ sub ImportContentFile {
   my $currdate = "x";
   my $colchannel = 0;
 #  my $colweek = 1;
-  my $coldate = 1;
-  my $coltime = 2;
-  my $coltitle = 3;
-  my $coldescription = 4;
+  my $coldate = 2;
+  my $coltime = 3;
+  my $coltitle = 4;
+  my $coldescription = 7;
 
 my $oBook;
 if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
@@ -163,11 +163,11 @@ sub ParseDate
   my ( $dinfo ) = @_;
 
   my( $month, $day, $year );
-#      progress("Mdatum $dinfo");
+  #    progress("Mdatum $dinfo");
   if( $dinfo =~ /^\d{4}-\d{2}-\d{2}$/ ){ # format   '2010-04-22' 
     ( $year, $month, $day ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
   } elsif( $dinfo =~ /^\d{2}.\d{2}.\d{4}$/ ){ # format '11/18/2011'
-    ( $month, $day, $year ) = ( $dinfo =~ /^(\d+).(\d+).(\d+)$/ );
+    ( $day, $month, $year ) = ( $dinfo =~ /^(\d+).(\d+).(\d+)$/ );
   } elsif( $dinfo =~ /^\d{1,2}-\d{1,2}-\d{2}$/ ){ # format '10-18-11' or '1-9-11'
     ( $month, $day, $year ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
   }
