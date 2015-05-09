@@ -41,11 +41,11 @@ if( not $res ) {
   print << 'EOHELP';
  [--manual] [--test] [--verbose]
 
-Extract files from mails in a maildir and store them using 
+Extract files from mails in a maildir and store them using
 NonameTV::FileStore.
 
   --manual  Ask the user which Importer to use if the information
-            cannot be derived from the message. 
+            cannot be derived from the message.
 
   --test    Run the importer in test-mode.
 
@@ -87,7 +87,7 @@ my $mgr = Mail::Box::Manager->new;
 StartLogSection( "nonametv-parse-maildir", 0 );
 
 foreach my $dir (@folders) {
-  my $folder = $mgr->open( "$root.$dir", 
+  my $folder = $mgr->open( "$root.$dir",
                            access => 'rw',
                            extract => 'ALWAYS' );
 
@@ -121,7 +121,7 @@ foreach my $dir (@folders) {
 $mgr->closeAllFolders;
 
 EndLogSection( "nonametv-parse-maildir" );
- 
+
 sub process_parts
 {
   my( $part, $dir, $from, $subject ) = @_;
@@ -141,7 +141,7 @@ sub process_parts
   else
   {
     my $disp = $part->body->disposition;
-    my $name = decode( 'MIME-Header', 
+    my $name = decode( 'MIME-Header',
 		       $part->body->dispositionFilename ) || 'noname';
     my $size = $part->body->size;
 
@@ -152,7 +152,7 @@ sub process_parts
       print "$name ($size bytes): ";
       $channel = <STDIN>;
       $channel =~ tr/\n\r //d;
-      $channel = undef if $channel eq "";        
+      $channel = undef if $channel eq "";
     }
 
     if( not defined $channel ) {
@@ -163,19 +163,14 @@ sub process_parts
     my $chd = $ds->sa->Lookup( 'channels', {xmltvid => $channel} );
 
     die "Unknown channel $channel" if not defined $chd;
-    
+
     p "Adding file $name for $channel";
 
     my $fs = GetFileStore( $chd->{grabber} );
     my ($content);
 
     # Channels you only want it decoded, not fucked up
-    #$channel eq "rtl2.de" or $channel eq "historytv.se" or
-    #       $channel eq "historytv.no" or $channel eq "historytv.dk" or
-    #       $channel eq "historytv.eu" or $channel eq "crimeandinvestigation.eu" or
-    #       $channel eq "sonyentertainment.tv" or $channel eq "axntv.de" or $channel eq "animax.tv" or
-    #       $channel eq "familytv.de" or $channel eq "dasneue.tv" or $channel eq "tnt-tv.dk
-    if($name =~ /\.xml$/i) {
+    if($name =~ /\.xml$/i or $channel eq "international.rt.com" or $channel eq "russia.rt.com") {
         $content = decode_base64($part->body);
     } else {
         $content = $part->decoded->string;
@@ -194,7 +189,7 @@ sub guess_channel
   my( $dir, $from, $subject, $filename, $type, $size ) = @_;
 
   if( $dir =~ /Disney/ ) {
-    # The Disney filenames are very unreliable. 
+    # The Disney filenames are very unreliable.
     if( $filename =~ /\bxd/i ) {
       return "xd.disneychannel.se";
     }
@@ -259,6 +254,10 @@ sub guess_channel
   }
 
   if( $dir =~ /GlobalListings/ ) {
+    # Russia Today
+    return "international.rt.com" if $filename =~ /^RTINT/i;
+    return "russia.rt.com" if $filename =~ /^RTRUS/i;
+
     return "hd.natgeo.se" if $filename =~ /^ng\s*swe\s*hd\b/i;
 
 	# Nat geo wild sends in XLS format
@@ -275,9 +274,9 @@ sub guess_channel
     return "crimeandinvestigation.eu"  if $filename =~ /cai.eng/i and $filename =~ /\.xml$/i;
     return "crimeandinvestigation.eu"  if $filename =~ /ci europe english/i and $filename =~ /\.xml$/i;
 
-    return "natgeotv.com" if $filename =~ /^ngscan/i and $filename =~ /\.xls$/i and $filename =~ /^ngden/i;
-    return "natgeotv.com" if $filename =~ /^ngswe_fin/i and $filename =~ /\.xls$/i and $filename =~ /^ngden/i;
-    #return "natgeo.dk" if $filename =~ /^ngden/i and $filename =~ /\.xls$/i;
+    return "natgeo.dk" if $filename =~ /^ngden/i and $filename =~ /\.xls$/i;
+    return "natgeotv.com" if $filename =~ /^ngscan/i and $filename =~ /\.xls$/i and $filename !~ /^ngden/i;
+    return "natgeotv.com" if $filename =~ /^ngswe_fin/i and $filename =~ /\.xls$/i and $filename !~ /^ngden/i;
     return "people.natgeo.dk" if $filename =~ /^ngppl\.den/i and $filename =~ /\.xls$/i;
 
 	# Travel Channel
@@ -292,8 +291,10 @@ sub guess_channel
     return "de.eonline.com"  if $filename =~ /^e\s*ger\b/i and $filename =~ /\.xls$/i;
 
     # FOX TV
-    return "foxtv.no"       if $filename =~ /^fox\s+norway/i;
-    return "foxtv.no"       if $filename =~ /^fox\.cr\.nor/i;
+    return "foxtv.no"       if $filename =~ /^fox\s+norway/i and $filename =~ /\.xml$/i;
+    return "foxtv.no"       if $filename =~ /^fox\.cr\.nor/i and $filename =~ /\.doc$/i;
+    return "foxtv.no"       if $filename =~ /^nor\s+fox/i and $filename =~ /\.xml$/i;
+    #return "foxtv.no"       if $subject  =~ /^fox\s+norway/i and $filename =~ /\.xml$/i;
     return "foxtv.se"       if $filename =~ /^fox\s+sweden/i and $filename =~ /\.xml$/i;
 
     # H2
@@ -312,10 +313,6 @@ sub guess_channel
     return "syfy.nl" if $filename =~ /^Syfy\s*Benelux/i and $filename =~ /DUT/;
     return "en.syfy.nl" if $filename =~ /^Syfy\s*Benelux/i and $filename =~ /ENG/;
 
-    # Russia Today
-    return "international.rt.com" if $filename =~ /^RTINT/i;
-    return "russia.rt.com" if $filename =~ /^RTRUS/i;
-
     # Sky News
     return "international.skynews.com" if $filename =~ /^SKYNI/i and $filename =~ /\.xls$/i;
     return "international.skynews.com" if $filename =~ /^SKYH/i and $filename =~ /\.xls$/i;
@@ -329,7 +326,7 @@ sub guess_channel
     return "natgeo.pl"                  if $filename =~ /^NGpol/i and $filename =~ /\.xls$/i;
     return "wild.natgeo.pl"             if $filename =~ /^NGWPol/i and $filename =~ /\.xls$/i;
  }
- 
+
  if( $dir =~ /Kanal10/ and $filename =~ /\.doc$/i and $from =~ /\@kanal10.se/i ) {
      return "kanal10.se";
  }
@@ -365,7 +362,7 @@ sub guess_channel
         return "bibeltv.de" if $filename =~ /bibeltv/i;
      }
  }
- 
+
  if( $dir =~ /Playboy/ and $filename =~ /\.doc$/i ) {
      return "europe.playboytv.com" if $filename =~ /^playboy/i;
      return "adultchannel.co.uk" if $filename =~ /^the\s*adult/i;
@@ -373,7 +370,7 @@ sub guess_channel
      return "brazzerstveurope.com" if $filename =~ /^brazzers/i;
      return "viasat.spice.com" if $filename =~ /^spice\s*viasat/i;
  }
- 
+
  if( $dir =~ /Hustler/ and $filename =~ /\.(xls|xlsx)$/i ) {
      return "europe.bluehustler.com" if $filename =~ /^blue.*gmt.*\b/i;
      return "europe.hustlertv.com" if $filename =~ /^hustler.*gmt.*\b/i;
@@ -397,26 +394,22 @@ sub guess_channel
      return "fatstone.tv";
  }
 
-if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
-     return "foxtv.se" if $filename =~ /^fox\s+sweden/i;
- }
- 
  if( $dir =~ /LifestyleTV/ and $filename =~ /\.xls|.xlsx$/i ) {
      return "lifestyletv.se";
  }
- 
+
  if( $dir =~ /TVChile/ and $filename =~ /\.xls|.xlsx$/i ) {
      return "tvchile.cl";
  }
- 
+
  if( $dir =~ /FuelTV/ and $filename =~ /epg/i ) {
      return "fuel.tv";
  }
- 
+
  if( $dir =~ /GodTV/ and $filename =~ /\.xlsx$/i ) {
      return "god.tv";
  }
- 
+
  if( $dir =~ /LuxeTV/ and $filename =~ /\.xls$/i ) {
      return "luxe.tv" if $filename =~ /\d\.xls$/i;
  }
@@ -478,6 +471,6 @@ sub md5sum {
   my( $file ) = @_;
   open(FILE, $file) or die "Can't open '$file': $!";
   binmode(FILE);
-  
+
   return Digest::MD5->new->addfile(*FILE)->hexdigest;
 }

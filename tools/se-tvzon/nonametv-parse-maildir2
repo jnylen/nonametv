@@ -302,6 +302,7 @@ sub guess_channel
     # excel (XLSX)
     if($filename =~ /\.xlsx$/i) {
     	return "classic.vh1.se" if $filename =~ /vh1.*euro.*classic/i;
+    	return "classic.vh1.se" if $filename =~ /vh1euroclassic/i;
 
     	if($filename =~ /^mtv.*live/i) {
     	    return "hd.mtv.se" if $filename =~ /listings/i;
@@ -324,10 +325,6 @@ sub guess_channel
 
  if( $dir =~ /Fatstone/ and $filename =~ /\.xlsx$/i ) {
      return "fatstone.tv";
- }
-
-if( $dir =~ /FOX/ and $filename =~ /\.xml$/i ) {
-     return "foxtv.se" if $filename =~ /^fox\s+sweden/i;
  }
 
  if( $dir =~ /TV8Norge/ and $filename =~ /\.xls|.xlsx$/i ) {
