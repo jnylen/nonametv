@@ -28,7 +28,7 @@ Options:
   --verbose
     Show which datafiles are created.
 
-  --quiet 
+  --quiet
     Show only fatal errors.
 
   --export-channels
@@ -44,7 +44,7 @@ Options:
   --channel-group <groupname>
     Export data only for the channel group specified.
 
-=cut 
+=cut
 
 sub new {
     my $proto = shift;
@@ -58,14 +58,14 @@ sub new {
     $self->{MaxDays} = 365 unless defined $self->{MaxDays};
     $self->{MinDays} = $self->{MaxDays} unless defined $self->{MinDays};
 
-    $self->{LastRequiredDate} = 
+    $self->{LastRequiredDate} =
       DateTime->today->add( days => $self->{MinDays}-1 )->ymd("-");
 
     $self->{OptionSpec} = [ qw/export-channels remove-old force-export
                 channel-group=s
 			    verbose+ quiet+ help/ ];
 
-    $self->{OptionDefaults} = { 
+    $self->{OptionDefaults} = {
       'export-channels' => 0,
       'remove-old' => 0,
       'force-export' => 0,
@@ -148,15 +148,15 @@ sub FindAll {
 
   my $ds = $self->{datastore};
 
-  my ( $res, $channels ) = $ds->sa->Sql( 
+  my ( $res, $channels ) = $ds->sa->Sql(
        "select id from channels where export=1");
 
   my $last_date = DateTime->today->add( days => $self->{MaxDays} -1 );
-  my $first_date = DateTime->today; 
+  my $first_date = DateTime->today;
 
   while( my $data = $channels->fetchrow_hashref() ) {
-    add_dates( $todo, $data->{id}, 
-               '1970-01-01 00:00:00', '2100-12-31 23:59:59', 
+    add_dates( $todo, $data->{id},
+               '1970-01-01 00:00:00', '2100-12-31 23:59:59',
                $first_date, $last_date );
   }
 
@@ -169,11 +169,11 @@ sub FindUpdated {
   my( $todo, $last_update ) = @_;
 
   my $ds = $self->{datastore};
- 
+
   my ( $res, $update_batches ) = $ds->sa->Sql( << 'EOSQL'
-    select channel_id, batch_id, 
+    select channel_id, batch_id,
            min(start_time)as min_start, max(start_time) as max_start
-    from programs 
+    from programs
     where batch_id in (
       select id from batches where last_update > ?
     )
@@ -183,11 +183,11 @@ EOSQL
     , [$last_update] );
 
   my $last_date = DateTime->today->add( days => $self->{MaxDays} -1 );
-  my $first_date = DateTime->today; 
+  my $first_date = DateTime->today;
 
   while( my $data = $update_batches->fetchrow_hashref() ) {
-    add_dates( $todo, $data->{channel_id}, 
-               $data->{min_start}, $data->{max_start}, 
+    add_dates( $todo, $data->{channel_id},
+               $data->{min_start}, $data->{max_start},
                $first_date, $last_date );
   }
 
@@ -195,7 +195,7 @@ EOSQL
 }
 
 # Find all dates that should be exported but haven't been exported
-# yet. 
+# yet.
 sub FindUnexportedDays {
   my $self = shift;
   my( $todo, $last_update ) = @_;
@@ -209,17 +209,17 @@ sub FindUnexportedDays {
     # The previous export was done $days ago.
 
     my $last_date = DateTime->today->add( days => $self->{MaxDays} -1 );
-    my $first_date = $last_date->clone->subtract( days => $days-1 ); 
+    my $first_date = $last_date->clone->subtract( days => $days-1 );
 
-    my ( $res, $channels ) = $ds->sa->Sql( 
+    my ( $res, $channels ) = $ds->sa->Sql(
        "select id from channels where export=1");
-    
+
     while( my $data = $channels->fetchrow_hashref() ) {
-      add_dates( $todo, $data->{id}, 
-                 '1970-01-01 00:00:00', '2100-12-31 23:59:59', 
-                 $first_date, $last_date ); 
+      add_dates( $todo, $data->{id},
+                 '1970-01-01 00:00:00', '2100-12-31 23:59:59',
+                 $first_date, $last_date );
     }
-    
+
     $channels->finish();
   }
 }
@@ -243,7 +243,7 @@ sub ReadState {
   my $self = shift;
 
   my $ds = $self->{datastore};
- 
+
   my $last_update = $ds->sa->Lookup( 'state', { name => "json_last_update" },
                                  'value' );
 
@@ -262,7 +262,7 @@ sub WriteState {
 
   my $ds = $self->{datastore};
 
-  $ds->sa->Update( 'state', { name => "json_last_update" }, 
+  $ds->sa->Update( 'state', { name => "json_last_update" },
                { value => $update_started } );
 }
 
@@ -275,18 +275,18 @@ sub add_dates {
 
   my $from_dt = create_dt( $from, 'UTC' )->truncate( to => 'day' );
   my $to_dt = create_dt( $to, 'UTC' )->truncate( to => 'day' );
- 
+
   $to_dt = $last->clone() if $last < $to_dt;
   $from_dt = $first->clone() if $first > $from_dt;
 
   my $first_dt = $from_dt->clone()->subtract( days => 1 );
- 
+
   for( my $dt = $first_dt->clone();
        $dt <= $to_dt; $dt->add( days => 1 ) ) {
     $h->{$chid}->{$dt->ymd('-')} = 1;
-  } 
+  }
 }
-  
+
 sub create_dt
 {
   my( $str, $tz ) = @_;
@@ -338,12 +338,12 @@ sub ExportFile {
 
   my( $res, $sth ) = $self->{datastore}->sa->Sql( "
         SELECT * from programs
-        WHERE (channel_id = ?) 
+        WHERE (channel_id = ?)
           and (start_time >= ?)
-          and (start_time < ?) 
-        ORDER BY start_time", 
+          and (start_time < ?)
+        ORDER BY start_time",
       [$chd->{id}, "$startdate 00:00:00", "$enddate 23:59:59"] );
-  
+
   my $w = $self->CreateWriter( $chd, $date );
 
   my $done = 0;
@@ -373,8 +373,8 @@ sub ExportFile {
       w "Adjusted endtime $d1->{end_time} => $d2->{start_time}";
 
       $d1->{end_time} = $d2->{start_time}
-    }        
-      
+    }
+
 
     $self->WriteEntry( $w, $d1, $chd )
       unless $d1->{title} eq "end-of-transmission";
@@ -427,7 +427,7 @@ sub CreateWriter
   $self->{writer_entries} = 0;
   # Make sure that writer_entries is always true if we don't require data
   # for this date.
-  $self->{writer_entries} = "0 but true" 
+  $self->{writer_entries} = "0 but true"
     if( ($date gt $self->{LastRequiredDate}) or $chd->{empty_ok} );
 
   $self->{lngstr} = LoadLanguage( $chd->{sched_lang},
@@ -450,8 +450,8 @@ sub CloseWriter
   open( my $fh, ">$path$filename.new")
     or die( "Json: cannot write to $path$filename.new" );
 
-  my $odata = { 
-    jsontv => { 
+  my $odata = {
+    jsontv => {
       programme => $data,
     }
   };
@@ -501,20 +501,20 @@ sub WriteEntry
 
   my $start_time = create_dt( $entry->{start_time}, "UTC" );
   my $end_time = create_dt( $entry->{end_time}, "UTC" );
-  
+
   my $d = {
     channel => $chd->{xmltvid},
     start => $start_time->strftime( "%s" ),
     stop => $end_time->strftime( "%s" ),
     title => { $chd->{sched_lang}, $entry->{title} }
   };
-  
-  $d->{desc} = { $chd->{sched_lang} => $entry->{description} } 
+
+  $d->{desc} = { $chd->{sched_lang} => $entry->{description} }
     if defined( $entry->{description} ) and $entry->{description} ne "";
-  
+
   $d->{'subTitle'} = { $chd->{sched_lang} => $entry->{subtitle} }
     if defined( $entry->{subtitle} ) and $entry->{subtitle} ne "";
-  
+
   if( defined( $entry->{episode} ) and ($entry->{episode} =~ /\S/) )
   {
     my( $season, $ep, $part );
@@ -536,11 +536,11 @@ sub WriteEntry
     if( $ep =~ /\S/ ) {
       my( $ep_nr, $ep_max ) = split( "/", $ep );
       $ep_nr++;
-      
+
       my $ep_text = $self->{lngstr}->{episode_number} . " $ep_nr";
-      $ep_text .= " " . $self->{lngstr}->{of} . " $ep_max" 
+      $ep_text .= " " . $self->{lngstr}->{of} . " $ep_max"
 	  if defined $ep_max;
-      $ep_text .= " " . $self->{lngstr}->{episode_season} . " $season" 
+      $ep_text .= " " . $self->{lngstr}->{episode_season} . " $season"
 	  if( $season );
 
 	  # MythTV
@@ -577,7 +577,7 @@ sub WriteEntry
       $d->{'episodeNum'} = { xmltv_ns => norm($entry->{episode}) };
     }
   }
-  
+
   if( defined( $entry->{program_type} ) and ($entry->{program_type} =~ /\S/) )
   {
     push @{$d->{category}->{en}}, $entry->{program_type};
@@ -602,7 +602,7 @@ sub WriteEntry
     }
   }
 
-  if( defined( $entry->{production_date} ) and 
+  if( defined( $entry->{production_date} ) and
       ($entry->{production_date} =~ /\S/) )
   {
     $d->{date} = substr( $entry->{production_date}, 0, 4 );
@@ -610,7 +610,12 @@ sub WriteEntry
 
   if( $entry->{aspect} ne "unknown" )
   {
-    $d->{video} = { aspect => $entry->{aspect} };
+    $d->{video}->{aspect} = $entry->{aspect};
+  }
+
+  if( $entry->{quality} )
+  {
+    $d->{video}->{quality} = $entry->{quality};
   }
 
   if( $entry->{directors} =~ /\S/ )
@@ -676,10 +681,17 @@ sub WriteEntry
   {
     $d->{rating}->{stars} = $entry->{star_rating};
   }
-  
+
   if( $entry->{rating} )
   {
-    $d->{rating}->{mpaa} = $entry->{rating};
+    if($entry->{rating} =~ /^FSK/) {
+      my $r = $entry->{rating};
+      $r =~ s/^FSK //;
+      $d->{rating}->{fsk} = $r;
+    } else {
+      $d->{rating}->{mpaa} = $entry->{rating};
+    }
+
   }
 
   if( $entry->{country} and $entry->{country} =~ /\S/ )
@@ -745,7 +757,7 @@ sub ExportChannelList
   {
     $channels->{$data->{xmltvid}} = {
       "displayName" => {
-	$self->{Language} => $data->{display_name}, 
+	$self->{Language} => $data->{display_name},
       },
       "baseUrl" => $self->{RootUrl},
     };
@@ -772,19 +784,19 @@ sub ExportChannelList
   $js->pretty( 1 );
   $fh->print( $js->encode( { jsontv => { channels => $channels } } ) );
   $fh->close();
-  
+
   system("gzip -f -n $outfile");
 }
 
 #
-# Remove old js-files and js.gz-files. 
+# Remove old js-files and js.gz-files.
 #
 sub RemoveOld
 {
   my( $self ) = @_;
 
   my $ds = $self->{datastore};
- 
+
   # Keep files for the last week.
   my $keep_date = DateTime->today->subtract( days => 8 )->ymd("-");
 
@@ -793,7 +805,7 @@ sub RemoveOld
 
   foreach my $file (@files)
   {
-    my($date) = 
+    my($date) =
       ($file =~ /(\d\d\d\d-\d\d-\d\d)\.js(\.gz){0,1}/);
 
     if( defined( $date ) )
@@ -817,4 +829,3 @@ sub RemoveOld
 ## Local Variables:
 ## coding: utf-8
 ## End:
-  

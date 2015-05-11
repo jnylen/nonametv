@@ -173,10 +173,13 @@ def create_xml():
 
                     # Video COULD be present
                     if programme.has_key("video"):
+                        xml_video = ET.SubElement(xml_programme, "video")
                         if programme['video'].has_key("aspect"):
-                            xml_video = ET.SubElement(xml_programme, "video")
                             xml_video_aspect = ET.SubElement(xml_video, "aspect")
                             xml_video_aspect.text = programme['video']['aspect']
+                        if programme['video'].has_key("quality"):
+                            xml_video_quality = ET.SubElement(xml_video, "quality")
+                            xml_video_quality.text = programme['video']['quality']
 
                     # A previously shown parameter COULD be present
                     if programme.has_key("previously_shown"):
@@ -201,6 +204,10 @@ def create_xml():
                             rating = ET.SubElement(xml_programme, "rating", { "system": "MPAA" })
                             rating_value = ET.SubElement(rating, "value")
                             rating_value.text = programme['rating']['mpaa']
+                        if programme['rating'].has_key("fsk"):
+                            rating = ET.SubElement(xml_programme, "rating", { "system": "FSK" })
+                            rating_value = ET.SubElement(rating, "value")
+                            rating_value.text = programme['rating']['fsk']
                         if programme['rating'].has_key("stars"):
                             star_rating = ET.SubElement(xml_programme, "star-rating")
                             star_rating_value = ET.SubElement(star_rating, "value")
