@@ -6,7 +6,7 @@ use warnings;
 =pod
 
 Sample importer for http-based sources.
-See xxx for instructions. 
+See xxx for instructions.
 
 Registration at: https://medienportal.srf.ch/app/
 Webservice documentation available via: http://www.crosspoint.ch/index.php?is_presseportal_ws
@@ -85,7 +85,7 @@ sub ImportContent {
   my ($batch_id, $cref, $chd) = @_;
 
   my $doc = ParseXml ($cref);
-  
+
   if (not defined ($doc)) {
     f ("$batch_id: Failed to parse.");
     return 0;
@@ -113,6 +113,7 @@ sub ImportContent {
 
       my $season = $programme->findvalue( './SEASON' );
       my $episode = $programme->findvalue( './FOLGENR' );
+      my $hd = $programme->findvalue( './HD' );
 
       my $ce = {
 #        channel_id => $chd->{id},
@@ -215,6 +216,7 @@ sub ImportContent {
 
       $ce->{original_title} = norm(normLatin1($org_title)) if $org_title and $org_title ne $title;
       $ce->{original_subtitle} = norm(normLatin1($subtitle_org)) if $subtitle_org and $subtitle_org ne $subtitle;
+      $ce->{quality} = "HDTV" if $hd eq "Ja";
 
       # EPISODES
       if($episode) {
@@ -223,6 +225,14 @@ sub ImportContent {
         } else {
           $ce->{episode} = sprintf( " . %d . ", $episode-1 );
         }
+      }
+
+      # Images
+      my $imgs = $programme->find( './/BILD' );
+      foreach my $item ($imgs->get_nodelist)
+      {
+          $ce->{fanart} = $item->find('./URL_300DPI')->to_literal;
+          #print "IMG:" .$item->to_literal;
       }
 
       $self->{datastorehelper}->AddProgramme( $ce );
