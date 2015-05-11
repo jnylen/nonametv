@@ -146,7 +146,7 @@ sub Object2Url {
 
   my( $year, $month, $day ) = ( $batch_id =~ /(\d+)-(\d+)-(\d+)$/ );
 
-  my $url = sprintf( "http://beta.frikanalen.tv/xmltv/%d/%02d/%02d", $year, $month, $day );
+  my $url = sprintf( "http://beta.frikanalen.no/xmltv/%d/%02d/%02d", $year, $month, $day );
 
   return( $url, undef );
 }
