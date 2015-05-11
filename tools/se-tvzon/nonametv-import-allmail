@@ -69,3 +69,4 @@ tools/nonametv-import WildTV $1 $2 $3
 tools/nonametv-import BibelTV $1 $2 $3
 tools/nonametv-import XITE $1 $2 $3
 tools/nonametv-import KinoPolska $1 $2 $3
+tools/nonametv-import ATV $1 $2 $3
