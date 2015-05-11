@@ -488,6 +488,33 @@ $channel_data{ "nickjrse-vh1se.sat.viasat.se" } =
       ],
   };
 
+=pod
+
+CN 06:00-21:00, Disney XD 06:00-18:00.﻿
+
+=cut
+
+$channel_data{ "cartoonnetwork.boxer.se" } =
+  {
+    "cartoonnetwork.se" =>
+      [
+        {
+          day => 'all',
+          time => '0600-2100',
+        },
+      ]
+  };
+
+  $channel_data{ "disneyxd.boxer.se" } =
+  {
+    "xd.disneychannel.se" =>
+      [
+        {
+          day => 'all',
+          time => '0600-1800',
+        },
+      ]
+  };
 
 
 use DateTime;
