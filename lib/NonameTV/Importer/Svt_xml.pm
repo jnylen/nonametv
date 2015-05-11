@@ -52,7 +52,7 @@ sub new {
 
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Stockholm" );
   $self->{datastorehelper} = $dsh;
-  
+
   # use augment
   $self->{datastore}->{augment} = 1;
 
@@ -115,12 +115,12 @@ sub ImportXML
       my $title = norm2($row->findvalue( './/sch:Title/@official' ) );
       my $title_org = norm2($row->findvalue( './/sch:Title/@original' ) );
       $title =~ s/¿/‒/g; # Wrong encoded char
-      
+
       my $time = $row->findvalue( './/sch:StartTime/@startcet' );
       my $endtime = $row->findvalue( './/sch:StartTime/@endcet' );
       my $date = $row->findvalue( './/sch:Date/@startcet' );
       my $enddate = $row->findvalue( './/sch:Date/@endcet' );
-      
+
 	  if($date ne $currdate ) {
         if( $currdate ne "x" ) {
 			$dsh->EndBatch( 1 );
@@ -144,10 +144,10 @@ sub ImportXML
 	  my $live       = $row->findvalue( './/sch:TechnicalDetails/@live' );
 	  my $ws         = $row->findvalue( './/sch:TechnicalDetails/@widescreen' );
 	  my $dol        = $row->findvalue( './/sch:TechnicalDetails/@surround5_1audio' );
-	  
+
 	  my $start = $self->create_dt( $date."T".$time );
 	  my $end   = $self->create_dt( $enddate."T".$endtime );
-	  
+
 	  # Genre description
 	  my $genredesc = norm2( $row->findvalue( './/sch:ShortDescription/@description' ) );
 	  my $genrenum  = $row->findvalue( './/sch:Classification/@content' );
@@ -160,7 +160,7 @@ sub ImportXML
         start_time => $start,
         end_time => $end,
       };
-      
+
       if( defined( $year ) and ($year =~ /(\d\d\d\d)/) )
       {
         $ce->{production_date} = "$1-01-01";
@@ -179,22 +179,22 @@ sub ImportXML
       }
 
       $ce->{original_title} = norm($title_org) if defined($title_org) and $ce->{title} ne norm($title_org) and norm($title_org) ne "";
-      
+
       #my ( $program_type, $category ) = ParseDescCatSwe( $genredesc );
   	  #AddCategory( $ce, $program_type, $category );
-      
+
       # Season stuff
 
       my @sentences2 = (split_text( $genredesc ), "");
-      
+
       for( my $i2=0; $i2<scalar(@sentences2); $i2++ )
   	  {
         if( my( $seasontextnum ) = ($sentences2[$i2] =~ /^Säsong (\d+)./ ) )
 	    {
 	      $season = $seasontextnum;
-	      
+
 	      #print("Text: $seasontext - Num: $season\n");
-	      
+
 	      # Only remove sentence if it could find a season
 	      if($season ne "") {
 	      	$sentences2[$i2] = "";
@@ -204,22 +204,22 @@ sub ImportXML
 	    {
 	      $seasontext =~ s/ och sista//g;
 	      $seasontext = lc($seasontext);
-	      
+
 	      $season = SeasonText($seasontext);
-	      
+
 	      #print("Text: $seasontext - Num: $season\n");
-	      
+
 	      # Only remove sentence if it could find a season
 	      if($season ne "") {
 	      	$sentences2[$i2] = "";
 	      }
 	    }
 	 }
-      
-      
+
+
       # Person
       my @sentences = (split_text( $desc ), "");
-      
+
       for( my $i=0; $i<scalar(@sentences); $i++ )
   	  {
         if( my( $originaltitle ) = ($sentences[$i] =~ /^\((.*)\)\.$/ ) )
@@ -232,14 +232,14 @@ sub ImportXML
 	      # If this program has an episode-number, it is by definition
 		  # a series (?). Svt often miscategorize series as movie.
 		  $ce->{program_type} = 'series';
-		  
+
 	      my( $ep, $eps, $name, $episode, $dummy );
 	      # Del 2 av 3: Pilot (episodename)
 	 	  ( $ce->{subtitle} ) = ($sentences[$i] =~ /:\s*(.+)\./);
-	 	  
+
 	 	  # norm2
 	 	  $ce->{subtitle} = norm2($ce->{subtitle});
-	 	  
+
 	 	  $sentences[$i] = "";
 	 	}
   	  	elsif( my( $directors ) = ($sentences[$i] =~ /^Regi:\s*(.*)/) )
@@ -293,7 +293,7 @@ sub ImportXML
             $sentences[$i] = "";
         }
      }
-     
+
       # Episode info in xmltv-format
       if( ($episode ne "0" and $episode ne "") and ( $of_episode ne "0" and $of_episode ne "") and ( $season ne "0" and $season ne "") )
       {
@@ -318,9 +318,9 @@ sub ImportXML
       	} else {
       		$ce->{episode} = sprintf( ". %d .", $episode-1 );
       	}
-        	
+
       }
-      
+
       # Remove if season = 0, episode 1, of_episode 1 - it's a one episode only programme
       if(($episode eq "1") and ( $of_episode eq "1") and ( $season eq "0")) {
       	delete($ce->{episode});
@@ -335,16 +335,16 @@ sub ImportXML
       if($ce->{title} =~ /^(Gomorron Sverige)$/i) {
         delete($ce->{end_time});
       }
-      
+
       $ce->{description} = join_text( @sentences );
-     
+
      #print Dumper($ce);
-     
+
      # hd
     if( $hd eq "true") {
-     	$ce->{quality} = "HDTV";
+    # 	$ce->{quality} = "HDTV";
     }
-     
+
     # Find live-info
 	if( $live eq "true" )
 	{
@@ -371,7 +371,7 @@ sub ImportXML
         ( $pty, $cat ) = $ds->LookupCat( 'Svt_genre2', $genrenum3 );
         AddCategory( $ce, $pty, $cat );
     }
-      
+
     progress( "SvtXML: $chd->{xmltvid}: $time - $title" );
     $dsh->AddCE( $ce );
 
@@ -393,12 +393,12 @@ sub create_dt
   my( $date, $time ) = split( 'T', $str );
 
   my( $year, $month, $day ) = split( '-', $date );
-  
+
   # Remove the dot and everything after it.
   $time =~ s/\..*$//;
-  
+
   my( $hour, $minute, $second ) = split( ":", $time );
-  
+
 
   my $dt = DateTime->new( year   => $year,
                           month  => $month,
@@ -407,9 +407,9 @@ sub create_dt
                           minute => $minute,
                           time_zone => 'Europe/Stockholm',
                           );
-  
+
   $dt->set_time_zone( "UTC" );
-  
+
   return $dt;
 }
 
@@ -421,7 +421,7 @@ sub parse_person_list
 
   # Remove all variants of m.fl.
   $str =~ s/\s*m[\. ]*fl\.*\b//;
-  
+
   # Remove trailing '.'
   $str =~ s/\.$//;
 
@@ -464,27 +464,27 @@ sub split_text
   # Lines ending with a comma is not the end of a sentence
 #  $t =~ s/,\s*\n+\s*/, /g;
 
-# newlines have already been removed by norm() 
-  # Replace newlines followed by a capital with space and make sure that there 
-  # is a dot to mark the end of the sentence. 
+# newlines have already been removed by norm()
+  # Replace newlines followed by a capital with space and make sure that there
+  # is a dot to mark the end of the sentence.
 #  $t =~ s/([\!\?])\s*\n+\s*([A-Z���])/$1 $2/g;
 #  $t =~ s/\.*\s*\n+\s*([A-Z���])/. $1/g;
 
-  # Turn all whitespace into pure spaces and compress multiple whitespace 
+  # Turn all whitespace into pure spaces and compress multiple whitespace
   # to a single.
   $t =~ tr/\n\r\t \xa0/     /s;
 
-  # Mark sentences ending with '.', '!', or '?' for split, but preserve the 
+  # Mark sentences ending with '.', '!', or '?' for split, but preserve the
   # ".!?".
   $t =~ s/([\.\!\?])\s+([\(A-Z���])/$1;;$2/g;
-  
+
   my @sent = grep( /\S\S/, split( ";;", $t ) );
 
   if( scalar( @sent ) > 0 )
   {
     # Make sure that the last sentence ends in a proper way.
     $sent[-1] =~ s/\s+$//;
-    $sent[-1] .= "." 
+    $sent[-1] .= "."
       unless $sent[-1] =~ /[\.\!\?]$/;
   }
 
@@ -518,12 +518,12 @@ sub norm2 {
   my( $str ) = @_;
 
   return "" if not defined( $str );
-  
+
   #$str =~ s/ï¿½/ä/;
   #$str =~ s/ï¿½/å/;
-  
+
   #return $str;
-  
+
   return normUtf8($str);
 }
 
