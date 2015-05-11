@@ -33,7 +33,7 @@ sub new {
 
   defined( $self->{FtpRoot} ) or die "You must specify FtpRoot";
   defined( $self->{Filename} ) or die "You must specify Filename";
-  
+
   my $conf = ReadConfig();
 
   return $self;
@@ -44,7 +44,7 @@ sub Object2Url {
   my( $objectname, $chd ) = @_;
 
   # Note: HTTP::Cache::Transparent caches the file and only downloads
-  # it if it has changed. This works since LWP interprets the 
+  # it if it has changed. This works since LWP interprets the
   # if-modified-since header and handles it locally.
 
   my $dir = $chd->{grabber_info};
@@ -71,15 +71,15 @@ sub ImportContent {
   my $ds = $self->{datastore};
 
   my $doc = ParseXml( $cref );
-  
+
   if( not defined( $doc ) ) {
     f "Failed to parse";
     return 0;
   }
-  
+
   # Find all paragraphs.
   my $ns = $doc->find( "//BroadcastDate_GMT" );
-  
+
   if( $ns->size() == 0 ) {
     f "No BroadcastDates found";
     return 0;
@@ -103,6 +103,8 @@ sub ImportContent {
 
       my $title = norm( $emission->findvalue( 'Title' ) );
       my $desc = norm( $emission->findvalue( 'Feature' ) );
+      my $hd = norm( $emission->findvalue( 'HD' ) );
+      my $image = norm( $emission->findvalue( 'ImageHD' ) );
 
       my $ce = {
         channel_id => $channel_id,
@@ -112,8 +114,11 @@ sub ImportContent {
         description => $desc,
       };
 
+      $ce->{quality} = "HDTV" if $hd eq "Yes";
+      $ce->{fanart} = $image if defined($image) and $image ne "";
+
       $ds->AddProgramme( $ce );
-      
+
     }
   }
 
