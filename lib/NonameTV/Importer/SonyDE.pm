@@ -167,6 +167,13 @@ sub ImportXML
             }
         }
 
+        if($ce->{description} =~ /(\d+)\. Staffel, Episode (\d+)\:(.*?)/i) {
+          my ( $sea, $ep, $eptitle ) = ($ce->{description} =~ /(\d+)\. Staffel, Episode (\d+)\:(.*?)/i ); # bugfix
+          $ce->{description} =~ s/(\d+)\. Staffel, Episode (\d+)\://i;
+          $ce->{episode} = sprintf( "%d . %d .", $sea-1, $ep-1 );
+          $ce->{description} = norm($ce->{description});
+        }
+
         # remove punct.and
         $ce->{description} = norm($ce->{description}) if defined($ce->{description});
         $ce->{description} =~ s/^\.// if defined($ce->{description});
@@ -175,24 +182,46 @@ sub ImportXML
             $ce->{production_date} = "$1-01-01";
         }
 
+        # Category / Genre
         my $genre = $prog->findvalue( 'category[@type="genre"]' );
         my $type  = $prog->findvalue( 'programme_type' );
 
         my ($program_type, $category ) = $ds->LookupCat( "SonyDE_genre", $genre );
-		AddCategory( $ce, $program_type, $category );
+		    AddCategory( $ce, $program_type, $category );
 
         my ($program_type2, $category2 ) = $ds->LookupCat( "SonyDE_type", $type );
-		AddCategory( $ce, $program_type2, $category2 );
+		    AddCategory( $ce, $program_type2, $category2 );
 
         my ($country2 ) = $ds->LookupCountry( "SonyDE", $country );
-		AddCountry( $ce, $country2 );
+		    AddCountry( $ce, $country2 );
 
         # add them
         ParseCredits( $ce, 'actors',     $prog, 'person[@type="cast"]/name' );
         ParseCredits( $ce, 'directors',  $prog, 'person[@type="director"]/name' );
 
+        # Subtitle and orgtitle
         $ce->{subtitle} = norm($subtitle) if defined $subtitle and $subtitle ne "";
         $ce->{original_title} = norm($title_org) if defined $title_org and norm($title_org) ne norm($title) and norm($title_org) ne "";
+
+        # Aspect
+        my $aspect  = $prog->findvalue( 'aspect_ratio' );
+        if($aspect eq "16:9" or $aspect eq "16:9 Full Frame") {
+          $ce->{aspect} = "16:9"
+        } elsif($aspect eq "4:3") {
+          $ce->{aspect} = "4:3"
+        }
+
+        # Rating (it includes stuff that only FSK have, not MPAA)
+        my $rating  = $prog->findvalue( 'pg' );
+        if($rating eq "12") {
+          $ce->{rating} = "FSK 12";
+        } elsif($rating eq "16") {
+          $ce->{rating} = "FSK 16";
+        } elsif($rating eq "18") {
+          $ce->{rating} = "FSK 18";
+        } elsif($rating eq "6") {
+          $ce->{rating} = "FSK 6";
+        }
 
         progress( "SonyDE: $chd->{xmltvid}: $start - $title" );
         $dsh->AddProgramme( $ce );

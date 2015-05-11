@@ -122,6 +122,7 @@ sub ImportContentFile {
     my $episode_nr = $xpc->findvalue( '@EpsiodenNr' );
     my $season_nr  = $xpc->findvalue( '@Staffel' );
     my $descr      = $xpc->findvalue( '@kurzInhalt' );
+    my $fsk        = $xpc->findvalue( '@fsk' );
 
     my $date = $start->ymd("-");
     if($date ne $currdate ) {
@@ -171,6 +172,8 @@ sub ImportContentFile {
     if( $audio_form ) {
       if ($audio_form eq 'Dolby Surround') {
         $ce->{stereo} = 'surround';
+      } elsif ($audio_form eq 'Dolby Digital 5.1') {
+        $ce->{stereo} = 'dolby digital';
       } elsif ($audio_form eq 'Stereo') {
         $ce->{stereo} = 'stereo';
       }
@@ -180,8 +183,8 @@ sub ImportContentFile {
     if( $video_form ){
       if ($video_form eq '16:9') {
         $ce->{aspect} = '16:9';
-      } elsif ($video_form eq 'Stereo') {
-        $ce->{aspect} = 'stereo';
+      } elsif ($video_form eq '3D 16:9') {
+        $ce->{aspect} = '16:9';
       } elsif ($video_form eq '4:3') {
         $ce->{aspect} = '4:3';
       }
@@ -235,6 +238,19 @@ sub ImportContentFile {
     if(defined($usedesc) and $usedesc eq "1") {
         $ce->{description} = norm($descr);
         $ce->{description} =~ s/^(\d+)\. Staffel, Folge (\d+)\: //i; # Remove episode info from the description
+    }
+
+    # FSK
+    if($fsk eq "o.A.") {
+      $ce->{rating} = "FSK 0";
+    }if($fsk eq "12") {
+      $ce->{rating} = "FSK 12";
+    } elsif($fsk eq "16") {
+      $ce->{rating} = "FSK 16";
+    } elsif($fsk eq "18") {
+      $ce->{rating} = "FSK 18";
+    } elsif($fsk eq "6") {
+      $ce->{rating} = "FSK 6";
     }
 
     $ds->AddProgrammeRaw( $ce );
