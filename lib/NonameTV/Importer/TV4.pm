@@ -14,20 +14,20 @@ previously-shown-date info available but not currently used.
    <program>
       <transmissiontime>15:45</transmissiontime>
       <title>S�songsstart: Melrose Place </title>
-      <description>Amerikansk dramaserie fr�n 1995 i 34 avsnitt.  Om en grupp unga 
-m�nniskor som bor i ett hyreshus p� Melrose Place i Los Angeles. Fr�gan �r vem de kan 
-lita p� bland sina grannar, f�r p� Melrose Place kan den man tror �r ens b�sta v�n 
-visa sig vara ens v�rsta fiende.      Del 17 av 34.  Bobby f�r ett ultimatum av 
-Peter. Kimberley ber�ttar f�r Alan om Matts tidigare k�rleksaff�rer vilket f�r Alan 
-att ta avst�nd fr�n Matt. Billy har skuldk�nslor efter Brooks sj�lvmordsf�rs�k och 
+      <description>Amerikansk dramaserie fr�n 1995 i 34 avsnitt.  Om en grupp unga
+m�nniskor som bor i ett hyreshus p� Melrose Place i Los Angeles. Fr�gan �r vem de kan
+lita p� bland sina grannar, f�r p� Melrose Place kan den man tror �r ens b�sta v�n
+visa sig vara ens v�rsta fiende.      Del 17 av 34.  Bobby f�r ett ultimatum av
+Peter. Kimberley ber�ttar f�r Alan om Matts tidigare k�rleksaff�rer vilket f�r Alan
+att ta avst�nd fr�n Matt. Billy har skuldk�nslor efter Brooks sj�lvmordsf�rs�k och
 kr�ver att Amanda tar henne tillbaka.</description>
-      <episode_description> Del 17 av 34.  Bobby f�r ett ultimatum av Peter. 
-Kimberley ber�ttar f�r Alan om Matts tidigare k�rleksaff�rer vilket f�r Alan att ta 
-avst�nd fr�n Matt. Billy har skuldk�nslor efter Brooks sj�lvmordsf�rs�k och kr�ver 
+      <episode_description> Del 17 av 34.  Bobby f�r ett ultimatum av Peter.
+Kimberley ber�ttar f�r Alan om Matts tidigare k�rleksaff�rer vilket f�r Alan att ta
+avst�nd fr�n Matt. Billy har skuldk�nslor efter Brooks sj�lvmordsf�rs�k och kr�ver
 att Amanda tar henne tillbaka.</episode_description>
-<program_description>Amerikansk dramaserie fr�n 1995 i 34 avsnitt.  Om en grupp unga 
-m�nniskor som bor i ett hyreshus p� Melrose Place i Los Angeles. Fr�gan �r vem de kan 
-lita p� bland sina grannar, f�r p� Melrose Place kan den man tror �r ens b�sta v�n 
+<program_description>Amerikansk dramaserie fr�n 1995 i 34 avsnitt.  Om en grupp unga
+m�nniskor som bor i ett hyreshus p� Melrose Place i Los Angeles. Fr�gan �r vem de kan
+lita p� bland sina grannar, f�r p� Melrose Place kan den man tror �r ens b�sta v�n
 visa sig vara ens v�rsta fiende.     </program_description>
 <creditlist>
   <person>
@@ -143,7 +143,7 @@ sub ImportContent
     error( "$batch_id: Failed to parse: $@" );
     return 0;
   }
-  
+
   # Find all "program"-entries.
   my $ns = $doc->find( "//program" );
   if( $ns->size() == 0 )
@@ -151,9 +151,9 @@ sub ImportContent
     error( "$batch_id: No data found" );
     return 0;
   }
-  
+
   $dsh->StartDate( $date, "00:00" );
-  
+
   foreach my $pgm ($ns->get_nodelist)
   {
     my $start = $self->create_dt($pgm->findvalue( 'transmissiontime' ));
@@ -169,21 +169,22 @@ sub ImportContent
     my $episode = $pgm->findvalue( 'episode_number' );
     my $eps = $pgm->findvalue( 'number_of_episodes' );
     my $prodyear = $pgm->findvalue( 'production_year' );
-    
+    my $genre = $pgm->findvalue( 'category' );
+
     my $prev_shown_date = $pgm->findvalue( 'previous_transmissiondate' );
-    
+
     my $description = $ep_desc || $pr_desc || $desc;
 
     # Check if ep_desc includes data we don't want
     $description =~ s/Reprisstart\.//i;
     $description =~ s/S.songsavslutning\.//i;
     $description = $pr_desc || $desc if norm($description) eq "";
-    
+
     if( ($title =~ /^[- ]*s.ndningsuppeh.ll[- ]*$/i) )
     {
       $title = "end-of-transmission";
     }
-    
+
     my $ce = {
       title       	 => norm($title),
       title_org		 => norm($title_org),
@@ -192,7 +193,7 @@ sub ImportContent
       ep_desc     	 => norm($ep_desc),
       pr_desc     	 => norm($pr_desc),
     };
-    
+
 #     $ce->{prev_shown_date} = norm($prev_shown_date)
 #     if( $prev_shown_date =~ /\S/ );
 
@@ -205,7 +206,7 @@ sub ImportContent
 	  {
 	    $ce->{live} = "0";
 	  }
-	  
+
 	# HDTV
 	  if( $definition eq "HD" )
 	  {
@@ -286,15 +287,6 @@ sub ImportContent
 
     $self->extract_extra_info( $ce );
 
-    # only movies got directors
-    if( scalar( @directors ) > 0 and !defined($ce->{episode}) and scalar( @actors ) > 0 )
-    {
-        $ce->{program_type} = "movie";
-    } elsif($ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|(.*)\-EM)\:/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|UFC|(.*)\-EM)$/i)
-    {
-        $ce->{program_type} = "sports";
-    }
-
     # Images
     my $imgs = $pgm->find( './/item' );
     foreach my $item ($imgs->get_nodelist)
@@ -303,15 +295,21 @@ sub ImportContent
         #print "IMG:" .$item->to_literal;
     }
 
+    # Fixes
     $ce->{title} =~ s/\:$//;
 
-    $ce->{program_type} = 'series' if defined($ce->{episode});
+    # Genres and category
+    my( $pty, $cat );
+    if(defined($genre) and $genre and $genre ne "") {
+        ( $pty, $cat ) = $ds->LookupCat( 'TV4', $genre );
+        AddCategory( $ce, $pty, $cat );
+    }
 
     progress($date." ".$starttime." - ".$ce->{title});
-    
+
     $dsh->AddProgramme( $ce );
   }
-  
+
   # Success
   return 1;
 }
@@ -327,7 +325,7 @@ sub extract_extra_info
   #
   my @pr_sentences = split_text( $ce->{pr_desc} );
   my @ep_sentences = split_text( $ce->{ep_desc} );
-  
+
   my( $program_type, $category ) = ParseDescCatSwe( $pr_sentences[0] );
   AddCategory( $ce, $program_type, $category );
   ( $program_type, $category ) = ParseDescCatSwe( $ep_sentences[0] );
@@ -377,7 +375,7 @@ sub extract_episode
   my $d = $ce->{description};
 
 
-  
+
   if((defined $ce->{description}) and ($ce->{description} eq "")) {
   	$ce->{description} = $ce->{pr_desc};
   }
@@ -404,11 +402,11 @@ sub extract_episode
 
   		# Fix original title
   		$ce->{title_org} =~ s/$romanseason//;
-  		
+
   		# Episode
   		my( $season2, $episode2 )=( $ce->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)| );
   		( $episode2 )=( $ce->{episode} =~ m|\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
-  		
+
   		# Put it into episode field
   		if(defined($romanseason_arabic) and not defined($season2) and defined($episode2)) {
   			$ce->{episode} = sprintf( "%d . %d .", $romanseason_arabic-1, $episode2 );
@@ -460,7 +458,7 @@ sub extract_episode
 
   # remove original title
   delete $ce->{title_org};
-  
+
 }
 
 sub create_dt ( $ )
