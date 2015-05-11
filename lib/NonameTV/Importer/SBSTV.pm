@@ -97,10 +97,10 @@ sub FilteredExtension {
 sub ImportContent {
   my $self = shift;
   my( $batch_id, $cref, $chd ) = @_;
-  
+
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
-  
+
   $self->{batch_id} = $batch_id;
 
   my $xmltvid=$chd->{xmltvid};
@@ -108,7 +108,7 @@ sub ImportContent {
   my $channel_name = $chd->{name};
   my $grabber_info = $chd->{grabber_info};
   my $currdate = "x";
-  
+
 
   my $doc = ParseXml( $cref );
 
@@ -123,26 +123,27 @@ sub ImportContent {
     f "No data found";
     return 0;
   }
-  
-  
+
+
   foreach my $b ($ns->get_nodelist) {
   	my $station = $b->findvalue( "station" );
   	my $day = $b->findvalue( "day" );
-  	
+    my $hd = $b->findvalue( "hd" );
+
   	if( $day ne $currdate ) {
 
           #$dsh->StartBatch( $batch_id, $channel_id );
-          $dsh->StartDate( $day , "00:00" ); 
+          $dsh->StartDate( $day , "00:00" );
           $currdate = $day;
 
           progress("Date is $day");
     }
-  	
+
   	# Skip if the channel_name aint right
   	if($station ne $grabber_info) {
   		next;
   	}
-  
+
   	my $title = $b->findvalue( "titel" );
 
   	# Episode and ofepisode
@@ -162,21 +163,21 @@ sub ImportContent {
     $titles =~ s/Tv-premiere://g if $titles;
     $titles =~ s/S.sonpremiere://g if $titles;
     $titles =~ s/S.sonafslutning://g if $titles;
-  
-  
+
+
   	# Start and so on
     my $starttime = $b->findvalue( "starttid" );
-    
+
     if($starttime eq "") {
     	f("No starttime for $titles");
     	next;
     }
-    
+
     my( $start, $start_dummy ) = ( $starttime =~ /(\d+:\d+):(\d+)/ );
     #my $stoptime = $b->findvalue( "sluttid" );
     #my( $stop, $stop_dummy ) = ( $stoptime =~ /(\d+:\d+):(\d+)/ );
 
-    
+
     # Descr. and genre
     my $desc = $b->findvalue( "ptekst1" );
     $desc =~ s/:\|apostrofe\|;/'/g;
@@ -189,7 +190,7 @@ sub ImportContent {
     my $genre = $b->findvalue( "genre" );
 
 
-	# Put everything in a array	
+	# Put everything in a array
     my $ce = {
       channel_id => $chd->{id},
       start_time => $start,
@@ -246,9 +247,9 @@ sub ImportContent {
     }
 
     $ce->{subtitle} = norm($subtitle) if $subtitle;
-    
+
     progress("$day $start - $titles");
-    
+
     # Director (only movies)
     my ( $dir ) = ( $desc =~ /Instr.:\s+(.*)./ );
     if(defined($dir) and $dir ne "") {
@@ -325,6 +326,8 @@ sub ImportContent {
         $ce->{original_title} =~ s/, The$//i;
         $ce->{original_title} = "The ".$ce->{original_title};
     }
+
+    $ce->{quality} = "HDTV" if $hd eq "yes";
 
     $dsh->AddProgramme( $ce );
   }
