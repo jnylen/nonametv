@@ -20,6 +20,19 @@ Arte_genre,serie,\N,series
 Arte_genre,spielfilm,,movie
 Arte_genre,stummfilm,,movie
 Arte_genre,theater,,tvshow
+ATV,actionthriller,Action/Thriller,
+ATV,dokumentation,Documentary,
+ATV,familie,Family,
+ATV,familien-serie,Family,
+ATV,fantasyabenteuer,Fantasy/Adventure,
+ATV,fashion,Fashion,
+ATV,historienkrimi,History/Crime,
+ATV,kostümdrama,Drama,
+ATV,krimi-serie,Crime,
+ATV,magazin,Magazine,
+ATV,mystery-serie,Mystery,
+ATV,scifi-action,Sci-Fi/Action,
+ATV,sitcom,Sitcom,
 C1R,boevike,\N,movie
 C1R,detektive,Crime,
 C1R,fil'me,\N,movie
@@ -1054,6 +1067,10 @@ RTL2,"science fiction",Sci-fi,
 RTL2,soap,Soap,
 RTL2,thriller,Thriller,
 RTL2,western,Western,
+RussiaToday,documentary,Documentary,series
+RussiaToday,interview,Interview,series
+RussiaToday,news,News,tvshow
+RussiaToday,"talk show","Talk show",series
 SBSTV,action,Action,
 SBSTV,"action og komedieserie",Action/Comedy,series
 SBSTV,actiondrama,Action/Drama,
@@ -1703,6 +1720,23 @@ TV2NO,ungdomsprogram,Youth,tvshow
 TV2NO,western,Western,
 TV2NO,westerndrama,Western/Drama,
 TV2NO,westernkomedie,Western/Comedy,
+TV4,aktuellt,\N,series
+TV4,barnprogram,Children's,series
+TV4,dokumentär,Documentary,series
+TV4,drama,Drama,series
+TV4,film,Movies,movie
+TV4,hälsa,Health,series
+TV4,kultur,Culture,series
+TV4,livsstil,Lifestyle,series
+TV4,matlagning,Food,series
+TV4,miniserie,Mini-Series,series
+TV4,nyheter,News,tvshow
+TV4,övrigt,\N,series
+TV4,såpopera,Soap/Opera,series
+TV4,sitcom,Sitcom,series
+TV4,sport,Sports,sports
+TV4,underhållning,Entertainment,series
+TV4,vetenskap,\N,series
 TV5Monde,documentary,Documentary,
 TV5Monde,drama,Drama,
 TV5Monde,entertainment,Entertainment,

@@ -1016,16 +1016,41 @@
 1274,TvdbEN,^.*$,program_type,series,\N,episodetitle
 1275,TvdbEN,^.*$,program_type,series,\N,episodetitle
 1276,TvdbFI,^.*$,\N,\N,\N,guess
-1277,TvdbPL,^.*$,\N,\N,\N,guess
-1278,TvdbPL,^.*$,\N,\N,\N,guess
-1279,TvdbPL,^.*$,\N,\N,\N,guess
-1280,TvdbPL,^.*$,\N,\N,\N,guess
-1281,TvdbPL,^.*$,\N,\N,\N,guess
-1282,TvdbPL,^.*$,\N,\N,\N,guess
-1283,TvdbPL,^.*$,\N,\N,\N,guess
-1284,TvdbPL,^.*$,\N,\N,\N,guess
-1285,TvdbPL,^.*$,\N,\N,\N,guess
-1286,TvdbPL,^.*$,\N,\N,\N,guess
-1287,TvdbPL,^.*$,\N,\N,\N,guess
-1288,TvdbPL,^.*$,\N,\N,\N,guess
-1289,TvdbPL,^.*$,\N,\N,\N,guess
+1277,TvdbPL,^.*$,program_type,series,\N,guess
+1278,TvdbPL,^.*$,program_type,series,\N,guess
+1279,TvdbPL,^.*$,program_type,series,\N,guess
+1280,TvdbPL,^.*$,program_type,series,\N,guess
+1281,TvdbPL,^.*$,program_type,series,\N,guess
+1282,TvdbPL,^.*$,program_type,series,\N,guess
+1283,TvdbPL,^.*$,program_type,series,\N,guess
+1284,TvdbPL,^.*$,program_type,series,\N,guess
+1285,TvdbPL,^.*$,program_type,series,\N,guess
+1286,TvdbPL,^.*$,program_type,series,\N,guess
+1287,TvdbPL,^.*$,program_type,series,\N,guess
+1288,TvdbPL,^.*$,program_type,series,\N,guess
+1289,TvdbPL,^.*$,program_type,series,\N,guess
+1297,TvdbPL,^.*$,program_type,series,\N,guess
+1298,TvdbPL,^.*$,program_type,series,\N,guess
+1299,TvdbPL,^.*$,program_type,series,\N,guess
+1300,TvdbPL,^.*$,program_type,series,\N,guess
+1301,TvdbDE,^.*$,program_type,series,\N,guess
+1302,TvdbDE,^.*$,program_type,series,\N,guess
+1303,TvdbPL,^.*$,program_type,series,\N,guess
+1304,TvdbPL,^.*$,program_type,series,\N,guess
+1305,TvdbEN,^.*$,program_type,series,\N,guess
+1305,TvdbEN,"Bread, Love and Dreams",program_type,series,185631,guess
+1305,TvdbEN,"My Husband Got a Family",program_type,series,256444,guess
+1305,TvdbEN,"Two Days and One Night",program_type,series,212151,guess
+1305,TvdbEN,"Hello Counselor",program_type,series,273388,guess
+1305,TvdbEN,"Unkind Ladies",program_type,series,292009,guess
+1305,TvdbEN,"Happy Together",program_type,series,258333,guess
+1305,TvdbEN,"Let's Go! Dream Team Season 2",program_type,series,270403,guess
+1305,TvdbEN,"House of Bluebird",program_type,series,292452,guess
+1346,TvdbEN,^.*$,program_type,series,\N,guess
+1040,TvdbDE,^.*$,program_type,series,\N,guess
+1041,TvdbDE,^.*$,program_type,series,\N,guess
+1042,TvdbDE,^.*$,program_type,series,\N,guess
+1040,TvdbEN,^.*$,program_type,series,\N,guess
+1041,TvdbEN,^.*$,program_type,series,\N,guess
+1042,TvdbEN,^.*$,program_type,series,\N,guess
+1040,TvdbDE,"Sword Art Online II",program_type,series,259640,guess
