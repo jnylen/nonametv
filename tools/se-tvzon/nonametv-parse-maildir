@@ -296,6 +296,7 @@ sub guess_channel
     return "foxtv.no"       if $filename =~ /^nor\s+fox/i and $filename =~ /\.xml$/i;
     #return "foxtv.no"       if $subject  =~ /^fox\s+norway/i and $filename =~ /\.xml$/i;
     return "foxtv.se"       if $filename =~ /^fox\s+sweden/i and $filename =~ /\.xml$/i;
+    return "foxtv.se"       if $filename =~ /^fox\s+sweden/i and $filename =~ /\.xls$/i;
 
     # H2
     if($filename =~ /h2\s+europe/i and $filename =~ /\.xml$/i) {
