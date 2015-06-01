@@ -19,16 +19,16 @@ use XML::LibXML;
 BEGIN {
     use Exporter   ();
     our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-    
+
     # set the version for version checking
     $VERSION     = 0.3;
 
     @ISA         = qw(Exporter);
     @EXPORT      = qw( );
     %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
-    @EXPORT_OK   = qw/MyGet expand_entities 
+    @EXPORT_OK   = qw/MyGet expand_entities
                       Html2Xml Htmlfile2Xml
-                      Word2Xml Wordfile2Xml 
+                      Word2Xml Wordfile2Xml
 		              File2Xml Content2Xml
 		              FindParagraphs
                       norm normLatin1 normUtf8
@@ -44,7 +44,7 @@ our @EXPORT_OK;
 my $wvhtml = 'wvHtml --charset=utf-8';
 # my $wvhtml = '/usr/bin/wvHtml';
 
-my $ua = LWP::UserAgent->new( agent => "nonametv (http://nonametv.org)", 
+my $ua = LWP::UserAgent->new( agent => "nonametv (http://nonametv.org)",
                               cookie_jar => {},
                               env_proxy => 1 );
 
@@ -52,12 +52,12 @@ my $ua = LWP::UserAgent->new( agent => "nonametv (http://nonametv.org)",
 # different from the last time the same url was fetched, ($content, false) if
 # it was fetched from the server and was the same as the last time it was
 # fetched and (undef,$error_message) if there was an error fetching the data.
- 
+
 sub MyGet
 {
   my( $url ) = @_;
   my $res = $ua->get( $url );
-  
+
   if( $res->is_success )
   {
     return ($res->content, not defined( $res->header( 'X-Content-Unchanged' ) ) );
@@ -162,7 +162,7 @@ sub Html2Xml {
 
   my $xml = XML::LibXML->new;
   $xml->recover(1);
-  
+
   # Remove character that makes the parser stop.
   $html =~ s/\x00//g;
 
@@ -172,7 +172,7 @@ sub Html2Xml {
     suppress_errors => 1,
     suppress_warnings => 1,
   }); };
-  
+
   if( $@ ne "" ) {
     my ($package, $filename, $line) = caller;
     print "parse_html_string failed: $@ when called from $filename:$line\n";
@@ -213,7 +213,7 @@ fails.
 sub Word2Xml
 {
   my( $content ) = @_;
-  
+
   my( $fh, $filename ) = tempfile();
   print $fh $content;
   close( $fh );
@@ -233,10 +233,10 @@ sub Wordfile2Xml
     w "$wvhtml $filename - failed: $?";
     return undef;
   }
-  
+
   # Remove character that makes LibXML choke.
   $html =~ s/\&hellip;/.../g;
-  
+
   return Html2Xml( $html );
 }
 
@@ -279,7 +279,7 @@ sub Content2Xml {
 
 FindParagraphs( $doc, $expr )
 
-Finds all paragraphs in the part of an xml-tree that matches an 
+Finds all paragraphs in the part of an xml-tree that matches an
 xpath-expression. Returns a reference to an array of strings.
 All paragraphs are normalized and empty strings are removed from the
 array.
@@ -290,7 +290,7 @@ into paragraphs.
 Use the expression '//body//.' for html-documents when you want to see
 all paragraphs in the page.
 
-=cut 
+=cut
 
 my %paraelem = (
 		p => 1,
@@ -339,13 +339,13 @@ sub norm
 # These codes can be used in \x{YY} expressions as shown below.
 #  if( $str =~ /unique string/ ) {
 #    for( my $i=0; $i < length( $str ); $i++ ) {
-#      printf( "%2x: %s\n", ord( substr( $str, $i, 1 ) ), 
-#               substr( $str, $i, 1 ) ); 
+#      printf( "%2x: %s\n", ord( substr( $str, $i, 1 ) ),
+#               substr( $str, $i, 1 ) );
 #    }
 #  }
 
   $str = expand_entities( $str );
-  
+
   $str =~ tr/\x{96}\x{93}\x{94}/-""/; #
   $str =~ tr/\x{201d}\x{201c}/""/;
   $str =~ tr/\x{2022}/*/; # Bullet
@@ -359,7 +359,7 @@ sub norm
   $str =~ s/\s+$//;
   $str =~ tr/\n\r\t /    /s;
   $str =~ s/ +/ /;
-  
+
   return $str;
 }
 
@@ -402,7 +402,7 @@ sub normUtf8
 =item AddCategory
 
 Add program_type and category to an entry if the entry does not already
-have a program_type and category. 
+have a program_type and category.
 
 AddCategory( $ce, $program_type, $category );
 
@@ -418,7 +418,7 @@ sub AddCategory
     $ce->{program_type} = $program_type;
   }
 
-  if( not defined( $ce->{category} ) and defined( $category ) 
+  if( not defined( $ce->{category} ) and defined( $category )
       and ( $category =~ /\S/ ) )
   {
     $ce->{category} = $category;
@@ -481,7 +481,7 @@ $sm->AddRegexp( qr/barnserie/i,          [ 'series', "Children's" ] );
 $sm->AddRegexp( qr/matlagningsserie/i,   [ 'series', 'Cooking' ] );
 $sm->AddRegexp( qr/motorserie/i,         [ 'series', 'sports' ] );
 $sm->AddRegexp( qr/fixarserie/i,         [ 'series', "Home/How-to" ] );
-$sm->AddRegexp( qr/science[-\s]*fiction[-\s]*serie/i, 
+$sm->AddRegexp( qr/science[-\s]*fiction[-\s]*serie/i,
                 [ 'series', 'SciFi' ] );
 $sm->AddRegexp( qr/barnprogram/i,          [ undef, "Children's" ] );
 
@@ -550,7 +550,7 @@ sub ParseDescCatSwe
   return (undef, undef) if not defined $desc;
 
   my $res = $sm->Match( $desc );
-  if( defined( $res ) ) 
+  if( defined( $res ) )
   {
     return @{$res};
   }
@@ -583,14 +583,14 @@ sub FixProgrammeData
   # with a defined episode (i.e. second part),
   # but doesn't have a program_type.
   if( exists( $d->{episode} ) and defined( $d->{episode} ) and
-      ($d->{episode} !~ /^\s*\.\s*\./) and 
+      ($d->{episode} !~ /^\s*\.\s*\./) and
       ( (not defined($d->{program_type})) or ($d->{program_type} =~ /^\s*$/) ) )
   {
     $d->{program_type} = "series";
   }
 }
 
-=pod 
+=pod
 
 my $doc = ParseXml( $strref );
 
@@ -608,10 +608,10 @@ sub ParseXml {
     $xml = XML::LibXML->new;
     $xml->load_ext_dtd(0);
   }
-  
+
   my $doc;
-  eval { 
-    $doc = $xml->parse_string($$cref); 
+  eval {
+    $doc = $xml->parse_string($$cref);
   };
   if( $@ )   {
     w "Failed to parse xml: $@";
@@ -621,7 +621,7 @@ sub ParseXml {
   return $doc;
 }
 
-=pod 
+=pod
 
 my $doc = ParseJson( $strref );
 
@@ -637,10 +637,10 @@ sub ParseJson {
   if( not defined $json ) {
     $json = new JSON;
   }
-  
+
   my $doc;
-  eval { 
-    $doc = $json->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->decode($$cref); 
+  eval {
+    $doc = $json->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->decode($$cref);
   };
   if( $@ )   {
     w "Failed to parse json: $@";
@@ -652,7 +652,7 @@ sub ParseJson {
 
 =pod
 
-Parse a reference to an xml-string in xmltv-format into a reference to an 
+Parse a reference to an xml-string in xmltv-format into a reference to an
 array of hashes with programme-info.
 
 =cut
@@ -674,7 +674,7 @@ sub ParseXmltv {
   if( $ns->size() == 0 ) {
     return;
   }
-  
+
   foreach my $pgm ($ns->get_nodelist) {
     my $start = $pgm->findvalue( '@start' );
     my $start_dt = create_dt( $start );
@@ -684,7 +684,7 @@ sub ParseXmltv {
 
     my $title = $pgm->findvalue( 'title' );
     my $subtitle = $pgm->findvalue( 'sub-title' );
-    
+
     my $desc = $pgm->findvalue( 'desc' );
     my $cat1 = $pgm->findvalue( 'category[1]' );
     my $cat2 = $pgm->findvalue( 'category[2]' );
@@ -702,7 +702,7 @@ sub ParseXmltv {
     foreach my $dir ($ns->get_nodelist) {
       push @directors, $dir->findvalue(".");
     }
-    
+
     my @actors;
     my $ns = $pgm->find( ".//actor" );
     foreach my $act ($ns->get_nodelist) {
@@ -720,43 +720,43 @@ sub ParseXmltv {
     foreach my $dir ($ns->get_nodelist) {
       push @adapters, $dir->findvalue(".");
     }
-    
+
     my @producers;
     $ns = $pgm->find( ".//producer" );
     foreach my $dir ($ns->get_nodelist) {
       push @producers, $dir->findvalue(".");
     }
-    
+
     my @composers;
     $ns = $pgm->find( ".//composer" );
     foreach my $dir ($ns->get_nodelist) {
       push @composers, $dir->findvalue(".");
     }
-    
+
     my @editors;
     $ns = $pgm->find( ".//editor" );
     foreach my $dir ($ns->get_nodelist) {
       push @editors, $dir->findvalue(".");
     }
-    
+
     my @presenters;
     $ns = $pgm->find( ".//presenter" );
     foreach my $dir ($ns->get_nodelist) {
       push @presenters, $dir->findvalue(".");
     }
-    
+
     my @commentators;
     $ns = $pgm->find( ".//commentator" );
     foreach my $dir ($ns->get_nodelist) {
       push @commentators, $dir->findvalue(".");
     }
-    
+
     my @guests;
     $ns = $pgm->find( ".//guest" );
     foreach my $dir ($ns->get_nodelist) {
       push @guests, $dir->findvalue(".");
     }
-    
+
     my %e = (
       start_dt => $start_dt,
       title => $title,
@@ -816,39 +816,39 @@ sub ParseXmltv {
     if( scalar( @actors ) > 0 ) {
       $e{actors} = join ", ", @actors;
     }
-    
+
     if( scalar( @writers ) > 0 ) {
       $e{writers} = join ", ", @writers;
     }
-    
+
     if( scalar( @adapters ) > 0 ) {
       $e{adapters} = join ", ", @adapters;
     }
-    
+
     if( scalar( @producers ) > 0 ) {
       $e{producers} = join ", ", @producers;
     }
-    
+
     if( scalar( @composers ) > 0 ) {
       $e{composers} = join ", ", @composers;
     }
-    
+
     if( scalar( @editors ) > 0 ) {
       $e{editors} = join ", ", @editors;
     }
-    
+
     if( scalar( @presenters ) > 0 ) {
       $e{presenters} = join ", ", @presenters;
     }
-    
+
     if( scalar( @commentators ) > 0 ) {
       $e{commentators} = join ", ", @commentators;
     }
-    
+
     if( scalar( @guests ) > 0 ) {
       $e{guests} = join ", ", @guests;
     }
-    
+
     push @d, \%e;
   }
 
@@ -859,21 +859,21 @@ sub create_dt
 {
   my( $datetime ) = @_;
 
-  my( $year, $month, $day, $hour, $minute, $second, $tz ) = 
+  my( $year, $month, $day, $hour, $minute, $second, $tz ) =
     ($datetime =~ /(\d{4})(\d{2})(\d{2})
                    (\d{2})(\d{2})(\d{2})\s+
                    (\S+)$/x);
-  
-  my $dt = DateTime->new( 
+
+  my $dt = DateTime->new(
                           year => $year,
-                          month => $month, 
+                          month => $month,
                           day => $day,
                           hour => $hour,
                           minute => $minute,
                           second => $second,
-                          time_zone => $tz 
+                          time_zone => $tz
                           );
-  
+
   return $dt;
 }
 
@@ -944,7 +944,7 @@ sub MonthNumber {
     @months_8 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
   } elsif( $lang =~ /^ru$/ ){
     @months_1 = qw/jan feb mar apr maj jun jul avg sep oct nov dec/;
-    @months_2 = qw/janvarja fevralja marta aprelja maja juin ijulja avgusta sentjabrja oktjabrja nojabrja dekabrja/;
+    @months_2 = qw/janvarja fevralja marta aprelja maja ijunja ijulja avgusta sentjabrja oktjabrja nojabrja dekabrja/;
     @months_3 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_4 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_5 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
@@ -1105,7 +1105,7 @@ sub CompareArrays #( $new, $old, $cb )
 
   my @a = sort { $cb->{cmp}( $a, $b ) } @{$new};
   my @b = sort { $cb->{cmp}( $a, $b ) } @{$old};
-  
+
   push @a, $cb->{max};
   push @b, $cb->{max};
 
@@ -1117,14 +1117,14 @@ sub CompareArrays #( $new, $old, $cb )
     my $db = $b[$ib];
 
     # If both arrays have reached the end, we are done.
-    if( ($cb->{cmp}($da, $cb->{max}) == 0) and 
+    if( ($cb->{cmp}($da, $cb->{max}) == 0) and
         ($cb->{cmp}($db, $cb->{max}) == 0 ) ) {
       last;
     }
 
     my $cmp = $cb->{cmp}($da, $db);
 
-    if( $cmp == 0 ) { 
+    if( $cmp == 0 ) {
       $cb->{equal}($da, $db);
       $ia++;
       $ib++;
@@ -1139,7 +1139,7 @@ sub CompareArrays #( $new, $old, $cb )
     }
   }
 }
-  
+
 1;
 
 ### Setup coding system
