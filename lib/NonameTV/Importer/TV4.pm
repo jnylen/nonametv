@@ -208,7 +208,7 @@ sub ImportContent
 	  }
 
 	# HDTV
-	  if( $definition eq "HD" )
+	  if( $definition eq "HD" and $chd->{xmltvid} eq "hd.tv4.se" )
 	  {
 	    $ce->{quality} = "HDTV";
 	  }
@@ -303,6 +303,13 @@ sub ImportContent
     if(defined($genre) and $genre and $genre ne "") {
         ( $pty, $cat ) = $ds->LookupCat( 'TV4', $genre );
         AddCategory( $ce, $pty, $cat );
+    }
+
+    # Some sports programs needs to be tagged sports correctly
+    if($ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|(.*)\-VM)\:/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|(.*)\-EM)\:/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|UFC|(.*)\-EM)$/i)
+    {
+        $ce->{program_type} = "sports";
+        delete($ce->{episode}) if defined($ce->{episode});
     }
 
     progress($date." ".$starttime." - ".$ce->{title});
