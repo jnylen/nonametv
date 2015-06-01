@@ -140,11 +140,13 @@ sub ImportXML
     my $genre    = norm($row->findvalue( 'Longline' ) );
     my $prodcountry = norm($row->findvalue( 'productioncountry' ) );
     my $actors = $row->findvalue( 'Actors' );
+    $actors =~ s/-$//g;
     $actors =~ s/, /;/g;
     $actors =~ s/;$//g;
     $actors =~ s/,$//g;
     my $directors = $row->findvalue( 'Directors' );
     $directors =~ s/, /;/g;
+    $directors =~ s/-$//g;
     $directors =~ s/;$//g;
     $directors =~ s/,$//g;
 
