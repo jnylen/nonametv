@@ -7,7 +7,7 @@ use warnings;
 
 Importer for data from TV2 Denmark,
 (You should change the filestore at the bottom)
- 
+
 =cut
 
 use strict;
@@ -33,7 +33,7 @@ sub new {
     bless ($self, $class);
 
     defined( $self->{UrlRoot} ) or die "You must specify UrlRoot";
-    
+
     $self->{MinWeeks} = 0;
     $self->{MaxWeeks} = 3;
 
@@ -53,10 +53,10 @@ sub Object2Url {
   my( $objectname, $chd ) = @_;
 
   my( $date ) = ($objectname =~ /_(.*)/);
-  
+
   my ( $year , $week ) = ( $date =~ /(\d+)-(\d+)$/ );
   my ($yearweek) = sprintf( "%04d-%02d", $year, $week );
-  
+
   my $url = $self->{UrlRoot} . '?category=all&day=all&format=xml&how=xml&content=all&update=&updateswitch=0'
     . '&week=' . $yearweek
     . '&channel=' . $chd->{grabber_info};
@@ -86,7 +86,7 @@ sub ImportContent
 
   my $xml = XML::LibXML->new;
   my $doc;
-  
+
   eval { $doc = $xml->parse_string($$cref); };
   if( $@ ne "" )
   {
@@ -105,26 +105,14 @@ sub ImportContent
 
   foreach my $pgm ($rows->get_nodelist)
   {
-  	my $date  = $pgm->findvalue( 'date' );
-
-  	## Batch
-	if($date ne $currdate ) {
-		if( $currdate ne "x" ) {
-			#$ds->EndBatch( 1 );
-		}
-
-		my $batchid = $chd->{xmltvid} . "_" . $date;
-		#$dsh->StartBatch( $batchid );
-		$dsh->StartDate( $date );
-		$currdate = $date;
-
-		progress("TV2: Date is: $date");
-	}
-  	
     my $start  = ParseDateTime($pgm->findvalue( 'time' ));
+  	my $date  = $start->ymd("-");
     my $title = $pgm->findvalue( 'title' );
     $title =~ s/\((\d+):(\d+)\)//g if $title;
     $title =~ s/\((\d+)\)//g if $title;
+    $title =~ s/, direkte$//g if $title;
+    $title =~ s/\(m\)//g if $title;
+
     my $genre = $pgm->findvalue( 'category' );
     my $cast  = $pgm->findvalue( 'cast' );
     my $year  = $pgm->findvalue( 'year' );
@@ -134,12 +122,25 @@ sub ImportContent
     if(!defined($original_title)) {
         $original_title = norm($pgm->findvalue( 'original_title' ));
     }
-    
+
+    ## Batch
+  	if($date ne $currdate ) {
+  		if( $currdate ne "x" ) {
+  			#$ds->EndBatch( 1 );
+  		}
+
+  		my $batchid = $chd->{xmltvid} . "_" . $date;
+  		#$dsh->StartBatch( $batchid );
+  		$dsh->StartDate( $date );
+  		$currdate = $date;
+
+  		progress("TV2: Date is: $date");
+  	}
+
     my $ce = {
-      title       => norm($title),
-      start_time 	=> $start->hms(":"),
-      channel_id  => $chd->{id},
-      batch_id		=> $batch_id,
+        channel_id => $chd->{id},
+        title => norm($title),
+        start_time => $start->hms(":"),
     };
 
     if(defined($pgm->findvalue( 'original_title' )) and $genre ne "Film"){
@@ -162,48 +163,49 @@ sub ImportContent
   	}
 
     progress( "TV2: $chd->{xmltvid}: $start - ".norm($ce->{title}) );
-    
+
     # Desc
-    if(defined($pgm->findvalue( 'description' ))) {
+    if(defined($pgm->findvalue( 'description' )) and norm($pgm->findvalue( 'description' )) ne "") {
     	$ce->{description} = norm($pgm->findvalue( 'description' ));
     }
-    
+
     # Subtitle
     if(defined($pgm->findvalue( 'original_episode_title' ))) {
     	if(norm($pgm->findvalue( 'original_episode_title' )) ne "") {
-    	    my $subtitle = norm($pgm->findvalue( 'original_episode_title' ));
-    	    $subtitle =~ s/- Part One/\(1\)/i;
-            $subtitle =~ s/- Part Two/\(2\)/i;
-            $subtitle =~ s/, Part One/ \(1\)/i;
-            $subtitle =~ s/, Part Two/ \(2\)/i;
-            $subtitle =~ s/\b, Part (\d+)\b/ \($1\)/i;
-            $subtitle =~ s/\:(\d+)\)$/\)/i;
-            $subtitle =~ s/\.$//i;
-    		$ce->{subtitle} = norm($subtitle);
-    	}
+    	  my $subtitle = norm($pgm->findvalue( 'original_episode_title' ));
+        $subtitle =~ s/- Part One/\(1\)/i;
+        $subtitle =~ s/- Part Two/\(2\)/i;
+        $subtitle =~ s/, Part One/ \(1\)/i;
+        $subtitle =~ s/, Part Two/ \(2\)/i;
+        $subtitle =~ s/\b, Part (\d+)\b/ \($1\)/i;
+        $subtitle =~ s/\:(\d+)\)$/\)/i;
+        $subtitle =~ s/\.$//i;
+         $ce->{subtitle} = norm($subtitle);
+      }
     }
 
+    # Genre
     if( $genre ){
-			my($program_type, $category ) = $ds->LookupCat( 'TV2Denmark', $genre );
-			AddCategory( $ce, $program_type, $category );
-	}
-	
-	if( defined( $year ) and ($year =~ /(\d\d\d\d)/) ) {
-		$ce->{production_date} = "$1-01-01";
-	}
+  			my($program_type, $category ) = $ds->LookupCat( 'TV2Denmark', $genre );
+  			AddCategory( $ce, $program_type, $category );
+  	}
 
+    # Year
+  	if( defined( $year ) and ($year =~ /(\d\d\d\d)/) ) {
+  		$ce->{production_date} = "$1-01-01";
+  	}
 
-	### Actors and Directors
+    ### Actors and Directors
     my( $producer ) = (norm($cast) =~ /Producere:\s*(.*)/i );
-	if( $producer ) {
-	    $cast =~ s/Producere:\s*(.*)//i;
-		$ce->{producers} = norm(parse_person_list( $producer ));
-	}
+	  if( $producer ) {
+	     $cast =~ s/Producere:\s*(.*)//i;
+		  $ce->{producers} = norm(parse_person_list( $producer ));
+	  }
     my( $dumperinoerino, $creators ) = (norm($cast) =~ /(Serieskabere|Serieskaber):\s*(.*)$/i );
-	if( $creators ) {
-	    $cast =~ s/(Serieskabere|Serieskaber):\s*(.*)//i;
-		$ce->{producers} = norm(parse_person_list( $creators ));
-	}
+	  if( $creators ) {
+	     $cast =~ s/(Serieskabere|Serieskaber):\s*(.*)//i;
+		  $ce->{producers} = norm(parse_person_list( $creators ));
+	  }
 
     my( $writers ) = (norm($cast) =~ /Manuskript:\s*(.*)\.$/ );
     if( $writers ) {
@@ -213,18 +215,18 @@ sub ImportContent
         #$ce->{writers} = norm(parse_person_list( $writers ));
     }
 
-	my( $directors ) = (norm($cast) =~ /Instruktion:\s*(.*)/i );
-	if( $directors ) {
-	    $cast =~ s/Instruktion:\s*(.*)//i;
-		$ce->{directors} = norm(parse_person_list( $directors ));
-	}
+    my( $directors ) = (norm($cast) =~ /Instruktion:\s*(.*)/i );
+	  if( $directors ) {
+	     $cast =~ s/Instruktion:\s*(.*)//i;
+		   $ce->{directors} = norm(parse_person_list( $directors ));
+	  }
 
     my( $directorandwriter ) = (norm($cast) =~ /Instruktion\s+og\s+manuskript:\s*(.*)/i );
-	if( $directorandwriter ) {
+	  if( $directorandwriter ) {
 	    $cast =~ s/Instruktion\s+og\s+manuskript:\s*(.*)//i;
-		$ce->{directors} = norm(parse_person_list( $directorandwriter ));
-		$ce->{writers} = norm(parse_person_list( $directorandwriter ));
-	}
+		  $ce->{directors} = norm(parse_person_list( $directorandwriter ));
+		  $ce->{writers} = norm(parse_person_list( $directorandwriter ));
+	  }
 
     my( $actors1 ) = (norm($cast) =~ /Desuden\s+medvirker:\s*(.*)$/i );
     if( $actors1 ) {
@@ -282,13 +284,12 @@ sub ImportContent
         }
     }
 
-    $ce->{directors} = undef if defined $ce->{directors} and $ce->{directors} =~ /^\(/; # Failure to parse
-
+    delete $ce->{directors} if defined $ce->{directors} and $ce->{directors} =~ /^\(/; # Failure to parse
     $dsh->AddProgramme( $ce );
   }
-  
+
   #$ds->EndBatch( 1 );
-  
+
   # Success
   return 1;
 }
@@ -328,7 +329,7 @@ sub parse_person_list
         push @pers, norm($p);
     }
   }
-  
+
   #print Dumper(@pers);
 
   return join( ";", grep( /\S/, @pers ) );
@@ -339,7 +340,7 @@ sub parse_person_list
 sub ParseDateTime {
   my( $str ) = @_;
 
-  my( $year, $month, $day, $hour, $minute, $second ) = 
+  my( $year, $month, $day, $hour, $minute, $second ) =
       ($str =~ /^(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)/ );
 
   my $dt = DateTime->new(
