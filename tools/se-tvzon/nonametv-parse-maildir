@@ -431,6 +431,7 @@ sub guess_channel
  if ( $dir =~ /KinoPolska/ and $filename =~ /\.xlsx$/i ) {
     return "kinopolska.pl" if $filename =~ /Kino Polska/i and $filename !~ /International/i;
     return "int.kinopolska.pl" if $filename =~ /Kino Polska International/i;
+    return "int.kinopolska.pl" if $filename =~ /KP INT/i;
     return "kinopolskamuzyka.pl" if $filename =~ /KPM/i and $filename !~ /INT/i;
     return "int.kinopolskamuzyka.pl" if $filename =~ /KPM INT/i;
 

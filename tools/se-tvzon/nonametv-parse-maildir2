@@ -430,6 +430,7 @@ sub guess_channel
     if($filename =~ /\.xml$/i) {
         return "familytv.de" if $filename =~ /^FamilyTV_/i;
         return "dasneue.tv" if $filename =~ /^DasNeueTV_/i;
+        return "blizztv.de" if $filename =~ /^Blizz_/i;
     }
  }
 
