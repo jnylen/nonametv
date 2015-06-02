@@ -704,6 +704,10 @@ Instore,documentaire,Documentary,series
 Instore,film,\N,movie
 Instore,muziek,Music,series
 Instore,serie/soap,Soap,series
+ITVDE_genre,sitcom,Sitcom,
+ITVDE_main,dokumentation/reportage,Documentary/Report,series
+ITVDE_main,serie,\N,series
+ITVDE_main,show/unterhaltung,Entertainment,series
 Kanal23,"kunst / kultur (uden musik, generelt)",Culture/Art,
 Kanal23,"musik / ballet / danse (generelt)",Music/Ballet/Dance,
 Kanal23,"nyheder (generelt)",News,tvshow

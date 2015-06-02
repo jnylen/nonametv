@@ -1054,3 +1054,10 @@
 1041,TvdbEN,^.*$,program_type,series,\N,guess
 1042,TvdbEN,^.*$,program_type,series,\N,guess
 1040,TvdbDE,"Sword Art Online II",program_type,series,259640,guess
+733,Tvdb,Wendy,program_type,series,270812,guess
+1353,TvdbDE,^.*$,program_type,series,\N,guess
+1305,TvdbEN,"THE Producers",program_type,series,294814,guess
+1305,TvdbEN,"Immortal Songs 2",program_type,series,271760,guess
+1305,TvdbEN,"The Man in the Mask",program_type,series,295948,guess
+273,TvdbEN,"Scorned: Crimes of Passion",program_type,series,255307,episodetitle
+1354,TvdbDE,^.*$,program_type,series,\N,guess

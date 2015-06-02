@@ -1,4 +1,3 @@
-199,VH1,vh1.se,"TV,Sweden",Mtve,1,1:3:0,1,tvshow,Music,en,0,http://www.vh1e.com/,0
 200,"Axess TV",axess.se,"TV,Sweden",Axess,1,,1,,,sv,0,http://www.axess.se/,0
 201,Arte,arte.de,"TV,Germany,Norway,Denmark,Finland,Sweden,Austria",Arte,1,,1,,,de,0,http://www.arte.de/,0
 202,"BBC World News",bbcworldnews.com,"TV,Norway,Denmark,Finland,Sweden,Germany,Switzerland,Austria",BBCWorld,1,,1,,,en,0,http://www.bbcworldnews.com/,0
@@ -168,8 +167,8 @@
 519,"NRK Super TV",supertv.nrk.no,"TV,Norway",NRK,1,nrk-super,1,series,Series,no,0,http://www.nrk.no/,0
 520,HTV1,htv1.hrt.hr,"TV,Croatia,Norway,Sweden,Denmark,Austria,Germany",HRT,1,mreza=2,1,,,hr,0,http://www.hrt.hr,0
 521,"Al Jazeera English",aljazeera.net,"TV,Norway,Sweden,Denmark,Finland,Switzerland,Austria,Germany",Infomedia,1,AJE,1,tvshow,News,en,0,http://www.aljazeera.net/,0
-525,"SVT1 HD",svt1hd.svt.se,"TV,Sweden",Downconverter,1,svt1.svt.se,1,,,sv,0,http://www.svt.se,0
-526,"SVT2 HD",svt2hd.svt.se,"TV,Sweden",Downconverter,1,svt2.svt.se,1,,,sv,0,http://www.svt.se,0
+525,"SVT1 HD",svt1hd.svt.se,"TV,Sweden",Downconverter,1,"svt1.svt.se, quality=HDTV",1,,,sv,0,http://www.svt.se,0
+526,"SVT2 HD",svt2hd.svt.se,"TV,Sweden",Downconverter,1,"svt2.svt.se, quality=HDTV",1,,,sv,0,http://www.svt.se,0
 527,"History Channel HD",hd.historytv.se,"TV,Sweden",Downconverter,1,"historytv.se, quality=HDTV",1,series,Documentary,sv,0,http://www.historytv.se/,0
 528,"Kanal 11",tv11.sbstv.se,"TV,Sweden",SBSTVSWE,1,,1,series,Series,sv,0,http://www.elva.tv/,0
 539,"National Geographic HD Sverige",hd.natgeo.se,"TV,Sweden",Downconverter,1,natgeo.se,1,series,Documentary,sv,0,http://natgeotv.com/se/hd/,0
@@ -182,7 +181,7 @@
 547,tagesschau24,einsextra.daserste.de,"TV,Germany,Austria,Denmark",DasErste,1,19,1,,,de,0,\N,0
 548,EinsFestival,einsfestival.daserste.de,"TV,Germany,Austria,Denmark",DasErste,1,12,1,,,de,0,\N,0
 549,EinsPlus,einsplus.daserste.de,"TV,Germany,Austria,Denmark",DasErste,1,15,1,,,de,0,\N,0
-550,"Das Erste HD",hd.daserste.de,"TV,Norway,Germany,Austria,Denmark",DasErste,1,,1,,,de,0,http://www.daserste.de/,0
+550,"Das Erste HD",hd.daserste.de,"TV,Norway,Germany,Austria,Denmark",DasErste,1,1,1,,,de,0,http://www.daserste.de/,0
 551,hr-fernsehen,hr.daserste.de,"TV,Germany,Austria,Denmark",DasErste,1,17,1,,,de,0,\N,0
 552,MDR,mdr.daserste.de,"TV,Germany,Sweden,Austria,Denmark",DasErste,1,14,1,,,de,0,\N,0
 553,NDR,ndr.daserste.de,"TV,Germany,Austria,Denmark",DasErste,1,2,1,,,de,0,\N,0
@@ -276,9 +275,9 @@
 714,"C More Fotboll Hockey Kids Sweden",fotboll-hockey-kids.cmore.se,"TV,Sweden",CMore,1,54,1,series,Series,sv,0,http://www.cmore.se/,0
 715,"C More Sport/Film HD Sweden",sport-filmhd.cmore.se,"TV,Sweden",CMore,1,17,1,sports,Sports,sv,0,http://www.cmore.se/,0
 716,"TV2 Nyhetskanalen",news.tv2.no,"TV,Norway",TV2NO,1,11,1,tvshow,News,no,0,http://www.tv2.no/kanalene/news/,0
-717,"TV2 Sport Premium 1",pl1.tv2.no,"TV,Norway",TV2NO,1,14,1,series,Series,no,0,http://www.tv2.no/,0
-718,"TV2 Sport Premium 2",pl2.tv2.no,"TV,Norway",TV2NO,1,15,1,series,Series,no,0,http://www.tv2.no/,0
-719,"TV2 Sport Premium 3",pl3.tv2.no,"TV,Norway",TV2NO,1,16,1,series,Series,no,0,http://www.tv2.no/,0
+717,"TV2 Sport Premium 1",pl1.tv2.no,"TV,Norway",TV2NO,1,14,1,sports,Sports,no,0,http://www.tv2.no/,0
+718,"TV2 Sport Premium 2",pl2.tv2.no,"TV,Norway",TV2NO,1,15,1,sports,Sports,no,0,http://www.tv2.no/,0
+719,"TV2 Sport Premium 3",pl3.tv2.no,"TV,Norway",TV2NO,1,16,1,sports,Sports,no,0,http://www.tv2.no/,0
 722,"Disney Channel Norway",disneychannel.no,"TV,Norway",DisneyChannel,1,,1,series,Children's,no,0,http://www.disneychannel.no/,0
 723,"Disney Junior Norway",junior.disneychannel.no,"TV,Norway",DisneyChannel,1,,1,series,Kids,no,0,http://www.disneyjunior.no/,0
 724,"Disney XD Norway",xd.disneychannel.no,"TV,Norway",DisneyChannel,1,,1,series,Children's,no,0,http://www.disneyxd.no/,0
@@ -534,7 +533,6 @@
 1041,AXN,axntv.de,"TV,Germany",SonyDE,1,,0,series,Series,de,0,http://www.axntv.de/,0
 1042,"Sony Entertainment Television Germany",sonyentertainment.tv,"TV,Germany",SonyDE,1,,0,series,Series,de,0,http://www.sonyentertainment.tv/,0
 1044,"Tele5 Germany",tele5.de,"TV,Germany,Austria",Tele5,1,,0,series,Series,de,0,,0
-1045,"Das Neue TV",dasneue.tv,"TV,Germany,Austria",ITVDE,1,,0,series,Series,de,0,,0
 1046,"Family TV Germany",familytv.de,"TV,Germany,Austria",ITVDE,1,,0,series,Series,de,0,,0
 1047,"Disney Channel Germany",disneychannel.de,"TV,Germany,Austria",PPS,1,disney_,1,series,Series,de,0,http://www.disneychannel.de/,0
 1048,"Disney Cinemagic Germany",cinemagic.disneychannel.de,"TV,Germany,Austria",PPS,1,discinemagic_,0,series,Series,de,0,http://cinemagic.disney.de/,0
@@ -775,3 +773,8 @@
 1346,"H2 (English)",h2.historytv.eu,"TV,Finland",History_xml,1,,0,series,Documentary,en,0,http://www.historytv.eu/,0
 1347,"Cartoon Network Sweden (Boxer)",cartoonnetwork.boxer.se,"TV,Sweden",Combiner,1,,0,,,sv,0,\N,0
 1348,"Disney XD Sweden (Boxer)",disneyxd.boxer.se,"TV,Sweden",Combiner,1,,0,,,sv,0,\N,0
+1350,"VH1 Finland",vh1.fi,"TV,Finland",MTVde,1,93:fi:FI,0,tvshow,Music,fi,0,http://www.vh1e.com/,0
+1351,"VH1 Norway",vh1.no,"TV,Norway",MTVde,1,93:no:NO,0,tvshow,Music,no,0,http://www.vh1e.com/,0
+1352,"VH1 Sweden",vh1.se,"TV,Sweden",MTVde,1,93:sv:SE,1,tvshow,Music,sv,0,http://www.vh1e.com/,0
+1353,KiKA,kika.daserste.de,"TV,Germany,Austria,Denmark",DasErste,1,10,0,,,de,0,\N,0
+1354,blizz,blizztv.de,"TV,Germany,Austria",ITVDE,1,,0,series,Series,de,0,,0
