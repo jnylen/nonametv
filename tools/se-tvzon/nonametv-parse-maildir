@@ -356,6 +356,7 @@ sub guess_channel
      if($filename =~ /\.doc$/i) {
         return "brazzerstveurope.com" if $filename =~ /^brazzers/i;
         return "kanal10.se" if $filename =~ /^programtabl/i;
+        return "kanal10.se" if $from =~ /catarina.cl\@gmail\.com/i;
      }
 
      # XML
@@ -430,6 +431,7 @@ sub guess_channel
 
  if ( $dir =~ /KinoPolska/ and $filename =~ /\.xlsx$/i ) {
     return "kinopolska.pl" if $filename =~ /Kino Polska/i and $filename !~ /International/i;
+    return "kinopolska.pl" if $filename =~ /\s+KP\s+/i and $filename !~ /INT/i;
     return "int.kinopolska.pl" if $filename =~ /Kino Polska International/i;
     return "int.kinopolska.pl" if $filename =~ /KP INT/i;
     return "kinopolskamuzyka.pl" if $filename =~ /KPM/i and $filename !~ /INT/i;
@@ -440,7 +442,7 @@ sub guess_channel
         return "360tunebox.spi.pl" if $filename =~ /^360TuneBox/i;
         return "docubox.spi.pl" if $filename =~ /^DocuBox/i;
         return "erox.spi.pl" if $filename =~ /^Erox/i;
-        return "eroxxx.spi.pl" if $filename =~ /^Eroxxx/i;
+        return "eroxxx.spi.pl" if $filename =~ /^Eroxxx/i and $filename =~ /GMT+2/i;
         return "fashionbox.spi.pl" if $filename =~ /^FashionBox/i;
         return "fastandfun.spi.pl" if $filename =~ /^Fast&Fun/i;
         return "fightbox.spi.pl" if $filename =~ /^FightBox/i;

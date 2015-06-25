@@ -61,4 +61,6 @@ $NONAMETV ZDF $1 $2 $3
 $NONAMETV HRT $1 $2 $3
 $NONAMETV ViasatPL $1 $2 $3
 $NONAMETV EurosportPL $1 $2 $3
-$NONAMETV KBSWorld $1 $2 $3
+$NONAMETV KBSWorld --force-update
+$NONAMETV Horse1 $1 $2 $3
+$NONAMETV RTLDE $1 $2 $3
