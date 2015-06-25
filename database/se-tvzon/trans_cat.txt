@@ -105,7 +105,7 @@ CanalPlus,barnfilm,Children's,movie
 CanalPlus,barnprogram,Kids,tvshow
 CanalPlus,barnserie,Children's,series
 CanalPlus,basket,Sports,
-CanalPlus,basketmagasin,Basket,sports
+CanalPlus,basketmagasin,Magazine,sports
 CanalPlus,båtsport,Boats,sports
 CanalPlus,"biografisk drama",Drama/Biography,
 CanalPlus,"biografiskt drama",Biography/Drama,
@@ -138,7 +138,7 @@ CanalPlus,dramakomedie,Drama/Comedy,
 CanalPlus,dramakomediserie,Drama/Comedy,series
 CanalPlus,dramaserie,Drama,
 CanalPlus,dramathriller,Drama,
-CanalPlus,elitserien,Football,sports
+CanalPlus,elitserien,Soccer,sports
 CanalPlus,"endast tjejer",Adult,
 CanalPlus,"endats tjejer",Adult,
 CanalPlus,"engelsk ligafotboll",Sports,
@@ -192,9 +192,9 @@ CanalPlus,fantasykomedi,Fantasy/Comedy,
 CanalPlus,"fiktiv dokumentärfilm",Documentary,movie
 CanalPlus,filmintervju,Talk,
 CanalPlus,"filmmagasin med hans wiklund",Magazine,
-CanalPlus,fodbold,Football,sports
-CanalPlus,fotball,Football,sports
-CanalPlus,fotboll,Football,sports
+CanalPlus,fodbold,Soccer,sports
+CanalPlus,fotball,Soccer,sports
+CanalPlus,fotboll,Soccer,sports
 CanalPlus,fotbollsmagasin,Magazine,sports
 CanalPlus,gangsterthriller,Gangster/Thriller,
 CanalPlus,gonzo,Adult,
@@ -210,7 +210,7 @@ CanalPlus,hockeymagasin,Hockey,tvshow
 CanalPlus,intervju,Talk,
 CanalPlus,ishockey,Hockey,sports
 CanalPlus,"italiensk ligafotboll",Sports,
-CanalPlus,kampsort,\N,sports
+CanalPlus,kampsort,"Martial Arts",sports
 CanalPlus,kampsport,"Martial Arts",sports
 CanalPlus,katastroffilm,,movie
 CanalPlus,komedi,Comedy,
@@ -274,7 +274,7 @@ CanalPlus,"science fiction-serie",Sci-Fi,serieis
 CanalPlus,"science fiction-skräck",Sci-Fi/Horror,
 CanalPlus,"science fiction-thriller",Sci-Fi/Thriller,
 CanalPlus,sckräk,Horror,
-CanalPlus,"serie a",\N,sports
+CanalPlus,"serie a",Soccer,sports
 CanalPlus,serier,series,Series
 CanalPlus,skräck,Horror,
 CanalPlus,skräckdrama,Horror/Drama,
@@ -382,7 +382,7 @@ DasErste_type,fernsehserie,\N,series
 DasErste_type,fersehfilm,\N,movie
 DasErste_type,film,\N,movie
 DasErste_type,filmkomödie,Comedy,movie
-DasErste_type,"fußball",\N,sports
+DasErste_type,"fußball",Soccer,sports
 DasErste_type,heimatfilm,\N,movie
 DasErste_type,jugendfilm,\N,movie
 DasErste_type,"kinder- und familienserie",Kids,
@@ -578,7 +578,7 @@ DreiSat_thember,"country und western",Western/Country,
 DreiSat_thember,erotik/sexualität,Adult,
 DreiSat_thember,familie,Family,
 DreiSat_thember,"film, kino, video",,movie
-DreiSat_thember,"fußball",Football,sports
+DreiSat_thember,"fußball",Soccer,sports
 DreiSat_thember,jazz,Music,
 DreiSat_thember,klassik,Music,
 DreiSat_thember,"krieg, konflikt, unruhen",War,
@@ -634,6 +634,157 @@ Euronews,lifestyle,Lifestyle,tvshow
 Euronews,"music news",Music/News,tvshow
 Euronews,news,News,tvshow
 Euronews,"science / technology",Science/Technology,tvshow
+Eurosport,alpint,Alpint,
+Eurosport,"alpint skiløb",Alpint,
+Eurosport,alppihiihto,Alpint,
+Eurosport,"artistisk gymnastik",Gymnastics,
+Eurosport,atletik,Athletics,
+Eurosport,"australialainen jalkapallo","Australian Football",
+Eurosport,"australian football","Australian Football",
+Eurosport,"australisk fotboll","Australian Football",
+Eurosport,autourheilu,Motors,
+Eurosport,backhoppning,Skiing,
+Eurosport,bågskytte,Archery,
+Eurosport,basket,Basketball,
+Eurosport,basketball,Basketball,
+Eurosport,"beach soccer",Soccer,
+Eurosport,beachsoccer,Soccer,
+Eurosport,bilracing,Motors,
+Eurosport,bilsport,Motors,
+Eurosport,bogenschiessen,Archery,
+Eurosport,boks,Boxing,
+Eurosport,boksing,Boxing,
+Eurosport,boksning,Boxing,
+Eurosport,bordtennis,"Table Tennis",
+Eurosport,boxen,Boxing,
+Eurosport,boxning,Boxing,
+Eurosport,brettseiling,Boat,
+Eurosport,brottning,Wrestling,
+Eurosport,brydning,Wrestling,
+Eurosport,bryting,Wrestling,
+Eurosport,bueskydning,Archery,
+Eurosport,bueskyting,Archery,
+Eurosport,cykel,Bicycle,
+Eurosport,cykling,Bicycle,
+Eurosport,fäktning,Fencing,
+Eurosport,fechten,Fencing,
+Eurosport,fekting,Fencing,
+Eurosport,"fia wtcc",Motors,
+Eurosport,fmx,Motors,
+Eurosport,fodbold,Soccer,
+Eurosport,fotball,Soccer,
+Eurosport,fotboll,Soccer,
+Eurosport,"freestyle motocross",Motors,
+Eurosport,"freestyle motocross (fmx)",Motors,
+Eurosport,friidrett,Athletics,
+Eurosport,friidrott,Athletics,
+Eurosport,"fußball",Soccer,
+Eurosport,"futbol australijski","Australian Football",
+Eurosport,fægtning,Fencing,
+Eurosport,"gimnastyka artystyczna",Gymnastics,
+Eurosport,"gimnastyka sportowa",Gymnastics,
+Eurosport,golf,Golf,
+Eurosport,"gp 3",Motors,
+Eurosport,gp3,Motors,
+Eurosport,hestesport,Horse,
+Eurosport,jalkapallo,Soccer,
+Eurosport,jeździectwo,Horse,
+Eurosport,jousiammunta,Archery,
+Eurosport,kajakarstwo,Canoeing,
+Eurosport,kampfsport,"Martial Arts",
+Eurosport,kamppailu-urheilu,"Martial Arts",
+Eurosport,kampsport,"Martial Arts",
+Eurosport,kano,Canoeing,
+Eurosport,kanot,Canoeing,
+Eurosport,kanu,Canoeing,
+Eurosport,kolarstwo,Bicycle,
+Eurosport,"kolarstwo górskie",Bicycle,
+Eurosport,koripallo,Basketball,
+Eurosport,koszykówka,Basketball,
+Eurosport,kraftsport,"Weight training",
+Eurosport,kunstturnen,Gymnastics,
+Eurosport,längdåkning,Skiing,
+Eurosport,leichtathletik,Athletics,
+Eurosport,"lekka atletyka",Athletics,
+Eurosport,lentopallo,Volleyball,
+Eurosport,maastopyöräily,Bicycle,
+Eurosport,magazyn,Magazine,
+Eurosport,mäkihyppy,Skiing,
+Eurosport,melonta,Canoeing,
+Eurosport,miekkailu,Fencing,
+Eurosport,moottoripyöräily,Motors,
+Eurosport,moottoriurheilu,Motors,
+Eurosport,"moto-x freestyle",Motors,
+Eurosport,motocross,Motors,
+Eurosport,motorcross,Motors,
+Eurosport,motorcykel,Motors,
+Eurosport,motorrad,Motors,
+Eurosport,"motorrad (sbk)",Motors,
+Eurosport,"motorrad (ssp)",Motors,
+Eurosport,"motorrad (sst)",Motors,
+Eurosport,motorsport,Motors,
+Eurosport,motorsykkel,Motors,
+Eurosport,"mountain bike",Bicycle,
+Eurosport,mountainbike,Bicycle,
+Eurosport,"nordic skiing",Skiing,
+Eurosport,nyrkkeily,Boxing,
+Eurosport,padling,Canoeing,
+Eurosport,pferdesport,Horse,
+Eurosport,"piłka nożna",Soccer,
+Eurosport,"pohjoismaiset hiihtolajit",Skiing,
+Eurosport,pöytätennis,"Table Tennis",
+Eurosport,"pro wrestling",Wrestling,
+Eurosport,pyöräily,Bicycle,
+Eurosport,"pływanie",Swimming,
+Eurosport,racerløb,Motors,
+Eurosport,radsport,Bicycle,
+Eurosport,"rajdy samochodowe",Motors,
+Eurosport,ralli,Motors,
+Eurosport,rally,Motors,
+Eurosport,rallye,Motors,
+Eurosport,rantafutis,"Beach football",
+Eurosport,ratsastus,Horse,
+Eurosport,redskabsgymnastik,Gymnastics,
+Eurosport,"rhythmische sportgymnastik",Gymnastics,
+Eurosport,ridning,Horse,
+Eurosport,ridsport,Horse,
+Eurosport,"rytmisk gymnastik",Gymnastics,
+Eurosport,"rytmisk gymnastikk",Gymnastics,
+Eurosport,"rytmisk sports gymnastik",Gymnastics,
+Eurosport,schwimmen,Swimming,
+Eurosport,segeln,Sailing,
+Eurosport,segling,Sailing,
+Eurosport,seiling,Sailing,
+Eurosport,sejlsport,Sailing,
+Eurosport,siatkówka,Volleyball,
+Eurosport,simhopp,Swimming,
+Eurosport,simning,Swimming,
+Eurosport,"ski nordiske grener",Skiing,
+Eurosport,skihop,Skiing,
+Eurosport,skispringen,Skiing,
+Eurosport,"skoki do wody",Swimming,
+Eurosport,"skoki narciarskie",Skiing,
+Eurosport,soutu,Canoeing,
+Eurosport,speedway,Motors,
+Eurosport,"sporty motorowe",Motors,
+Eurosport,"sporty walki",Boxing,
+Eurosport,"strand fodbold","Beach football",
+Eurosport,strandfotball,"Beach football",
+Eurosport,svømming,Swimming,
+Eurosport,svømning,Swimming,
+Eurosport,sykkel,Bicycle,
+Eurosport,szermierka,Fencing,
+Eurosport,tenis,Tennis,
+Eurosport,"tenis stołowy",Tennis,
+Eurosport,tennis,Tennis,
+Eurosport,terrengsykling,Bicycle,
+Eurosport,tischtennis,Tennis,
+Eurosport,udspring,Swimming,
+Eurosport,uimahypyt,Swimming,
+Eurosport,uintiurheilu,Swimming,
+Eurosport,volleyball,Volleyball,
+Eurosport,volleyboll,Volleyball,
+Eurosport,wrestling,Wrestling,
 Fatstone,bmx.,Biking,sports
 Fatstone,general.,\N,sports
 Fatstone,kiting.,Kiting,sports
@@ -691,6 +842,16 @@ HBO_genre,vestern,Western,
 HBO_genre,western,Western,
 HBO_primary,movies,\N,movie
 HBO_primary,serie_episodes,\N,series
+Horse1,dokumentär,Documentary,
+Horse1,dokumentär/porträtt,Documentary/Biography,
+Horse1,dokumentärserie,Documentary,series
+Horse1,drama,Drama,
+Horse1,dramaserie,Drama,series
+Horse1,hoppning,Horse,
+Horse1,långfilm,\N,movie
+Horse1,reality,Reality,
+Horse1,ungdomsserie,Youth,series
+Horse1,utbildningsprogram,Education,
 HRT,animacija,Animation,
 HRT,drame,Drama,
 HRT,filmovi,\N,movie
@@ -1385,7 +1546,7 @@ Svt_genre2,3604,Football,sports
 Svt_genre2,3605,Handball,sports
 Svt_genre2,3610,Tennis,sports
 Svt_genre2,3613,Horse,sports
-Svt_genre2,3619,Racing,sports
+Svt_genre2,3619,Motors,sports
 Svt_genre2,3620,Skiing,sports
 Svt_genre2,3621,Skiing,sports
 Svt_genre2,3623,Skating,sports
@@ -1623,9 +1784,9 @@ TV2NO,film,\N,movie
 TV2NO,"film thriller",Thriler,movie
 TV2NO,forbrukermagasin,"Home improvement",\N
 TV2NO,forbrukerprogram,"Home improvement",
-TV2NO,fotball,Football,sports
-TV2NO,fotball-vm,Football,sports
-TV2NO,friidrett,\N,sports
+TV2NO,fotball,Soccer,sports
+TV2NO,fotball-vm,Soccer,sports
+TV2NO,friidrett,Athletics,sports
 TV2NO,gameshow,Game,tvshow
 TV2NO,grøsser,Horror,
 TV2NO,grøsserfilm,Horror,movie
@@ -1682,7 +1843,7 @@ TV2NO,sitcom,Sitcom,
 TV2NO,skrekkfilm,Horror,movie
 TV2NO,"sort actionkomedie",Action/Comedy,
 TV2NO,"sp10 sportsnyheter",\N,sports
-TV2NO,"sp22 fotball",Football,sports
+TV2NO,"sp22 fotball",Soccer,sports
 TV2NO,"sp42 sykkel",Bicycle,sports
 TV2NO,"sp80 studio/pauseinn",\N,sports
 TV2NO,speninngsfilm,Horror,movie
@@ -1729,18 +1890,22 @@ TV4,barnprogram,Children's,series
 TV4,dokumentär,Documentary,series
 TV4,drama,Drama,series
 TV4,film,Movies,movie
+TV4,gameshow,Gameshow,
 TV4,hälsa,Health,series
+TV4,komedi,Comedy,
 TV4,kultur,Culture,series
 TV4,livsstil,Lifestyle,series
 TV4,matlagning,Food,series
 TV4,miniserie,Mini-Series,series
 TV4,nyheter,News,tvshow
 TV4,övrigt,\N,series
+TV4,resor,Travel,
 TV4,såpopera,Soap/Opera,series
 TV4,sitcom,Sitcom,series
 TV4,sport,Sports,sports
+TV4,talkshow,Talkshow,
 TV4,underhållning,Entertainment,series
-TV4,vetenskap,\N,series
+TV4,vetenskap,Science,series
 TV5Monde,documentary,Documentary,
 TV5Monde,drama,Drama,
 TV5Monde,entertainment,Entertainment,

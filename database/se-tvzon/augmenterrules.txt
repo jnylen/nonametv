@@ -1061,3 +1061,27 @@
 1305,TvdbEN,"The Man in the Mask",program_type,series,295948,guess
 273,TvdbEN,"Scorned: Crimes of Passion",program_type,series,255307,episodetitle
 1354,TvdbDE,^.*$,program_type,series,\N,guess
+1355,Tvdb,^.*$,program_type,series,\N,guess
+1355,Tvdb,Stallkompisar,program_type,series,81993,guess
+1355,Tvdb,Heartland,program_type,series,82701,guess
+1355,Tvdb,Wendy,program_type,series,270812,guess
+1356,TvdbNO,^.*$,program_type,series,\N,guess
+1357,TvdbDE,^.*$,program_type,series,\N,episodetitle
+1040,TvdbDE,"Sailor Moon S",program_type,series,78500,guess
+1040,TvdbDE,"Sailor Moon R",program_type,series,78500,guess
+1040,TvdbDE,"Sailor Moon SuperS",program_type,series,78500,guess
+1040,TvdbEN,Schwermetall,program_type,series,260046,guess
+1040,TvdbDE,"Jeanne, die Kamikaze-Diebin",program_type,series,72832,guess
+1040,TvdbDE,"Sengoku Basara - Samurai Kings",program_type,series,87881,guess
+1040,TvdbDE,"DragonBall GT",program_type,series,79275,guess
+1040,TvdbDE,"Sailor Moon S1",program_type,series,78500,guess
+1040,TvdbEN,"Naruto Shippuden",program_type,series,79824,episodetitle
+1040,TvdbDE,Fate/Zero,program_type,series,275798,episodetitle
+1040,TvdbDE,"Crayon Shin-chan",program_type,series,82694,guess
+1040,TvdbEN,"Dance in the Vampire Bund",program_type,series,128171,episodetitle
+1040,TvdbDE,"Samurai Girls",program_type,series,186911,guess
+1358,TvdbDE,^.*$,program_type,series,\N,guess
+1359,TvdbDE,^.*$,program_type,series,\N,guess
+1360,TvdbDE,^.*$,program_type,series,\N,guess
+1361,TvdbDE,^.*$,program_type,series,\N,guess
+1362,TvdbDE,^.*$,program_type,series,\N,guess

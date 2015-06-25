@@ -136,6 +136,13 @@ DR,østrig,AT
 FOXTV,france,FR
 FOXTV,"united kingdom",UK
 FOXTV,"united states",US
+Horse1,australien,AU
+Horse1,franrike,FR
+Horse1,kanada,CA
+Horse1,"nya zeeland",NZ
+Horse1,storbritannien,GB
+Horse1,sverige,SE
+Horse1,usa,US
 KFZ,a,AT
 KFZ,aus,AU
 KFZ,ausatralien,AU
