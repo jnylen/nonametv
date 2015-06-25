@@ -14,7 +14,7 @@ use utf8;
 use DateTime;
 use XML::LibXML;
 
-use NonameTV qw/ParseXml norm/;
+use NonameTV qw/ParseXml norm AddCategory/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/f/;
 
@@ -105,6 +105,8 @@ sub ImportContent {
       my $desc = norm( $emission->findvalue( 'Feature' ) );
       my $hd = norm( $emission->findvalue( 'HD' ) );
       my $image = norm( $emission->findvalue( 'ImageHD' ) );
+      my $bc_type = norm( $emission->findvalue( 'BroadcastType' ) );
+      my $sport = norm( $emission->findvalue( 'Sport' ) );
 
       my $ce = {
         channel_id => $channel_id,
@@ -116,6 +118,14 @@ sub ImportContent {
 
       $ce->{quality} = "HDTV" if $hd eq "Yes";
       $ce->{fanart} = $image if defined($image) and $image ne "";
+      $ce->{live} = 1 if $bc_type eq "DIREKT" or $bc_type eq "LIVE";
+      $ce->{rerun} = 1 if $bc_type eq "Repris" or $bc_type eq "Genudsendelse";
+
+      # Sport
+      if( $sport and $sport ne "" ) {
+  			my($program_type, $category ) = $ds->LookupCat( 'Eurosport', $sport );
+  			AddCategory( $ce, "sports", $category );
+  		}
 
       $ds->AddProgramme( $ce );
 

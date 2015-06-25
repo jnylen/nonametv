@@ -92,9 +92,9 @@ sub ImportXML
   }
 
   ## Fix for data falling off when on a new week (same date, removing old programmes for that date)
-  my ($week, $year, $meh);
-  ($week, $year) = ($file =~ /wk\s*(\d+)_(\d+)/i);
-  ($meh, $week) = ($file =~ /wk(\s*|)(\d+)/i) if(!defined $year);
+  my ($dummy, $week, $year, $meh);
+  ($dummy, $week, $year) = ($file =~ /(wk|uke)\s*(\d+)_(\d+)/i);
+  ($dummy, $meh, $week) = ($file =~ /(wk|uke)(\s*|_|)(\d+)/i) if(!defined $year);
 
   if(!defined $year) {
     error( "FOXTV: $chd->{xmltvid}: Failure to get year from filename, grabbing current year" ) ;
@@ -345,10 +345,12 @@ sub ImportXLS {
       my $prodcountry = norm($oWkS->{Cells}[$iR][$columns{'Country'}]->Value );
       my $actors = $oWkS->{Cells}[$iR][$columns{'Actors'}]->Value;
       $actors =~ s/, /;/g;
+      $actors =~ s/-$//g;
       $actors =~ s/;$//g;
       $actors =~ s/,$//g;
       my $directors = $oWkS->{Cells}[$iR][$columns{'Directors'}]->Value;
       $directors =~ s/, /;/g;
+      $directors =~ s/-$//g;
       $directors =~ s/;$//g;
       $directors =~ s/,$//g;
 

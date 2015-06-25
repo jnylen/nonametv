@@ -53,11 +53,11 @@ sub ImportContentFile
   my $channel_id = $chd->{id};
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
-  
+
   return if( $file !~ /\.doc$/i );
 
   progress( "Kanal10: $xmltvid: Processing $file" );
-  
+
   my $doc;
   $doc = Wordfile2Xml( $file );
 
@@ -71,10 +71,10 @@ sub ImportContentFile
     my $str = $node->getData();
     $node->setData( uc( $str ) );
   }
-  
+
   # Find all paragraphs.
   my $ns = $doc->find( "//p" );
-  
+
   if( $ns->size() == 0 ) {
     error( "Kanal10 $xmltvid: $file: No ps found." ) ;
     return;
@@ -109,7 +109,7 @@ sub ImportContentFile
 
           my $batch_id = "${xmltvid}_" . $date;
           $dsh->StartBatch( $batch_id, $channel_id );
-          $dsh->StartDate( $date , "00:00" ); 
+          $dsh->StartDate( $date , "00:00" );
           $currdate = $date;
         }
       }
@@ -132,40 +132,27 @@ sub ImportContentFile
         start_time => $time,
       };
 
-      	
-        
-        #my $d = norm($desc);
-        #if((not defined $d) or ($d eq "")) {
-        	my $d = norm($title);
-        #}
-       
-      # Episode
-      if($d) {
-      		my ($ep, $eps);
-      		
-          	# Del 2
-  			( $ep ) = ($d =~ /\bdel\s+(\d+)/ );
-  			$ce->{episode} = sprintf( " . %d .", $ep-1 ) if defined $ep;
-
-  			# Del 2 av 3
-  			( $ep, $eps ) = ($d =~ /\bdel\s+(\d+)\((\d+)\)/ );
-  			$ce->{episode} = sprintf( " . %d/%d . ", $ep-1, $eps ) 
-    		if defined $eps;
-    		$title =~ s/del\s+(\d+)\((\d+)\)//i if defined $eps;
-    		$title =~ s/del\s+(\d+)//i if defined $ep;
-    		
-    		
-      }
-
-	  # Just in case
-	  $ce->{title} = norm($title);
-
-	  # Remove repris (use this in the future?)
+	    # Just in case
+      $title =~ s/\(Textat till svenska(\.|)\)//;
+	    # Remove repris (use this in the future?)
       $title =~ s/\(Repris(.*)\)$//;
-      
+      $title =~ s/"//g;
+
       # Set title
       $ce->{title} = norm($title);
       $ce->{description} = norm($desc) if $desc;
+
+      my( $t, $st ) = ($ce->{title} =~ /(.*)\: (.*)/);
+      if( defined( $st ) )
+      {
+        # This program is part of a series and it has a colon in the title.
+        # Assume that the colon separates the title from the subtitle.
+        $ce->{title} = $t;
+        $ce->{description} = $st;
+      }
+
+      # Parse episode
+      $self->extract_episode( $ce );
 
 			push( @ces , $ce );
 
@@ -178,7 +165,7 @@ sub ImportContentFile
   FlushDayData( $xmltvid, $dsh , @ces );
 
   $dsh->EndBatch( 1 );
-    
+
   return;
 }
 
@@ -210,7 +197,7 @@ sub ParseDate {
 
     $month = MonthNumber( $monthname, 'sv' );
   }
-	
+
 #my $dt_now = DateTime->now();
 
 print("day: $day, month: $month, year: $year\n");
@@ -220,7 +207,7 @@ print("day: $day, month: $month, year: $year\n");
     			month => $month,
     			day => $day,
       		);
-  
+
   # Add a year if the month is January
   #if($month eq 1) {
   #  	$dt->add( year => 1 );
@@ -256,7 +243,7 @@ sub ParseShow {
   }
 
   my ( $hour , $min ) = ( $time =~ /^(\d+).(\d+)$/ );
-  
+
   $time = sprintf( "%02d:%02d", $hour, $min );
 
   return( $time, $title, $desc );
@@ -296,6 +283,68 @@ sub FlushDayData {
         $dsh->AddProgramme( $element );
       }
     }
+}
+
+sub extract_episode
+{
+  my $self = shift;
+  my( $ce ) = @_;
+
+  my $d = $ce->{description};
+  my $t = $ce->{title};
+
+  # Try to extract episode-information from the description.
+  my( $ep, $eps, $ep2, $eps2 );
+  my $episode;
+
+  ## description
+  if(defined($d)) {
+    # Del 2(3)
+    ( $ep, $eps ) = ($d =~ /del\s+(\d+)\((\d+)\)/i );
+    $episode = sprintf( " . %d/%d . ", $ep-1, $eps )
+      if defined $eps;
+
+  	if(defined $episode and defined $eps) {
+  		$ce->{description} =~ s/del\s+(\d+)\((\d+)\)//i;
+  	}
+
+    # Del 2
+    ( $ep ) = ($d =~ /del\s+(\d+)/i );
+    $episode = sprintf( " . %d .", $ep-1 ) if defined $ep;
+
+    if(defined $episode and defined $ep) {
+      $ce->{description} =~ s/Del\s+(\d+)//i;
+    }
+  }
+
+  ## title
+  if(defined($t) and !defined($episode)) {
+    # Del 2(3)
+    ( $ep, $eps ) = ($t =~ /del\s+(\d+)\((\d+)\)/i );
+    $episode = sprintf( " . %d/%d . ", $ep-1, $eps )
+      if defined $eps;
+
+  	if(defined $episode and defined $eps) {
+  		$ce->{title} =~ s/del\s+(\d+)\((\d+)\)//i;
+  	}
+
+    # Del 2
+    ( $ep ) = ($t =~ /del\s+(\d+)/i );
+    $episode = sprintf( " . %d .", $ep-1 ) if defined $ep;
+
+    if(defined $episode and defined $ep) {
+      $ce->{title} =~ s/del\s+(\d+)//i;
+    }
+  }
+
+  if( defined( $episode ) )
+  {
+    $ce->{episode} = $episode;
+    $ce->{program_type} = 'series';
+  }
+
+  $ce->{title} = norm($ce->{title});
+  $ce->{description} = norm($ce->{description});
 }
 
 1;

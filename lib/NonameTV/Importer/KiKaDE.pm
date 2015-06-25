@@ -39,10 +39,6 @@ sub Object2Url {
   my( $objectname, $chd ) = @_;
   my( $xmltvid, $year, $week ) = ( $objectname =~ /^(.+)_(\d+)-(\d+)$/ );
 
-  if (!defined ($chd->{grabber_info})) {
-    return (undef, 'Grabber info must contain path!');
-  }
-
   my $url = sprintf( 'http://www.kika-presse.de/media/export/text%dpw%02d.xml', $year , $week );
 
   # Only one url to look at and no error
@@ -101,7 +97,7 @@ sub ImportContent {
   my ($batch_id, $cref, $chd) = @_;
 
   my $doc = ParseXml ($cref);
-  
+
   if (not defined ($doc)) {
     f ("$batch_id: Failed to parse.");
     return 0;
@@ -131,7 +127,7 @@ sub ImportContent {
 
     foreach my $program ($programs->get_nodelist) {
       my ($hour, $minute) = ($program->findvalue ('@Time') =~ m|(\d+)\.(\d+)|);
-      my $start_time = DateTime->new ( 
+      my $start_time = DateTime->new (
         year      => $year,
         month     => $month,
         day       => $day,
@@ -160,7 +156,7 @@ sub ImportContent {
           f('missing expected stop time!');
           printf( "%s\n", $program->serialize()  );
         }
-        my $stop_time = DateTime->new ( 
+        my $stop_time = DateTime->new (
           year      => $year,
           month     => $month,
           day       => $day,
@@ -275,7 +271,7 @@ sub ImportContent {
             if( $episodetitle ){
               $ece{subtitle} = $episodetitle;
             }
-  
+
             my $episodedesc = $episode->findvalue ('FolgeLangText');
             if( ( $episodedesc ne 'Inhalt wird nachgereicht!' ) &&
                !( $episodedesc =~ m|^Inhalt momentan nicht verf..?gbar!$| ) ){

@@ -306,10 +306,25 @@ sub ImportContent
     }
 
     # Some sports programs needs to be tagged sports correctly
-    if($ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|(.*)\-VM)\:/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|(.*)\-EM)\:/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|UFC|(.*)\-EM)$/i)
+    if($ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|Segling|(.*)\-VM)\:/i or $ce->{title} =~ /^FIFA (.*)-(VM|EM) (\d\d\d\d)\:/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Segling|Simning|(.*)\-EM)\:/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|UFC|Segling|(.*)\-EM)$/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Segling|Simning|UFC)\:/i)
     {
-        $ce->{program_type} = "sports";
-        delete($ce->{episode}) if defined($ce->{episode});
+      # Different types needs different Genres
+      if($ce->{title} =~ /^Handboll/i) {
+        $ce->{category} = "Handball";
+      } elsif($ce->{title} =~ /^Fotboll/i or $ce->{title} =~ /^FIFA (.*)-(VM|EM) (\d\d\d\d)\:/i) {
+        $ce->{category} = "Soccer";
+      } elsif($ce->{title} =~ /^Hockey/i) {
+        $ce->{category} = "Hockey";
+      } elsif($ce->{title} =~ /^Innebandy/i) {
+        $ce->{category} = "Floorball";
+      } elsif($ce->{title} =~ /^Simning/i) {
+        $ce->{category} = "Swimming";
+      } elsif($ce->{title} =~ /^Segling/i) {
+        $ce->{category} = "Sailing";
+      }
+
+      $ce->{program_type} = "sports";
+      delete($ce->{episode}) if defined($ce->{episode});
     }
 
     progress($date." ".$starttime." - ".$ce->{title});
