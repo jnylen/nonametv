@@ -1,4 +1,4 @@
-package NonameTV::Importer::RTLDE;
+package NonameTV::Importer::DR_Json;
 
 use strict;
 use utf8;
@@ -6,7 +6,7 @@ use warnings;
 
 =pod
 
-Importer for RTL Deutschland (VOX, RTL, RTL Nitro, n-tv, Super RTL, RTL2)
+Importer for DR.dk
 The file downloaded is in JSON format.
 
 =cut
@@ -30,10 +30,8 @@ sub new {
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
 
-    my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
+    my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "UTC" );
     $self->{datastorehelper} = $dsh;
-
-    $self->{datastore}->{augment} = 1;
 
     return $self;
 }
@@ -52,7 +50,7 @@ sub Object2Url {
 
   my( $date ) = ($objectname =~ /_(.*)/);
 
-  my $url = $self->{UrlRoot} . "/v3/epgs/movies/".$chd->{grabber_info}."/".$date."?fields=*,movie.*,movie.format,movie.paymentPaytypes,movie.pictures,movie.trailers,epgImages,epgImages.*,epgFormat,*.*";
+  my $url = "http://www.dr.dk/mu/Schedule/". $date ."%40".$chd->{grabber_info}."?merge=True";
 
   return( $url, undef );
 }
@@ -74,6 +72,7 @@ sub ImportContent {
   my $self = shift;
   my( $batch_id, $cref, $chd ) = @_;
 
+
   my $xmltvid=$chd->{xmltvid};
   my $channel_id = $chd->{id};
   my $currdate = "x";
@@ -87,50 +86,48 @@ sub ImportContent {
 
   # Data
   my $json = new JSON->allow_nonref;
-  my $data = $json->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->decode($$cref)->{"items"};
+  my $parse = $json->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->decode($$cref);
 
-  my ($p, $start_of_week, $folge);
+  if( $parse->{'TotalSize'} == 0) {
+    error( "DR_Json: $chd->{xmltvid}: No data found" );
+    return;
+  }
 
-  foreach $p (@{$data}) {
-    my $title = $p->{"title"};
-    my $subtitle = $p->{"subTitle"};
+  # The broadcasts are here
+  my $data = $parse->{"Data"}[0]->{'Broadcasts'};
 
-    # Start and so on
-    my $start = ParseDateTime( $p->{"startDate"} );
-    my $time = $start->hms(":");
+  foreach my $p (@{$data}) {
+    my $start = ParseDateTime( $p->{"AnnouncedStartTime"} );
+    my $end = ParseDateTime( $p->{"AnnouncedEndTime"} );
+    my $title = $p->{"Title"};
+    my $year = $p->{"ProductionYear"};
+    my $desc = $p->{"Description"};
 
-    # Put everything in a array
+    # Add
     my $ce = {
-        channel_id => $chd->{id},
-        start_time => $time,
-        title => norm($title),
+      channel_id => $chd->{id},
+      start_time => $start->hms(":"),
+      title      => norm($title),
     };
 
-    if(defined($subtitle) and $subtitle ne "") {
-      if( ( $folge ) = ($subtitle =~ m|^Folge (\d+)$| ) ){
-        $ce->{episode} = '. ' . ($folge - 1) . ' .';
-        $ce->{program_type} = "series";
-      } else {
-        $ce->{subtitle} = norm($subtitle);
-        $ce->{program_type} = "series";
-      }
-    }
-
+    $ce->{production_date} = "$year-01-01" if defined($year) and $year ne "";
+    $ce->{description}     = norm($desc)   if defined($desc) and $desc ne "";
 
     progress($start." $ce->{title}");
 
     $dsh->AddProgramme( $ce );
-
-  #  $dsh->AddProgramme( $ce );
   }
+
   return 1;
 }
 
+# The start and end-times are in the format 2007-12-31T01:00:00
+# and are expressed in the local timezone.
 sub ParseDateTime {
   my( $str ) = @_;
 
   my( $year, $month, $day, $hour, $minute, $second ) =
-      ($str =~ /^(\d+)-(\d+)-(\d+) (\d+):(\d+)/ );
+      ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)/ );
 
   my $dt = DateTime->new(
     year => $year,
@@ -138,6 +135,7 @@ sub ParseDateTime {
     day => $day,
     hour => $hour,
     minute => $minute,
+    second => $second,
       );
 
   return $dt;

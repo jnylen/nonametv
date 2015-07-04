@@ -1,4 +1,4 @@
-package NonameTV::Importer::DR_xml;
+package NonameTV::Importer::DR_newxml;
 
 use strict;
 use warnings;
@@ -20,9 +20,9 @@ use NonameTV qw/ParseXml AddCategory AddCountry norm/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/w f p/;
 
-use NonameTV::Importer::BaseDaily;
+use NonameTV::Importer::BaseWeekly;
 
-use base 'NonameTV::Importer::BaseDaily';
+use base 'NonameTV::Importer::BaseWeekly';
 
 sub new {
   my $proto = shift;
@@ -30,18 +30,30 @@ sub new {
   my $self  = $class->SUPER::new( @_ );
   bless ($self, $class);
 
-  if( defined( $self->{UrlRoot} ) ){
-    w( 'UrlRoot is deprecated' );
-  } else {
-    $self->{UrlRoot} = 'http://www.dr.dk/Tjenester/epglive/epg.';
-  }
+  $self->{UrlRoot} = 'http://www.dr.dk/programoversigttiltryk/Sendeplaner/dr-epg-xml/';
+  $self->{MaxWeeks} = 3;
 
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Copenhagen" );
   $self->{datastorehelper} = $dsh;
-  $self->{NO_DUPLICATE_SKIP} = 1;
   $self->{datastore}->{augment} = 1;
 
   return $self;
+}
+
+
+sub Object2Url {
+  my $self = shift;
+  my( $objectname, $chd ) = @_;
+
+
+  my( $year, $week ) = ( $objectname =~ /(\d\d\d\d)-(\d\d)$/ );
+
+  my $url = sprintf( "%s%s/%d_%d/%s_Uge_%d.xml",
+                     $self->{UrlRoot}, $chd->{grabber_info},
+                     $year, $week, $chd->{grabber_info}, $week);
+
+
+  return( $url, undef );
 }
 
 sub ApproveContent {
@@ -57,15 +69,6 @@ sub ApproveContent {
   else {
     return undef;
   }
-}
-
-sub FilterContent {
-  my( $self, $cref, $chd ) = @_;
-
-  $$cref =~ s|<message_id>.*</message_id>||;
-  $$cref =~ s|<message_timestamp>.*</message_timestamp>||;
-
-  return( $cref, undef );
 }
 
 sub ContentExtension {
@@ -110,11 +113,11 @@ sub ImportContent {
     my $start = ParseDateTime( $b->findvalue( "pro_publish[1]/ppu_start_timestamp_announced" ) );
 
     if( $start->ymd("-") ne $currdate ){
-		p("Date is ".$start->ymd("-"));
+  		p("Date is ".$start->ymd("-"));
 
-		$dsh->StartDate( $start->ymd("-") , "00:00" );
-		$currdate = $start->ymd("-");
-	}
+  		$dsh->StartDate( $start->ymd("-") , "00:00" );
+  		$currdate = $start->ymd("-");
+	  }
 
     my $title = $b->findvalue( "pro_title" );
     my $title_alt = $b->findvalue( "pro_publish[1]/ppu_title_alt" );
@@ -133,11 +136,11 @@ sub ImportContent {
     my $desc = $b->findvalue( "pro_publish[1]/ppu_description" );
     my $genre = $b->findvalue( "prd_genre_text" );
 
-	# Cleanup
-	$title =~ s/Fredagsfilm: //i;
-	$title =~ s/Dokumania: //i;
+  	# Cleanup
+  	$title =~ s/Fredagsfilm: //i;
+  	$title =~ s/Dokumania: //i;
 
-	# Put everything in a array
+	  # Put everything in a array
     my $ce = {
       channel_id => $chd->{id},
       start_time => $start->hms(":"),
@@ -146,49 +149,41 @@ sub ImportContent {
       subtitle	  => norm($subtitle),
     };
 
-	  # Episode info in xmltv-format
-      if( ($episode ne "") and ( $of_episode ne "") )
-      {
-        $ce->{episode} = sprintf( ". %d/%d .", $episode-1, $of_episode );
-      }
-      elsif( $episode ne "" )
-      {
-        $ce->{episode} = sprintf( ". %d .", $episode-1 );
-      }
+    # Episode info in xmltv-format
+    if( ($episode ne "") and ( $of_episode ne "") )
+    {
+      $ce->{episode} = sprintf( ". %d/%d .", $episode-1, $of_episode );
+    }
+    elsif( $episode ne "" )
+    {
+      $ce->{episode} = sprintf( ". %d .", $episode-1 );
+    }
 
+    # Country
     my($country2 ) = $ds->LookupCountry( "DR", norm($country) );
     AddCountry( $ce, $country2 );
 
+    # Aspect
     $ce->{aspect} = '4:3';
-
     my $widescreen =  $b->findvalue( 'pro_publish[1]/ppu_video' );
-	if( $widescreen eq '16:9' ){
-   	 	$ce->{aspect} = '16:9';
-	}
-	if( $widescreen eq 'HD' ){
-   	 	$ce->{quality} = "HDTV";
-	}
+  	if( $widescreen eq '16:9' ){
+     	 	$ce->{aspect} = '16:9';
+  	} elsif( $widescreen eq 'HD' ){
+     	 	$ce->{quality} = "HDTV";
+  	}
 
-	my $live = $b->findvalue( 'pro_publish[1]/ppu_islive' );
-	if( $live eq "TRUE" )
-	{
-		$ce->{live} = "1";
-	}
-	else
-	{
-		$ce->{live} = "0";
-	}
+    # Rerun?
+    my $rerun = $b->findvalue( 'pro_publish[1]/ppu_isrerun' );
+  	if( $rerun eq "TRUE" )
+  	{
+  		$ce->{rerun} = "1";
+  	}
+  	else
+  	{
+  		$ce->{rerun} = "0";
+  	}
 
-	my $rerun = $b->findvalue( 'pro_publish[1]/ppu_isrerun' );
-	if( $rerun eq "TRUE" )
-	{
-		$ce->{rerun} = "1";
-	}
-	else
-	{
-		$ce->{rerun} = "0";
-	}
-
+    # Prod year
     $ce->{production_date} = "$year-01-01" if $year ne "";
 
     # Sometimes these production years differs through out the
@@ -198,86 +193,89 @@ sub ImportContent {
         $ce->{production_date} = "$1-01-01";
     }
 
+    # Category
     my($program_type, $category ) = $ds->LookupCat( 'DR', $genre );
-	AddCategory( $ce, $program_type, $category );
+	  AddCategory( $ce, $program_type, $category );
 
-	## Arrays
-	my @actors;
+    ## Arrays
+  	my @actors;
     my @directors;
 
-	## Split the text, add directors and more.
-	my @sentences = (split_text( $ce->{description} ), "");
-	for( my $i=0; $i<scalar(@sentences); $i++ )
+    ## Split the text, add directors and more.
+  	my @sentences = (split_text( $ce->{description} ), "");
+  	for( my $i=0; $i<scalar(@sentences); $i++ )
     {
-		if( my( $role, $name ) = ($sentences[$i] =~ /^(.*)\:\s+(.*)./) )
-        {
-        	# If name is longer than 15 skip. Probably a fucked up text.
-        	if(length($name) > 15) {
-        		#print("Longer than 15.\n");
-        		next;
-        	}
-
-        	# Include the role
-			my $name_new = norm( $name )." (".norm($role).")";
-
-			if( $role =~ /Instruktion/i  ) {
-				# This should ONLY happened on the Instruktion one.
-				$name = parse_person_list($name);
-
-				# Director
-				push @directors, $name;
-
-				# Not a series?
-				if(!defined($ce->{episode})) {
-					# If this program has an director, it should be
-                	# a movie. If it isn't, please tag this DIRECTLY.
-                	$ce->{program_type} = 'movie';
-
-                	# Category removal
-                	if(defined($ce->{category}) and $ce->{category} eq "Series") {
-                    	$ce->{category} = undef;
-                    }
-				}
-			} else {
-				push @actors, $name_new;
-			}
-
-			$sentences[$i] = "";
+      if( my( $role, $name ) = ($sentences[$i] =~ /^(.*)\:\s+(.*)./) )
+      {
+        # If name is longer than 15 skip. Probably a fucked up text.
+        if(length($name) > 15) {
+          #print("Longer than 15.\n");
+          next;
         }
 
+        # Include the role
+  			my $name_new = norm( $name )." (".norm($role).")";
+
+  			if( $role =~ /Instruktion/i  ) {
+  				# This should ONLY happened on the Instruktion one.
+  				$name = parse_person_list($name);
+
+  				# Director
+  				push @directors, $name;
+
+  				# Not a series?
+  				if(!defined($ce->{episode})) {
+  					# If this program has an director, it should be
+            # a movie. If it isn't, please tag this DIRECTLY.
+            $ce->{program_type} = 'movie';
+
+            # Category removal
+            if(defined($ce->{category}) and $ce->{category} eq "Series") {
+              $ce->{category} = undef;
+            }
+  				}
+  			} else {
+  				push @actors, $name_new;
+  			}
+
+  			$sentences[$i] = "";
+      }
     }
 
-	$ce->{description} = join_text( @sentences );
+    # add new text
+    $ce->{description} = join_text( @sentences );
 
-	# Season and this is a series now.
-      if(defined($ce->{episode})) {
-      	my ( $original_title, $romanseason ) = ( $ce->{title} =~ /^(.*)\s+(.*)$/ );
+    # episodes is in the title
+    if(defined($ce->{episode})) {
+      my ( $original_title, $romanseason ) = ( $ce->{title} =~ /^(.*)\s+(.*)$/ );
 
-      	# Roman season found
-      	if(defined($romanseason) and isroman($romanseason)) {
-      		my $romanseason_arabic = arabic($romanseason);
+      # Roman season found
+      if(defined($romanseason) and isroman($romanseason)) {
+        my $romanseason_arabic = arabic($romanseason);
 
-      		$ce->{title} = norm($original_title);
+        $ce->{title} = norm($original_title);
 
-      		# Series
-      		$ce->{program_type} = "series";
-      		if(defined($ce->{category}) and $ce->{category} eq "Movies") {
-      			$ce->{category} = undef;
-      		}
+        # Series
+        $ce->{program_type} = "series";
+        if(defined($ce->{category}) and $ce->{category} eq "Movies") {
+          $ce->{category} = undef;
+        }
 
-      		$ce->{episode} = $romanseason_arabic-1 . $ce->{episode};
+        $ce->{episode} = $romanseason_arabic-1 . $ce->{episode};
 
-      	}
       }
+    }
 
+    # add actors
     if( scalar( @actors ) > 0 )
     {
-    	$ce->{actors} = join ";", @actors;
+      $ce->{actors} = join ";", @actors;
     }
 
+    # add directors
     if( scalar( @directors ) > 0 )
     {
-		$ce->{directors} = join ";", @directors;
+		  $ce->{directors} = join ";", @directors;
     }
 
     # DR fucks Family guy up and tags every episode as a movie, wtf?
@@ -290,7 +288,7 @@ sub ImportContent {
 
     $ce->{original_title} = norm($title_alt) if defined($title_alt) and $ce->{title} ne norm($title_alt) and norm($title_alt) ne ""; # Add original title
 
-	p($start." $ce->{title}");
+	  p($start." $ce->{title}");
 
     $dsh->AddProgramme( $ce );
   }
@@ -304,7 +302,7 @@ sub ParseDateTime {
   my( $str ) = @_;
 
   my( $year, $month, $day, $hour, $minute, $second ) =
-      ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)$/ );
+      ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)/ );
 
   my $dt = DateTime->new(
     year => $year,
@@ -316,21 +314,6 @@ sub ParseDateTime {
       );
 
   return $dt;
-}
-
-sub Object2Url {
-  my $self = shift;
-  my( $objectname, $chd ) = @_;
-
-
-  my( $date ) = ( $objectname =~ /(\d+-\d+-\d+)$/ );
-
-  my $url = sprintf( "%s%s.drxml?dato=%s",
-                     $self->{UrlRoot}, $chd->{grabber_info},
-                     $date);
-
-
-  return( $url, undef );
 }
 
 # Split a string into individual sentences.

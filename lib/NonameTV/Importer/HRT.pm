@@ -5,7 +5,7 @@ use warnings;
 
 =pod
 
-Importer for data from HRT. 
+Importer for data from HRT.
 One file per channel and 4-day period downloaded from their site.
 The downloaded file is in xml-format.
 
@@ -31,7 +31,7 @@ sub new {
     bless ($self, $class);
 
     defined( $self->{UrlRoot} ) or die "You must specify UrlRoot";
-    
+
     # use augment
     $self->{datastore}->{augment} = 1;
 
@@ -55,13 +55,13 @@ sub ImportContent
     error( "$batch_id: Failed to parse $@" );
     return 0;
   }
-  
+
   # Find all "programme"-entries.
   my $ns = $doc->find( "//programme" );
-  
+
   foreach my $sc ($ns->get_nodelist)
   {
-    
+
     #
     # start time
     #
@@ -81,7 +81,7 @@ sub ImportContent
       error( "$batch_id: Invalid endtime '" . $sc->findvalue( './@stop' ) . "'. Skipping." );
       next;
     }
-    
+
     #
     # title, subtitle
     #
@@ -93,7 +93,7 @@ sub ImportContent
     $title = $sc->getElementsByTagName('title');
     my $org_title = $sc->getElementsByTagName('sub-title');
     my $subtitle = $sc->getElementsByTagName('sub-title');
-    
+
     $title =~ s/\(R\)//g if $title;
     $title =~ s/^Filmski maraton://;
     my ($newtitle, $cat) = ($title =~ /(.*),(.*)/);
@@ -104,13 +104,13 @@ sub ImportContent
     $title =~ s/\((\d+)\)//;
     $title =~ s/\((\d+)\/(\d+)\)//;
     $title =~ s/\.$//;
-    
-    
+
+
     #
     # description
     #
     my $desc  = $sc->getElementsByTagName('desc');
-    
+
     #
     # genre
     #
@@ -177,13 +177,13 @@ sub ImportContent
       $ce->{episode} = norm($episode);
       $ce->{program_type} = 'series';
     }
-    
+
     # (episodenum/of_episods)
   	my ( $ep2, $eps2 ) = ($ce->{title} =~ /\((\d+)\/(\d+)\)/ );
   	$ce->{episode} = sprintf( " . %d/%d . ", $ep2-1, $eps2 ) if defined $eps2;
   	$ce->{title} =~ s/\(.*\)//g;
     $ce->{title} = norm($ce->{title});
-    
+
 	my( $title_split, $genre_split ) = split( ',', norm($ce->{title}) );
     $ce->{title} = norm($title_split);
 
@@ -196,20 +196,20 @@ sub ImportContent
 		    AddCategory( $ce, $program_type, $category );
 		}
 	}
-	
+
 	if(defined($org_title) and defined($program_type)) {
 		my ( $season ) = ($org_title =~ /(\d+)$/ );
-			
+
 		# Season
-		if(defined($season) and defined($program_type) and $program_type eq "series") {
+		if(defined($season) and defined($program_type) and $program_type eq "series" and defined($ce->{episode}) and $ce->{episode} ne "") {
 			$ce->{episode} = $season-1 . $ce->{episode};
-			
+
 			if("$org_title" ne "") {
 				$org_title =~ s/\d+$//g;
 				$org_title = ucfirst(lc($org_title));
 				$org_title = norm($org_title);
 				$org_title =~ s/,$//g;
-				
+
 				$ce->{subtitle} = undef;
 				$ce->{original_title} = norm($ce->{title});
 				$ce->{title} = norm($org_title);
@@ -220,7 +220,7 @@ sub ImportContent
 			$ce->{subtitle} = undef;
 		}
 	}
-	
+
     if( defined( $production_year ) and ($production_year =~ /(\d\d\d\d)/) )
     {
       $ce->{production_date} = "$1-01-01";
@@ -230,7 +230,7 @@ sub ImportContent
 
     $ds->AddProgramme( $ce );
   }
-  
+
   # Success
   return 1;
 }
@@ -256,7 +256,7 @@ sub create_dt
 {
   my $self = shift;
   my( $str ) = @_;
-  
+
   my $year = substr( $str , 0 , 4 );
   my $month = substr( $str , 4 , 2 );
   my $day = substr( $str , 6 , 2 );
@@ -269,7 +269,7 @@ sub create_dt
   {
     return undef;
   }
-  
+
   my $dt = DateTime->new( year   => $year,
                           month  => $month,
                           day    => $day,
@@ -278,9 +278,9 @@ sub create_dt
                           second => $second,
                           time_zone => 'Europe/Zagreb',
                           );
-  
+
   $dt->set_time_zone( "UTC" );
-  
+
   return $dt;
 }
 

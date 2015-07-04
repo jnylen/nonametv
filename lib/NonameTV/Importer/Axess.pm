@@ -6,7 +6,7 @@ use warnings;
 =pod
 
 Importer for files in the format provided by Axess Television.
-This is supposedly the format defined by TTSpektra. 
+This is supposedly the format defined by TTSpektra.
 
 =cut
 
@@ -44,7 +44,7 @@ sub InitiateDownload {
   $mech->get($self->{LoginUrl});
 
   $mech->submit_form(
-      with_fields => { 
+      with_fields => {
 	'ctl00$body$loginControl$UserName' => $self->{Username},
 	'ctl00$body$loginControl$Password' => $self->{Password},
       },
@@ -64,7 +64,7 @@ sub Object2Url {
   my( $objectname, $chd ) = @_;
 
   my( $date ) = ( $objectname =~ /_(.*)$/ );
- 
+
   my $url = $self->{UrlRoot} . $date;
 
   # Only one url to look at and no error
@@ -85,17 +85,17 @@ sub FilterContent {
   }
 
   my $doc = ParseXml( $cref );
-  
+
   if( not defined $doc ) {
     return (undef, "ParseXml failed" );
-  } 
+  }
 
   my $xp = XML::LibXML::XPathContext->new($doc);
-  
+
   # Create namespace
   # http://perl-xml.sourceforge.net/faq/#namespaces_xpath
   $xp->registerNs(tt => 'http://www.ttspektra.se' );
-  
+
   # Remove all OtherBroadcast since they change
   # each time the data for today is downloaded.
   my $ns = $xp->find( "//tt:OtherBroadcast" );
@@ -126,28 +126,28 @@ sub ImportContent {
 
   my $doc = ParseXml( $cref );
   my $xp = XML::LibXML::XPathContext->new($doc);
-  
+
   # Create namespace
   # http://perl-xml.sourceforge.net/faq/#namespaces_xpath
   $xp->registerNs(tt => 'http://www.ttspektra.se' );
-  
+
   my $ns = $xp->find( "//tt:TVRProgramBroadcast" );
 
   if( $ns->size() == 0 ) {
     error( "$batch_id: No data found" );
     return 0;
   }
-  
+
   foreach my $pb ($ns->get_nodelist)
   {
-    my $start = $xp->findvalue( 
+    my $start = $xp->findvalue(
       'tt:TVRBroadcast/tt:BroadcastDateTime/tt:StartDateTime', $pb );
-    my $end = $xp->findvalue( 
+    my $end = $xp->findvalue(
       'tt:TVRBroadcast/tt:BroadcastDateTime/tt:EndDateTime', $pb );
-    my $url = $xp->findvalue( 
+    my $url = $xp->findvalue(
       'tt:TVRBroadcast/tt:BroadcastInformation/tt:WebPage/@URL', $pb );
     my $title = norm( $xp->findvalue( 'tt:TVRProgram/tt:Title', $pb ) );
-    my $subtitle = norm( 
+    my $subtitle = norm(
       $xp->findvalue( 'tt:TVRProgram/tt:VersionableInfo/tt:Version/tt:EpisodeTitle', $pb ) );
 
     if( $title eq $subtitle ) {
@@ -162,7 +162,7 @@ sub ImportContent {
     }
 
     my $intro = $xp->findvalue( 'tt:TVRProgram/tt:Intro', $pb );
-    my $description = $xp->findvalue( 
+    my $description = $xp->findvalue(
       'tt:TVRProgram/tt:Description/tt:TextDesc', $pb );
     my $episodenum = $xp->findvalue( 'tt:TVRProgram/tt:EpisodeNumber', $pb );
 
@@ -186,7 +186,7 @@ sub ImportContent {
 
 	my ( $program_type, $category ) = ParseDescCatSwe( $ce->{description} );
   	AddCategory( $ce, $program_type, $category );
-    
+
     if( my( $dumperino, $dumptag, $year ) = ($description =~ /(Produktions.r|Produktion.r|Inspelat)(:|)\s+(\d\d\d\d)\./) )
     {
       $ce->{description} =~ s/(Produktions.r|Produktion.r|Inspelat)(:|)\s+(\d\d\d\d)\.//i;
@@ -214,8 +214,8 @@ sub ImportContent {
     if( $episodenum ne "" ) {
       $ce->{episode} = " . " . ($episodenum-1) . " . ";
     }
-    
-    
+
+
     if( defined($ep_nr) ) {
       $ce->{episode} = sprintf( " . %d/%d . ", $ep_nr-1, $eps );
     }
@@ -246,6 +246,13 @@ sub ImportContent {
 
     $ce->{description} = norm($ce->{description}) if defined $ce->{description};
 
+    # Image
+    if($url ne "") {
+      my ($program_id) = ($url =~ /(\d+)$/);
+      $ce->{fanart} = "http://www.axess.se/public/upload/images/tv_programs/" . $program_id . ".jpg";
+    }
+
+
     $ds->AddProgramme( $ce );
   }
 
@@ -273,13 +280,13 @@ sub ParseDateTime {
   error( "$@" ) if $@;
 
   return undef if not defined $dt;
-  
+
   if( $second > 0 ) {
     $dt->add( minutes => 1 );
   }
-  
+
   $dt->set_time_zone( 'UTC' );
-  
+
   return $dt->ymd() . " " . $dt->hms();
 }
 

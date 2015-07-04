@@ -152,7 +152,7 @@ sub ImportXML
 
     my $desc;
     $desc = $ep_desc;
-    $desc = $se_desc if !defined($ep_desc) or norm($ep_desc) eq "" or norm($ep_desc) eq "null";
+    $desc = $se_desc if !defined($ep_desc) or norm($ep_desc) eq "" or norm($ep_desc) eq "null" or norm($ep_desc) eq "1";
 
     my $ce = {
         channel_id => $chd->{id},
@@ -271,7 +271,7 @@ sub ImportXLS {
             $columns{'ORGTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Original Title$/ );
 
             $columns{'Ser No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Season Number/ );
-            $columns{'Ser Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Season Number/ );
+            $columns{'Ser Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Season Synopsis/ );
 
             $columns{'Ep No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Number/ );
             $columns{'Ep Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Title/ );
@@ -356,8 +356,8 @@ sub ImportXLS {
 
       my $desc;
       $desc = $ep_desc;
-      $desc = $se_desc if !defined($ep_desc) or norm($ep_desc) eq "" or norm($ep_desc) eq "-";
-      $desc = "" if $desc eq "" or $desc eq "-" or $desc eq "\x{2d}";
+      $desc = $se_desc if !defined($ep_desc) or norm($ep_desc) eq "" or norm($ep_desc) eq "-" or norm($ep_desc) eq "1";
+      $desc = "" if $desc eq "" or $desc eq "-" or $desc eq "\x{2d}" or $desc eq "1";
 
       my $ce = {
           channel_id => $chd->{id},

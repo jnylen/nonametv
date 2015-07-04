@@ -37,6 +37,14 @@ sub new {
     return $self;
 }
 
+sub ContentExtension {
+  return 'json';
+}
+
+sub FilteredExtension {
+  return 'json';
+}
+
 sub Object2Url {
   my $self = shift;
   my( $objectname, $chd ) = @_;

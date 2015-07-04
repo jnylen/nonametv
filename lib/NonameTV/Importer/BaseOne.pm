@@ -5,8 +5,8 @@ use warnings;
 
 =pod
 
-Abstract base-class for an Importer that downloads data in one 
-file per channel. 
+Abstract base-class for an Importer that downloads data in one
+file per channel.
 
 =cut
 

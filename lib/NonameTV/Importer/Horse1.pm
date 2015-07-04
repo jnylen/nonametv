@@ -35,7 +35,7 @@ sub new {
         $self->{UrlRoot} = 'http://www.horse1.se/tv-tabla';
     }
 
-    my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
+    my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Stockholm" );
     $self->{datastorehelper} = $dsh;
 
     $self->{datastore}->{augment} = 1;
@@ -288,7 +288,7 @@ sub ParseDateTime {
     time_zone => "Europe/Stockholm"
       );
 
-  $dt->set_time_zone( "UTC" );
+#  $dt->set_time_zone( "UTC" );
 
   return $dt;
 }

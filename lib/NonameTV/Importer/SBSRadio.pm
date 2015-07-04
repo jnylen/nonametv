@@ -7,7 +7,7 @@ use warnings;
 =pod
 
 Importer for SBS Radio (Mix Megapol, The Voice and more)
-The file downloaded is in JSON format.
+The file downloaded is in XML format.
 
 =cut
 
@@ -29,7 +29,7 @@ sub new {
     my $class = ref($proto) || $proto;
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
-    
+
     my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
     $self->{datastorehelper} = $dsh;
     $self->{NO_DUPLICATE_SKIP} = 1;
@@ -43,7 +43,7 @@ sub Object2Url {
 
   my( $date ) = ($objectname =~ /_(.*)/);
   my( $year, $month, $day ) = split( /-/, $date );
-  
+
   my $url = $self->{UrlRoot} . "/epg/" . $year . $month . $day . "_".$chd->{grabber_info}."_other_PI.xml";
 
   return( $url, undef );
