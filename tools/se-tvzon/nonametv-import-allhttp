@@ -14,6 +14,7 @@ $NONAMETV CMoreFI $1 $2 $3
 $NONAMETV Discovery_xml $1 $2 $3
 $NONAMETV Discovery_xmltv $1 $2 $3
 $NONAMETV DR $1 $2 $3
+$NONAMETV DR_radio $1 $2 $3
 $NONAMETV DK4 $1 $2 $3
 $NONAMETV DigiTV $1 $2 $3
 $NONAMETV DreiSat $1 $2 $3
