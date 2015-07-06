@@ -39,7 +39,7 @@ sub new {
 
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
   $self->{datastorehelper} = $dsh;
-  
+
   # use augment
   $self->{datastore}->{augment} = 1;
 
@@ -77,7 +77,7 @@ sub ImportDOC
   return if( $file !~ /\.doc$/i );
 
   progress( "Turner DOC: $xmltvid: Processing $file" );
-  
+
   my $doc;
   $doc = Wordfile2Xml( $file );
 
@@ -91,10 +91,10 @@ sub ImportDOC
     my $str = $node->getData();
     $node->setData( uc( $str ) );
   }
-  
+
   # Find all paragraphs.
   my $ns = $doc->find( "//div" );
-  
+
   if( $ns->size() == 0 ) {
     error( "Turner DOC: $xmltvid: $file: No divs found." ) ;
     return;
@@ -128,7 +128,7 @@ sub ImportDOC
 
           my $batch_id = "${xmltvid}_" . $date;
           $dsh->StartBatch( $batch_id, $channel_id );
-          $dsh->StartDate( $date , "00:00" ); 
+          $dsh->StartDate( $date , "00:00" );
           $currdate = $date;
 
           progress("Turner DOC: $xmltvid: Date is $date");
@@ -168,7 +168,7 @@ sub ImportDOC
   FlushDayData( $xmltvid, $dsh , @ces );
 
   $dsh->EndBatch( 1 );
-    
+
   return;
 }
 
@@ -294,7 +294,7 @@ sub ImportXLS
   FlushDayData( $xmltvid, $dsh , @ces );
 
   $dsh->EndBatch( 1 );
-    
+
   return;
 }
 
@@ -303,14 +303,14 @@ sub FlushDayData {
 
     if( @data ){
       foreach my $element (@data) {
-      	
+
       	# Get year from description
       	if(defined($element->{description})) {
       		my( $year ) = ( $element->{description} =~ /^(\d\d\d\d),/ );
       		if($year) {
       			$element->{production_date} = $year."-01-01";
       		}
-      		
+
       		# Credits
       		if( $element->{description} =~ /Dir:/ ) {
       			my ( $dirs, $actors ) = ( $element->{description} =~ /Dir:\s+([A-Z].+?),\s+Act:\s+([A-Z].+?),\s+Sub/ );
@@ -324,31 +324,44 @@ sub FlushDayData {
 							my @actors = split( /\s*,\s*/, $actors );
 							$element->{actors} = join( ";", grep( /\S/, @actors ) );
 						}
-						
+
 						# TCM only provides a weird description, so please use
 						# themoviedb.
 						if($xmltvid eq "tcmeurope.com") {
-							$element->{description} = undef;
+						#	$element->{description} = undef;
 						}
-						
+
 						# Movies
 						$element->{program_type} = "movie";
       		}
 
       		if($xmltvid eq "cartoonnetwork.nl") {
       		    my $subtitle = $element->{description};
-                if($subtitle =~ /\((.*?)\)/) {
-                    my($subtitle_org) = ($subtitle =~ /\((.*?)\)/);
-                    $subtitle =~ s/\(.*\)//g;
-                    $element->{original_subtitle} = norm($subtitle_org);
-                    $element->{program_type} = "series";
-                }
+              if($subtitle =~ /\((.*?)\)/) {
+                my($subtitle_org) = ($subtitle =~ /\((.*?)\)/);
+                $subtitle =~ s/\(.*\)//g;
+                $element->{original_subtitle} = norm($subtitle_org);
+                $element->{program_type} = "series";
+              }
 
-                $element->{subtitle} = norm($subtitle);
+              $element->{subtitle} = norm($subtitle);
       		    $element->{description} = undef;
       		}
+
+          if($xmltvid eq "cartoonnetwork.com") {
+            if($element->{description} =~ /^Prod Year (\d\d\d\d)/i) {
+              $element->{production_date} = "$1-01-01";
+              $element->{program_type} = "movie";
+              $element->{description} = undef;
+            } else {
+              my $subtitle = $element->{description};
+              $element->{subtitle} = norm($subtitle);
+      		    $element->{description} = undef;
+              $element->{program_type} = "series";
+            }
+      		}
       	}
-      	
+
         progress("Turner: $xmltvid: $element->{start_time} - $element->{title}");
 
         $dsh->AddProgramme( $element );

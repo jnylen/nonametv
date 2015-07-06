@@ -129,6 +129,48 @@ sub AugmentProgram( $$$ ){
     $resultref->{'program_type'} = $ruleref->{remoteref};
   }elsif( $ruleref->{matchby} eq 'replacesubtitle' ) {
     $resultref->{'subtitle'} = $ruleref->{remoteref};
+  }elsif( $ruleref->{matchby} eq 'setdescassubtitle' ) {
+    # When the sub is still in the description and you are sure a long description wont show up
+    if(!defined($ceref->{'subtitle'}) or $ceref->{'subtitle'} eq "") {
+      $resultref->{'subtitle'} = $ceref->{description};
+
+      # Season in desc
+      if($resultref->{subtitle} =~ /^(S.song|S.son|Sesong) (\d+)/) {
+        my ( $ep_info, $st ) = ($resultref->{subtitle} =~ /(.*)\: (.*)/);
+        if( defined( $st ) and $st ne "" )
+        {
+          $resultref->{subtitle} = $st;
+        }
+
+        my ($dummy1, $season_s, $dummy2, $episode_s) = ($ep_info =~ /^(S.song|S.son|Sesong) (\d+) \- (Episode|Episod) (\d+)/i);
+        $resultref->{episode} = sprintf( "%d . %d .", $season_s-1, $episode_s-1 ) if defined($season_s) and defined($episode_s);
+      }
+
+      # Subtitle
+      if($resultref->{subtitle} =~ /, The$/i) {
+        $resultref->{subtitle} =~ s/, The$//i;
+        $resultref->{subtitle} = "The " . $resultref->{subtitle};
+      }
+      if($resultref->{subtitle} =~ /, A$/i) {
+        $resultref->{subtitle} =~ s/, A$//i;
+        $resultref->{subtitle} = "A " . $resultref->{subtitle};
+      }
+      if($resultref->{subtitle} =~ /, An$/i) {
+        $resultref->{subtitle} =~ s/, An$//i;
+        $resultref->{subtitle} = "An " . $resultref->{subtitle};
+      }
+      $resultref->{subtitle} =~ s|Del\s+(\d+)$| ($1)|;
+      $resultref->{subtitle} =~ s|Pt\.(\d+)$| ($1)|;
+      $resultref->{subtitle} =~ s|Part (\d+)$| ($1)|;
+      $resultref->{subtitle} =~ s|Part Ii$| (2)|;
+      $resultref->{subtitle} =~ s|Part I$| (1)|;
+      $resultref->{subtitle} =~ s|Pt(\d+)$| ($1)|;
+      $resultref->{subtitle} =~ s|,\s+del\s+(\d+)$| ($1)|;
+      $resultref->{subtitle} =~ s|\s+-\s+| |;
+      $resultref->{subtitle} =~ s|\s+:\s+| |;
+
+      $resultref->{'description'} = "";
+    }
   }elsif( $ruleref->{matchby} eq 'splitsubtitle' ) {
     if( $ruleref->{otherfield} eq 'subtitle' ){
       my( $episodetitle )=( $ceref->{subtitle} =~ m|$ruleref->{othervalue}| );
@@ -160,7 +202,7 @@ sub AugmentProgram( $$$ ){
           SELECT * from programs
           WHERE channel_id = ? and title = ? and subtitle = ? and episode = ? and description is not null
           ORDER BY timediff( ? , start_time ) asc, start_time asc, end_time desc
-          LIMIT 1", 
+          LIMIT 1",
         [$ceref->{channel_id}, $ceref->{title}, $ceref->{subtitle}, $ceref->{episode}, $ceref->{start_time}] );
       my $ce;
       while( defined( my $ce = $sth->fetchrow_hashref() ) ) {
@@ -175,7 +217,7 @@ sub AugmentProgram( $$$ ){
           SELECT * from programs
           WHERE channel_id = ? and title = ? and episode = ? and description is not null
           ORDER BY timediff( ? , start_time ) asc, start_time asc, end_time desc
-          LIMIT 1", 
+          LIMIT 1",
         [$ceref->{channel_id}, $ceref->{title}, $ceref->{episode}, $ceref->{start_time}] );
       my $ce;
       while( defined( my $ce = $sth->fetchrow_hashref() ) ) {
@@ -191,7 +233,7 @@ sub AugmentProgram( $$$ ){
           SELECT * from programs
           WHERE channel_id = ? and title = ? and subtitle = ? and description is not null
           ORDER BY timediff( ? , start_time ) asc, start_time asc, end_time desc
-          LIMIT 1", 
+          LIMIT 1",
         [$ceref->{channel_id}, $ceref->{title}, $ceref->{subtitle}, $ceref->{start_time}] );
       my $ce;
       while( defined( my $ce = $sth->fetchrow_hashref() ) ) {
@@ -207,7 +249,7 @@ sub AugmentProgram( $$$ ){
           SELECT * from programs
           WHERE channel_id = ? and title = ? and description is not null
           ORDER BY abs( timediff( start_time, ? ) ) asc, start_time asc, end_time desc
-          LIMIT 1", 
+          LIMIT 1",
         [$ceref->{channel_id}, $ceref->{title}, $ceref->{start_time}] );
       my $ce;
       if( defined( my $ce = $sth->fetchrow_hashref() ) ) {

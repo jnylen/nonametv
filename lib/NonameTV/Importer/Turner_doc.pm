@@ -36,9 +36,11 @@ sub new {
   my $self  = $class->SUPER::new( @_ );
   bless ($self, $class);
 
-
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
   $self->{datastorehelper} = $dsh;
+
+  # use augment
+  $self->{datastore}->{augment} = 1;
 
   return $self;
 }
@@ -54,11 +56,11 @@ sub ImportContentFile
   my $channel_id = $chd->{id};
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
-  
+
   return if( $file !~ /\.doc$/i );
 
   progress( "Turner_doc: $xmltvid: Processing $file" );
-  
+
   my $doc;
   $doc = Wordfile2Xml( $file );
 
@@ -72,10 +74,10 @@ sub ImportContentFile
     my $str = $node->getData();
     $node->setData( uc( $str ) );
   }
-  
+
   # Find all paragraphs.
   my $ns = $doc->find( "//p" );
-  
+
   if( $ns->size() == 0 ) {
     error( "Turner_doc - $xmltvid: $file: No ps found." ) ;
     return;
@@ -109,7 +111,7 @@ sub ImportContentFile
 
           my $batch_id = "${xmltvid}_" . $date;
           $dsh->StartBatch( $batch_id, $channel_id );
-          $dsh->StartDate( $date , "00:00" ); 
+          $dsh->StartDate( $date , "00:00" );
           $currdate = $date;
         }
       }
@@ -129,7 +131,21 @@ sub ImportContentFile
         start_time => $time,
         title => $title,
       };
-      
+
+      # , The$ => ^The
+      if($ce->{title} =~ /, The$/i) {
+        $ce->{title} =~ s/, The$//i;
+        $ce->{title} = "The " . $ce->{title};
+      }
+      if($ce->{title} =~ /, A$/i) {
+        $ce->{title} =~ s/, A$//i;
+        $ce->{title} = "A " . $ce->{title};
+      }
+      if($ce->{title} =~ /, An$/i) {
+        $ce->{title} =~ s/, An$//i;
+        $ce->{title} = "An " . $ce->{title};
+      }
+
       # add the programme to the array
       # as we have to add description later
       push( @ces , $ce );
@@ -138,16 +154,64 @@ sub ImportContentFile
         # the last element is the one to which
         # this description belongs to
         my $element = $ces[$#ces];
+        my ( $ep_info, $st, $season, $episode, $dummy1, $dummy2 );
 
-        $element->{description} .= $text;
+        # Movie?
+        if($text =~ /^Prod Year (\d\d\d\d)/i) {
+          $element->{production_date} = "$1-01-01";
+          $element->{program_type} = "movie";
+        } elsif(defined($element->{description}) and $element->{description} ne "" and $text ne "" and $text !~ /Programme Schedule$/i) {
+          $element->{subtitle} = $element->{description};
+          $element->{description} = $text;
+          $element->{program_type} = "series";
+
+          # Season?
+          if($element->{subtitle} =~ /^(S.song|S.son|Sesong) (\d+)/) {
+            $ep_info = $element->{subtitle};
+            ( $ep_info, $st ) = ($element->{subtitle} =~ /(.*)\: (.*)/);
+            if( defined( $st ) and $st ne "" )
+            {
+              $element->{subtitle} = $st;
+            }
+
+            # Episode info ( Sæson 1 - Episode 7-8: Den Mest Dovne / Spøgelset )
+            ($dummy1, $season, $dummy2, $episode) = ($ep_info =~ /^(S.song|S.son|Sesong) (\d+) \- (Episode|Episod) (\d+)/i);
+            $element->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 ) if defined($season) and defined($episode);
+          }
+
+          # Subtitle
+          if($element->{subtitle} =~ /, The$/i) {
+            $element->{subtitle} =~ s/, The$//i;
+            $element->{subtitle} = "The " . $element->{subtitle};
+          }
+          if($element->{subtitle} =~ /, A$/i) {
+            $element->{subtitle} =~ s/, A$//i;
+            $element->{subtitle} = "A " . $element->{subtitle};
+          }
+          if($element->{subtitle} =~ /, An$/i) {
+            $element->{subtitle} =~ s/, An$//i;
+            $element->{subtitle} = "An " . $element->{subtitle};
+          }
+          $element->{subtitle} =~ s|Del\s+(\d+)$| ($1)|;
+          $element->{subtitle} =~ s|Pt\.(\d+)$| ($1)|;
+          $element->{subtitle} =~ s|Pt(\d+)$| ($1)|;
+          $element->{subtitle} =~ s|,\s+del\s+(\d+)$| ($1)|;
+          $element->{subtitle} =~ s|\s+del\s+(\d+)$| ($1)|;
+          $element->{subtitle} =~ s|\s+-\s+| |;
+          $element->{subtitle} =~ s|\s+:\s+| |;
+        } else {
+          $element->{description} .= $text;
+        }
+
+
     }
   }
-  
+
   # save last day if we have it in memory
   FlushDayData( $xmltvid, $dsh , @ces );
 
   $dsh->EndBatch( 1 );
-    
+
   return;
 }
 
@@ -221,7 +285,7 @@ sub ParseShow {
   ( $time, $title ) = ( $text =~ /^CET\s+(\d+\.\d+)\s+(.*)$/ );
 
   my ( $hour , $min ) = ( $time =~ /^(\d+).(\d+)$/ );
-  
+
   $time = sprintf( "%02d:%02d", $hour, $min );
 
   return( $time, $title );
