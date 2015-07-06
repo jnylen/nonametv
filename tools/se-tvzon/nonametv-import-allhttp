@@ -65,3 +65,4 @@ $NONAMETV EurosportPL $1 $2 $3
 $NONAMETV KBSWorld --force-update
 $NONAMETV Horse1 $1 $2 $3
 $NONAMETV RTLDE $1 $2 $3
+$NONAMETV KiKA $1 $2 $3
