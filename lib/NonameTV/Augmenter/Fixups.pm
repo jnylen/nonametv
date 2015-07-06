@@ -169,7 +169,7 @@ sub AugmentProgram( $$$ ){
       $resultref->{subtitle} =~ s|\s+-\s+| |;
       $resultref->{subtitle} =~ s|\s+:\s+| |;
 
-      $resultref->{'description'} = "";
+      $resultref->{'description'} = undef;
     }
   }elsif( $ruleref->{matchby} eq 'splitsubtitle' ) {
     if( $ruleref->{otherfield} eq 'subtitle' ){
