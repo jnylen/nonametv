@@ -16,13 +16,15 @@ use HTTP::Request::Common;
 use XML::Simple;
 use Encode qw(encode decode);
 use Data::Dumper;
+use DBM::Deep;
+use Compress::Zlib;
 use Debug::Simple;
 use NonameTV::Config qw/ReadConfig/;
 use NonameTV::Log qw/w d/;
 
 sub new {
     my $self = bless {};
-    
+
     my $args;
     if (ref $_[0] eq 'HASH') {
         # Subroutine arguments by hashref
@@ -32,29 +34,29 @@ sub new {
         $args = {};
         ($args->{cache}) = @_;
     }
-    
+
     # Nonametv conf
     my $conf = ReadConfig( );
-    
+
     $args->{cache} = $conf->{ContentCachePath} . 'Tvrage/tvrage.db';
     $args->{useragent} ||= "nonametv (http://nonametv.org)";
-    
+
 
     $self->{ua} = LWP::UserAgent->new;
     $self->{ua}->env_proxy();
     $self->setUserAgent($args->{useragent});
-    
+
     $self->{xml} = XML::Simple->new(
-        ForceArray => ['Showinfo'],#, 'Season', 'episode'
+        ForceArray => ['Showinfo', 'Season'],#, 'Season', 'episode'
         SuppressEmpty => 1,
     );
 
     $self->setCacheDB($args->{cache});
-    
-    
+
+
     #my %opt = (quiet => 0, debug => 4, verbose => 3);
     #Debug::Simple::debuglevels(\%opt);
-    
+
     return $self;
 }
 
@@ -221,39 +223,32 @@ sub setSeriesId {
 
 sub showInfo {
     my ($self, $sid) = @_;
-    
     my $series = $self->{cache};
-    
-    
+
     &debug(2, "TVRage: getSeries: $sid, $sid\n");
 
-    #my $sid = $self->getSeriesId($showId, $nocache?$nocache-1:0);
-    #return undef unless $sid;
-
     if (defined $series->{$sid}) {
-        # Get updated series data
-            &debug(2, "TVRage: From Series Cache: $sid\n");
-#print Dumper( $series->{$sid} );
-    # Get full series data
-    } else {
-         #&debug(2, "download: $sid\n");
-         &verbose(1, "TVRage: Downloading series: $sid\n");
-            my $data = $self->_downloadXml("http://services.tvrage.com/feeds/showinfo.php?sid=". $sid);
-            #print Dumper( $data );
-            return undef unless $data;
+      # Get updated series data
+      &debug(2, "TVRage: From Series Cache: $sid\n");
 
-            # Copy updated series into cache
-            while (my ($key,$value) = each %{$data}) {
-                $series->{$sid}->{$key} = $value;
-                
-            }
-         
-        $self->getEpisodes($sid);
-        
-        #print Dumper( $series->{$sid} );
-        
+    } else {
+      #&debug(2, "download: $sid\n");
+      &verbose(1, "TVRage: Downloading series: $sid\n");
+      my $data = $self->_downloadXml("http://services.tvrage.com/feeds/showinfo.php?sid=". $sid);
+
+      return undef unless $data;
+
+      # Copy updated series into cache
+      while (my ($key,$value) = each %{$data}) {
+        $series->{$sid}->{$key} = $value;
+      }
+
+      $self->getEpisodes($sid);
+
+      #print Dumper( $series->{$sid} );
+
     }
-    
+
     #print Dumper( $series );
     return $series->{$sid};
 }
@@ -261,27 +256,27 @@ sub showInfo {
 sub getEpisodes {
     my ($self, $sid) = @_;
     my $series = $self->{cache};
-    
+
     # Episodes already downloaded?
     if (defined $series->{$sid}->{episodes}) {
-            &debug(2, "From Episodes Cache: $sid\n");
-#print Dumper( $series->{$sid}->{episodes} );
+      &debug(2, "From Episodes Cache: $sid\n");
+
     # Get full series data
     } else {
-         #&debug(2, "download: $sid\n");
-         &verbose(1, "TVRage: Downloading episodes: $sid\n");
-            my $data = $self->_downloadXml("http://services.tvrage.com/feeds/episode_list.php?sid=". $sid);
-            #print Dumper( $data );
-            return undef unless $data;
+      #&debug(2, "download: $sid\n");
+      &verbose(1, "TVRage: Downloading episodes: $sid\n");
+      my $data = $self->_downloadXml("http://services.tvrage.com/feeds/episode_list.php?sid=". $sid);
 
-            # Copy updated series into cache
-            $series->{$sid}->{episodes} = [] unless $series->{$sid}->{episodes};
-            $series->{$sid}->{episodes} = $data;
-         
-     }
-        
-        #print Dumper( $series->{$sid}->{episodes} );
-        return $series->{$sid}->{episodes};
+      return undef unless $data;
+
+      # Copy updated series into cache
+      $series->{$sid}->{episodes} = [] unless $series->{$sid}->{episodes};
+      $series->{$sid}->{episodes} = $data;
+  }
+
+  #print Dumper( $series->{$sid}->{episodesabs} );
+
+  return $series->{$sid};
 }
 
 sub getEpisode {
@@ -290,7 +285,7 @@ sub getEpisode {
     my $season2 = $season;
     $episode--; $season--;
     my $series = $self->{cache};
-    
+
     # check if it's in array format and return the details, or in hash (one episdoe added only) o return error
     if($series->{$sid}->{episodes}{Episodelist}{Season} =~ /Array/) {
     	if(defined($series->{$sid}) and defined($series->{$sid}->{episodes}{Episodelist}{Season}[$season]) and defined($series->{$sid}->{episodes}{Episodelist}{Season}[$season]{episode}[$episode])) {
@@ -305,19 +300,19 @@ sub getEpisode {
 			# if so, provide it back into Augmenter, or else return UNDEF.
 			if($series->{$sid}->{episodes}{Episodelist}{Season}{episode} =~ /Hash/) {
     		if($series->{$sid}->{episodes}{Episodelist}{Season}{episode}{epnum} eq $episode2) {
-    			w("TVRage: Found an episode (" . $episode2 . " of season " . $season2 . ") in HASH Format, and provided it into the Augmenter."); 
+    			w("TVRage: Found an episode (" . $episode2 . " of season " . $season2 . ") in HASH Format, and provided it into the Augmenter.");
     			return $series->{$sid}->{episodes}{Episodelist}{Season}{episode};
     		} else {
-    			w("TVRage: Didn't find the right episodenum for " . $episode2 . " of season " . $season2 . " in the hash, so did not pass it into Augmenter."); 
+    			w("TVRage: Didn't find the right episodenum for " . $episode2 . " of season " . $season2 . " in the hash, so did not pass it into Augmenter.");
     			return undef;
     		}
     	} else {
     		# One season, alot of episodes
     		if($series->{$sid}->{episodes}{Episodelist}{Season}{episode}[$episode]{epnum} eq $episode2) {
-    			w("TVRage: Found an episode (" . $episode2 . " of season " . $season2 . ") in HASH (Episodes in array) Format, and provided it into the Augmenter."); 
+    			w("TVRage: Found an episode (" . $episode2 . " of season " . $season2 . ") in HASH (Episodes in array) Format, and provided it into the Augmenter.");
     			return $series->{$sid}->{episodes}{Episodelist}{Season}{episode}[$episode];
     		} else {
-    			w("TVRage: Didn't find the right episodenum for " . $episode2 . " of season " . $season2 . " in the hash (Episodes in array), so did not pass it into Augmenter."); 
+    			w("TVRage: Didn't find the right episodenum for " . $episode2 . " of season " . $season2 . " in the hash (Episodes in array), so did not pass it into Augmenter.");
     			return undef;
     		}
     	}
@@ -326,6 +321,51 @@ sub getEpisode {
     	w("TVRage: the episode list is not in array nor hash format, weird.");
     	return undef;
     }
+}
+
+sub getEpisodeAbs {
+    my ($self, $sid, $episodeabs) = @_;
+    $episodeabs--;
+    my $series = $self->{cache};
+
+    my @eps = [];
+
+    # Absolute numbers
+    my $total_seasons = $series->{$sid}->{episodes}->{totalseasons};
+    for ( my $i = 0; $i < $total_seasons; $i++ )
+    {
+      my $season = $series->{$sid}->{episodes}->{Episodelist}->{Season}[$i];
+      my $season_num = $season->{no};
+      my $episode_count = $season->{episode}->length();
+
+      for (my $k=0; $k < $episode_count; $k++)
+      {
+        my $episode = $season->{episode}->get($k);
+
+        my $abs_num = $episode->{epnum};
+        my $abs = $abs_num-1;
+        my $ce = {
+          absolute_number => $abs_num,
+          season_number   => $season_num,
+          episode_number  => $episode->{seasonnum},
+          title           => $episode->{title},
+          link            => $episode->{link},
+          airdate        => $episode->{airdate}
+        };
+
+        $eps[$abs] = $ce;
+      }
+
+    }
+
+    if(my $p = $eps[$episodeabs]) {
+      w("TVRage: Found an absolute number");
+      return $p;
+    } else {
+      w("TVRage: Didn't find the right episode");
+      return undef;
+    }
+
 }
 
 1;
