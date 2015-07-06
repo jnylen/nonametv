@@ -58,7 +58,7 @@ sub Object2Url {
 
   my $datefirst = first_day_of_week( $year, $week )->add( days => 0 )->epoch; # monday
 
-  my $url = "http://snutt.nrk.no/publisering/epg/dist/backend/epg/?channel=".$chd->{grabber_info}."&time=".$datefirst;
+  my $url = "http://snutt.nrk.no/nrkno_apps/epg/dist/backend/epg/?channel=".$chd->{grabber_info}."&time=".$datefirst;
 
   return( $url, undef );
 }
