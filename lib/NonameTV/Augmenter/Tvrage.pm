@@ -29,9 +29,9 @@ sub new {
 
 sub FillHash( $$$$ ) {
   my( $self, $resultref, $series, $episode, $ceref )=@_;
-  
+
   #print Dumper( $series, $episode );
-  
+
   # Genre
   my @genres = ();
   foreach my $genre ( $series->{genres}->{genre} ){
@@ -52,7 +52,12 @@ sub FillHash( $$$$ ) {
     my $cat = join "/", @genres;
     AddCategory( $resultref, undef, $cat );
   }
-  
+
+  # This is an absolute number match, change episode number
+  if(defined($episode->{season_number})) {
+    $resultref->{episode} = ($episode->{season_number} - 1) . ' . ' . ($episode->{episode_number} - 1) . ' .';
+  }
+
   # Standard info (episode)
   $resultref->{subtitle} = normUtf8( norm( $episode->{title} ) );
   $resultref->{production_date} = normUtf8( norm( $episode->{airdate} ) );
@@ -60,26 +65,28 @@ sub FillHash( $$$$ ) {
 
   $resultref->{extra_id} = $series->{showid};
   $resultref->{extra_id_type} = "tvrage";
-  
+
+  $resultref->{original_title} = $series->{showname} if !defined($resultref->{original_title}) or $resultref->{original_title} eq "";
+
   $resultref->{program_type} = 'series';
-  
+
   #print Dumper( $resultref );
 }
 
 sub AugmentProgram( $$$ ){
   my( $self, $ceref, $ruleref ) = @_;
-  
+
   #print Dumper( $ceref );
   #print Dumper( $ruleref );
-  
+
   # empty hash to get all attributes to change
   my $resultref = {};
   # result string, empty/false for success, message/true for failure
   my $result = '';
-  
+
   if( $ruleref->{matchby} eq 'episodeseason' ) {
     # match by episode and season
-        
+
         if( defined $ceref->{episode} ){
       my( $season, $episode )=( $ceref->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
       if( (defined $episode) and (defined $season) ){
@@ -92,7 +99,7 @@ sub AugmentProgram( $$$ ){
         my $tvrage;
         my $searchResults;
         if( defined( $ruleref->{remoteref} ) and ( $ruleref->{remoteref} ne "" ) ) {
-          
+
           # Get moar info via ShowInfo (genres and name)
           $tvrage = TVRage::API->new();
           $series = $tvrage->showInfo( $ruleref->{remoteref} );
@@ -111,6 +118,38 @@ sub AugmentProgram( $$$ ){
                 w( "no episode " . $episode . " of season " . $season . " found for '" . $ceref->{title} . "'" );
             }
           }
+      }
+    }
+
+  } elsif( $ruleref->{matchby} eq 'episodeabs' ) {
+    if( defined $ceref->{episode} )
+    {
+      my( $episodeabs )=( $ceref->{episode} =~ m|^\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
+      if( defined $episodeabs ){
+        $episodeabs += 1;
+
+        my $series;
+        my $tvrage;
+        my $episode;
+        if( defined( $ruleref->{remoteref} ) and ( $ruleref->{remoteref} ne "" ) ) {
+          # Get moar info via ShowInfo (genres and name)
+          $tvrage = TVRage::API->new();
+          $series = $tvrage->showInfo( $ruleref->{remoteref} );
+        } else {
+          die("You need to input series id into remoteref, until this is fixed.");
+        }
+
+        # Find season and episode
+        if($episodeabs ne "") {
+          my $episode = $tvrage->getEpisodeAbs( $ruleref->{remoteref}, $episodeabs );
+
+          if( defined( $episode ) ) {
+              $self->FillHash( $resultref, $series, $episode, $ceref );
+          } else {
+              w( "no episode absolute " . $episodeabs . " found for '" . $ceref->{title} . "'" );
+          }
+        }
+
       }
     }
   }else{
