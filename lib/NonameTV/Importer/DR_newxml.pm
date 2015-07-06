@@ -136,18 +136,27 @@ sub ImportContent {
     my $desc = $b->findvalue( "pro_publish[1]/ppu_description" );
     my $genre = $b->findvalue( "prd_genre_text" );
 
-  	# Cleanup
-  	$title =~ s/Fredagsfilm: //i;
-  	$title =~ s/Dokumania: //i;
-
 	  # Put everything in a array
     my $ce = {
       channel_id => $chd->{id},
       start_time => $start->hms(":"),
       title => norm($title),
       description => norm($desc),
-      subtitle	  => norm($subtitle),
     };
+
+    $ce->{subtitle} = norm($subtitle) if norm($subtitle) ne "";
+
+    # Movie.
+    if($ce->{title} =~ /^(Natbio|Filmperler|Fredagsfilm)\:/i) {
+      $ce->{program_type} = "movie";
+    }
+
+    # Cleanup
+  	$ce->{title} =~ s/Fredagsfilm: //i;
+  	$ce->{title} =~ s/Dokumania: //i;
+    $ce->{title} =~ s/Filmperler: //i;
+    $ce->{title} =~ s/Natbio: //i;
+    $ce->{title} = norm($ce->{title});
 
     # Episode info in xmltv-format
     if( ($episode ne "") and ( $of_episode ne "") )
@@ -287,6 +296,8 @@ sub ImportContent {
     }
 
     $ce->{original_title} = norm($title_alt) if defined($title_alt) and $ce->{title} ne norm($title_alt) and norm($title_alt) ne ""; # Add original title
+    $ce->{title} = "end-of-transmission" if $ce->{title} =~ /^Udsendelsesoph.*r$/i;
+    $ce->{category} = "Movies" if defined($ce->{program_type}) and $ce->{program_type} eq "movie" and (defined($ce->{category}) and $ce->{category} eq "Series");
 
 	  p($start." $ce->{title}");
 
