@@ -5,7 +5,7 @@ use warnings;
 
 =pod
 
-Importer for data from C More. 
+Importer for data from C More.
 One file per channel and day downloaded from their site.
 The downloaded file is in xml-format.
 
@@ -29,7 +29,7 @@ sub new {
     my $class = ref($proto) || $proto;
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
-    
+
     $self->{datastore}->{augment} = 1;
 
     # Canal Plus' webserver returns the following date in some headers:
@@ -71,7 +71,7 @@ sub FilterContent {
 
   if( not defined $doc ) {
     return (undef, "ParseXml failed" );
-  } 
+  }
 
   # Find all "Schedule"-entries.
   my $ns = $doc->find( "//Channel" );
@@ -79,7 +79,7 @@ sub FilterContent {
   if( $ns->size() == 0 ) {
     return (undef, "No channels found" );
   }
-  
+
 #  foreach my $ch ($ns->get_nodelist) {
 #   my $currid = $ch->findvalue( '@Id' );
 #    if( $currid != $chid ) {
@@ -109,7 +109,7 @@ sub ImportContent
   my $ds = $self->{datastore};
   $ds->{SILENCE_END_START_OVERLAP}=1;
   $ds->{SILENCE_DUPLICATE_SKIP}=1;
- 
+
   my $xml = XML::LibXML->new;
   my $doc;
   eval { $doc = $xml->parse_string($$cref); };
@@ -118,7 +118,7 @@ sub ImportContent
     f "Failed to parse $@";
     return 0;
   }
-  
+
   # Find all "Schedule"-entries.
   my $ns = $doc->find( "//Schedule" );
 
@@ -127,23 +127,23 @@ sub ImportContent
     f "No data found";
     return 0;
   }
-  
+
   foreach my $sc ($ns->get_nodelist)
   {
-    # Sanity check. 
+    # Sanity check.
     # What does it mean if there are several programs?
     if( $sc->findvalue( 'count(.//Program)' ) != 1 ) {
       f "Wrong number of Programs for Schedule " .
           $sc->findvalue( '@Id' );
       return 0;
-    } 
+    }
 
     my $title = $sc->findvalue( './Program/@Title' );
 
     my $start = $self->create_dt( $sc->findvalue( './@CalendarDate' ) );
     if( not defined $start )
     {
-      w "Invalid starttime '" 
+      w "Invalid starttime '"
           . $sc->findvalue( './@CalendarDate' ) . "'. Skipping.";
       next;
     }
@@ -165,7 +165,7 @@ sub ImportContent
     if( ($length eq "") or ($length == 0) )
     {
       if( not defined $next_start ) {
-	w "Neither next_start nor length for " . $start->ymd() . " " . 
+	w "Neither next_start nor length for " . $start->ymd() . " " .
 	    $start->hms() . " " . $title;
 	next;
       }
@@ -178,7 +178,7 @@ sub ImportContent
       # Sometimes the claimed length of the movie makes the movie end
       # a few minutes after the next movie is supposed to start.
       # Assume that next_start is correct.
-      if( (defined $next_start ) and ($end > $next_start) 
+      if( (defined $next_start ) and ($end > $next_start)
           and ($next_start > $start) )
       {
         $end = $next_start;
@@ -187,11 +187,12 @@ sub ImportContent
 
     my $series_title = $sc->findvalue( './Program/@SeriesTitle' );
     my $org_title = $sc->findvalue( './Program/@Title' );
-    
+
     my $org_desc = $sc->findvalue( './Program/Synopsis/Short' );
+    my $med_desc = $sc->findvalue( './Program/Synopsis/Medium' );
     my $epi_desc = $sc->findvalue( './Program/Synopsis/Long' );
-    my $desc  = $epi_desc || $org_desc;
-    
+    my $desc  = $med_desc || $epi_desc || $org_desc;
+
     my $genre = norm($sc->findvalue( './Program/@GenreKey' ));
 #    my $country = $sc->findvalue( './Program/@Country' );
 
@@ -209,7 +210,7 @@ sub ImportContent
     my $production_year = $sc->findvalue( './Program/@ProductionYear' );
     my $production_country = $sc->findvalue( './Program/@ProductionCountry' );
 
-    
+
     # Episode info
     my $epino = $sc->findvalue( './Program/@EpisodeNumber' );
     my $seano = $sc->findvalue( './Program/@SeasonNumber' );
@@ -236,7 +237,7 @@ sub ImportContent
       {
         $ce->{subtitle} = $2;
       }
-      elsif( $title ne $ce->{title} ) 
+      elsif( $title ne $ce->{title} )
       {
         $ce->{subtitle } = $title;
       }
@@ -270,7 +271,7 @@ sub ImportContent
           }
      	}else {
           $ce->{episode} = sprintf( ". %d .", $epino-1 );
-          if( defined( $production_year ) and 
+          if( defined( $production_year ) and
             ($production_year =~ /\d{4}/) )
         	{
         	    my( $year ) = ($ce->{production_date} =~ /(\d{4})-/ );
@@ -289,7 +290,7 @@ sub ImportContent
     if(defined($direcs)) {
     	$ce->{directors} = parse_person_list($direcs);
     }
-    
+
     #$self->extract_extra_info( $ce );
 
     # Program types
@@ -342,7 +343,7 @@ sub ImportContent
 
     $ds->AddProgramme( $ce );
   }
-  
+
   # Success
   return 1;
 }
@@ -351,7 +352,7 @@ sub create_dt
 {
   my $self = shift;
   my( $str ) = @_;
-  
+
   my( $date, $time ) = split( 'T', $str );
 
   if( not defined $time )
@@ -359,12 +360,12 @@ sub create_dt
     return undef;
   }
   my( $year, $month, $day ) = split( '-', $date );
-  
+
   # Remove the dot and everything after it.
   $time =~ s/\..*$//;
-  
+
   my( $hour, $minute, $second ) = split( ":", $time );
-  
+
   if( $second > 59 ) {
     return undef;
   }
@@ -377,9 +378,9 @@ sub create_dt
                           second => $second,
                           time_zone => 'Europe/Stockholm',
                           );
-  
+
   $dt->set_time_zone( "UTC" );
-  
+
   return $dt;
 }
 
