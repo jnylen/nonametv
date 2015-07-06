@@ -93,8 +93,8 @@ sub ImportXML
 
   ## Fix for data falling off when on a new week (same date, removing old programmes for that date)
   my ($dummy, $week, $year, $meh);
-  ($dummy, $week, $year) = ($file =~ /(wk|uke)\s*(\d+)_(\d+)/i);
-  ($dummy, $meh, $week) = ($file =~ /(wk|uke)(\s*|_|)(\d+)/i) if(!defined $year);
+  ($dummy, $week, $year) = ($file =~ /(wk|uke|week)\s*(\d+)_(\d+)/i);
+  ($dummy, $meh, $week) = ($file =~ /(wk|uke|week)(\s*|_|)(\d+)/i) if(!defined $year);
 
   if(!defined $year) {
     error( "FOXTV: $chd->{xmltvid}: Failure to get year from filename, grabbing current year" ) ;
