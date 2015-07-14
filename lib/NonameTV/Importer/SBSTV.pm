@@ -246,23 +246,36 @@ sub ImportContent {
         $subtitle = "";
     }
 
-    $ce->{subtitle} = norm($subtitle) if $subtitle;
+    # Clean subtitlerino
+    $subtitle =~ s/^F(\d+)\s+-\s+//i if $subtitle;
+    $subtitle =~ s/B(\d)//i if $subtitle;
+    $subtitle =~ s/([A-z]{3})\/([A-z0-9]+)// if $subtitle;
+    $subtitle =~ s/(\d\d\d\d\d\d)// if $subtitle;
+    $subtitle =~ s|\bpt\s+(\d+)$| ($1)|;
+    $subtitle =~ s|\((\d+)\:(\d+)\)$| ($1)|;
+    $subtitle = norm($subtitle);
+    $subtitle =~ s/ -$// if $subtitle;
+    $subtitle =~ s/ b$// if $subtitle;
+    $ce->{subtitle} = norm($subtitle) if $subtitle and $subtitle ne "" and $subtitle !~ /m2t$/i and $subtitle !~ /M2P$/i and $title ne "Homeshopping";
+
 
     progress("$day $start - $titles");
 
     # Director (only movies)
-    my ( $dir ) = ( $desc =~ /Instr.:\s+(.*)./ );
+    my ( $duimmerino, $dir ) = ( $desc =~ /Instr(\.\:|\.|\:)\s+(.*)./ );
     if(defined($dir) and $dir ne "") {
     	$ce->{directors} = norm($dir);
     	$ce->{program_type} = 'movie';
+      $ce->{description} =~ s/Instr(\.\:|\.|\:)(.*)$//i;
+      $ce->{description} = norm($ce->{description});
     } else {
     	my $instruktion = $b->findvalue( "instruktion" );
-    	my ( $instr ) = ( $instruktion =~ /Instr.:\s+(.*)/ );
+    	my ( $duimmerino2, $instr ) = ( $instruktion =~ /Instr(\.\:|\.|\:)\s+(.*)/ );
     	if(defined($instr) and $instr and $instr ne "") {
     	    $instr = norm($instr);
     	    $instr =~ s/\.$//g;
-    	    $ce->{directors} = join( ";", split(',', norm($instr)) );
-            $ce->{program_type} = 'movie';
+    	    $ce->{directors} = join( ";", split(/,|\/|\s+og\+/, norm($instr)) );
+          $ce->{program_type} = 'movie';
     	}
     }
 
@@ -308,14 +321,14 @@ sub ImportContent {
             my $pushname = norm($act) . " (" . norm($role) . ")";
 
 
-            push(@acts, $pushname);
+            push(@acts, $pushname) if $pushname ne "";
         }
 
         $ce->{actors} = join( ";", @acts );
     }
 
 
-    if(defined($ce->{subtitle}) and ($ce->{subtitle} =~ /$ce->{title}/i)) {
+    if(defined($ce->{subtitle}) and ($ce->{subtitle} eq $ce->{title})) {
         $ce->{subtitle} = undef;
     }
 
