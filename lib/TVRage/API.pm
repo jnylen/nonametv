@@ -21,6 +21,7 @@ use Compress::Zlib;
 use Debug::Simple;
 use NonameTV::Config qw/ReadConfig/;
 use NonameTV::Log qw/w d/;
+use TryCatch;
 
 sub new {
     my $self = bless {};
@@ -107,6 +108,8 @@ sub _downloadXml {
     return undef unless $xml;
 
     $xml = Compress::Zlib::memGunzip($xml) unless $xml =~ /^</;
+
+    return undef if !defined($xml);
 
     # Remove empty tags
     $xml =~ s/(<[^\/\s>]*\/>|<[^\/\s>]*><\/[^>]*>)//gs;
@@ -332,11 +335,22 @@ sub getEpisodeAbs {
 
     # Absolute numbers
     my $total_seasons = $series->{$sid}->{episodes}->{totalseasons};
+
+    # Something shitty happened
+    return if !defined($total_seasons);
+
     for ( my $i = 0; $i < $total_seasons; $i++ )
     {
       my $season = $series->{$sid}->{episodes}->{Episodelist}->{Season}[$i];
+      next if !defined($season->{episode});
+
       my $season_num = $season->{no};
-      my $episode_count = $season->{episode}->length();
+      my $episode_count;
+      try {
+        $episode_count = $season->{episode}->length();
+      };
+
+      return if !defined($episode_count);
 
       for (my $k=0; $k < $episode_count; $k++)
       {
@@ -359,10 +373,10 @@ sub getEpisodeAbs {
     }
 
     if(my $p = $eps[$episodeabs]) {
-      w("TVRage: Found an absolute number");
+      #w("TVRage: Found an absolute number");
       return $p;
     } else {
-      w("TVRage: Didn't find the right episode");
+      #w("TVRage: Didn't find the right episode");
       return undef;
     }
 
