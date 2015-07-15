@@ -13,6 +13,9 @@ Same format as DreiSat.
 =cut
 
 use DateTime;
+use Crypt::OpenSSL::Bignum;
+use Crypt::OpenSSL::RSA;
+use MIME::Base64;
 use XML::LibXML;
 
 use NonameTV qw/ParseXml/;
@@ -78,12 +81,40 @@ sub InitiateDownload {
 
   my $mech = $self->{cc}->UserAgent();
 
-  my $response = $mech->get('https://pressetreff.zdf.de/index.php?id=vptzdf&user=' . $self->{Username} . '&pass=' . $self->{Password} . '&logintype=login&pid=83&redirect_url=&tx_felogin_pi1[noredirect]=0');
+  my $response = $mech->get('https://presseportal.zdf.de/start/index.php?eID=FrontendLoginRsaPublicKey');
 
-  if ($response->is_success) {
+  # split the result into modulus and exponent
+  my ($modulus, $exponent) = ($mech->content() =~ m|([0-9A-F]+):([0-9A-F]+):| );
+
+  # create RSA public key object from parameters
+  my $n = Crypt::OpenSSL::Bignum->new_from_hex($modulus);
+  my $e = Crypt::OpenSSL::Bignum->new_from_hex($exponent);
+  my $rsa = Crypt::OpenSSL::RSA->new_key_from_parameters($n, $e);
+
+  # it is important to use the right padding (not the modules default)
+  $rsa->use_pkcs1_padding ();
+
+  my $password_rsa = $rsa->encrypt ($self->{Password});
+  my $password_rsa_base64 = encode_base64 ($password_rsa);
+  $password_rsa_base64 =~ s/\n//g;
+  my $password_rsaauth = 'rsa:' . $password_rsa_base64;
+
+
+  $response = $mech->get('https://presseportal.zdf.de/start/');
+
+  if (!($mech->success())) {
+    return $mech->status_line;
+  }
+
+  $mech->form_with_fields (('user', 'pass'));
+  $mech->field ('user', $self->{Username}, 1);
+  $mech->field ('pass', $password_rsaauth, 1);
+  $response = $mech->click_button (name => 'submit');
+
+  if ($mech->success()) {
     return undef;
   } else {
-    return $response->status_line;
+    return $mech->status_line;
   }
 }
 
@@ -99,8 +130,8 @@ sub Object2Url {
     $station = $chd->{grabber_info};
   }elsif( $self->{ZDFProgrammdienstStation} ){
     $station = $self->{ZDFProgrammdienstStation};
-  }else{
-    $station = "01"; # hd.zdf.de
+#  }else{
+#    $station = "01"; # hd.zdf.de
   }
 
   # get first day in the given batch
@@ -110,8 +141,13 @@ sub Object2Url {
   $first->add (days => -2);
 
   my $date = $first->dmy( '.' );
+  my $last = $first;
+  $last->add (days => 6);
+  my $lastdate = $last->dmy ('.');
 
-  my $url = 'https://pressetreff.zdf.de/index.php?id=386&tx_zdfprogrammdienst_pi1%5Bformat%5D=xml&tx_zdfprogrammdienst_pi1%5Blongdoc%5D=1&tx_zdfprogrammdienst_pi1%5Bstation%5D=' . $station . '&tx_zdfprogrammdienst_pi1%5Bdatestart%5D=' . $date . '&tx_zdfprogrammdienst_pi1%5Bweek%5D=' . $week . '&tx_zdfprogrammdienst_pi1%5Baction%5D=showDownloads&tx_zdfprogrammdienst_pi1%5Bcontroller%5D=Broadcast';
+  #my $url = 'https://pressetreff.zdf.de/index.php?id=386&tx_zdfprogrammdienst_pi1%5Bformat%5D=xml&tx_zdfprogrammdienst_pi1%5Blongdoc%5D=1&tx_zdfprogrammdienst_pi1%5Bstation%5D=' . $station . '&tx_zdfprogrammdienst_pi1%5Bdatestart%5D=' . $date . '&tx_zdfprogrammdienst_pi1%5Bweek%5D=' . $week . '&tx_zdfprogrammdienst_pi1%5Baction%5D=showDownloads&tx_zdfprogrammdienst_pi1%5Bcontroller%5D=Broadcast';
+  # https://presseportal.zdf.de/programmdienst/programmwoche/30/zdf/18.07.2015/24.07.2015/bc/showDownloads//xml/langfassung/
+  my $url = 'https://presseportal.zdf.de/programmdienst/programmwoche/' . $week . '/' . $station . '/' . $date . '/' . $lastdate . '/bc/showDownloads//xml/langfassung/';
 
   p("ZDF: fetching data from $url");
 
