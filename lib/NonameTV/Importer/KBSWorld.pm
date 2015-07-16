@@ -61,7 +61,7 @@ sub FetchDataFromSite {
   my $mech = $self->{cc}->UserAgent();
 
   my $response = $mech->post( "http://kbsworld.kbs.co.kr/schedule/down_schedule_.php", { 'wlang' => 'e', 'down_time_add' => '0', 'start_date' => $datefirst, 'end_date' => $datelast, 'ftype' => 'xls' } );
-  my $content  = $response->decoded_content();
+  my $content  = $response->content( format => 'text' );
 
   return ($content, undef);
 }
@@ -78,10 +78,14 @@ sub ImportContent {
   $$cref =~ s/<br style='(.*?)'>/\n/g;
   $$cref =~ s/&nbsp;//g;
   $$cref =~ s/&#39;/'/g;
+  $$cref =~ s/&#65533;//g;
   $$cref =~ s/ & / &amp; /g;
+  $$cref =~ s/<The Return of Superman>//g;
 
   my $data = '<?xml version="1.0" encoding="utf-8"?>';
   $data .= $$cref;
+
+  #print Dumper($data);
 
   my $doc;
   my $xml = XML::LibXML->new;
