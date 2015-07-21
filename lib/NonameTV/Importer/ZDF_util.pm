@@ -302,6 +302,10 @@ sub ParseData
           case /&f43;/  {$ce{aspect} = "4:3"}
           # 2014-04, for 3sat
           case /&ot;/   {} # audio language == original audio
+          # ZDF new press site june 2015 after fixups
+          case /4zu3/             {$ce{aspect} = "4:3"}
+          case /mono/             {$ce{stereo} = "mono"}
+          case /schwarzweiß/ {} # colour=no
           else                    { w ("unhandled attribute: $attribut") } 
         }
       }

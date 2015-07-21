@@ -170,16 +170,22 @@ sub FilterContent {
   my( $cref, $chd ) = @_;
 
   # fixup amp entity
-  $$cref =~ s|&amp;amp;|&amp;|g;
+#  $$cref =~ s|&amp;amp;|&amp;|g;
 
   # fixup custom entities
-#  $$cref =~ s|&amp;ad;|&ad;|g;
-#  $$cref =~ s|&amp;dd;|&dd;|g;
-#  $$cref =~ s|&amp;ds;|&ds;|g;
-#  $$cref =~ s|&amp;f16;|&f16;|g;
-#  $$cref =~ s|&amp;hd;|&hd;|g;
-#  $$cref =~ s|&amp;st;|&st;|g;
-#  $$cref =~ s|&amp;vo;|&vo;|g;
+  $$cref =~ s|&amp;ad;|&ad;|g;
+  $$cref =~ s|&amp;dd;|&dd;|g;
+  $$cref =~ s|&amp;ds;|&ds;|g;
+  $$cref =~ s|&amp;f43;|&f43;|g;
+  $$cref =~ s|&amp;f16;|&f16;|g;
+  $$cref =~ s|&amp;sw;|&sw;|g;
+  $$cref =~ s|&amp;hd;|&hd;|g;
+  $$cref =~ s|&amp;mo;|&mo;|g;
+  $$cref =~ s|&amp;st;|&st;|g;
+  $$cref =~ s|&amp;vo;|&vo;|g;
+
+  # fixup newline
+  $$cref =~ s|&lt;br&gt;|\n|g;
 
   my $doc = ParseXml( $cref );
 
