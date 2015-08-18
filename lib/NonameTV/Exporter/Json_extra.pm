@@ -666,6 +666,11 @@ sub WriteEntry
     $d->{rerun} = $entry->{rerun};
   }
 
+  if( $entry->{new} )
+  {
+    $d->{new} = $entry->{new};
+  }
+
   if( $entry->{original_title} ) {
   	$d->{original_title} = $entry->{original_title};
   }

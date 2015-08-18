@@ -135,6 +135,9 @@ foreach my $msg ($infolder->messages) {
   elsif( $fromaddr =~ /\@fyc.pt/i ) {
     MoveMessage( $msg, "FuelTV" );
   }
+  elsif( $fromaddr =~ /\@fuel.tv/i ) {
+    MoveMessage( $msg, "FuelTV" );
+  }
   elsif( $fromaddr =~ /\@luxe.tv/i ) {
     MoveMessage( $msg, "LuxeTV" );
   }
@@ -166,6 +169,9 @@ foreach my $msg ($infolder->messages) {
     MoveMessage( $msg, "Gospel" );
   }
   elsif( $fromaddr =~ /\@dw.de/i ) {
+    MoveMessage( $msg, "DWDE" );
+  }
+  elsif( $fromaddr =~ /\@dw.com/i ) {
     MoveMessage( $msg, "DWDE" );
   }
   elsif( $fromaddr =~ /\@horseandcountry.tv/i ) {
@@ -231,8 +237,8 @@ sub MoveMessage {
   my( $msg, $foldername ) = @_;
 
   if( not exists $folders->{$foldername} ) {
-    $folders->{$foldername} = 
-	$rootfolder->openSubFolder( $targetprefix . $foldername, 
+    $folders->{$foldername} =
+	$rootfolder->openSubFolder( $targetprefix . $foldername,
 				    access => 'rw' );
   }
 

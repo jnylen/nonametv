@@ -54,6 +54,10 @@ def copy_to_channels(file_name)
     { :xmltvid => "hd.tnt-glitz.tv", :info => "TNT GLITZ HD" },
     { :xmltvid => "tnt-serie.de", :info => "TNT SERIE" }, { :xmltvid => "hd.tnt-serie.de", :info => "TNT SERIE HD" },
     { :xmltvid => "universalchannel.de", :info => "UNIVERSAL CHANNEL HD" },
+
+    { :xmltvid => "boomerangtv.de", :info => "BOOMERANG" },
+    { :xmltvid => "cartoonnetwork.de", :info => "CARTOON NETWORK" },
+
     ]
 
     channels.each do |c|

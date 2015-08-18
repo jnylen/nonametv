@@ -24,7 +24,7 @@ then
 
   # Remove old files after 70 days (safes space)
   tools/nonametv-filestore-removeold --all --leavedays 70
-  
+
   # remove Tvrage cache (they can't be updated automatic..
   # .. as tvrage doesnt provide that sort of system)
   rm /nonametv/contentcache/Tvrage/tvrage.db
@@ -33,7 +33,7 @@ then
   # (for example if the time on the server is way off)
   #tools/nonametv-export Xmltv --force-export
   tools/nonametv-export Json --force-export
-  
+
   # Remove old programmes and batches - dont use, fucks up the previouslyshown
   # augmenter
   #perl -I lib tools/nonametv-remove-old
@@ -76,6 +76,7 @@ $d perl -I lib tools/nonametv-update-tvdb da
 $d perl -I lib tools/nonametv-update-tvdb hr
 $d perl -I lib tools/nonametv-update-tvdb it
 $d perl -I lib tools/nonametv-update-tvdb nl
+$d perl -I lib tools/nonametv-update-tvdb fr
 
 # Import files sent through ftp
 $d tools/se-tvzon/nonametv-filestore-svt $Q

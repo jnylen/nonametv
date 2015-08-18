@@ -235,66 +235,41 @@ sub guess_channel
  if( $dir =~ /Turner/ ) {
     # Word files
 	return "cartoonnetwork.se" if $filename =~ /^cn\s*nordic\s+\(swe\)\s*\b/i;
-	return "boomerangtv.se" if $filename =~ /^boomerang\s*nordic\s*\(swe\)\s*\b/i;
+	return "boomerangtv.se"    if $filename =~ /^boomerang\s*nordic\s*\(swe\)\s*\b/i;
 
 	return "cartoonnetwork.no" if $filename =~ /^cn\s*nordic\s+\(nor\)\s*\b/i;
-    return "boomerangtv.no" if $filename =~ /^boomerang\s*nordic\s*\(nor\)\s*\b/i;
+  return "boomerangtv.no"    if $filename =~ /^boomerang\s*nordic\s*\(nor\)\s*\b/i;
 
-    return "cartoonnetwork.dk" if $filename =~ /^cn\s*nordic\s+\(dan\)\s*\b/i;
-    return "boomerangtv.dk" if $filename =~ /^boomerang\s*nordic\s*\(dan\)\s*\b/i;
+  return "cartoonnetwork.dk" if $filename =~ /^cn\s*nordic\s+\(dan\)\s*\b/i;
+  return "boomerangtv.dk"    if $filename =~ /^boomerang\s*nordic\s*\(dan\)\s*\b/i;
 
-    return "tcmeurope.com" if $filename =~ /^tcm\s*nordic/i and $filename =~ /eng/i;
-    return "se.tcmeurope.com" if $filename =~ /^tcm\s*nordic/i and $filename =~ /swe/i;
-    return "no.tcmeurope.com" if $filename =~ /^tcm\s*nordic/i and $filename =~ /\(NOR\)/i and $filename !~ /dan/ and $filename !~ /\.xls$/i;
-    return "dk.tcmeurope.com" if $filename =~ /^tcm\s*nordic/i and $filename =~ /dan/i;
+  return "tcmeurope.com"     if $filename =~ /^tcm\s*nordic/i and $filename =~ /eng/i;
+  return "se.tcmeurope.com"  if $filename =~ /^tcm\s*nordic/i and $filename =~ /swe/i;
+  return "no.tcmeurope.com"  if $filename =~ /^tcm\s*nordic/i and $filename =~ /\(NOR\)/i and $filename !~ /dan/ and $filename !~ /\.xls$/i;
+  return "dk.tcmeurope.com"  if $filename =~ /^tcm\s*nordic/i and $filename =~ /dan/i;
 
 	# Excel (XLS)
 	if( $filename =~ /\.xls$/i ) {
 		# CNN
 		if( $filename =~ /cnn/i ) {
-		    return "cnn.com" if $filename =~ /\(in\s+cet\)/i;
+		  return "cnn.com" if $filename =~ /\(in\s+cet\)/i;
 		}
 
 		# Cartoon network ENGLISH
-        return "cartoonnetwork.com" if $filename =~ /^cn\s*nordic/i;
-        return "cartoonnetwork.nl" if $filename =~ /^cn\s*dutch/i and $filename =~ /combo/i;
+    return "cartoonnetwork.com" if $filename =~ /^cn\s*nordic/i;
+    return "cartoonnetwork.nl" if $filename =~ /^cn\s*dutch/i and $filename =~ /combo/i;
 	}
 
-	# XML Germany
-	if( $filename =~ /\.xml$/i ) {
-	    return "cartoonnetwork.de" if $filename =~ /^CN_/i;
-	    return "boomerangtv.de" if $filename =~ /^Boomerang_/i;
-	    #return "tnt-serie.de" if $filename =~ /^TNTSerie_/i;
-	    #return "tnt-film.de" if $filename =~ /^TNT_/i;
-	    #return "tnt-glitz.tv" if $filename =~ /^Glitz_/i;
-	}
-
-
-	# XML Nordic (Nonstop)
-	if( $filename =~ /\.xml$/i ) {
-	    return "star.nonstop.tv" if $filename =~ /^Star/i and $filename =~ /Swedish/i;
-	    return "fi.star.nonstop.tv" if $filename =~ /^Star/i and $filename =~ /Finnish/i;
-	}
-
-    # XLS Nordic (Nonstop)
-    if( $filename =~ /\.(xls|xlsx)$/i ) {
-        # Nonstop
-	    return "showtime.nonstop.tv" if $filename =~ /^SHO/i and $filename =~ /SWE/i;
-	    return "silver.nonstop.tv"   if $filename =~ /^SIL/i and $filename =~ /SWE/i;
-	    return "no.showtime.nonstop.tv" if $filename =~ /^SHO/i and $filename =~ /NOR/i;
-        return "no.silver.nonstop.tv"   if $filename =~ /^SIL/i and $filename =~ /NOR/i;
-        return "dk.showtime.nonstop.tv" if $filename =~ /^SHO/i and $filename =~ /DAN/i;
-        return "dk.silver.nonstop.tv"   if $filename =~ /^SIL/i and $filename =~ /DAN/i;
-        return "fi.showtime.nonstop.tv" if $filename =~ /^SHO/i and $filename =~ /FIN/i;
-        return "fi.silver.nonstop.tv"   if $filename =~ /^SIL/i and $filename =~ /FIN/i;
-	    return "tnt-tv.dk" if $filename =~ /^TNT/i and $filename =~ /DAN/i;
-	    return "tnt-tv.se" if $filename =~ /^TNT/i and $filename =~ /SWE/i;
-	    return "tnt-tv.no" if $filename =~ /^TNT/i and $filename =~ /NOR/i;
-    }
+  # XLS Nordic
+  if( $filename =~ /\.(xls|xlsx)$/i ) {
+	  return "tnt-tv.dk" if $filename =~ /^TNT/i and $filename =~ /DAN/i;
+	  return "tnt-tv.se" if $filename =~ /^TNT/i and $filename =~ /SWE/i;
+	  return "tnt-tv.no" if $filename =~ /^TNT/i and $filename =~ /NOR/i;
   }
+ }
 
  if( $dir =~ /Euronews/ and $filename =~ /\.(xls|xlsx)/i ) {
-      return "euronews.com";
+    return "euronews.com";
  }
 
  if( $dir =~ /MTV/ ) {
@@ -311,10 +286,10 @@ sub guess_channel
 
     # excel (XLS)
     if($filename =~ /\.xls$/i) {
-        return "classic.vh1.se" if $filename =~ /vh1.*euro.*classic/i;
+      return "classic.vh1.se" if $filename =~ /vh1.*euro.*classic/i;
 
-        if($filename =~ /^mtv.*live/i) {
-    	    return "hd.mtv.se" if $filename =~ /listings/i;
+      if($filename =~ /^mtv.*live/i) {
+    	  return "hd.mtv.se" if $filename =~ /listings/i;
     	}
     }
  }
@@ -391,6 +366,8 @@ sub guess_channel
     return "english.dw.de" if $filename =~ /English/i;
     return "la.dw.de" if $filename =~ /Latino/i;
     return "amerika.dw.de" if $filename =~ /Amerika/i;
+    return "asien.dw.de" if $filename =~ /Deutsch/i;
+    return "dw.de" if $filename =~ /^DW\s+/i;
  }
 
  if( $dir =~ /HaC/ and $filename =~ /\.xml$/i ) {

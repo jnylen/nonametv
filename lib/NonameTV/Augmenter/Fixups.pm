@@ -103,6 +103,15 @@ sub AugmentProgram( $$$ ){
   	my( $title, $season ) = split( /|/, $ruleref->{remoteref} );
   	$resultref->{'title'} = $title;
   	$resultref->{'season'} = $season;
+  }elsif( $ruleref->{matchby} eq 'splittitlereverse_type' ) {
+  	# Used like:
+  	# real title: Dox 5 år: Buss 174
+    # title: ^.*(Dox 5 år):\s+(.*)$
+  	# remoteref: movie
+
+    my( $title, $episodetitle )=( $ceref->{title} =~ m|$ruleref->{title}| );
+    $resultref->{'title'} = $episodetitle;
+    $resultref->{program_type} = $ruleref->{remoteref};
   }elsif( $ruleref->{matchby} eq 'splitguesttitle' ) {
     # split the name of the guest from the title and put it into subtitle and guest
     my( $title, $episodetitle )=( $ceref->{title} =~ m|$ruleref->{title}| );

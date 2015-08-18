@@ -404,7 +404,7 @@ sub guess_channel
      return "tvchile.cl";
  }
 
- if( $dir =~ /FuelTV/ and $filename =~ /epg/i ) {
+ if( $dir =~ /FuelTV/ and $filename =~ /\.xls|.xlsx$/i ) {
      return "fuel.tv";
  }
 
@@ -438,7 +438,7 @@ sub guess_channel
     return "int.kinopolskamuzyka.pl" if $filename =~ /KPM INT/i;
 
     # GMT+2
-    if($filename =~ /GMT\+2/i) {
+    if($filename =~ //i) {
         return "360tunebox.spi.pl" if $filename =~ /^360TuneBox/i;
         return "docubox.spi.pl" if $filename =~ /^DocuBox/i;
         return "erox.spi.pl" if $filename =~ /^Erox/i;
