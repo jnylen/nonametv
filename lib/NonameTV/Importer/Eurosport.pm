@@ -118,11 +118,21 @@ sub ImportContent {
 
       $ce->{quality} = "HDTV" if $hd eq "Yes";
       $ce->{fanart} = $image if defined($image) and $image ne "";
-      $ce->{live} = 1 if $bc_type eq "DIREKT" or $bc_type eq "LIVE";
-      $ce->{rerun} = 1 if $bc_type eq "Repris" or $bc_type eq "Genudsendelse";
+
+      if(defined($bc_type) and ($bc_type eq "DIREKT" or $bc_type eq "LIVE" or $bc_type eq "Jälkilähetys" or $bc_type eq "NA ŻYWO")) {
+        $ce->{live} = 1;
+      } else {
+        $ce->{live} = 0;
+      }
+
+
+      if(defined($bc_type) and ($bc_type eq "Repris" or $bc_type eq "Genudsendelse" or $bc_type eq "Replay" or $bc_type eq "Uusinta" or $bc_type eq "Reprise" or $bc_type eq "Powtórka")) {
+        $ce->{new} = 0;
+      }
+
 
       # Sport
-      if( $sport and $sport ne "" ) {
+      if( defined($sport) and $sport ne "" ) {
   			my($program_type, $category ) = $ds->LookupCat( 'Eurosport', $sport );
   			AddCategory( $ce, "sports", $category );
   		}

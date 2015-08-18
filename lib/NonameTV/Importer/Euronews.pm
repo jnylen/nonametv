@@ -109,6 +109,7 @@ sub ImportXLS {
   my $coltitle = 2;
   my $coldesc = 4;
   my $colgenre = 6;
+  my $colpremiere = 7;
 
 my $oBook;
 
@@ -188,6 +189,19 @@ my $ref = ReadData ($file);
 
       $oWkC = $oWkS->{Cells}[$iR][$coldesc];
       $ce->{description} = $oWkC->Value if( $oWkC->Value );
+
+      # premiere
+      $oWkC = $oWkS->{Cells}[$iR][$colpremiere];
+      next if( ! $oWkC );
+      my $premiere = $oWkC->Value if( $oWkC->Value );
+      if( $premiere eq "yes" )
+      {
+        $ce->{new} = "1";
+      }
+      else
+      {
+        $ce->{new} = "0";
+      }
 
 
 		# Genre

@@ -185,11 +185,11 @@ sub ImportContent {
     my $rerun = $b->findvalue( 'pro_publish[1]/ppu_isrerun' );
   	if( $rerun eq "TRUE" )
   	{
-  		$ce->{rerun} = "1";
+  		$ce->{new} = "0";
   	}
   	else
   	{
-  		$ce->{rerun} = "0";
+  		$ce->{new} = "1";
   	}
 
     # Prod year

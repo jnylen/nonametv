@@ -203,6 +203,10 @@ sub ImportContent
     # to see if this is a premiere.
 #    my $premieredate = $sc->findvalue( './Program/@PremiereDate' );
 
+    # Premiere? Live?
+    my $premiere = $sc->findvalue( './@IsPremiere' );
+    my $type     = $sc->findvalue( './@Type' );
+
     # program_type can be partially derived from this:
     my $class = $sc->findvalue( './Program/@Class' );
     my $cate = $sc->findvalue( './Program/@Category' );
@@ -339,6 +343,20 @@ sub ImportContent
             $ce->{fanart} = 'http://cdn01.img.cmore.se/' . $ic->findvalue( './@Id' ) . '/8.img';
         }
       }
+    }
+
+    # Live?
+    if($type eq "Live") {
+      $ce->{live} = 1;
+    } else {
+      $ce->{live} = 0;
+    }
+
+    # Premiere
+    if($premiere eq "true") {
+      $ce->{new} = 1;
+    } else {
+      $ce->{new} = 0;
     }
 
     $ds->AddProgramme( $ce );

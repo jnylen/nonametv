@@ -39,7 +39,7 @@ sub new {
   $self->{datastorehelper} = $dsh;
 
   if( defined( $self->{UrlRoot} ) ){
-    w( 'UrlRoot is deprecated' );
+    #w( 'UrlRoot is deprecated' );
   } else {
     $self->{UrlRoot} = 'http://ttv.sbstv.dk/programoversigtxml/xml.php';
   }
@@ -129,6 +129,7 @@ sub ImportContent {
   	my $station = $b->findvalue( "station" );
   	my $day = $b->findvalue( "day" );
     my $hd = $b->findvalue( "hd" );
+    my $rerun = $b->findvalue( "genudsendelse" );
 
   	if( $day ne $currdate ) {
 
@@ -341,6 +342,12 @@ sub ImportContent {
     }
 
     $ce->{quality} = "HDTV" if $hd eq "yes";
+
+    if($rerun eq "yes" or $rerun eq "1") {
+      $ce->{new} = "0";
+    } else {
+      $ce->{new} = "1";
+    }
 
     $dsh->AddProgramme( $ce );
   }

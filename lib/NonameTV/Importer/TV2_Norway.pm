@@ -114,6 +114,11 @@ sub ImportContent
     my $episode = $sc->findvalue( 'episode-num[@system="xmltv_ns"]' );
 
     #
+    # replay?
+    #
+    my $rerun = $sc->findvalue( 'episode-num[@system="dd_replay"]' );
+
+    #
     # image
     #
     my $image = $sc->findvalue( 'icon/@src' );
@@ -195,6 +200,13 @@ sub ImportContent
     {
       $ce->{episode} = norm($episode);
       $ce->{program_type} = 'series';
+    }
+
+    # replay
+    if(defined($rerun) and norm($rerun) eq "true") {
+      $ce->{new} = "0";
+    } else {
+      $ce->{new} = "1";
     }
 
     $ce->{subtitle} = undef;

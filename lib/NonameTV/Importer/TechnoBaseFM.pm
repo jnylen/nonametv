@@ -6,7 +6,7 @@ use warnings;
 =pod
 
 Sample importer for http-based sources.
-See xxx for instructions. 
+See xxx for instructions.
 
 =cut
 
@@ -47,12 +47,12 @@ sub Object2Url {
 
   # Day=0 today, Day=1 tomorrow etc. Yesterday = yesterday
 
-  my $dt = DateTime->new( 
+  my $dt = DateTime->new(
                           year  => $year,
                           month => $month,
-                          day   => $day 
+                          day   => $day
                           );
- 
+
   my $url = "http://www.$xmltvid/showplan/" . $dt->ymd( ) . '/';
 
   # Only one url to look at and no error
@@ -104,7 +104,7 @@ sub ImportContent {
 
   my $ds = $self->{datastore};
 
-  my $dt = DateTime->new( 
+  my $dt = DateTime->new(
                           year  => $year,
                           month => $month,
                           day   => $day,

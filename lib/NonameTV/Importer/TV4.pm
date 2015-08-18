@@ -156,20 +156,21 @@ sub ImportContent
 
   foreach my $pgm ($ns->get_nodelist)
   {
-    my $start = $self->create_dt($pgm->findvalue( 'transmissiontime' ));
-    my $starttime = $start->hms();
-    my $title =$pgm->findvalue( 'title' );
-    my $title_org = $pgm->findvalue( 'originaltitle' );
-    my $desc = $pgm->findvalue( 'description' );
-    my $ep_desc = $pgm->findvalue( 'episode_description' );
-    my $pr_desc = $pgm->findvalue( 'program_description' );
-    my $live = $pgm->findvalue( 'live' );
-    my $definition = $pgm->findvalue( 'definition' );
-    my $season = $pgm->findvalue( 'season_number' );
-    my $episode = $pgm->findvalue( 'episode_number' );
-    my $eps = $pgm->findvalue( 'number_of_episodes' );
-    my $prodyear = $pgm->findvalue( 'production_year' );
-    my $genre = $pgm->findvalue( 'category' );
+    my $start       = $self->create_dt($pgm->findvalue( 'transmissiontime' ));
+    my $starttime   = $start->hms();
+    my $title       = $pgm->findvalue( 'title' );
+    my $title_org   = $pgm->findvalue( 'originaltitle' );
+    my $desc        = $pgm->findvalue( 'description' );
+    my $ep_desc     = $pgm->findvalue( 'episode_description' );
+    my $pr_desc     = $pgm->findvalue( 'program_description' );
+    my $live        = $pgm->findvalue( 'live' );
+    my $definition  = $pgm->findvalue( 'definition' );
+    my $season      = $pgm->findvalue( 'season_number' );
+    my $episode     = $pgm->findvalue( 'episode_number' );
+    my $eps         = $pgm->findvalue( 'number_of_episodes' );
+    my $prodyear    = $pgm->findvalue( 'production_year' );
+    my $genre       = $pgm->findvalue( 'category' );
+    my $rerun       = $pgm->findvalue( 'rerun' );
 
     my $prev_shown_date = $pgm->findvalue( 'previous_transmissiondate' );
 
@@ -221,9 +222,9 @@ sub ImportContent
 
     foreach my $act ($ns2->get_nodelist)
     {
-      my $role = undef;
-      my $name = norm( $act->findvalue('./real_name') );
-      my $type = norm( $act->findvalue('./type') );
+      my $role   = undef;
+      my $name   = norm( $act->findvalue('./real_name') );
+      my $type   = norm( $act->findvalue('./type') );
 
       # Role played
       if( $act->findvalue('./role_played') ) {
@@ -325,6 +326,13 @@ sub ImportContent
 
       $ce->{program_type} = "sports";
       delete($ce->{episode}) if defined($ce->{episode});
+    }
+
+    # replay
+    if(defined($rerun) and norm($rerun) eq "true") {
+      $ce->{new} = "0";
+    } else {
+      $ce->{new} = "1";
     }
 
     progress($date." ".$starttime." - ".$ce->{title});

@@ -233,7 +233,7 @@ sub ImportXLS {
       my $ce = {
         channel_id => $channel_id,
         start_time => $time,
-        title	   => norm($title),
+        title	     => norm($title),
         aspect     => '16:9',
       };
 

@@ -107,8 +107,8 @@ sub ImportXLS
           if( $oWkS->{Cells}[$iR][$iC] ){
             $columns{$oWkS->{Cells}[$iR][$iC]->Value} = $iC;
 
-			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Series \(English\)$/ );
-			$columns{'ORGTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Series \(English\)$/ );
+			      $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Series \(English\)$/ );
+			      $columns{'ORGTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Series \(English\)$/ );
 
             $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode \(English\)/ );
 
@@ -120,35 +120,37 @@ sub ImportXLS
             $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ and $oWkS->{Cells}[$iR][$iC]->Value !~ /EET/ );
             $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time/ and $oWkS->{Cells}[$iR][$iC]->Value !~ /EET/ ); # Dont set the time to EET
 
-            # Swedish
-			if($chd->{sched_lang} eq "sv") {
-			    $columns{'Title'}    = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series \(Swedish\)/ );
-			    $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Swedish\)/ );
-			}
+            $columns{'Premiere'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Premiere$/ );
 
-			# Norwegian
+            # Swedish
+			      if($chd->{sched_lang} eq "sv") {
+			         $columns{'Title'}    = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series \(Swedish\)/ );
+			         $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Swedish\)/ );
+			      }
+
+			      # Norwegian
             if($chd->{sched_lang} eq "no") {
                 $columns{'Title'}    = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series \(Norwegian\)/ );
-			    $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Norwegian\)/ );
-			}
+			          $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Norwegian\)/ );
+			      }
 
-			# Danish
+			      # Danish
             if($chd->{sched_lang} eq "da") {
                 $columns{'Title'}    = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series \(Danish\)/ );
-			    $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Danish\)/ );
-			}
+			          $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Danish\)/ );
+			      }
 
-			# Finnish
+			      # Finnish
             if($chd->{sched_lang} eq "fi") {
                 $columns{'Title'}    = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series \(Finnish\)/ );
-			    $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Finnish\)/ );
-			}
+			          $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Finnish\)/ );
+			      }
 
             # Polish
             if($chd->{sched_lang} eq "pl") {
                 $columns{'Title'}    = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series \(Polish\)/ );
-			    $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Polish\)/ );
-			}
+			          $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Polish\)/ );
+			      }
 
             $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
           }
@@ -238,6 +240,17 @@ sub ImportXLS
         $oWkC = $oWkS->{Cells}[$iR][$columns{'ORGTitle'}];
         my $title_org = $oWkC->Value if( $oWkC->Value );
         $ce->{original_title} = norm($title_org) if defined($title_org) and $ce->{title} ne norm($title_org) and norm($title_org) ne "";
+      }
+
+      # Premiere
+      my $premiere = $oWkS->{Cells}[$iR][$columns{'Premiere'}]->Value if $oWkS->{Cells}[$iR][$columns{'Premiere'}];
+      if( defined($premiere) and $premiere eq "Y" )
+      {
+        $ce->{new} = "1";
+      }
+      else
+      {
+        $ce->{new} = "0";
       }
 
 

@@ -153,6 +153,7 @@ sub ImportXML
     my $desc;
     $desc = $ep_desc;
     $desc = $se_desc if !defined($ep_desc) or norm($ep_desc) eq "" or norm($ep_desc) eq "null" or norm($ep_desc) eq "1";
+    my $premiere    = norm($row->findvalue( 'Premiere' ) );
 
     my $ce = {
         channel_id => $chd->{id},
@@ -212,6 +213,15 @@ sub ImportXML
         $title_org = "The ".norm($title_org);
     }
     $ce->{original_title} = norm($title_org) if defined($title_org) and $ce->{title} ne norm($title_org) and norm($title_org) ne "";
+
+    if( $premiere eq "Premiere" )
+    {
+      $ce->{new} = "1";
+    }
+    else
+    {
+      $ce->{new} = "0";
+    }
 
     progress( "FOXTV: $chd->{xmltvid}: $start - $title" );
     $dsh->AddProgramme( $ce );
@@ -287,6 +297,7 @@ sub ImportXLS {
 
             $columns{'HD'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /High Definition/ );
             $columns{'169'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /16:9 Format/ );
+            $columns{'Premiere'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Premiere/ );
 
             $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
           }
@@ -296,8 +307,6 @@ sub ImportXLS {
 
         next;
       }
-
-      my $oWkC;
 
       # date - column 0 ('Date')
       my $oWkC = $oWkS->{Cells}[$iR][$columns{'Date'}];
@@ -359,6 +368,8 @@ sub ImportXLS {
       $desc = $se_desc if !defined($ep_desc) or norm($ep_desc) eq "" or norm($ep_desc) eq "-" or norm($ep_desc) eq "1";
       $desc = "" if $desc eq "" or $desc eq "-" or $desc eq "\x{2d}" or $desc eq "1";
 
+      my $premiere = norm($oWkS->{Cells}[$iR][$columns{'Premiere'}]->Value );
+
       my $ce = {
           channel_id => $chd->{id},
           title => norm($title),
@@ -419,6 +430,15 @@ sub ImportXLS {
           $title_org = "The ".norm($title_org);
       }
       $ce->{original_title} = norm($title_org) if defined($title_org) and $ce->{title} ne norm($title_org) and norm($title_org) ne "";
+
+      if( $premiere eq "Premiere" )
+      {
+        $ce->{new} = "1";
+      }
+      else
+      {
+        $ce->{new} = "0";
+      }
 
       progress( "FOXTV: $chd->{xmltvid}: $start - $title" );
       $dsh->AddProgramme( $ce );

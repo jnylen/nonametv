@@ -38,7 +38,7 @@ sub new {
 
   # use augment
   $self->{datastore}->{augment} = 1;
-  
+
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "UTC" );
   $self->{datastorehelper} = $dsh;
 
@@ -77,10 +77,10 @@ sub ImportContentFile {
 
     my @members = $zip->members();
     foreach my $member (@members) {
-      push( @english_files, $member->{fileName} ) 
+      push( @english_files, $member->{fileName} )
 	  if $member->{fileName} =~ /.xml$/i;
     }
-    
+
     my $numfiles = scalar( @english_files );
     if( $numfiles != 1 ) {
       f "Found $numfiles matching files, expected 1.";
@@ -92,18 +92,18 @@ sub ImportContentFile {
     $new_filename = $english_files[0];
     $data = $zip->contents( $english_files[0] );
   }
-  
+
   if(!defined($data)) {
   	return 0;
   }
-  
+
 $data =~ s|
 ||g;
 $data =~ s| xmlns="urn:schemas-harris-com:bcm:tvguide"||;
 
   #my $docz = ParseXml( $data );
   my $doc = XML::LibXML->load_xml(string => $data);
-  
+
   my $rows = $doc->findnodes( ".//Day" );
 
   if( $rows->size() == 0 ) {
@@ -128,33 +128,54 @@ $data =~ s| xmlns="urn:schemas-harris-com:bcm:tvguide"||;
 
 		progress("France24: Date is: $date");
 	}
-  
+
 
 	# Programmes is in a node of the day
     foreach my $prog ($row->childNodes()) {
       	my $title = $prog->findvalue( './Genre' ); #
-      	
+
       	# Not a title - possible a value for the day
       	if( !$title ){
       		next;
       	}
-      	
+
       	my $time = $prog->findvalue( './TVGuideTime' );
-      	
       	my $dt = $self->create_dt( $date . "T" . $time );
-      	
+
       	# Uppercase the first letter
         $title = ucfirst(lc($title));
-      	
+
+        my $live = $prog->findvalue( './Live' );
+        my $repeat = $prog->findvalue( './Repeat' );
+
       	my $ce = {
           channel_id => $chd->{id},
           title => norm($title),
           start_time => $dt->ymd("-") . " " . $dt->hms(":"),
         };
-      	
+
+        # Find live-info
+      	if( $live eq "Live" )
+      	{
+      	  $ce->{live} = "1";
+        }
+        else
+        {
+    	    $ce->{live} = "0";
+    	  }
+
+        if( $repeat eq "R" )
+        {
+          $ce->{new} = "0";
+        }
+        else
+        {
+          $ce->{new} = "1";
+        }
+
       	progress( "France24: ".$dt->hms(":")." - $title" );
         $ds->AddProgramme( $ce );
-      
+
     }
 
   } # next row
@@ -177,16 +198,16 @@ sub ParseDate {
   # format '2011/05/16'
   } elsif( $text =~ /^\d{4}\/\d{2}\/\d{2}$/i ){
     ( $year, $month, $day ) = ( $text =~ /^(\d{4})\/(\d{2})\/(\d{2})$/i );
-   
+
   # format '1/14/2012'
   } elsif( $text =~ /^\d+\/\d+\/\d{4}$/i ){
     ( $month, $day, $year ) = ( $text =~ /^(\d+)\/(\d+)\/(\d+)$/i );
-    
+
   # format '02/14/12'
   } elsif( $text =~ /^\d+\/\d+\/\d{2}$/i ){
     ( $month, $day, $year ) = ( $text =~ /^(\d+)\/(\d+)\/(\d+)$/i );
   }
-  
+
 
   $year += 2000 if $year < 100;
 
@@ -198,7 +219,7 @@ sub create_dt
 {
   my $self = shift;
   my( $str ) = @_;
-  
+
   my( $date, $time ) = split( 'T', $str );
 
   if( not defined $time )
@@ -206,12 +227,12 @@ sub create_dt
     return undef;
   }
   my( $year, $month, $day ) = split( '-', $date );
-  
+
   # Remove the dot and everything after it.
   $time =~ s/\..*$//;
-  
+
   my( $hour, $minute, $second ) = split( ":", $time );
-  
+
   if( $second > 59 ) {
     return undef;
   }
@@ -224,12 +245,12 @@ sub create_dt
                           second => $second,
                           time_zone => "Europe/Stockholm",
                           );
-  
+
   $dt->set_time_zone( "UTC" );
-  
+
   return $dt;
 }
-  
+
 1;
 
 ### Setup coding system

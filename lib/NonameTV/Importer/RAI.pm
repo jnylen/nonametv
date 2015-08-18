@@ -15,8 +15,9 @@ Import data for RAI in xml-format.
 use DateTime;
 use XML::LibXML;
 use Roman;
+use Data::Dumper;
 
-use NonameTV qw/ParseXml AddCategory AddCountry norm/;
+use NonameTV qw/Html2Xml ParseXml AddCategory AddCountry norm normUtf8/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/w f p/;
 
@@ -29,12 +30,6 @@ sub new {
   my $class = ref($proto) || $proto;
   my $self  = $class->SUPER::new( @_ );
   bless ($self, $class);
-
-  if( defined( $self->{UrlRoot} ) ){
-    w( 'UrlRoot is deprecated' );
-  } else {
-    $self->{UrlRoot} = 'http://www.ufficiostampa.rai.it/work/rss/';
-  }
 
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Rome" );
   $self->{datastorehelper} = $dsh;
@@ -57,13 +52,22 @@ sub ApproveContent {
 }
 
 sub FilterContent {
-  my( $self, $cref, $chd ) = @_;
+  my $self = shift;
+  my( $cref, $chd ) = @_;
 
-  return( $cref, undef );
+  my $doc = Html2Xml( $$cref );
+
+  if( not defined $doc ) {
+    return (undef, "Html2Xml failed" );
+  }
+
+  my $str = $doc->toString(1);
+
+  return( \$str, undef );
 }
 
 sub ContentExtension {
-  return 'xml';
+  return 'html';
 }
 
 sub FilteredExtension {
@@ -73,8 +77,6 @@ sub FilteredExtension {
 sub ImportContent {
   my $self = shift;
   my( $batch_id, $cref, $chd ) = @_;
-
-  #$$cref = Unicode::String::latin1 ($$cref)->utf8 ();
 
   $self->{batch_id} = $batch_id;
 
@@ -92,86 +94,101 @@ sub ImportContent {
     return 0;
   }
 
-  my $ns = $doc->find( "//programma" );
+  my $ns = $doc->find( "//li" );
 
   if( $ns->size() == 0 ) {
     f "No data found";
     return 0;
   }
 
-  foreach my $b ($ns->get_nodelist) {
-  	# Start and so on
-    my $start = ParseDateTime( $b->findvalue( "giorno" ) );
+  # Start date
+  my( $date ) = ( $batch_id =~ /(\d\d\d\d-\d\d-\d\d)$/ );
+  $dsh->StartDate( $date , "06:00" );
 
-    if( $start->ymd("-") ne $currdate ){
-		p("Date is ".$start->ymd("-"));
+  foreach my $pgm ($ns->get_nodelist) {
+    my $time        = norm( $pgm->findvalue( './/span[@class="ora"]//text()' ) );
+    my $title       = norm( $pgm->findvalue( './/span[@class="info"]//text()' ) );
+    my $desc        = $pgm->findvalue( './/div[@class="eventDescription"]//text()' );
+    my $desc_extra  = $pgm->findvalue( './/div[@class="eventDescription"]//span[@class="solotesto"]//text()' );
 
-		$dsh->StartDate( $start->ymd("-") , "00:00" );
-		$currdate = $start->ymd("-");
-	}
+    $desc =~ s/$desc_extra//i;
 
-    my $title = $b->findvalue( "titolo" );
-    my $time = $b->findvalue( "ora" );
-    my $text = $b->findvalue( "trama" );
-
-    # Descr. and genre
-    my $desc = $b->findvalue( "sottotitolo" );
-
-    if($time !~ /:/) {
-        next;
-    }
-
-	# Put everything in a array
     my $ce = {
-      channel_id => $chd->{id},
-      start_time => $time.":00",
-      title => norm($title),
+      channel_id  => $chd->{id},
+      start_time  => $time,
+      title       => norm($title),
       description => norm($desc),
     };
 
     # Title
     if( $title =~ /^FILM/  ) {
-    	$ce->{title} =~ s/FILM//g; # REMOVE ET
+    	$ce->{title} =~ s/^FILM//g; # REMOVE ET
     	$ce->{program_type} = 'movie';
     }elsif( $title =~ /^TELEFILM/  ) {
-        $ce->{title} =~ s/TELEFILM//g; # REMOVE ET
+        $ce->{title} =~ s/^TELEFILM//g; # REMOVE ET
         $ce->{program_type} = 'series';
     }elsif( $title =~ /^TV MOVIE/  ) {
-        $ce->{title} =~ s/TV MOVIE//g; # REMOVE ET
+        $ce->{title} =~ s/^TV MOVIE//g; # REMOVE ET
         $ce->{program_type} = 'series';
     }elsif( $title =~ /^MOVIE/  ) {
-        $ce->{title} =~ s/MOVIE//g; # REMOVE ET
+        $ce->{title} =~ s/^MOVIE//g; # REMOVE ET
     }
 
+    # Clean up
+    $ce->{title} = norm($ce->{title});
+    $ce->{title} =~ s/^- //;
+
+
     # Desc
-    if( $desc =~ /^FILM/  ) {
+    my @desc_extra_sentences = split_text( $desc_extra );
+    if( $desc_extra_sentences[0] =~ /^FILM/  ) {
         $ce->{program_type} = 'movie';
     }
 
-    if( my( $years, $country ) = ($text =~ /(\d\d\d\d)\s+(.*?)$/) )
+    for( my $i=0; $i<scalar(@desc_extra_sentences); $i++ )
     {
-        $ce->{production_date} = $years."-01-01";
+      if($i eq "0" and norm($desc_extra_sentences[$i]) =~ /^(.*?)\s+-/) {
+        my ($genre) = ($desc_extra_sentences[$i] =~ /^(.*?)\s+-/ );
+        if(defined($genre)) {
+          $genre = lc($genre);
+          my ( $program_type, $category ) = $self->{datastore}->LookupCat( "RAI", $genre );
+          AddCategory( $ce, $program_type, $category );
+        }
 
-        my($country2 ) = $ds->LookupCountry( "RAI", $country );
-        AddCountry( $ce, $country2 );
+        $desc_extra_sentences[$i] =~ s/^(.*?) -//i;
+        $desc_extra_sentences[$i] = norm($desc_extra_sentences[$i]);
+      }
 
-    	$text =~ s/$years//g; # REMOVE ET
-    	$text =~ s/$country//g; # REMOVE ET
-    	$text = norm($text);
+      if( my( $directors, $actors, $prodyear2, $country2 ) = (normUtf8($desc_extra_sentences[$i]) =~ /^di\s+(.*)\s+con\s+(.*)\s+(\d\d\d\d)\s+(.*?)/) )
+      {
+        $ce->{directors} = normUtf8(parse_person_list( $directors )) if normUtf8($directors) ne "AA VV"; # What is AA VV?
+        $ce->{actors} = normUtf8(parse_person_list( $actors ));
+        $ce->{production_date} = $prodyear2."-01-01";
+
+        $desc_extra_sentences[$i] = "";
+      }
+      elsif( my( $directors2, $actors2 ) = (normUtf8($desc_extra_sentences[$i]) =~ /^di\s+(.*)\s+con\s+(.*)/) )
+      {
+        $ce->{directors} = normUtf8(parse_person_list( $directors2 )) if normUtf8($directors2) ne "AA VV"; # What is AA VV?
+        $ce->{actors} = normUtf8(parse_person_list( $actors2 ));
+
+        $desc_extra_sentences[$i] = "";
+      }
+
+      if( my( $actors2 ) = (normUtf8($desc_extra_sentences[$i]) =~ /^con\s*(.*)/) )
+      {
+        $ce->{actors} = normUtf8(parse_person_list( $actors2 ));
+        $desc_extra_sentences[$i] = "";
+      }
+
+      if( my( $prodyear, $prodcountry ) = (norm($desc_extra_sentences[$i]) =~ /^(\d\d\d\d)\s+(.*?)$/) )
+      {
+        $ce->{production_date} = $prodyear."-01-01";
+        $desc_extra_sentences[$i] = "";
+      }
     }
 
-    if( my( $directors ) = ($text =~ /^di\s*(.*)\s*con/) )
-    {
-    	$ce->{directors} = norm(parse_person_list( $directors )) if norm($directors) ne "AA VV"; # What is AA VV?
-    }
-
-    if( my( $actors ) = ($text =~ /con\s*(.*)/) )
-    {
-    	$ce->{actors} = norm(parse_person_list( $actors ));
-
-    	#print("$ce->{actors}\n");
-    }
-
+    # Title stuff
     $ce->{title} =~ s/\^ Visione RAI//g;
     $ce->{title} = norm($ce->{title});
 
@@ -181,58 +198,47 @@ sub ImportContent {
     # Episode and season (roman)
     ( $dummy, $ep ) = ($ce->{title} =~ /Ep(\.|)\s*(\d+)$/i );
     if(defined($ep) && !defined($ce->{episode})) {
-        $ce->{episode} = sprintf( " . %d .", $ep-1 );
-        $ce->{title} =~ s/- Ep(.*)$//gi;
-      	$ce->{title} =~ s/Ep(.*)$//gi;
-      	$ce->{title} = norm($ce->{title});
-      	$ce->{title} =~ s/ serie$//gi;
-      	$ce->{title} = norm($ce->{title});
+      $ce->{episode} = sprintf( " . %d .", $ep-1 );
+      $ce->{title} =~ s/- Ep(.*)$//gi;
+    	$ce->{title} =~ s/Ep(.*)$//gi;
+    	$ce->{title} = norm($ce->{title});
+    	$ce->{title} =~ s/ serie$//gi;
+    	$ce->{title} = norm($ce->{title});
 
-      	# Season
-      	my ( $original_title, $romanseason ) = ( $ce->{title} =~ /^(.*)\s+(.*)$/ );
+    	# Season
+    	my ( $original_title, $romanseason ) = ( $ce->{title} =~ /^(.*)\s+(.*)$/ );
 
-        # Roman season found
-        if(defined($romanseason) and isroman($romanseason)) {
-            my $romanseason_arabic = arabic($romanseason);
+      # Roman season found
+      if(defined($romanseason) and isroman($romanseason)) {
+        my $romanseason_arabic = arabic($romanseason);
 
-            # Episode
-          	my( $romanepisode ) = ($ce->{episode} =~ /.\s+(\d*)\s+./ );
+        # Episode
+      	my( $romanepisode ) = ($ce->{episode} =~ /.\s+(\d*)\s+./ );
 
-          	# Put it into episode field
-          	if(defined($romanseason_arabic) and defined($romanepisode)) {
-          			$ce->{episode} = sprintf( "%d . %d .", $romanseason_arabic-1, $romanepisode );
+        # Put it into episode field
+        if(defined($romanseason_arabic) and defined($romanepisode)) {
+          $ce->{episode} = sprintf( "%d . %d .", $romanseason_arabic-1, $romanepisode );
 
-          			# Set original title
-          			$ce->{title} = norm($original_title);
-          	}
+        	# Set original title
+          $ce->{title} = norm($original_title);
         }
+      }
     }
 
     # pt. ep
     ( $ep ) = ($title =~ /pt\.\s*(\d+)/ );
     if(defined($ep) && !defined($ce->{episode})) {
-        $ce->{episode} = sprintf( " . %d .", $ep-1 );
-        $ce->{title} =~ s/pt. (.*)$//g;
-        $ce->{title} =~ s/pt.(.*)$//g;
+      $ce->{episode} = sprintf( " . %d .", $ep-1 );
+      $ce->{title} =~ s/pt. (.*)$//g;
+      $ce->{title} =~ s/pt.(.*)$//g;
     }
 
     # pt. ep
     ( $ep ) = ($title =~ /pt\s*(\d+)/ );
     if(defined($ep) && !defined($ce->{episode})) {
-        $ce->{episode} = sprintf( " . %d .", $ep-1 );
-        $ce->{title} =~ s/pt (.*)$//g;
-        $ce->{title} =~ s/pt(.*)$//g;
-    }
-
-    # Genre, in a way
-    my ($genre) = ($ce->{description} =~ /^(.*?)\s+-/ );
-    if(defined($genre)) {
-        $genre = lc($genre);
-        my ( $program_type, $category ) = $self->{datastore}->LookupCat( "RAI", $genre );
-        AddCategory( $ce, $program_type, $category );
-
-        # Remove it
-        $ce->{description} =~ s/^(.*?) -//gi;
+      $ce->{episode} = sprintf( " . %d .", $ep-1 );
+      $ce->{title} =~ s/pt (.*)$//g;
+      $ce->{title} =~ s/pt(.*)$//g;
     }
 
     # Seems buggy sometimes
@@ -241,8 +247,10 @@ sub ImportContent {
     }
 
     $ce->{title} = norm($ce->{title});
+    $ce->{description} = join_text( @desc_extra_sentences ) if !defined($ce->{description}) or norm($ce->{description}) eq "";
 
-	p($time." $ce->{title}");
+
+	  p($time." $ce->{title}");
 
     $dsh->AddProgramme( $ce );
   }
@@ -303,15 +311,12 @@ sub Object2Url {
 
 
   my( $date ) = ( $objectname =~ /(\d+-\d+-\d+)$/ );
-  my( $year, $month, $day ) =
-        ($date =~ /^(\d+)-(\d+)-(\d+)$/ );
-
-  $month =~ s/^0*//;
+  my( $year, $month, $day ) = ($date =~ /^(\d+)-(\d+)-(\d+)$/ );
 
 
-  my $url = sprintf( "%s%s%s%s%spal.xml",
-                     $self->{UrlRoot}, $chd->{grabber_info},
-                     $day, $month, $year);
+  my $url = sprintf( "http://www.rai.it/dl/portale/html/palinsesti/guidatv/static/%s_%s_%s_%s.html",
+                     $chd->{grabber_info},
+                     $year, $month, $day);
 
 
   return( $url, undef );
@@ -342,7 +347,7 @@ sub split_text
 
   # Mark sentences ending with '.', '!', or '?' for split, but preserve the
   # ".!?".
-  $t =~ s/([\.\!\?])\s+([A-Z���])/$1;;$2/g;
+  $t =~ s/([\.\!\?])\s+([A-ZÅÄÖa-zåäö0-9])/$1;;$2/g;
 
   my @sent = grep( /\S\S/, split( ";;", $t ) );
 

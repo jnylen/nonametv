@@ -37,7 +37,7 @@ sub new {
 
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
   $self->{datastorehelper} = $dsh;
-  
+
   # use augment
   $self->{datastore}->{augment} = 1;
 
@@ -102,9 +102,9 @@ sub ImportXML
       my $title_org = $row->findvalue( './/PROGRAMME//PROGRAMME_TITLE_ORIGINAL' );
       my $start = $self->create_dt( $row->findvalue( './/BROADCAST_START_DATETIME' ) );
       my $end = $self->create_dt( $row->findvalue( './/BROADCAST_END_TIME' ) );
-      
+
       my $date = $start->ymd("-");
-      
+
 	  if($date ne $currdate ) {
         if( $currdate ne "x" ) {
 			$dsh->EndBatch( 1 );
@@ -119,14 +119,14 @@ sub ImportXML
       }
 
 	  # extra info
-	  my $subtitle = $row->findvalue( './/PROGRAMME//PROGRAMME_SUBTITLE_ORIGINAL' );
+	  my $subtitle     = $row->findvalue( './/PROGRAMME//PROGRAMME_SUBTITLE_ORIGINAL' );
 	  my $subtitle_org = $row->findvalue( './/BROADCAST_SUBTITLE' );
-	  my $season = $row->findvalue( './/PROGRAMME//SERIES_NUMBER' );
-	  my $episode = $row->findvalue( './/PROGRAMME//EPISODE_NUMBER' );
-	  my $of_episode = $row->findvalue( './/PROGRAMME//NUMBER_OF_EPISODES' );
-	  my $desc = $row->findvalue( './/PROGRAMME//TEXT//TEXT_TEXT' );
-	  my $year = $row->findvalue( './/PROGRAMME//PROGRAMME_YEAR' );
-	  
+	  my $season       = $row->findvalue( './/PROGRAMME//SERIES_NUMBER' );
+	  my $episode      = $row->findvalue( './/PROGRAMME//EPISODE_NUMBER' );
+	  my $of_episode   = $row->findvalue( './/PROGRAMME//NUMBER_OF_EPISODES' );
+	  my $desc         = $row->findvalue( './/PROGRAMME//TEXT//TEXT_TEXT' );
+	  my $year         = $row->findvalue( './/PROGRAMME//PROGRAMME_YEAR' );
+	  my $premiere     = $row->findvalue( './/BROADCAST_INFO/@PREMIERE' );
 
 
       my $ce = {
@@ -136,14 +136,14 @@ sub ImportXML
         end_time => $end->ymd("-") . " " . $end->hms(":"),
         description => norm($desc),
       };
-      
+
       $ce->{subtitle} = norm($subtitle) if $subtitle;
-      
+
       if( defined( $year ) and ($year =~ /(\d\d\d\d)/) )
     	{
       		$ce->{production_date} = "$1-01-01";
     	}
-      
+
       # Episode info in xmltv-format
       if( ($episode ne "") and ( $of_episode ne "") and ( $season ne "") and ($season > 0) )
       {
@@ -164,7 +164,17 @@ sub ImportXML
 
       $ce->{original_title}    = norm($title_org) if defined $title_org and norm($title_org) ne $ce->{title} and $title_org ne "";
       $ce->{original_subtitle} = norm($subtitle_org) if defined $subtitle_org and norm($subtitle_org) ne $ce->{title} and norm($subtitle_org) ne norm($subtitle) and $subtitle_org ne "";
-      
+
+      # Find rerun-info
+      if( $premiere eq "Yes" )
+      {
+        $ce->{new} = "1";
+      }
+      else
+      {
+        $ce->{new} = "0";
+      }
+
       progress( "HistoryXML: $chd->{xmltvid}: $start - $title" );
       $ds->AddProgramme( $ce );
 
@@ -181,7 +191,7 @@ sub create_dt
 {
   my $self = shift;
   my( $str ) = @_;
-  
+
   my( $date, $time ) = split( 'T', $str );
 
   if( not defined $time )
@@ -189,12 +199,12 @@ sub create_dt
     return undef;
   }
   my( $year, $month, $day ) = split( '-', $date );
-  
+
   # Remove the dot and everything after it.
   $time =~ s/\..*$//;
-  
+
   my( $hour, $minute ) = split( ":", $time );
-  
+
 
   my $dt = DateTime->new( year   => $year,
                           month  => $month,
@@ -203,9 +213,9 @@ sub create_dt
                           minute => $minute,
                           time_zone => 'Europe/Stockholm',
                           );
-  
+
   $dt->set_time_zone( "UTC" );
-  
+
   return $dt;
 }
 

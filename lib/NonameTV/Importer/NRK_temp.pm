@@ -119,6 +119,7 @@ sub ImportContent {
         my $title  = $p->{"title"};
         my $desc   = $p->{"description"};
         my $start  = $p->{"start"};
+        my $rerun  = $p->{"reRun"};
         $start =~ s/\./:/g;
 
         # Defined?
@@ -235,6 +236,13 @@ sub ImportContent {
                 }
 
             }
+        }
+
+        # Rerun?
+        if(defined($rerun) and norm($rerun) eq "(R)") {
+          $ce->{new} = "0";
+        } else {
+          $ce->{new} = "1";
         }
 
 

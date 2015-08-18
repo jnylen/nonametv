@@ -284,6 +284,14 @@ sub ImportContent
         }
     }
 
+    ## New?
+    my $new = $pgm->findvalue( 'new' );
+    if($new eq "1") {
+      $ce->{new} = 1;
+    } else {
+      $ce->{new} = 0;
+    }
+
     delete $ce->{directors} if defined $ce->{directors} and $ce->{directors} =~ /^\(/; # Failure to parse
     $dsh->AddProgramme( $ce );
   }

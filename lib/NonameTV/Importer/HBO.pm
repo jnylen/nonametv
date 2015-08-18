@@ -213,6 +213,17 @@ sub ImportContent {
         $ce->{fanart} = $prg->findvalue( 'thnImage' );
       }
 
+      # New?
+      my $premier = $prg->findvalue( 'premier' );
+      if( $premier eq "1" )
+      {
+        $ce->{new} = "0";
+      }
+      else
+      {
+        $ce->{new} = "1";
+      }
+
       $dsh->AddProgramme( $ce );
 
       progress( "HBO: $channel_xmltvid: $starttime - $ce->{title}" );

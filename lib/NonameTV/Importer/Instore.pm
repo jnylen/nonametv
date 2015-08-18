@@ -170,10 +170,11 @@ sub ImportContent
     my $genre    = norm($sc->findvalue( './genre'   ));
     my $season   = norm($sc->findvalue( './season'  ));
     my $episode  = norm($sc->findvalue( './episode' ));
-    my $year	 = norm($sc->findvalue( './jaarvanuitgave'    ));
-    my $dir		 = norm($sc->findvalue( './producer'));
+    my $year	   = norm($sc->findvalue( './jaarvanuitgave'    ));
+    my $dir		   = norm($sc->findvalue( './producer'));
     my $subtitle = norm($sc->findvalue( './episodetitle'));
-    my $image = norm($sc->findvalue( './image'));
+    my $image    = norm($sc->findvalue( './image'));
+    my $rerun    = norm($sc->findvalue( './originalairdatesweden'));
 
 
 	my $ce = {
@@ -227,8 +228,18 @@ sub ImportContent
         $ce->{fanart} = $image;
     }
 
-	# Add Programme
-	$dsh->AddCE( $ce );
+    # Find rerun-info
+	  if( !defined($rerun) or $rerun eq "" )
+	  {
+	    $ce->{new} = "1";
+	  }
+	  else
+	  {
+	    $ce->{new} = "0";
+	  }
+
+	  # Add Programme
+	  $dsh->AddCE( $ce );
   }
 
   #$dsh->EndBatch( 1 );

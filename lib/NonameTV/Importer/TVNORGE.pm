@@ -32,7 +32,7 @@ sub new {
     defined( $self->{UrlRoot} ) or die "You must specify UrlRoot";
     my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Vienna" );
   	$self->{datastorehelper} = $dsh;
-  	
+
   	$self->{datastore}->{augment} = 1;
 
     return $self;
@@ -61,7 +61,7 @@ sub FilterContent {
 
   if( not defined $doc ) {
     return (undef, "ParseXml failed" );
-  } 
+  }
 
   # Find all "Schedule"-entries.
   my $ns = $doc->find( "//program" );
@@ -88,17 +88,17 @@ sub ImportContent
   my $self = shift;
 
   my( $batch_id, $cref, $chd ) = @_;
-  
+
   my( $date ) = ($batch_id =~ /_(.*)$/);
-  
+
 
   my $ds = $self->{datastore};
   my $dsh = $self->{datastorehelper};
   $ds->{SILENCE_END_START_OVERLAP}=1;
   $ds->{SILENCE_DUPLICATE_SKIP}=1;
- 
- 	$dsh->StartDate( $date , "00:00" ); 
- 
+
+ 	$dsh->StartDate( $date , "00:00" );
+
   my $xml = XML::LibXML->new;
   my $doc;
   eval { $doc = $xml->parse_string($$cref); };
@@ -107,7 +107,7 @@ sub ImportContent
     f "Failed to parse $@";
     return 0;
   }
-  
+
   # Find all "Schedule"-entries.
   my $ns = $doc->find( "//program" );
 
@@ -116,20 +116,20 @@ sub ImportContent
     f "No data found 2";
     return 0;
   }
-  
-  
-  
+
+
+
   foreach my $sc ($ns->get_nodelist)
   {
-  	
-  	
-  	
-    my $title_original = $sc->findvalue( './originaltitle' );
-	my $title_programme = $sc->findvalue( './title' );
-	my $title = norm($title_programme) || norm($title_original);
 
-	$title =~ s/^Premiere: //g;
-	$title =~ s/^Sesongpremiere: //g;
+
+
+    my $title_original = $sc->findvalue( './originaltitle' );
+	  my $title_programme = $sc->findvalue( './title' );
+	  my $title = norm($title_programme) || norm($title_original);
+
+	  $title =~ s/^Premiere: //g;
+	  $title =~ s/^Sesongpremiere: //g;
 
     my $start = $sc->findvalue( './starttime' );
     my $end   = $sc->findvalue( './endtime' );
@@ -145,16 +145,17 @@ sub ImportContent
     ## END
 
     my $hd = $sc->findvalue( './hd' );
-    
+
     my $desc = undef;
     my $desc_episode = $sc->findvalue( './shortdescription' );
 	$desc = norm($desc_episode);
-	
-	my $genre = $sc->findvalue( './category' );
+
+	my $genre           = $sc->findvalue( './category' );
 	my $production_year = $sc->findvalue( './productionyear' );
-	my $episode =  $sc->findvalue( './episode' );
-	my $numepisodes =  $sc->findvalue( './numepisodes' );
-	my $subtitle = $sc->findvalue( './episodetitle' );
+	my $episode         =  $sc->findvalue( './episode' );
+	my $numepisodes     =  $sc->findvalue( './numepisodes' );
+	my $subtitle        = $sc->findvalue( './episodetitle' );
+  my $rerun           = $sc->findvalue( './rerun' );
 
 
 	# TVNorge seems to have the season in the originaltitle, weird.
@@ -171,8 +172,8 @@ sub ImportContent
       start_time  => $self->create_dt( $start ),
       end_time    => $self->create_dt( $end ),
     };
-    
-    
+
+
     if( defined( $production_year ) and ($production_year =~ /(\d\d\d\d)/) )
     {
       $ce->{production_date} = "$1-01-01";
@@ -264,10 +265,17 @@ sub ImportContent
         $ce->{program_type} = 'movie';
     }
 
+    # replay
+    if(defined($rerun) and norm($rerun) eq "true") {
+      $ce->{new} = "0";
+    } else {
+      $ce->{new} = "1";
+    }
+
 
     $dsh->AddProgramme( $ce );
   }
-  
+
   # Success
   return 1;
 }
@@ -290,13 +298,13 @@ sub create_dt
 {
   my $self = shift;
   my( $str ) = @_;
-  
-  my( $year, $month, $day, $hour, $minute ) = 
+
+  my( $year, $month, $day, $hour, $minute ) =
       ($str =~ /^(\d+)-(\d+)-(\d+) (\d+):(\d+)$/ );
 
 
-  
+
   return sprintf( "%02d:%02d", $hour, $minute );
 }
-    
+
 1;

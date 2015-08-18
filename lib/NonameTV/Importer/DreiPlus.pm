@@ -147,6 +147,7 @@ sub ImportXML
   foreach my $row ($rows->get_nodelist) {
     my $date = $row->findvalue( './/header/kdatum' );
     my $starttime = $row->findvalue( './/header/szeit' );
+    my $rerun = $row->findvalue( './@rerun' );
 
     # Date
     if($date ne $currdate ) {
@@ -260,6 +261,16 @@ sub ImportXML
     {
         $ce->{production_date} = "$1-01-01";
     }
+
+    # Find rerun-info
+	  if( $rerun eq "ja" )
+	  {
+	    $ce->{new} = "0";
+	  }
+	  else
+	  {
+	    $ce->{new} = "1";
+	  }
 
     # Add programme
     $ds->AddProgrammeRaw( $ce );

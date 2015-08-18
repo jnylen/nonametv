@@ -135,6 +135,7 @@ sub ImportXML
       my $desc     = $program->findvalue( './/SYNOPSIS' );
       my $director = $program->findvalue( './/DIRECTOR' );
       my $actors   = $program->findvalue( './/CAST' );
+      my $rerun    = $program->findvalue( './/ISREPLAY' );
 
       next if $title eq "";
 
@@ -201,6 +202,16 @@ sub ImportXML
       }
 
       $ce->{stereo} = lc($audio);
+
+      # Find rerun-info
+      if( $rerun eq "Y" )
+      {
+        $ce->{new} = "0";
+      }
+      else
+      {
+        $ce->{new} = "1";
+      }
 
       progress( "ATV: $chd->{xmltvid}: $time - $title" );
       $dsh->AddProgramme( $ce );

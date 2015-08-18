@@ -120,7 +120,7 @@ sub ImportContent( $$$ ) {
   my ($batch_id, $cref, $chd) = @_;
 
   my $doc = ParseXml ($cref);
-  
+
   if (not defined ($doc)) {
     f ("$batch_id: Failed to parse.");
     return 0;
@@ -191,7 +191,7 @@ sub ImportContent( $$$ ) {
 
         # unify style of two or more episodes in one programme
         $subtitle =~ s|\s*/\s*| / |g;
-        # unify style of story arc 
+        # unify style of story arc
         $subtitle =~ s|[ ,-]+Teil (\d)+$| \($1\)|;
         $subtitle =~ s|[ ,-]+Part (\d)+$| \($1\)|;
         $ce->{subtitle} = norm( $subtitle );
@@ -213,10 +213,10 @@ sub ImportContent( $$$ ) {
     my @countries;
     my $ns4 = $xpc->find( 's:infos/s:produktion/s:produktionsland/@laendername' );
     foreach my $con ($ns4->get_nodelist)
-	{
-	    my ( $c ) = $self->{datastore}->LookupCountry( "Arte", $con->to_literal );
-	  	push @countries, $c if defined $c;
-	}
+  	{
+  	    my ( $c ) = $self->{datastore}->LookupCountry( "Arte", $con->to_literal );
+  	  	push @countries, $c if defined $c;
+  	}
 
     if( scalar( @countries ) > 0 )
     {
@@ -309,6 +309,14 @@ sub ImportContent( $$$ ) {
       }
     }
 
+    # New?
+    my $new = $xpc->findvalue( 's:termin/s:wiederholung/erstausstrahlung' );
+    if( $new eq "true" ) {
+      $ce->{new} = 1;
+    } else {
+      $ce->{new} = 0;
+    }
+
     ParseCredits( $ce, 'actors',     $xpc, 's:mitwirkende/s:mitwirkender[@funktion="Darsteller"]/s:mitwirkendentyp/s:person/s:name/@name' );
     ParseCredits( $ce, 'directors',  $xpc, 's:mitwirkende/s:mitwirkender[@funktion="Regie"]/s:mitwirkendentyp/s:person/s:name/@name' );
     ParseCredits( $ce, 'producers',  $xpc, 's:mitwirkende/s:mitwirkender[@funktion="Produzent"]/s:mitwirkendentyp/s:person/s:name/@name' );
@@ -343,12 +351,12 @@ sub parseTimestamp( $ ){
     }
     my $dt;
     eval {
-      $dt = DateTime->new ( 
+      $dt = DateTime->new (
         year      => $year,
         month     => $month,
         day       => $day,
         hour      => $hour,
-        minute    => $minute, 
+        minute    => $minute,
         second    => $second,
         time_zone => $offset
       );
