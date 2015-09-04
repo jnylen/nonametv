@@ -170,7 +170,7 @@ sub ImportContent
     my $eps         = $pgm->findvalue( 'number_of_episodes' );
     my $prodyear    = $pgm->findvalue( 'production_year' );
     my $genre       = $pgm->findvalue( 'category' );
-    my $rerun       = $pgm->findvalue( 'rerun' );
+    my $rerun       = $pgm->findvalue( 'premier' );
 
     my $prev_shown_date = $pgm->findvalue( 'previous_transmissiondate' );
 
@@ -330,9 +330,9 @@ sub ImportContent
 
     # replay
     if(defined($rerun) and norm($rerun) eq "true") {
-      $ce->{new} = "0";
-    } else {
       $ce->{new} = "1";
+    } else {
+      $ce->{new} = "0";
     }
 
     progress($date." ".$starttime." - ".$ce->{title});
