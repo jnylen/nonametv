@@ -694,6 +694,8 @@ sub WriteEntry
 
   }
 
+  $d->{new} = $entry->{new};
+
   if( $entry->{country} and $entry->{country} =~ /\S/ )
   {
     #$d->{country} = $entry->{country};
