@@ -38,7 +38,7 @@ sub ParseData
 
   $ds->{SILENCE_END_START_OVERLAP}=1;
 #  $ds->{SILENCE_DUPLICATE_SKIP}=1;
- 
+
   my $doc;
   eval { $doc = ParseXml ($cref); };
   if( $@ ne "" )
@@ -46,7 +46,7 @@ sub ParseData
     error( "$batch_id: Failed to parse $@" );
     return 0;
   }
-  
+
   # Find all "sendung"-entries.
   my $ns = $doc->find( '//sendung' );
   if( $ns->size() == 0 ){
@@ -61,7 +61,7 @@ sub ParseData
   }
   # keep last endtime as a hint for DST switch issues
   my $lastendtime;
-  
+
   foreach my $sc ($ns->get_nodelist)
   {
     my %sce = (
@@ -190,7 +190,6 @@ sub ParseData
     ( $program_type, $categ ) = $ds->LookupCat( "DreiSat_thember", $thember );
     AddCategory( \%sce, $program_type, $categ );
 
-
     # there can be more than one broadcast times
     # so we have to find each 'ausstrahlung'
     # and insert the program for each of them
@@ -288,7 +287,7 @@ sub ParseData
           case /&st;/   {$ce{stereo} = "stereo"}
           case /&vo;/   {} # video text
           # ZDFneo
-          case /&zw;/   {$ce{stereo} = "bilingual"} 
+          case /&zw;/   {$ce{stereo} = "bilingual"}
           # ZDFinfo
           case /&mhp;/  {} # DVB-MHP
           # ZDF new press site after fixups
@@ -296,7 +295,7 @@ sub ParseData
           case /audiodeskription/ {} # audio description
           case /highdefinition/   {$ce{quality} = "HDTV"}
           case /zweikanalton/     {$ce{stereo} = "bilingual"}
-          case /&zk;/             {$ce{stereo} = "bilingual"} 
+          case /&zk;/             {$ce{stereo} = "bilingual"}
           # new attributes 2012-10
           case /&mo;/   {$ce{stereo} = "mono"}
           case /&f43;/  {$ce{aspect} = "4:3"}
@@ -306,7 +305,17 @@ sub ParseData
           case /4zu3/             {$ce{aspect} = "4:3"}
           case /mono/             {$ce{stereo} = "mono"}
           case /schwarzweiß/ {} # colour=no
-          else                    { w ("unhandled attribute: $attribut") } 
+          else                    { w ("unhandled attribute: $attribut") }
+        }
+      }
+
+
+      # presse images, use the largest One
+      my $images = $sc->findnodes( './programm//pressebilder//pressebild' );
+      foreach my $image ($images->get_nodelist)
+      {
+        if($image->string_value() =~ /672x378/i) {
+          $sce{fanart} = $image->string_value();
         }
       }
 
@@ -317,7 +326,7 @@ sub ParseData
     }
 
   }
-  
+
   # Success
   return 1;
 }
@@ -341,7 +350,7 @@ sub create_dt
   }
 
   my( $hour, $minute, $second ) = ( $time =~ /(\d{2}):(\d{2}):(\d{2})/ );
-  
+
   if( $second > 59 ) {
     return undef;
   }
@@ -361,9 +370,9 @@ sub create_dt
     error ("Could not convert time! Check for daylight saving time border. " . $year . "-" . $month . "-" . $day . " " . $hour . ":" . $minute);
     return undef;
   };
-  
+
   $dt->set_time_zone( "UTC" );
-  
+
   return $dt;
 }
 
@@ -471,7 +480,7 @@ sub clean_untertitel
       $sce->{subtitle} = $sce->{title};
     }
     $sce->{title} = $seriesname;
-    
+
     return undef;
   }
 
@@ -488,7 +497,7 @@ sub clean_untertitel
   # Spielfilm, Argentinien 2006
   # Stummfilm, Sowjetunion 1924
   # Zeichentrickfilm, USA/Australien 1997
-  # 
+  #
   if ($subtitle =~ m|^[^ ,]+, [^ ]+ [0-9][0-9][0-9][0-9]$|) {
     my ($format, $pcountries, $pyear) = ($subtitle =~ m|^([^ ,]+), ([^ ]+) ([0-9]+)$|);
 
@@ -744,7 +753,7 @@ sub clean_untertitel
   # Hongkong-Spielfilm von 2003
   # Nach Motiven der Romane von Maj Sjöwall und Per Wahlöö
   # Film von Claus U. Eckert und Petra Thurn
-  # 
+  #
 
   if( $subtitle ){
     d( 'no match (or fall-through) for subtitle: ' . $subtitle );
@@ -810,7 +819,7 @@ sub ParseWeek
     error( "Failed to parse $@" );
     return undef;
   }
-  
+
   # Find all "sendung"-entries.
   my $ns = $doc->find( '/programmdaten/@woche' );
   if( $ns->size() != 1 ){
