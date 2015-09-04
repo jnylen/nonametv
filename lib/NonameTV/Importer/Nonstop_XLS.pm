@@ -108,7 +108,7 @@ sub ImportXLS
 
     # browse through rows
     my $i = 0;
-    for(my $iR = 1 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+    for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
       $i++;
 
       # date - column 0 ('Date')
@@ -121,9 +121,9 @@ sub ImportXLS
 	  # Startdate
       if( $date ne $currdate ) {
       	if( $currdate ne "x" ) {
-			# save last day if we have it in memory
-		#	FlushDayData( $channel_xmltvid, $dsh , @ces );
-			$dsh->EndBatch( 1 );
+			     # save last day if we have it in memory
+		       #	FlushDayData( $channel_xmltvid, $dsh , @ces );
+			     $dsh->EndBatch( 1 );
         }
 
       	my $batchid = $chd->{xmltvid} . "_" . $date;
@@ -162,7 +162,9 @@ sub ImportXLS
       };
 
 	  # Extra
+    $ce->{title}           =~ s/&amp;/&/g;
 	  $ce->{subtitle}        = norm($oWkS->{Cells}[$iR][$num_subtitle]->Value) if $oWkS->{Cells}[$iR][$num_subtitle];
+    $ce->{subtitle}        =~ s/&amp;/&/g if defined($ce->{subtitle});
 	  $ce->{actors}          = parse_person_list(norm($oWkS->{Cells}[$iR][$num_actors]->Value))          if defined($num_actors) and $oWkS->{Cells}[$iR][$num_actors];
 	  $ce->{directors}       = parse_person_list(norm($oWkS->{Cells}[$iR][$num_directors]->Value))       if defined($num_directors) and $oWkS->{Cells}[$iR][$num_directors];
       $ce->{production_date} = $year."-01-01" if defined($year) and $year ne "" and $year ne "0000";
@@ -239,8 +241,11 @@ sub ParseDate {
     ( $day, $month, $year ) = ( $text =~ /^(\d+)\/(\d+)\/(\d+)$/ );
   } elsif( $text =~ /^\d+-\d+-(\d\d\d\d)$/ ) { # format '2011-07-01'
     ( $day, $month, $year ) = ( $text =~ /^(\d+)-(\d+)-(\d+)$/ );
+  }elsif( $text =~ /^(\d|\d\d)-\d+-(\d\d)$/ ) { # format '9-2-15'
+    ( $month, $day, $year ) = ( $text =~ /^(\d|\d\d)-(\d+)-(\d\d)$/ );
   }
 
+  return undef if !defined($year);
   $year += 2000 if $year < 100;
 
   return sprintf( '%d-%02d-%02d', $year, $month, $day );

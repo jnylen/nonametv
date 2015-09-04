@@ -263,6 +263,7 @@ sub guess_channel
   # XLS Nordic
   if( $filename =~ /\.(xls|xlsx)$/i ) {
 	  return "tnt-tv.dk" if $filename =~ /^TNT/i and $filename =~ /DAN/i;
+    return "tnt-tv.dk" if $filename =~ /^TNT/i and $filename =~ /DEN/i;
 	  return "tnt-tv.se" if $filename =~ /^TNT/i and $filename =~ /SWE/i;
 	  return "tnt-tv.no" if $filename =~ /^TNT/i and $filename =~ /NOR/i;
   }
@@ -325,11 +326,12 @@ sub guess_channel
 
  if( $dir =~ /EBS/ and $filename =~ /\.xls$/i ) {
     # ENT. (BRIT) NORDIC
-    return "bbcentertainment.com" if $filename =~ /entertainment\s+scandi/i;
     return "bbcentertainment.com" if $filename =~ /brit\s+scandi/i;
 
+    # Norway
+    return "no.bbcentertainment.no" if $filename =~ /brit\s+norway/i;
+
     # ENT. (BRIT) EU
-    return "bbcentertainment.eu" if $filename =~ /entertainment\s+europe/i;
     return "bbcentertainment.eu" if $filename =~ /brit\s+europe/i;
 
     # HD
