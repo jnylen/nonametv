@@ -1,23 +1,25 @@
-package NonameTV::Importer::TVNORGE;
+package NonameTV::Importer::Discovery_Norway;
 
 =pod
 
-This importer works for both TVNorge, MAX and FEM.
+This importer works for both Discovery Networks Norway.
 It downloads per day xml files from respective channel's
 pressweb. The files are in xml-style
 
 =cut
 
 use DateTime;
+use DateTimeX::Easy;
 use XML::LibXML;
 use HTTP::Date;
+use Data::Dumper;
 
 use NonameTV qw/ParseXml norm AddCategory AddCountry/;
 use NonameTV::Log qw/w progress error f/;
 use NonameTV::DataStore::Helper;
-use NonameTV::Importer::BaseDaily;
+use NonameTV::Importer::BaseWeekly;
 
-use base 'NonameTV::Importer::BaseDaily';
+use base 'NonameTV::Importer::BaseWeekly';
 
 sub new {
     my $proto = shift;
@@ -25,11 +27,9 @@ sub new {
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
 
-
     $self->{MinDays} = 0 unless defined $self->{MinDays};
     $self->{MaxDays} = 25 unless defined $self->{MaxDays};
 
-    defined( $self->{UrlRoot} ) or die "You must specify UrlRoot";
     my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Vienna" );
   	$self->{datastorehelper} = $dsh;
 
@@ -38,14 +38,49 @@ sub new {
     return $self;
 }
 
+sub InitiateDownload {
+  my $self = shift;
+
+  my $mech = $self->{cc}->UserAgent();
+
+  $mech->get("http://presse.sbsdiscovery.no/brukere/logginn");
+
+  $mech->submit_form(
+      with_fields => {
+	       'user[email]'    => $self->{Username},
+	       'user[password]' => $self->{Password},
+      },
+      button => 'commit',
+  );
+
+  if( $mech->content =~ /notice-box/ ) {
+    return undef;
+  }
+  else {
+    return "Login failed";
+  }
+}
+
+sub first_day_of_week
+{
+  my ($year, $week) = @_;
+
+  # Week 1 is defined as the one containing January 4:
+  DateTime
+    ->new( year => $year, month => 1, day => 4, hour => 00, minute => 00, time_zone => 'Europe/Oslo' )
+    ->add( weeks => ($week - 1) )
+    ->truncate( to => 'week' );
+} # end first_day_of_week
+
 sub Object2Url {
   my $self = shift;
   my( $objectname, $chd ) = @_;
 
-  my( $year, $month, $day ) = ( $objectname =~ /(\d+)-(\d+)-(\d+)$/ );
+  my( $year, $week ) = ( $objectname =~ /(\d+)-(\d+)$/ );
 
-  my $url = $self->{UrlRoot} .
-    $chd->{grabber_info} . '/' . $day . $month . $year;
+  my $datefirst = first_day_of_week( $year, $week ); # monday
+
+  my $url = "http://presse.sbsdiscovery.no/tablaa.xml?channel=" . $chd->{grabber_info} . "&show_type=all&utf8=%E2%9C%93&week=" . $datefirst->ymd("-");
 
   return( $url, undef );
 }
@@ -97,7 +132,7 @@ sub ImportContent
   $ds->{SILENCE_END_START_OVERLAP}=1;
   $ds->{SILENCE_DUPLICATE_SKIP}=1;
 
- 	$dsh->StartDate( $date , "00:00" );
+ 	#$dsh->StartDate( $date , "00:00" );
 
   my $xml = XML::LibXML->new;
   my $doc;
@@ -117,20 +152,10 @@ sub ImportContent
     return 0;
   }
 
-
+  my $currdate = "x";
 
   foreach my $sc ($ns->get_nodelist)
   {
-
-
-
-    my $title_original = $sc->findvalue( './originaltitle' );
-	  my $title_programme = $sc->findvalue( './title' );
-	  my $title = norm($title_programme) || norm($title_original);
-
-	  $title =~ s/^Premiere: //g;
-	  $title =~ s/^Sesongpremiere: //g;
-
     my $start = $sc->findvalue( './starttime' );
     my $end   = $sc->findvalue( './endtime' );
 
@@ -141,6 +166,23 @@ sub ImportContent
 
     my $start2 = $format->parse_datetime( $start );
     my $stop2  = $format->parse_datetime( $end );
+
+    # Date
+    if( $start2->ymd("-") ne $currdate ){
+        progress("Date is ".$start2->ymd("-"));
+
+        $dsh->StartDate( $start2->ymd("-") , "00:00" );
+        $currdate = $start2->ymd("-");
+    }
+
+
+    my $title_original = $sc->findvalue( './originaltitle' );
+	  my $title_programme = $sc->findvalue( './title' );
+	  my $title = norm($title_programme) || norm($title_original);
+
+	  $title =~ s/^Premiere: //g;
+	  $title =~ s/^Sesongpremiere: //g;
+
     my $durat  = $start2->delta_ms($stop2)->in_units('minutes');
     ## END
 
@@ -148,22 +190,22 @@ sub ImportContent
 
     my $desc = undef;
     my $desc_episode = $sc->findvalue( './shortdescription' );
-	$desc = norm($desc_episode);
+  	$desc = norm($desc_episode);
 
-	my $genre           = $sc->findvalue( './category' );
-	my $production_year = $sc->findvalue( './productionyear' );
-	my $episode         =  $sc->findvalue( './episode' );
-	my $numepisodes     =  $sc->findvalue( './numepisodes' );
-	my $subtitle        = $sc->findvalue( './episodetitle' );
-  my $rerun           = $sc->findvalue( './rerun' );
+  	my $genre           = $sc->findvalue( './category' );
+  	my $production_year = $sc->findvalue( './productionyear' );
+  	my $episode         =  $sc->findvalue( './episode' );
+  	my $numepisodes     =  $sc->findvalue( './numepisodes' );
+  	my $subtitle        = $sc->findvalue( './episodetitle' );
+    my $rerun           = $sc->findvalue( './rerun' );
 
 
-	# TVNorge seems to have the season in the originaltitle, weird.
-	# �r 2
+  	# TVNorge seems to have the season in the originaltitle, weird.
+  	# �r 2
     my ( $dummy, $season ) = ($title_original =~ /(.r|sesong)\s*(\d+)$/ );
 
 
-	progress("TVNorge: $chd->{xmltvid}: $start - $title");
+  	progress("TVNorge: $chd->{xmltvid}: $start - $title");
 
     my $ce = {
       title 	  => norm($title),
@@ -298,10 +340,12 @@ sub create_dt
 {
   my $self = shift;
   my( $str ) = @_;
+  my( $year, $month, $day, $hour, $minute, $seconds );
 
-  my( $year, $month, $day, $hour, $minute ) =
-      ($str =~ /^(\d+)-(\d+)-(\d+) (\d+):(\d+)$/ );
-
+  ( $year, $month, $day, $hour, $minute, $seconds ) = ($str =~ /^(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)$/ );
+  if(!defined $year) {
+    ( $year, $month, $day, $hour, $minute ) = ($str =~ /^(\d+)-(\d+)-(\d+) (\d+):(\d+)$/ );
+  }
 
 
   return sprintf( "%02d:%02d", $hour, $minute );
