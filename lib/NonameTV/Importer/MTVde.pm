@@ -54,7 +54,7 @@ sub Object2Url {
 
   #my $channel = $chd->{grabber_info};
   my( $channel, $country, $country2 ) = split( /:/, $chd->{grabber_info} );
-  
+
   if( $channel =~ m|^\d+$| ){
     # weeks are numbered 1 to 52/53
     my $url = sprintf( "http://api.mtvnn.com/v2/airings.struppi?channel_id=%d&program_week_is=%d&language_code=%s&country_code=%s", $channel, $week, $country, $country2 );
@@ -96,7 +96,7 @@ sub ImportContent( $$$ ) {
   my ($batch_id, $cref, $chd) = @_;
 
   my $doc = ParseXml ($cref);
-  
+
   if (not defined ($doc)) {
     f ("$batch_id: Failed to parse.");
     return 0;
@@ -142,7 +142,7 @@ sub ImportContent( $$$ ) {
       } else {
         # unify style of two or more episodes in one programme
         $subtitle =~ s|\s*/\s*| / |g;
-        # unify style of story arc 
+        # unify style of story arc
         $subtitle =~ s|[ ,-]+Teil (\d)+$| \($1\)|;
         $subtitle =~ s|[ ,-]+Part (\d)+$| \($1\)|;
         $ce->{subtitle} = norm( $subtitle );
@@ -225,12 +225,12 @@ sub parseTimestamp( $ ){
     } else {
       $offset = 'Europe/Berlin';
     }
-    my $dt = DateTime->new ( 
+    my $dt = DateTime->new (
       year      => $year,
       month     => $month,
       day       => $day,
       hour      => $hour,
-      minute    => $minute, 
+      minute    => $minute,
       second    => $second,
       time_zone => $offset
     );

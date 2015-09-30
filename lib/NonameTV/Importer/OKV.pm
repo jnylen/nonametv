@@ -78,7 +78,7 @@ sub FilterContent {
   }
 
   # Find all "Schedule"-entries.
-  my $ns = $doc->find( "//programtable" );
+  my $ns = $doc->find( "//programme" );
 
   if( $ns->size() == 0 ) {
     return (undef, "No data found" );
@@ -103,7 +103,6 @@ sub ImportContent
 
   my( $batch_id, $cref, $chd ) = @_;
 
-
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
   $ds->{SILENCE_END_START_OVERLAP}=1;
@@ -119,7 +118,7 @@ sub ImportContent
   }
 
   # Find all "Schedule"-entries.
-  my $ns = $doc->find( "//program" );
+  my $ns = $doc->find( "//programme" );
 
   if( $ns->size() == 0 )
   {
@@ -127,51 +126,46 @@ sub ImportContent
     return 0;
   }
 
-  my $currdate = "x";
+  my( $date ) = ($batch_id =~ /_(.*)$/);
+  $dsh->StartDate( $date, "00:00" );
 
   foreach my $sc ($ns->get_nodelist)
   {
-    my $start = $self->create_dt( $sc->findvalue( './datum' ) . " " . $sc->findvalue( './time' ) );
+
+    #
+    # start time
+    #
+    my $start = $self->create_dt( $sc->findvalue( './@start' ) );
     if( not defined $start )
     {
-      w "Invalid starttime '"
-          . $sc->findvalue( './datum' ) . " " . $sc->findvalue( './time' ) . "'. Skipping.";
+      error( "$batch_id: Invalid starttime '" . $sc->findvalue( './@start' ) . "'. Skipping." );
       next;
     }
 
-    # Date
-    my $date = $start->ymd("-");
-
-	if($date ne $currdate ) {
-      	if( $currdate ne "x" ) {
-      	#	$dsh->EndBatch( 1 );
-        }
-
-        my $batchid = $chd->{xmltvid} . "_" . $date;
-        #print $batchid."\n";
-
-        #$dsh->StartBatch( $batchid , $chd->{id} );
-        $dsh->StartDate( $date , "06:00" );
-        $currdate = $date;
-
-        progress("OKV: Date is: $date");
+    #
+    # end time
+    #
+    my $end = $self->create_dt( $sc->findvalue( './@stop' ) );
+    if( not defined $end )
+    {
+      error( "$batch_id: Invalid endtime '" . $sc->findvalue( './@stop' ) . "'. Skipping." );
+      next;
     }
 
     # Data
     my $title    = norm($sc->findvalue( './title'   ));
     $title       =~ s/&amp;/&/g; # Wrong encoded char
-    my $desc     = norm($sc->findvalue( './description'    ));
+    my $desc     = norm($sc->findvalue( './desc'    ));
     my $year     = norm($sc->findvalue( './year'    ));
     my $duration = norm($sc->findvalue( './duration'    ));
     my $genre    = norm($sc->findvalue( './genre'    ));
-    my $end      = $start->clone()->add( minutes => $duration );
 
-	my $ce = {
+	  my $ce = {
         channel_id 		=> $chd->{id},
         title 			=> $title,
-        start_time 		=> $start,
+        start_time   => $start->hms(":"),
+        end_time     => $end->hms(":"),
         description 	=> $desc,
-        end_time        => $end,
     };
 
     my ( $dummy, $dummy2, $episode ) = ($title =~ /(,|) (del|avsnitt|akt|vecka) (\d+)$/i ); # bugfix
@@ -184,7 +178,7 @@ sub ImportContent
         $ce->{episode} = sprintf( ". %d/%d .", $episode2-1, $ofepisodes );
     }
 
-    my ( $dummy5, $dummy6, $episode3, $subtitle ) = ($title =~ /(,|) (del|avsnitt|akt|vecka) (\d+)\: (.*)$/i ); # bugfix
+    my ( $dummy5, $dummy6, $episode3, $subtitle ) = ($title =~ /(,|) (del|avsnitt|akt|vecka) (\d+)(\:| \-) (.*)$/i ); # bugfix
     if(defined($episode3)) {
         $ce->{episode} = sprintf( ". %d .", $episode3-1 );
         $ce->{subtitle} = norm($subtitle);
@@ -207,7 +201,7 @@ sub ImportContent
     $title =~ s/, akt (\d+)//;
     $title =~ s/ avsnitt (\d+) av (\d+)//;
     $title =~ s/ del (\d+) av (\d+)//;
-    $title =~ s/ avsnitt (\d+)\: (.*)//;
+    $title =~ s/ avsnitt (\d+)(\:| \-) (.*)//;
     $title =~ s/ del (\d+)\: (.*)//;
     $title =~ s/ avsnitt (\d+)//;
     $title =~ s/ del (\d+)//;
@@ -232,12 +226,12 @@ sub ImportContent
 
     # year
     if($year =~ /(\d\d\d\d)/) {
-	  $ce->{production_date} = "$1-01-01";
-	}
+  	  $ce->{production_date} = "$1-01-01";
+  	}
 
 
-	# Add Programme
-	$dsh->AddCE( $ce );
+  	# Add Programme
+  	$dsh->AddProgramme( $ce );
   }
 
   #$dsh->EndBatch( 1 );
@@ -251,27 +245,26 @@ sub create_dt
   my $self = shift;
   my( $str ) = @_;
 
+  my $year = substr( $str , 0 , 4 );
+  my $month = substr( $str , 4 , 2 );
+  my $day = substr( $str , 6 , 2 );
+  my $hour = substr( $str , 8 , 2 );
+  my $minute = substr( $str , 10 , 2 );
+  my $second = substr( $str , 12 , 2 );
+  my $offset = substr( $str , 15 , 5 );
 
-  my( $date, $time ) = split( ' ', $str );
-
-  if( not defined $time )
+  if( not defined $year )
   {
     return undef;
   }
-  my( $year, $month, $day ) = split( '\-', $date );
 
-  # Remove the dot and everything after it.
-  $time =~ s/\..*$//;
-
-  my( $hour, $minute, $second ) = split( ":", $time );
-
-
-  my $dt = DateTime->new( year => $year,
-                          month => $month,
-                          day => $day,
-                          hour => $hour,
+  my $dt = DateTime->new( year   => $year,
+                          month  => $month,
+                          day    => $day,
+                          hour   => $hour,
                           minute => $minute,
-                          time_zone => "Europe/Stockholm",
+                          second => $second,
+                          time_zone => 'Europe/Stockholm',
                           );
 
   $dt->set_time_zone( "UTC" );

@@ -104,9 +104,9 @@ sub ImportXLS {
   my $currdate = "x";
   my $coldate = 1;
   my $coltime = 2;
-  my $coltitle = 6;
-  my $colepisode = 7;
-  my $coldesc = 8;
+  my $coltitle = 5;
+  my $colepisode = 6;
+  my $coldesc = 7;
 
 my $oBook;
 

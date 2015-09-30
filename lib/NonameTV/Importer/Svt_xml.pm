@@ -336,6 +336,10 @@ sub ImportXML
         delete($ce->{end_time});
       }
 
+      # Remove titles which can't be matched if they are in there
+      $ce->{title} =~ s/^(Filmkluben)\://i;
+      $ce->{title} = norm($ce->{title});
+
       $ce->{description} = join_text( @sentences );
 
      #print Dumper($ce);
