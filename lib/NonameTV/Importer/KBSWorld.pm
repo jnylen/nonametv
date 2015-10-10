@@ -81,11 +81,15 @@ sub ImportContent {
   $$cref =~ s/&#65533;//g;
   $$cref =~ s/ & / &amp; /g;
   $$cref =~ s/<The Return of Superman>//g;
+  $$cref =~ s/<The Human Condition - Urban Farmer>//g;
+  $$cref =~ s/<2015 K-POP WORLD FESTIVAL IN CHANGWON>//g;
 
   my $data = '<?xml version="1.0" encoding="utf-8"?>';
   $data .= $$cref;
 
-  #print Dumper($data);
+  open(my $fh, '>', '/nonametv/kbs_' . $batch_id . '.xml');
+  print $fh $data;
+  close $fh;
 
   my $doc;
   my $xml = XML::LibXML->new;
