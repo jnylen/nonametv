@@ -131,6 +131,7 @@ sub ImportContent
   my $dsh = $self->{datastorehelper};
   $ds->{SILENCE_END_START_OVERLAP}=1;
   $ds->{SILENCE_DUPLICATE_SKIP}=1;
+  my $xmltvid = $chd->{xmltvid};
 
  	#$dsh->StartDate( $date , "00:00" );
 
@@ -241,7 +242,7 @@ sub ImportContent
 
     # Director
     my $director = norm($sc->findvalue( './director' ));
-    if(defined($director) and $director ne "") {
+    if(defined($director) and $director ne "" and $xmltvid ne "eurosport.sbsdiscovery.no") {
         $ce->{directors} = parse_person_list($director);
         $ce->{program_type} = 'movie';
     }
@@ -303,7 +304,7 @@ sub ImportContent
     }
 
     # If duration is higher than 100 minutes (1h 40min) then its a movie
-    if($durat > 100 and $subtitle eq "" and not defined($ce->{episode})) {
+    if($durat > 100 and $subtitle eq "" and not defined($ce->{episode}) and $xmltvid ne "eurosport.sbsdiscovery.no") {
         $ce->{program_type} = 'movie';
     }
 
