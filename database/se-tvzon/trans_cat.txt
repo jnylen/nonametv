@@ -1232,64 +1232,150 @@ RTL2,"science fiction",Sci-fi,
 RTL2,soap,Soap,
 RTL2,thriller,Thriller,
 RTL2,western,Western,
+RTS,divertissement,Entertainment,
+RTS,documentaire,Documentary,
+RTS,"musique, théatre, danse",Musical/Theatre/Dance,
+RTS,sport,Sports,sports
 RussiaToday,documentary,Documentary,series
 RussiaToday,interview,Interview,series
 RussiaToday,news,News,tvshow
 RussiaToday,"talk show","Talk show",series
+SBSTV,"-amr. drama",Drama,
 SBSTV,action,Action,
 SBSTV,"action og komedieserie",Action/Comedy,series
 SBSTV,actiondrama,Action/Drama,
 SBSTV,actioneventyr,Action/Adventure,
 SBSTV,actionfilm,Action,movie
+SBSTV,actionkomedie,Action/Comedy,
+SBSTV,actionkrimi,Action/Crime,
 SBSTV,actionserie,Action,series
 SBSTV,actionthriller,Action/Thriller,
+SBSTV,adventure-drama,Adventure/Drama,
+SBSTV,adventure-komedie,Adventure/Comedy,
 SBSTV,animationsfilm,Animation,movie
 SBSTV,animationsserie,Animation,series
+SBSTV,atletik,\N,sports
+SBSTV,"autentisk drama",Drama,
 SBSTV,bilmagasin,Magazine,
+SBSTV,bueskydning,\N,sports
+SBSTV,comedy,Comedy,
+SBSTV,cykling,\N,sports
 SBSTV,docusoap,Documentary/Soap,
 SBSTV,dokumentar,Documentary,
+SBSTV,"dokumentar miniserie",Documentary,
+SBSTV,dokumentarprogram,Documentary,
 SBSTV,dokumentarserie,Documentary,series
+SBSTV,"dokumentarserie, sæson 1",Documentary,series
+SBSTV,"dokumentarserie, sæson 2",Documentary,series
+SBSTV,"dokumentarserie, sæson 3",Documentary,series
+SBSTV,"dokumentarserie, sæson 4",Documentary,series
+SBSTV,"dokumentarserie, sæson 5",Documentary,series
+SBSTV,"dokumentarserie, sæson 6",Documentary,series
 SBSTV,dokumentarserie.,Documentary,series
 SBSTV,drama,Drama,
+SBSTV,dramaeventyr,Drama/Adventure,
 SBSTV,dramakomedie,Drama/Comedy,
 SBSTV,dramaserie,Drama,series
+SBSTV,"dramaserie (1:2)",Drama,series
+SBSTV,"dramaserie (2:2)",Drama,series
+SBSTV,dramaserie.,Drama,series
+SBSTV,ekstremsport,\N,sports
 SBSTV,"erotisk komediedrama",Adult/Comedy/Drama,
+SBSTV,eventyrdrama,Adventure/Drama,
+SBSTV,eventyrfilm,Adventure,movie
+SBSTV,eventyrkomedie,Adventure/Comedy,
 SBSTV,eventyrserie,Adventure,series
 SBSTV,familiefilm,Family,movie
+SBSTV,familiekomedie,Family/Comedy,
+SBSTV,fodbold,\N,sports
 SBSTV,fodboldmagasin,Magazine/Soccer,
 SBSTV,"fra den engelske liga",\N,sports
 SBSTV,"fra den spanske liga",\N,sports
+SBSTV,fængselsdrama,Drama,
+SBSTV,gangsterfilm,\N,movie
+SBSTV,"golden globenomineret drama",Drama,
 SBSTV,gyser,Horror,
+SBSTV,gyserfilm,Horror,movie
+SBSTV,gyserthriller,Horror/Thriller,
+SBSTV,julefilm,\N,movie
+SBSTV,katastrofefilm,\N,movie
 SBSTV,komedie,Comedy,
 SBSTV,"komedie- og actionserie",Comedy/Action,series
+SBSTV,komedie/eventyrfilm,Comedy/Adventure,movie
 SBSTV,komediedrama,Comedy/Drama,
 SBSTV,komediefilm,Comedy,movie
 SBSTV,komedieserie,Comedy,series
 SBSTV,komedieserie.,Comedy,series
+SBSTV,koncertfilm,Concert,movie
+SBSTV,krigsdrama,War/Drama,
+SBSTV,krigsfilm,War,movie
+SBSTV,krimi,Crime,
 SBSTV,krimidokumentar,Crime/Documentary,
+SBSTV,"krimidokumentar, sæson 1",Crime/Documentary,series
+SBSTV,"krimidokumentar, sæson 2",Crime/Documentary,series
+SBSTV,"krimidokumentar, sæson 2.",Crime/Documentary,series
+SBSTV,"krimidokumentar, sæson 3",Crime/Documentary,series
+SBSTV,"krimidokumentar, sæson 4",Crime/Documentary,series
+SBSTV,"krimidokumentar, sæson 5",Crime/Documentary,series
+SBSTV,"krimidokumentar, sæson 6",Crime/Documentary,series
+SBSTV,"krimidokumentar, sæson 7",Crime/Documentary,series
 SBSTV,krimigyser,Crime/Horror,
+SBSTV,krimikomedie,Crime/Comedy,
 SBSTV,krimiserie,Crime,series
+SBSTV,"krimiserie (1:2)",Crime,series
+SBSTV,"krimiserie (2:2)",Crime,series
+SBSTV,krimiserie.,Crime,series
+SBSTV,kærlighedsdrama,Romance/Drama,
 SBSTV,livsstilsprogram,Lifestyle,series
 SBSTV,livsstilsserie,Lifestyle,series
 SBSTV,madprogram,Food,series
 SBSTV,"make-over program",Make-over,series
 SBSTV,modeprogram,Fashion,series
+SBSTV,motorsport,Motor,sports
 SBSTV,musikprogram,Music,tvshow
+SBSTV,"oscarbelønnet komediedrama",Comedy/Drama,
 SBSTV,pokalfodbold,Soccer,sports
+SBSTV,"prisbelønnet gyser",Horror,
+SBSTV,"prisbelønnet thriller",Thriller,
+SBSTV,programserie,\N,series
 SBSTV,realityserie,Reality,series
 SBSTV,realityshow,Reality,series
-SBSTV,reportageserie,\N,series
+SBSTV,reportageserie,,series
+SBSTV,"romantisk drama",Romance/Drama,
 SBSTV,"romantisk komedie",Romance/Comedy,
+SBSTV,"romantisk komedieserie",Romance/Comedy,series
+SBSTV,"science fiction-drama",Sci-Fi/Drama,
 SBSTV,"science fiction-film",Sci-Fi,movie
+SBSTV,"science fiction-komedie",Sci-Fi/Comedy,
+SBSTV,"science fiction-thriller",Sci-Fi/Thriller,
+SBSTV,"science fictionserie",Sci-Fi,series
 SBSTV,show,\N,series
+SBSTV,snooker,\N,sports
+SBSTV,speedway,\N,sports
+SBSTV,sport,\N,sports
+SBSTV,sportsdrama,Drama,\N
 SBSTV,spændingsserie,\N,series
+SBSTV,strandfodbold,\N,sports
+SBSTV,"sæson 3",\N,series
+SBSTV,"sæson 4",\N,series
+SBSTV,talkshow,Talkshow,series
+SBSTV,tegnefilm,Animated,movie
+SBSTV,tennis,Tennis,sports
 SBSTV,thriller,Thriller,
 SBSTV,thrillerdrama,Thriller/Drama,
 SBSTV,thrillerkomedie,Thriller/Comedy,
+SBSTV,trav,\N,sports
 SBSTV,underholdningsprogram,Entertainment,series
 SBSTV,underholdningsserie,Entertainment,series
 SBSTV,underholdningsshow,Entertainment,series
+SBSTV,underholdningsshow.,Entertainment,series
+SBSTV,ungdomsdrama,Youth/Drama,
+SBSTV,ungdomsfilm,Youth,movie
 SBSTV,ungdomskomedie,Youth/Comedy,
+SBSTV,ungdomsserie,\N,series
+SBSTV,videnskabsshow,\N,series
+SBSTV,western,Western,
+SBSTV,westernkomedie,Western/Comedy,
 SBS_Discovery,children,Children's,series
 SBS_Discovery,film,\N,movie
 SBS_Discovery,program,\N,series
