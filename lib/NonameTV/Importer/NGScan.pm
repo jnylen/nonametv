@@ -111,6 +111,7 @@ sub ImportXLS
 			      $columns{'ORGTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Series \(English\)$/ );
 
             $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode \(English\)/ );
+            $columns{'Episode Title EN'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode \(English\)/ );
 
             $columns{'Ser No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series No/ );
             $columns{'Ep No'}  = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode No/ );
@@ -126,30 +127,35 @@ sub ImportXLS
 			      if($chd->{sched_lang} eq "sv") {
 			         $columns{'Title'}    = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series \(Swedish\)/ );
 			         $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Swedish\)/ );
+               $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode \(Swedish\)/ );
 			      }
 
 			      # Norwegian
             if($chd->{sched_lang} eq "no") {
                 $columns{'Title'}    = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series \(Norwegian\)/ );
 			          $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Norwegian\)/ );
+                $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode \(Norwegian\)/ );
 			      }
 
 			      # Danish
             if($chd->{sched_lang} eq "da") {
                 $columns{'Title'}    = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series \(Danish\)/ );
 			          $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Danish\)/ );
+                $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode \(Danish\)/ );
 			      }
 
 			      # Finnish
             if($chd->{sched_lang} eq "fi") {
                 $columns{'Title'}    = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series \(Finnish\)/ );
 			          $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Finnish\)/ );
+                $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode \(Finnish\)/ );
 			      }
 
             # Polish
             if($chd->{sched_lang} eq "pl") {
                 $columns{'Title'}    = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series \(Polish\)/ );
 			          $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Polish\)/ );
+                $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode \(Polish\)/ );
 			      }
 
             $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
@@ -182,35 +188,31 @@ sub ImportXLS
         $currdate = $date;
       }
 
-	  # time
-	  $oWkC = $oWkS->{Cells}[$iR][$columns{'Time'}];
+	    # time
+	    $oWkC = $oWkS->{Cells}[$iR][$columns{'Time'}];
       next if( ! $oWkC );
       my $time = ParseTime($oWkC->Value) if( $oWkC->Value );
 
       # title
-      my ($title, $test);
+      my ($firsttitle, $eptitle);
       $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
-      if (defined $oWkC)
-	  {
-	    $title = norm($oWkC->Value);
-	  }
-	  else
-	  {
-	    my $oWkl = $oWkS->{Cells}[$iR][$columns{'Episode Title'}];
-		next if( ! $oWkl );
-		$test = $oWkl->Value if $oWkl->Value;
-	  }
+      $firsttitle = norm($oWkC->Value) if defined $oWkC;
 
-	  #$title = norm($test) if !defined($title);
+      # eptitle
+      $oWkC = $oWkS->{Cells}[$iR][$columns{'Episode Title'}];
+      $eptitle = norm($oWkC->Value);
+
+      my $title = $firsttitle || $eptitle;
 
       next if( ! $title );
 
-	  # episode and season
-      my $epino = $oWkS->{Cells}[$iR][$columns{'Ep No'}]->Value if $oWkS->{Cells}[$iR][$columns{'Ep No'}];
-      my $seano = $oWkS->{Cells}[$iR][$columns{'Ser No'}]->Value if $oWkS->{Cells}[$iR][$columns{'Ser No'}];
+	    # episode and season
+      my ($epino, $seano, $desc);
+      $epino = $oWkS->{Cells}[$iR][$columns{'Ep No'}]->Value if defined $oWkS->{Cells}[$iR][$columns{'Ep No'}];
+      $seano = $oWkS->{Cells}[$iR][$columns{'Ser No'}]->Value if defined $oWkS->{Cells}[$iR][$columns{'Ser No'}];
 
-	  # extra info
-	  my $desc = $oWkS->{Cells}[$iR][$columns{'Synopsis'}]->Value if $oWkS->{Cells}[$iR][$columns{'Synopsis'}];
+	    # extra info
+  	  $desc = $oWkS->{Cells}[$iR][$columns{'Synopsis'}]->Value if defined $oWkS->{Cells}[$iR][$columns{'Synopsis'}];
 
       progress("NGScan: $chd->{xmltvid}: $time - $title");
 
@@ -230,15 +232,19 @@ sub ImportXLS
       }
 
       # Extra
-      if(defined($oWkS->{Cells}[$iR][$columns{'Episode Title'}]) and norm($oWkS->{Cells}[$iR][$columns{'Episode Title'}]->Value) ne $ce->{title}) {
-        $ce->{subtitle} = norm($oWkS->{Cells}[$iR][$columns{'Episode Title'}]->Value);
+      if(defined($eptitle) and norm($eptitle) ne $ce->{title}) {
+        $ce->{subtitle} = $eptitle;
       }
 
-
       # org title
-      if(defined $columns{'ORGTitle'}) {
+      my $title_org;
+      if(defined $columns{'ORGTitle'} and defined $oWkS->{Cells}[$iR][$columns{'ORGTitle'}]) {
         $oWkC = $oWkS->{Cells}[$iR][$columns{'ORGTitle'}];
-        my $title_org = $oWkC->Value if( $oWkC->Value );
+        $title_org = $oWkC->Value if( $oWkC->Value );
+        $ce->{original_title} = norm($title_org) if defined($title_org) and $ce->{title} ne norm($title_org) and norm($title_org) ne "";
+      } elsif(defined $eptitle and !defined $firsttitle and (defined $columns{'Episode Title EN'} and defined $oWkS->{Cells}[$iR][$columns{'Episode Title EN'}])) {
+        $oWkC = $oWkS->{Cells}[$iR][$columns{'Episode Title EN'}];
+        $title_org = $oWkC->Value if( $oWkC->Value );
         $ce->{original_title} = norm($title_org) if defined($title_org) and $ce->{title} ne norm($title_org) and norm($title_org) ne "";
       }
 
