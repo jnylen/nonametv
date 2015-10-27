@@ -87,10 +87,6 @@ sub ImportContent {
   my $data = '<?xml version="1.0" encoding="utf-8"?>';
   $data .= $$cref;
 
-  open(my $fh, '>', '/nonametv/kbs_' . $batch_id . '.xml');
-  print $fh $data;
-  close $fh;
-
   my $doc;
   my $xml = XML::LibXML->new;
   eval { $doc = $xml->parse_string($data); };
