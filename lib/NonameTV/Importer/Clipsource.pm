@@ -209,13 +209,6 @@ sub ImportContent
       }
     }
 
-    # Genres
-    my $genres  = $xpc->findnodes( 'genreList/genre' );
-    foreach my $genre ($genres->get_nodelist) {
-    #  my ( $program_type, $category ) = $self->{datastore}->LookupCat( "Clipsource", $genre );
-    #  AddCategory( $ce, $program_type, $category );
-    }
-
     # Categories
     my $cats  = $xpc->findnodes( 'categoryList/category/treeNode' );
     foreach my $cat ($cats->get_nodelist) {
@@ -226,6 +219,13 @@ sub ImportContent
       } elsif($cat->findvalue('treeNode') eq "Sport") {
         $ce->{program_type} = "sports";
       }
+    }
+
+    # Genres
+    my $genres  = $xpc->findnodes( 'genreList/genre' );
+    foreach my $genre ($genres->get_nodelist) {
+      my ( $program_type, $category ) = $self->{datastore}->LookupCat( "Clipsource", $genre->to_literal );
+      AddCategory( $ce, $program_type, $category );
     }
 
     # Rerun?
