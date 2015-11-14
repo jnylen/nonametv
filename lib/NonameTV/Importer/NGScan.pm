@@ -93,7 +93,7 @@ sub ImportXLS
     #my $oWkS = $oBook->{Worksheet}[$iSheet];
     progress( "NGScan: $chd->{xmltvid}: Processing worksheet: $oWkS->{Name}" );
 
-	my $foundcolumns = 0;
+	  my $foundcolumns = 0;
 
     # browse through rows
     for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
@@ -177,8 +177,8 @@ sub ImportXLS
 	  # Startdate
       if( $date ne $currdate ) {
       	if( $currdate ne "x" ) {
-			# save last day if we have it in memory
-			$dsh->EndBatch( 1 );
+			   # save last day if we have it in memory
+			   $dsh->EndBatch( 1 );
         }
 
       	my $batchid = $chd->{xmltvid} . "_" . $date;
@@ -199,10 +199,15 @@ sub ImportXLS
       $firsttitle = norm($oWkC->Value) if defined $oWkC;
 
       # eptitle
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Episode Title'}];
-      $eptitle = norm($oWkC->Value);
+      my $title;
+      if(defined($eptitle) and defined($columns{'Episode Title'})) {
+        $oWkC = $oWkS->{Cells}[$iR][$columns{'Episode Title'}];
+        $eptitle = norm($oWkC->Value);
 
-      my $title = $firsttitle || $eptitle;
+        $title = $firsttitle || $eptitle;
+      } else {
+        $title = $firsttitle;
+      }
 
       next if( ! $title );
 
