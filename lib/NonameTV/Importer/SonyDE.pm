@@ -223,6 +223,11 @@ sub ImportXML
           $ce->{rating} = "FSK 6";
         }
 
+        # Anime should be tagged as Anime
+        if($chd->{xmltvid} eq "animax.tv") {
+          $ce->{category} = "Anime";
+        }
+
         progress( "SonyDE: $chd->{xmltvid}: $start - $title" );
         $dsh->AddProgramme( $ce );
     }
