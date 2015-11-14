@@ -277,8 +277,8 @@ sub Object2Url {
 
   my( $year, $week ) = ( $batch_id =~ /(\d+)-(\d+)$/ );
 
-  my $url = sprintf( "http://rest.tv2.no/cms-tvguide-dw-rest/xmltv/%02d/%01d/channel/%s",
-                     $year, $week, $data->{grabber_info});
+  my $url = sprintf( "https://rest.tv2.no/epg-dw-rest/xmltv/program/%01d/%01d",
+                      $data->{grabber_info}, $week);
 
   return( $url, undef );
 }
