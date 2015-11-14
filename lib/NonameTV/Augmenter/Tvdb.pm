@@ -117,7 +117,7 @@ sub FillHash( $$$$ ) {
   if( $series->{FirstAired} ) {
     $resultref->{production_date} = $series->{FirstAired};
   }
-  
+
   # episodepic
   if( $episode->{filename} ) {
 #    $resultref->{url_image_main} = sprintf('http://thetvdb.com/banners/%s', $episode->{filename});
@@ -129,7 +129,7 @@ sub FillHash( $$$$ ) {
         $episode->{seriesid}, $episode->{seasonid}, $episodeid, $self->{LanguageNo}
       );
   }
-  
+
   my $tvdbactors = $series->{Actor};
 
   my @actors = ();
@@ -158,7 +158,7 @@ sub FillHash( $$$$ ) {
     }
   }
   @actors = grep{ defined } @actors;
-  
+
   if( @actors ) {
   	  # replace programme's actors
 	  $resultref->{actors} = join( ';', @actors );
@@ -170,9 +170,9 @@ sub FillHash( $$$$ ) {
 	$resultref->{directors} = $self->ParseCast( norm($episode->{Director}) );
 	$resultref->{writers} = $self->ParseCast( norm($episode->{Writer}) );
 
-  $resultref->{program_type} = 'series';  
+  $resultref->{program_type} = 'series';
   # Genre
-  if( $series->{Genre} ){
+  if( $series->{Genre} and (!defined $ceref->{category} or $ceref->{category} ne "Anime") ){
     if( $episode->{SeasonNumber} != 0 ){
       # notice, Genre is ordered by some internal order, not by importance!
       my @genres = split( '\|', $series->{Genre} );
@@ -207,8 +207,8 @@ sub FillHash( $$$$ ) {
     	$resultref->{'star_rating'} = $series->{Rating}-1 . ' / 9';
   	}
   }
-  
-  
+
+
   # Extra id
   $resultref->{extra_id} = $episode->{seriesid};
   $resultref->{extra_id_type} = "thetvdb";
@@ -319,13 +319,13 @@ sub AugmentProgram( $$$ ){
             $series = $self->{tvdb}->getSeries( $ceref->{original_title}, 0 );
           }
         }
-        
+
         if( (defined $series)){
         	# Use $ce->{original_title} with the real title if its provided by the data
         	if(!defined($ceref->{original_title})) {
         	    #$resultref->{title} = normUtf8( norm( $series->{SeriesName} ) );
         	}
-        	
+
         	# Find season and episode
         	if(($season ne "") and ($episode ne "")) {
         		my $episode2 = $self->{tvdb}->getEpisode($series->{SeriesName}, $season, $episode, 0);
@@ -345,28 +345,28 @@ sub AugmentProgram( $$$ ){
   	# title: Jersey Shoe 2
   	# remoteref: 2
   	# ( much like Fixups setseason )
-    
+
     # Check is remoteref is actually in there, or the whole shit will crash.
     if( defined( $ruleref->{remoteref} ) ) {
 
     	my( $season ) = $ruleref->{remoteref};
-    	
+
 		if( defined $ceref->{episode} ){
       	    my( $season_episode, $episode )=( $ceref->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
       	    if( (defined $episode) and (defined $season_episode) ){
         		$episode += 1;
         		$season_episode += 1;
-        
+
         		my $seriesname = $ceref->{title};
-        		
+
         		# Remove the season from title
         		$seriesname =~ s/$season//;
-        		
+
         		# Norm it.
         		$seriesname = norm($seriesname);
-        
+
                 my $series = $self->{tvdb}->getSeries( $seriesname, 0 );
-        
+
         		if( (defined $series)){
         			# Find season and episode
         			if(($season ne "") and ($episode ne "")) {
@@ -401,7 +401,7 @@ sub AugmentProgram( $$$ ){
       }
       if( defined $series ){
         #$resultref->{title} = normUtf8( norm( $series->{SeriesName} ) );
-        
+
         my $episodetitle = $ceref->{subtitle};
 
         $episodetitle =~ s|\s+-\s+Teil\s+(\d+)$| ($1)|;   # _-_Teil_#
@@ -491,15 +491,15 @@ sub AugmentProgram( $$$ ){
   }elsif( $ruleref->{matchby} eq 'episodeid' ) {
       # match by episode id from remote_ref (sid|eid)
       my $series;
-      
+
       my( $sid, $eid ) = split( / /, $ruleref->{remoteref} );
-      
+
       # Get title
       my $seriesname = $self->{tvdb}->getSeriesName( $sid, 0 );
       $series = $self->{tvdb}->getSeries( $seriesname, 0 );
-      
+
       $resultref->{description} = "hej";
-      
+
       # Do the fabulous things.
       if( defined $series ){
         $resultref->{title} = normUtf8( norm( $series->{SeriesName} ) );
