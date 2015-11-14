@@ -147,7 +147,8 @@ sub Object2Url {
 
   #my $url = 'https://pressetreff.zdf.de/index.php?id=386&tx_zdfprogrammdienst_pi1%5Bformat%5D=xml&tx_zdfprogrammdienst_pi1%5Blongdoc%5D=1&tx_zdfprogrammdienst_pi1%5Bstation%5D=' . $station . '&tx_zdfprogrammdienst_pi1%5Bdatestart%5D=' . $date . '&tx_zdfprogrammdienst_pi1%5Bweek%5D=' . $week . '&tx_zdfprogrammdienst_pi1%5Baction%5D=showDownloads&tx_zdfprogrammdienst_pi1%5Bcontroller%5D=Broadcast';
   # https://presseportal.zdf.de/programmdienst/programmwoche/30/zdf/18.07.2015/24.07.2015/bc/showDownloads//xml/langfassung/
-  my $url = 'https://presseportal.zdf.de/programmdienst/programmwoche/' . $week . '/' . $station . '/' . $date . '/' . $lastdate . '/bc/showDownloads//xml/langfassung/';
+  # https://presseportal.zdf.de/programmwochen/programmwoche/47/zdf/14.11.2015/20.11.2015/bc/showDownloads//xml/langfassung/
+  my $url = 'https://presseportal.zdf.de/programmwochen/programmwoche/' . $week . '/' . $station . '/' . $date . '/' . $lastdate . '/bc/showDownloads//xml/langfassung/';
 
   p("ZDF: fetching data from $url");
 
