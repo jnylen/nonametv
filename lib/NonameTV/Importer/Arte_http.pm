@@ -51,10 +51,10 @@ sub InitiateDownload {
     return $mech->status_line;
   }
 
-  $mech->form_with_fields( ( 'form1:password' ) );
-  $mech->field( 'form1:user', $self->{Username}, 1 );
-  $mech->field( 'form1:password', $self->{Password}, 1 );
-  $mech->click_button( name => 'form1:einloggen' );
+  $mech->form_with_fields( ( 'password' ) );
+  $mech->field( 'user', $self->{Username}, 1 );
+  $mech->field( 'password', $self->{Password}, 1 );
+  $mech->click_button( name => 'einloggen' );
 
   if ($mech->success()) {
     return undef;
