@@ -17,7 +17,7 @@
                     <td><xsl:value-of select="preset"/></td>
                     <xsl:choose>
                         <xsl:when test="station/logo">
-                                <td><img src="{station/logo/@url}" width="66" height="50"/></td>
+                                <td><img src="{station/logo/@url}" width="66"/></td>
                         </xsl:when>
                         <xsl:otherwise>
                             <td></td>
