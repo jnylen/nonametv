@@ -217,8 +217,9 @@ sub AugmentProgram( $$$ ){
 
         my $series;
         if( defined( $ruleref->{remoteref} ) ) {
-          my $seriesname = $self->{tvdb}->getSeriesName( $ruleref->{remoteref} );
-          $series = $self->{tvdb}->getSeries( $seriesname );
+#          my $seriesname = $self->{tvdb}->getSeriesName( $ruleref->{remoteref} );
+#          $series = $self->{tvdb}->getSeries( $seriesname );
+          $series = $self->{tvdb}->getSeries( $ruleref->{remoteref} );
         } else {
           $series = $self->{tvdb}->getSeries( $ceref->{title} );
         }
@@ -282,9 +283,11 @@ sub AugmentProgram( $$$ ){
 
     if( defined( $ceref->{subtitle} ) ) {
       my $series;
+      my $seriesname;
       if( defined( $ruleref->{remoteref} ) ) {
-        my $seriesname = $self->{tvdb}->getSeriesName( $ruleref->{remoteref} );
-        $series = $self->{tvdb}->getSeries( $seriesname );
+#        my $seriesname = $self->{tvdb}->getSeriesName( $ruleref->{remoteref} );
+#        $series = $self->{tvdb}->getSeries( $seriesname );
+        $series = $self->{tvdb}->getSeries( $ruleref->{remoteref} );
       } else {
         $series = $self->{tvdb}->getSeries( $ceref->{title} );
       }
@@ -316,7 +319,11 @@ sub AugmentProgram( $$$ ){
           w( "episode not found by title: " . $ceref->{title} . " - \"" . $episodetitle . "\"" );
         }
       } else {
-        d( "series not found by title: " . $ceref->{title} );
+        if( defined( $seriesname ) ) {
+          d( 'series ' . $ruleref->{remoteref} . ' not found by title: ' . $seriesname );
+        } else {
+          d( 'series not found by title: ' . $ceref->{title} );
+        }
       }
     }
 
