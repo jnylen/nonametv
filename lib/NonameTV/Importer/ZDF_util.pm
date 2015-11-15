@@ -127,12 +127,9 @@ sub ParseData
     my $origin = $sc->findvalue( './programm//herkunftsender' );
 
     # short description
-    my $shortdesc = $sc->findvalue( './programm//pressetext//kurz' );
+    my $shortdesc = $sc->findvalue( './programm//programmtext//kurztext' );
 
-    # long description
-    my $longdesc = $sc->findvalue( './programm//pressetext//lang' );
-
-    # whole description (ZDF/ZDFneo)
+    # whole description for press in html
     my $wholedesc = $sc->findvalue( './programm//pressetext' );
 
     # darsteller, beteiligte, stab
@@ -147,7 +144,7 @@ sub ParseData
     # form the description out of 'zusatz', 'shortdesc', 'longdesc', 'wholedesc'
     # 'origin'
     my $description;
-    $description .= norm($longdesc) || norm($shortdesc) || norm($wholedesc);
+    $description .= norm($shortdesc) || norm($wholedesc);
     if ($description) {
       $sce{description} = $description;
     }
