@@ -24,7 +24,7 @@ use Encode qw/from_to/;
 use Switch;
 use XML::LibXML;
 
-use NonameTV qw/AddCategory AddCountry norm ParseXml/;
+use NonameTV qw/AddCategory AddCountry norm normUndef ParseXml/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/d p w f/;
 
@@ -312,8 +312,11 @@ sub ImportContent {
       $subtitle = $subtitle2;
     }
     # clean up ARD Alpha metadata in subtitle
-    if ($subtitle =~ m|\s*VPS:\d.*$|) {
-      $subtitle =~ s|\s*VPS:\d.*$||;
+    if ($subtitle) {
+      if ($subtitle =~ m|\s*VPS:\d.*$|) {
+        $subtitle =~ s|\s*VPS:\d.*$||;
+        $subtitle = normUndef( $subtitle );
+      }
     }
 
     if ($subtitle) {

@@ -31,7 +31,7 @@ BEGIN {
                       Word2Xml Wordfile2Xml
 		              File2Xml Content2Xml
 		              FindParagraphs
-                      norm normLatin1 normUtf8
+                      norm normLatin1 normUtf8 normUndef
                       AddCategory AddCountry
                       ParseDescCatSwe FixProgrammeData
 		              ParseXml ParseXmltv ParseJson
@@ -396,6 +396,17 @@ sub normUtf8
   # it should still be a string of perl characters
   $str = decode('utf-8', $str);
 
+  return $str;
+}
+
+#
+# turn empty strings into undef / NULL
+#
+sub normUndef
+{
+  my( $str ) = @_;
+
+  return undef if( !$str );
   return $str;
 }
 
