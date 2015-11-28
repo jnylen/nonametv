@@ -83,6 +83,7 @@ CREATE TABLE `programs` (
   `star_rating` varchar(20) DEFAULT NULL,
   `live` int(1) DEFAULT NULL,
   `rerun` int(1) DEFAULT NULL,
+  `new` tinyint(1) DEFAULT NULL,
   `extra_id` varchar(65) DEFAULT NULL COMMENT 'imdbid(movies)/tvdbid(series)/tvrageid(series)',
   `extra_id_type` varchar(65) DEFAULT NULL COMMENT 'type: tvrage,themoviedb,thetvdb',
   `original_title` varchar(255) DEFAULT NULL COMMENT 'Original Title',

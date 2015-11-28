@@ -1535,3 +1535,7 @@
 1400,TvdbFR,^.*$,program_type,series,\N,guess
 1401,TvdbFR,^.*$,program_type,series,\N,guess
 1405,TvdbDK,^.*$,program_type,series,\N,guess
+1410,TvdbNO,^.*$,program_type,series,\N,guess
+1412,TvdbDK,^.*$,program_type,series,\N,guess
+1414,TvdbFI,^.*$,program_type,series,\N,guess
+1416,Tvdb,^.*$,program_type,series,\N,guess
