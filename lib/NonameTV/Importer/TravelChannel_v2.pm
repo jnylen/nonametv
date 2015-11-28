@@ -50,7 +50,7 @@ sub new {
 
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
   $self->{datastorehelper} = $dsh;
-  
+
   $self->{datastore}->{augment} = 1;
 
   return $self;
@@ -95,7 +95,7 @@ sub ImportXLS
 	my $foundcolumns = 0;
 
     # browse through rows
-    for(my $iR = 1 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+    for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
 
       if( not %columns ){
         # the column names are stored in the first row
@@ -109,15 +109,18 @@ sub ImportXLS
 			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series Title/ );
 
           $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Title/ );
-          
+
           $columns{'Ser No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Series$/ );
           $columns{'Ep No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Episode$/ );
-          
+          $columns{'Ser No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Series #$/ );
+          $columns{'Ep No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Episode #$/ );
+
           $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Epg/ );
           $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Listing/ );
-          
+          $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description/ );
+
           $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
-          $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Plan Time/ );
+          $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Time$/ );
 
             $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
           }
@@ -129,8 +132,6 @@ sub ImportXLS
 
         next;
       }
-
-
 
       # date - column 0 ('Date')
       my $oWkC = $oWkS->{Cells}[$iR][$columns{'Date'}];
@@ -146,11 +147,11 @@ sub ImportXLS
 		#	FlushDayData( $channel_xmltvid, $dsh , @ces );
 			$dsh->EndBatch( 1 );
         }
-      
+
       	my $batchid = $chd->{xmltvid} . "_" . $date;
         $dsh->StartBatch( $batchid , $chd->{id} );
         progress("Travel: $chd->{xmltvid}: Date is $date");
-        $dsh->StartDate( $date , "00:00" ); 
+        $dsh->StartDate( $date , "00:00" );
         $currdate = $date;
       }
 
@@ -210,7 +211,6 @@ sub ImportXLS
 
 sub ParseDate {
   my( $text ) = @_;
-  print("Text: \"$text\"\n");
 
   $text =~ s/^\s+//;
 
@@ -219,8 +219,10 @@ sub ParseDate {
   if( $text =~ /^\d+\/(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\/\d+$/i ){
     ( $day, $monthname, $year ) = ( $text =~ /^(\d+)\/(\S+)\/(\d+)$/ );
     $month = MonthNumber( lc($monthname), "en" );
+  } elsif( $text =~ /^\d\d\d\d-\d\d-\d\d$/i ) {
+    ( $year, $month, $day ) = ( $text =~ /^(\d\d\d\d)-(\d\d)-(\d\d)$/ );
   }
-  
+
   $year+= 2000 if $year< 100;
 
   return sprintf( '%d-%02d-%02d', $year, $month, $day );

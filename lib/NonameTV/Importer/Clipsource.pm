@@ -75,8 +75,8 @@ sub ImportContent
     my $eid = $ei->findvalue( 'contentIdRef' );
 
     my $e = {
-      startTime       => norm($ei->findvalue( 'timeList/startTime' )),
-      endTime         => norm($ei->findvalue( 'timeList/endTime' )),
+      startTime       => norm($ei->findvalue( 'timeList/time/startTime' )),
+      endTime         => norm($ei->findvalue( 'timeList/time/endTime' )),
       live            => norm($ei->findvalue( 'live' )),
       rerun           => norm($ei->findvalue( 'rerun' )),
       materialIdRef   => norm($ei->findvalue( 'materialIdRef' ))
@@ -144,17 +144,9 @@ sub ImportContent
     my $v_format   = $md->{videoFormat};
 
     # content
-    my $descs  = $xpc->findnodes( './/descriptionList/description', $row );
-    my $desc   = undef;
+    my $desc   = $xpc->findvalue( 'descriptionList/description[@type="content"]' );
 
-    foreach my $t ($descs->get_nodelist)
-    {
-        if($t->findvalue( './@language' ) eq "swe" and $t->findvalue( './@type' ) eq "content") {
-            $desc = norm($t->findvalue('./description'));
-        }
-    }
-
-    my $title        = $xpc->findvalue( 'genericTitleList/title/title' );
+    my $title        = $xpc->findvalue( 'genericTitleList/title' );
     my $title_orgs   = $xpc->findnodes( 'titleList/title[@original="true"]' );
 
     # extra

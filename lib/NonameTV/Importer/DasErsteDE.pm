@@ -24,7 +24,7 @@ use Encode qw/from_to/;
 use Switch;
 use XML::LibXML;
 
-use NonameTV qw/AddCategory AddCountry norm normUndef ParseXml/;
+use NonameTV qw/AddCategory AddCountry norm ParseXml/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/d p w f/;
 
@@ -73,10 +73,10 @@ sub Object2Url {
   my( $date ) = ($objectname =~ /_(.*)/);
 
   my( $year, $month, $day ) = split( '-', $date );
-  my $dt = DateTime->new( 
+  my $dt = DateTime->new(
                           year  => $year,
                           month => $month,
-                          day   => $day 
+                          day   => $day
                           );
 
   my $senderid = $chd->{grabber_info};
@@ -126,10 +126,10 @@ sub FilterContent {
   $$cref =~ s|,</|</|;
 
   my $doc = ParseXml( $cref );
- 
+
   if( not defined $doc ) {
     return (undef, "ParseXml failed" );
-  } 
+  }
 
   my $str = $doc->toString(1);
 
@@ -158,12 +158,12 @@ sub ImportContent {
   {
     my( $year, $month, $day ) = split("-", $date);
     $self->{currdate} = DateTime->new( year => $year,
-                                       month => $month, 
+                                       month => $month,
                                        day => $day );
   }
 
   my $doc = ParseXml( $cref );
-  
+
   if( not defined( $doc ) )
   {
     f( "$batch_id: Failed to parse." );
@@ -187,7 +187,7 @@ sub ImportContent {
     f( "$batch_id: Wrong day: $daytext" );
     return 0;
   }
-        
+
   # The data really looks like this...
   my $ns = $doc->find( "//Sendung" );
   if( $ns->size() == 0 )
@@ -197,7 +197,7 @@ sub ImportContent {
   }
 
   $dsh->StartDate( $date, "05:30" );
-  
+
   my $programs = 0;
 
   foreach my $pgm ($ns->get_nodelist)
@@ -244,6 +244,8 @@ sub ImportContent {
     # strip running time
     $desc =~ s|^Laufzeit:\s+ca.\s+\d+ Min[^<]*\n\n||;
     $desc =~ s|^Laufzeit:\s+\d+ Min[^<]*\n\n||;
+    $desc =~ s|<|&lt;|;
+    $desc =~ s|>|&gt;|;
     # keep the short description only
     my @descs = split (/\n\Q*\E\n/, $desc);
     $desc = $descs[0];
@@ -312,11 +314,8 @@ sub ImportContent {
       $subtitle = $subtitle2;
     }
     # clean up ARD Alpha metadata in subtitle
-    if ($subtitle) {
-      if ($subtitle =~ m|\s*VPS:\d.*$|) {
-        $subtitle =~ s|\s*VPS:\d.*$||;
-        $subtitle = normUndef( $subtitle );
-      }
+    if ($subtitle =~ m|\s*VPS:\d.*$|) {
+      $subtitle =~ s|\s*VPS:\d.*$||;
     }
 
     if ($subtitle) {

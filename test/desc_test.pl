@@ -3,11 +3,28 @@
 use strict;
 use warnings;
 use Data::Dumper;
+use DateTime;
 
-my $text = "Draga Genevieve 3, dokumentarna serija (5/13)";
- # (episodenum/of_episods)
-  	my ( $ep2, $eps2 ) = ($text =~ /\((\d+)\/(\d+)\)/ );
-  	my $episode = sprintf( " . %d/%d . ", $ep2-1, $eps2 ) if defined $eps2;
-  	$text =~ s/\(.*\)//g;
-#    $text = norm($text);
-print("$text\n");
+my $text = "2015-08-20T22:45:00.000Z";
+
+print Dumper(ParseDateTime($text)->ymd("-"));
+print Dumper(ParseDateTime($text)->hms(":"));
+
+sub ParseDateTime {
+  my( $str ) = @_;
+
+  my( $year, $month, $day, $hour, $minute, $second ) =
+      ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)/ );
+
+  my $dt = DateTime->new(
+    year => $year,
+    month => $month,
+    day => $day,
+    hour => $hour,
+    minute => $minute,
+    second => $second,
+    time_zone => "UTC"
+  );
+
+  return $dt;
+}
