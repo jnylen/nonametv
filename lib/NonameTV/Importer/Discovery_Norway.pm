@@ -9,7 +9,6 @@ pressweb. The files are in xml-style
 =cut
 
 use DateTime;
-use DateTimeX::Easy;
 use XML::LibXML;
 use HTTP::Date;
 use Data::Dumper;
@@ -30,7 +29,7 @@ sub new {
     $self->{MinDays} = 0 unless defined $self->{MinDays};
     $self->{MaxDays} = 25 unless defined $self->{MaxDays};
 
-    my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Vienna" );
+    my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Oslo" );
   	$self->{datastorehelper} = $dsh;
 
   	$self->{datastore}->{augment} = 1;
@@ -145,9 +144,10 @@ sub ImportContent
   }
 
   # Find all "Schedule"-entries.
-  my $ns = $doc->find( "//program" );
+  my $ns_day = $doc->find( "//day" );
 
-  if( $ns->size() == 0 )
+
+  if( $ns_day->size() == 0 )
   {
     f "No data found 2";
     return 0;
@@ -155,169 +155,172 @@ sub ImportContent
 
   my $currdate = "x";
 
-  foreach my $sc ($ns->get_nodelist)
+
+  foreach my $dc ($ns_day->get_nodelist)
   {
-    my $start = $sc->findvalue( './starttime' );
-    my $end   = $sc->findvalue( './endtime' );
+    # day
+    my $dayte = $dc->findvalue( '@date' );
+    if( $dayte ne $currdate ){
+        progress("Date is ".$dayte);
 
-    # Count minutes between two times
-    my $format = DateTime::Format::Strptime->new(
-        pattern => '%Y-%m-%d %H:%M',
-    );
-
-    my $start2 = $format->parse_datetime( $start );
-    my $stop2  = $format->parse_datetime( $end );
-
-    # Date
-    if( $start2->ymd("-") ne $currdate ){
-        progress("Date is ".$start2->ymd("-"));
-
-        $dsh->StartDate( $start2->ymd("-") , "00:00" );
-        $currdate = $start2->ymd("-");
+        $dsh->StartDate( $dayte , "06:00" );
+        $currdate = $dayte;
     }
 
+    # Airings
+    my $ns = $dc->find( "./program" );
 
-    my $title_original = $sc->findvalue( './originaltitle' );
-	  my $title_programme = $sc->findvalue( './title' );
-	  my $title = norm($title_programme) || norm($title_original);
-
-	  $title =~ s/^Premiere: //g;
-	  $title =~ s/^Sesongpremiere: //g;
-
-    my $durat  = $start2->delta_ms($stop2)->in_units('minutes');
-    ## END
-
-    my $hd = $sc->findvalue( './hd' );
-
-    my $desc = undef;
-    my $desc_episode = $sc->findvalue( './shortdescription' );
-  	$desc = norm($desc_episode);
-
-  	my $genre           = $sc->findvalue( './category' );
-  	my $production_year = $sc->findvalue( './productionyear' );
-  	my $episode         =  $sc->findvalue( './episode' );
-  	my $numepisodes     =  $sc->findvalue( './numepisodes' );
-  	my $subtitle        = $sc->findvalue( './episodetitle' );
-    my $rerun           = $sc->findvalue( './rerun' );
-
-
-  	# TVNorge seems to have the season in the originaltitle, weird.
-  	# �r 2
-    my ( $dummy, $season ) = ($title_original =~ /(.r|sesong)\s*(\d+)$/ );
-
-
-  	progress("TVNorge: $chd->{xmltvid}: $start - $title");
-
-    my $ce = {
-      title 	  => norm($title),
-      channel_id  => $chd->{id},
-      description => norm($desc),
-      start_time  => $self->create_dt( $start ),
-      end_time    => $self->create_dt( $end ),
-    };
-
-
-    if( defined( $production_year ) and ($production_year =~ /(\d\d\d\d)/) )
+    foreach my $sc ($ns->get_nodelist)
     {
-      $ce->{production_date} = "$1-01-01";
-    }
+      my $start = $sc->findvalue( './starttime' );
+      my $end   = $sc->findvalue( './endtime' );
 
-    $genre =~ s/fra (\d+)//g;
+      my $start2 = $self->create_dt( $start );
+      my $stop2 = $self->create_dt( $end );
 
-    if( $genre ){
-        my($country, $genretext) = ($genre =~ /^(.*?)\s+(.*?)$/);
-        $country = norm($country);
-        $genretext = norm($genretext);
-        $genretext =~ s/\.$//g;
-        $country =~ s/\.$//g;
 
-        $genretext =~ s/\[(.*?)\]//g;
+      my $title_original = $sc->findvalue( './originaltitle' );
+  	  my $title_programme = $sc->findvalue( './title' );
+  	  my $title = norm($title_programme) || norm($title_original);
 
-		my($program_type, $category ) = $ds->LookupCat( 'TVNorge', $genretext );
-		AddCategory( $ce, $program_type, $category );
+  	  $title =~ s/^Premiere: //g;
+  	  $title =~ s/^Sesongpremiere: //g;
 
-		my($country2 ) = $ds->LookupCountry( 'TVNorge', $country );
-        AddCountry( $ce, $country2 );
-    }
+      my $durat  = $start2->delta_ms($stop2)->in_units('minutes');
+      ## END
 
-    # Director
-    my $director = norm($sc->findvalue( './director' ));
-    if(defined($director) and $director ne "" and $xmltvid ne "eurosport.sbsdiscovery.no") {
-        $ce->{directors} = parse_person_list($director);
-        $ce->{program_type} = 'movie';
-    }
+      my $hd = $sc->findvalue( './hd' );
 
-    # Hosts
-    my $host = norm($sc->findvalue( './host' ));
-    if(defined($host) and $host ne "") {
-        $ce->{presenters} = parse_person_list($host);
-    }
+      my $desc = undef;
+      my $desc_episode = $sc->findvalue( './shortdescription' );
+    	$desc = norm($desc_episode);
 
-    # Actors
-    my @actors;
-    my $acts = $sc->find( './/actors' );
-    foreach my $act ($acts->get_nodelist)
-    {
-        my $name = $act->to_literal;
+    	my $genre           = $sc->findvalue( './category' );
+    	my $production_year = $sc->findvalue( './productionyear' );
+    	my $episode         =  $sc->findvalue( './episode' );
+    	my $numepisodes     =  $sc->findvalue( './numepisodes' );
+    	my $subtitle        = $sc->findvalue( './episodetitle' );
+      my $rerun           = $sc->findvalue( './rerun' );
 
-        # Only push actors with an actual name
-        if($name ne "") {
-            push @actors, $name;
-        }
-    }
 
-    if( scalar( @actors ) > 0 )
-    {
-        $ce->{actors} = join ";", @actors;
-    }
+    	# TVNorge seems to have the season in the originaltitle, weird.
+    	# �r 2
+      my ( $dummy, $season ) = ($title_original =~ /(.r|sesong)\s*(\d+)$/ );
 
-	# Episodes
-	if(($season) and ($episode) and ($numepisodes)) {
-		$ce->{episode} = sprintf( "%d . %d/%d . ", $season-1, $episode-1, $numepisodes );
-	} elsif(($season) and ($episode) and (!$numepisodes)) {
-		$ce->{episode} = sprintf( "%d . %d . ", $season-1, $episode-1 );
-	} elsif((!$season) and ($episode) and ($numepisodes)) {
-		$ce->{episode} = sprintf( " . %d/%d . ", $episode-1, $numepisodes );
-	} elsif((!$season) and ($episode) and (!$numepisodes)) {
-		 $ce->{episode} = sprintf( " . %d . ", $episode-1 );
-	}
 
-	# HD
-	if($hd eq "true")
-	{
-	    $ce->{quality} = 'HDTV';
-	}
+    	progress("TVNorge: $chd->{xmltvid}: $start2 - $title");
 
-	# original title
-    if(defined($title_original) and $title_original =~ /, (.r|sesong) (.*)/i) {
-  	    $title_original =~ s/, (.r|sesong) (.*)//i;
+      my $ce = {
+        title 	  => norm($title),
+        channel_id  => $chd->{id},
+        description => norm($desc),
+        start_time  => $start2->hms(':'),
+      };
+
+
+      if( defined( $production_year ) and ($production_year =~ /(\d\d\d\d)/) )
+      {
+        $ce->{production_date} = "$1-01-01";
+      }
+
+      $genre =~ s/fra (\d+)//g;
+
+      if( $genre ){
+          my($country, $genretext) = ($genre =~ /^(.*?)\s+(.*?)$/);
+          $country = norm($country);
+          $genretext = norm($genretext);
+          $genretext =~ s/\.$//g;
+          $country =~ s/\.$//g;
+
+          $genretext =~ s/\[(.*?)\]//g;
+
+  		my($program_type, $category ) = $ds->LookupCat( 'TVNorge', $genretext );
+  		AddCategory( $ce, $program_type, $category );
+
+  		my($country2 ) = $ds->LookupCountry( 'TVNorge', $country );
+          AddCountry( $ce, $country2 );
+      }
+
+      # Director
+      my $director = norm($sc->findvalue( './director' ));
+      if(defined($director) and $director ne "" and $xmltvid ne "eurosport.sbsdiscovery.no") {
+          $ce->{directors} = parse_person_list($director);
+          $ce->{program_type} = 'movie';
+      }
+
+      # Hosts
+      my $host = norm($sc->findvalue( './host' ));
+      if(defined($host) and $host ne "") {
+          $ce->{presenters} = parse_person_list($host);
+      }
+
+      # Actors
+      my @actors;
+      my $acts = $sc->find( './/actors' );
+      foreach my $act ($acts->get_nodelist)
+      {
+          my $name = $act->to_literal;
+
+          # Only push actors with an actual name
+          if($name ne "") {
+              push @actors, $name;
+          }
+      }
+
+      if( scalar( @actors ) > 0 )
+      {
+          $ce->{actors} = join ";", @actors;
+      }
+
+  	# Episodes
+  	if(($season) and ($episode) and ($numepisodes)) {
+  		$ce->{episode} = sprintf( "%d . %d/%d . ", $season-1, $episode-1, $numepisodes );
+  	} elsif(($season) and ($episode) and (!$numepisodes)) {
+  		$ce->{episode} = sprintf( "%d . %d . ", $season-1, $episode-1 );
+  	} elsif((!$season) and ($episode) and ($numepisodes)) {
+  		$ce->{episode} = sprintf( " . %d/%d . ", $episode-1, $numepisodes );
+  	} elsif((!$season) and ($episode) and (!$numepisodes)) {
+  		 $ce->{episode} = sprintf( " . %d . ", $episode-1 );
   	}
 
-  	$ce->{original_title} = norm($title_original) if defined($title_original) and $ce->{title} ne norm($title_original) and norm($title_original) ne "";
+  	# HD
+  	if($hd eq "true")
+  	{
+  	    $ce->{quality} = 'HDTV';
+  	}
 
-    if($subtitle ne "") {
-        if($subtitle =~ /(.r|sesong)\s*(\d+), (\d+)\. del/i) {
-            $ce->{episode} = sprintf( "%d . %d . ", $2-1, $3-1 );
-        } else {
-            $ce->{subtitle} = norm(ucfirst(lc($subtitle)));
-        }
+  	# original title
+      if(defined($title_original) and $title_original =~ /, (.r|sesong) (.*)/i) {
+    	    $title_original =~ s/, (.r|sesong) (.*)//i;
+    	}
+
+    	$ce->{original_title} = norm($title_original) if defined($title_original) and $ce->{title} ne norm($title_original) and norm($title_original) ne "";
+
+      if($subtitle ne "") {
+          if($subtitle =~ /(.r|sesong)\s*(\d+), (\d+)\. del/i) {
+              $ce->{episode} = sprintf( "%d . %d . ", $2-1, $3-1 );
+          } else {
+              $ce->{subtitle} = norm(ucfirst(lc($subtitle)));
+          }
+      }
+
+      # If duration is higher than 100 minutes (1h 40min) then its a movie
+      if($durat > 100 and $subtitle eq "" and not defined($ce->{episode}) and $xmltvid ne "eurosport.sbsdiscovery.no") {
+          $ce->{program_type} = 'movie';
+      }
+
+      # replay
+      if(defined($rerun) and norm($rerun) eq "true") {
+        $ce->{new} = "0";
+      } else {
+        $ce->{new} = "1";
+      }
+
+
+      $dsh->AddProgramme( $ce );
     }
-
-    # If duration is higher than 100 minutes (1h 40min) then its a movie
-    if($durat > 100 and $subtitle eq "" and not defined($ce->{episode}) and $xmltvid ne "eurosport.sbsdiscovery.no") {
-        $ce->{program_type} = 'movie';
-    }
-
-    # replay
-    if(defined($rerun) and norm($rerun) eq "true") {
-      $ce->{new} = "0";
-    } else {
-      $ce->{new} = "1";
-    }
-
-
-    $dsh->AddProgramme( $ce );
   }
+
 
   # Success
   return 1;
@@ -349,7 +352,17 @@ sub create_dt
   }
 
 
-  return sprintf( "%02d:%02d", $hour, $minute );
+  my $dt = DateTime->new( year   => $year,
+                          month  => $month,
+                          day    => $day,
+                          hour   => $hour,
+                          minute => $minute,
+                          time_zone => 'Europe/Oslo',
+                          );
+
+  $dt->set_time_zone( "UTC" );
+
+  return $dt;
 }
 
 1;
