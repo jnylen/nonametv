@@ -314,11 +314,11 @@ sub ImportContent {
       $subtitle = $subtitle2;
     }
     # clean up ARD Alpha metadata in subtitle
-    if ($subtitle =~ m|\s*VPS:\d.*$|) {
+    if (defined($subtitle) and $subtitle =~ m|\s*VPS:\d.*$|) {
       $subtitle =~ s|\s*VPS:\d.*$||;
     }
 
-    if ($subtitle) {
+    if (defined($subtitle) and $subtitle) {
       $ce->{subtitle} = $subtitle;
     }
 
