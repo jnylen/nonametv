@@ -33,8 +33,10 @@ def download_json_files():
     if not os.path.exists('/tmp/xmltv_convert/json'):
         os.makedirs('/tmp/xmltv_convert/json')
 
-    page = urllib2.urlopen('http://json.xmltv.se/')
-    soup = BeautifulSoup(page)
+    hdr = {'User-Agent': 'Mozilla/5.0'}
+    req = urllib2.Request('http://json.xmltv.se/', headers=hdr)
+    page = urllib2.urlopen(req)
+    soup = BeautifulSoup(page, "html.parser")
     soup.prettify()
 
     for anchor in soup.findAll('a', href=True):
@@ -50,7 +52,9 @@ def download_json_files():
             if filedate >= aweekago.date():
                 if len(channels) == 0 or channel in channels or channel.startswith( 'channels' ):
                     stdout.write("Downloading http://json.xmltv.se/%s " % anchor['href'])
-                    f = urllib2.urlopen('http://json.xmltv.se/%s' % anchor['href'])
+
+                    req2 = urllib2.Request('http://json.xmltv.se/%s' % anchor['href'], headers=hdr)
+                    f = urllib2.urlopen(req2)
                     data = f.read()
                     with open('/tmp/xmltv_convert/json/%s' % anchor['href'].replace('.gz', ''), 'w+ ') as outfile:
                         outfile.write(data)
