@@ -13,18 +13,10 @@ $V && echo "Local rsync"
 
 rsync -c --delete -r $NROOT/json_extra_staging/ $NROOT/json_extra/
 rsync -c --delete -r $NROOT/json_staging/ $NROOT/json/
-tools/se-tvzon/nonametv-json-gendatalist
+#tools/se-tvzon/nonametv-json-gendatalist
 
-$V && echo "tvzon"
-#sitecopy --update $SC_OPT tvzon
+$V && echo "chaeun"
 
-rsync -c --delete -r $NROOT/json_extra/ /server/www/xmltv/json_extra/
-rsync -c --delete -r $NROOT/json/ /server/www/xmltv/json/
-rsync -c --delete -r $NROOT/datalist.xml.gz /server/www/xmltv/datalist.xml.gz
-
-$V && echo "saito"
-
-rsync -c --delete -r $NROOT/json_extra/ saito:/server/xmltv_files/json_extra/
-rsync -c --delete -r $NROOT/json/ saito:/server/xmltv_files/json/
-rsync -c --delete -r $NROOT/datalist.xml.gz saito:/server/xmltv_files/datalist.xml.gz
-
+rsync -c --delete -r $NROOT/json_extra/ chaeun:/server/xmltv_files/json_extra/
+rsync -c --delete -r $NROOT/json/ chaeun:/server/xmltv_files/json/
+#rsync -c --delete -r $NROOT/datalist.xml.gz chaeun:/server/xmltv_files/datalist.xml.gz
