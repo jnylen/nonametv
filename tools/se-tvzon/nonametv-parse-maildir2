@@ -300,15 +300,8 @@ sub guess_channel
  }
 
  if( $dir =~ /Fatstone/ and $filename =~ /\.xlsx$/i ) {
-     return "fatstone.tv";
+  #   return "fatstone.tv";
  }
-
- if( $dir =~ /TV8Norge/ and $filename =~ /\.xls|.xlsx$/i ) {
-      return "ostfold.tv8norge.no" if $filename =~ /tv8ostfold/i;
-      return "buskerud.tv8norge.no" if $filename =~ /tv8buskerud/i;
-      return "storby.tv8norge.no" if $filename =~ /tv8storby/i;
-
-  }
 
  if( $dir =~ /Mezzo/ ) {
     if($filename =~ /\.xls$/i) {
@@ -388,7 +381,7 @@ sub guess_channel
     }
 
     if( $subject =~ /WFC/i and $filename =~ /\.(xls|xlsx|txt)$/i ) {
-        return "wfc.tv";
+    #    return "wfc.tv";
     }
 
     if( ( $subject =~ /fashiontv/i or $from =~ /\@ftv.com/i ) and $filename =~ /\.xlsx$/i ) {
@@ -408,7 +401,7 @@ sub guess_channel
     # ITV
     if($filename =~ /\.xml$/i) {
         return "familytv.de" if $filename =~ /^FamilyTV_/i;
-        return "dasneue.tv" if $filename =~ /^DasNeueTV_/i;
+    #    return "dasneue.tv" if $filename =~ /^DasNeueTV_/i;
         return "blizztv.de" if $filename =~ /^Blizz_/i;
     }
  }
@@ -423,7 +416,7 @@ sub guess_channel
  }
 
  if ( $dir =~ /OKGoteborg/ and $filename =~ /\.doc$/i ) {
-    return "oppnakanalengoteborg.se";
+  #  return "oppnakanalengoteborg.se";
  }
 
  if( $dir =~ /DreiPlus/ and $filename =~ /\.(zip|xml)$/i ) {
