@@ -360,7 +360,7 @@ sub create_dt
                           time_zone => 'Europe/Oslo',
                           );
 
-  $dt->set_time_zone( "UTC" );
+  #$dt->set_time_zone( "UTC" );
 
   return $dt;
 }
