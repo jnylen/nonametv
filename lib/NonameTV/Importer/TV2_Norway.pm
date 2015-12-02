@@ -188,7 +188,7 @@ sub ImportContent
     }
 
     # image
-    if(defined($image) and $image ne "") {
+    if(defined($image) and $image ne "" and $image !~ /bilde_mangler/i) {
         #static.tv2.no/presse/images/medium/GREYSANATOMY_Y9_186_019.jpg => presse.tv2.no/presse/images/original/GREYSANATOMY_Y9_186_019.jpg
         $ce->{fanart} = $image;
         $ce->{fanart} =~ s/static\./presse\./;
@@ -198,6 +198,8 @@ sub ImportContent
     # episode
     if( defined( $episode ) and ($episode =~ /\S/) )
     {
+      $episode = norm($episode);
+      $episode =~ s/\.\d+\/\d+$/\./;
       $ce->{episode} = norm($episode);
       $ce->{program_type} = 'series';
     }
