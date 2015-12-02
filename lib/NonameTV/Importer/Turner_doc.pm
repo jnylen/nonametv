@@ -129,7 +129,7 @@ sub ImportContentFile
       my $ce = {
         channel_id => $chd->{id},
         start_time => $time,
-        title => $title,
+        title => norm($title),
       };
 
       # , The$ => ^The
@@ -144,6 +144,13 @@ sub ImportContentFile
       if($ce->{title} =~ /, An$/i) {
         $ce->{title} =~ s/, An$//i;
         $ce->{title} = "An " . $ce->{title};
+      }
+      if($ce->{title} =~ /^NY\:/i) {
+        $ce->{title} =~ s/^NY\://i;
+        $ce->{title} = norm($ce->{title});
+        $ce->{new} = "1";
+      } else {
+        $ce->{new} = "0";
       }
 
       # add the programme to the array
@@ -160,7 +167,7 @@ sub ImportContentFile
         if($text =~ /^Prod Year (\d\d\d\d)/i) {
           $element->{production_date} = "$1-01-01";
           $element->{program_type} = "movie";
-        } elsif(defined($element->{description}) and $element->{description} ne "" and $text ne "" and $text !~ /Programme Schedule$/i) {
+        } elsif(defined($element->{description}) and $element->{description} ne "" and $text ne "" and $text !~ /Programme Schedule$/i and $text !~ /^CET\s+\d+\.\d+/i ) {
           $element->{subtitle} = $element->{description};
           $element->{description} = $text;
           $element->{program_type} = "series";
