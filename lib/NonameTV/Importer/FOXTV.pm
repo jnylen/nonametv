@@ -94,6 +94,7 @@ sub ImportXML
   ## Fix for data falling off when on a new week (same date, removing old programmes for that date)
   my ($dummy, $week, $year, $meh);
   ($dummy, $week, $year) = ($file =~ /(wk|uke|week)\s*(\d+)_(\d+)/i);
+  ($year, $dummy, $week) = ($file =~ /(\d\d\d\d)_(wk|uke|week)\s*(\d+)/i) if (!defined $week);
   ($dummy, $meh, $week) = ($file =~ /(wk|uke|week)(\s*|_|)(\d+)/i) if(!defined $year);
 
   if(!defined $year) {
@@ -115,13 +116,7 @@ sub ImportXML
     my $start = $row->findvalue( 'StartTime' );
     ($day, $month, $year) = ($row->findvalue( 'Date' ) =~ /^(\d\d)\/(\d\d)\/(\d\d\d\d)$/);
     $date = $year."-".$month."-".$day;
-	if($date ne $currdate ) {
-        if( $currdate ne "x" ) {
-		#	$dsh->EndBatch( 1 );
-        }
-
-        #my $batchid = $chd->{xmltvid} . "_" . $date;
-        #$dsh->StartBatch( $batchid , $chd->{id} );
+	  if($date ne $currdate ) {
         $dsh->StartDate( $date , "00:00" );
         $currdate = $date;
 
@@ -457,8 +452,8 @@ sub ParseDate {
 
   if( $text =~ /^\d+-\d+-\d+$/ ) { # format '2011-07-01'
     ( $year, $month, $day ) = ( $text =~ /^(\d+)-(\d+)-(\d+)$/ );
-  } elsif( $text =~ /^\d+\/\d+\/\d+$/ ) { # format '01/11/2008'
-    ( $day, $month, $year ) = ( $text =~ /^(\d+)\/(\d+)\/(\d+)$/ );
+  } elsif( $text =~ /^\d+\/\d+\/\d\d\d\d$/ ) { # format '01/11/2008'
+    ( $day, $month, $year ) = ( $text =~ /^(\d+)\/(\d+)\/(\d\d\d\d)$/ );
   }
 
   if(not defined($year)) {
