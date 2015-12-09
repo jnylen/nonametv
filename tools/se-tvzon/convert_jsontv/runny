@@ -42,3 +42,7 @@ rsync -c --delete -r $NROOT/datalist.xml.gz chaeun:/server/xmltv_files/datalist.
 # Compare
 tools/se-tvzon/nonametv-xmltv-compare-run
 rsync --delete -r /var/local/nonametv/xmltv_compare/ /var/www/html/compare/
+
+# Combined files
+ruby /home/jnylen/notice.rb
+/home/jnylen/xmltv-grabber
