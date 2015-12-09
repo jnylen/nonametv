@@ -85,7 +85,7 @@ sub DESTROY {
 
 =over 4
 
-=item Connect 
+=item Connect
 
   $sa->Connect();
 
@@ -169,12 +169,12 @@ sub Delete {
 
 =item Add( $table, $values, $die_on_error )
 
-Add a new record to a table. $table should be a string containing the name 
+Add a new record to a table. $table should be a string containing the name
 of a table, $values should be a hash-reference with field-names and values.
 $die_on_error defaults to $self->{die_on_error}.
 Returns the primary key assigned to the new record or -1 if the Add failed.
 
-=cut 
+=cut
 
 sub Add {
   my $self = shift;
@@ -219,8 +219,8 @@ sub Add {
 Update all records matching $args. $table should be a string containing the name of a table, $args and $new_values should be a hash-reference with field-names and values. Returns the number of updated records.
 
 Example:
-    $ds->Update( "users", { uid => 1 }, 
-		 { lastname => "Holmlund", 
+    $ds->Update( "users", { uid => 1 },
+		 { lastname => "Holmlund",
 		   firstname => "Mattias" } );
 
 =cut
@@ -298,13 +298,13 @@ sub _BuildLookup {
 
 =item Lookup( $table, $args [, $field] )
 
-Retrieve values from a record. $table should be a string containing the name 
-of a table, $args should be a hash-reference with field-names and values. 
+Retrieve values from a record. $table should be a string containing the name
+of a table, $args should be a hash-reference with field-names and values.
 If $field is specified, it should be the name of a field in the record and
-Lookup will then return the contents of that field. If $field is undef, 
+Lookup will then return the contents of that field. If $field is undef,
 a hash-reference with all fields and values in the record is returned.
 
-If $args fails to identify one unique record, undef is returned. 
+If $args fails to identify one unique record, undef is returned.
 
 =cut
 
@@ -392,7 +392,7 @@ sub LookupManySql {
 Same as Lookup, but returns a dbi statement handle that can be used
 as an iterator. Can also take several field-arguments.
 
-=cut 
+=cut
 
 sub Iterate {
   my $self = shift;
@@ -476,4 +476,3 @@ Copyright (C) 2007 Mattias Holmlund.
 ## Local Variables:
 ## coding: utf-8
 ## End:
-
