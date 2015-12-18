@@ -157,8 +157,6 @@
 305,Tvdb,"^.*Hitlåtens historia.*$",program_type,series,135781,episodetitle
 305,Fixups,"^.*(Mänsklighetens sista dagar):\s+(.*)$",\N,\N,\N,splittitle
 255,Tvdb,"Penn and Teller: Bullshit!",program_type,series,72301,episodeseason
-232,Tvrage,"RAW Comedy Club",program_type,series,21721,episodeseason
-232,Tvrage,"Sofias änglar",program_type,series,27497,episodeseason
 429,Tvdb,"Falling Skies",program_type,movie,205281,episodeseason
 297,TvdbDE,^.*$,program_type,series,\N,episodetitle
 298,TvdbDE,^.*$,program_type,series,\N,episodetitle
@@ -201,18 +199,18 @@
 493,Fixups,^.*(Tema):\s+(.*)$,\N,\N,\N,splittitle
 305,Fixups,"^.*(Världens språk):\s+(.*)$",\N,\N,\N,splittitle
 281,Tvdb,"Inside the Actors Studio",program_type,series,72614,episodetitle
-269,TvdbEN,^.*$,program_type,series,\N,episodetitle
-270,TvdbEN,^.*$,program_type,series,\N,episodetitle
-271,TvdbEN,^.*$,program_type,series,\N,episodetitle
-272,TvdbEN,^.*$,program_type,series,\N,episodetitle
-273,TvdbEN,^.*$,program_type,series,\N,episodetitle
-274,TvdbEN,^.*$,program_type,series,\N,episodetitle
-275,TvdbEN,^.*$,program_type,series,\N,episodetitle
-276,TvdbEN,^.*$,program_type,series,\N,episodetitle
-270,TvdbEN,"Ultimate Survival",program_type,series,79545,episodetitle
-270,Fixups,"American Loggers",subtitle,"Man vs Mud","Man vs. Mud",replacesubtitle
-270,TvdbEN,"Gold Rush: Alaska",program_type,series,208111,episodetitle
-270,TvdbEN,"Gold Rush - Season 2 Specials",program_type,series,208111,episodetitle
+269,Tvdb,^.*$,program_type,series,\N,guess
+270,Tvdb,^.*$,program_type,series,\N,guess
+271,Tvdb,^.*$,program_type,series,\N,guess
+272,Tvdb,^.*$,program_type,series,\N,guess
+273,Tvdb,^.*$,program_type,series,\N,guess
+274,Tvdb,^.*$,program_type,series,\N,guess
+275,Tvdb,^.*$,program_type,series,\N,guess
+276,Tvdb,^.*$,program_type,series,\N,guess
+270,TvdbEN,"Ultimate Survival",program_type,series,79545,guess
+270,Fixups,"American Loggers",subtitle,"Man vs Mud","Man vs. Mud",guess
+270,TvdbEN,"Gold Rush: Alaska",program_type,series,208111,guess
+270,TvdbEN,"Gold Rush - Season 2 Specials",program_type,series,208111,guess
 \N,Fixups,Mythbusters,subtitle,"101 Uses for Duct Tape","Duct Tape Hour",replacesubtitle
 \N,Fixups,Mythbusters,subtitle,"Exploding Bumpers","Exploding Bumper",replacesubtitle
 \N,Fixups,Mythbusters,subtitle,"Thermite vs Ice","Thermite vs. Ice",replacesubtitle
@@ -233,7 +231,7 @@
 \N,Fixups,"Deadliest Catch",subtitle,"New Blood Part 1","New Blood",replacesubtitle
 \N,Fixups,"Deadliest Catch",subtitle,"New Blood Part 2","New Blood",replacesubtitle
 \N,Fixups,"Deadliest Catch",subtitle,"Proving Ground","Proving Grounds",replacesubtitle
-270,TvdbEN,"American Hotrod",program_type,series,80389,episodetitle
+270,TvdbEN,"American Hotrod",program_type,series,80389,guess
 \N,Fixups,"American Hotrod",subtitle,"'54 Corvette and '55 Chevy - Part 3","'54 Corvette & '55 Chevy (Part 3)",replacesubtitle
 \N,Fixups,"Ultimate Survival",subtitle,"Global Survivor Guide","Global Survival Guide",replacesubtitle
 \N,Fixups,"American Hotrod",subtitle,"'56 Chevy Convertible - Part 1","'56 Chevy Convertible (Part 1)",replacesubtitle
@@ -360,10 +358,8 @@
 264,Tvdb,"The X factor US",program_type,series,230121,episodeseason
 264,Tvdb,90210,program_type,series,82716,episodeseason
 264,Tvdb,"Kåkfarare i köket",program_type,series,255435,episodeseason
-264,Tvrage,Distraction,program_type,series,7045,episodeseason
 264,Tvdb,"Kan du texten?",program_type,series,80314,episodeseason
 264,Fixups,"Tori & Dean",subtitle,"Hem ljuva Hollywood","Tori And Dean: Home Sweet Hollywood",replacetitle
-265,Tvrage,Matmissbrukarna,program_type,series,18516,episodeseason
 265,Tvdb,"Nigella's kitchen",program_type,series,194201,episodeseason
 265,Tvdb,"Poliser i paradiset",program_type,series,20560,episodeseason
 265,Tvdb,"Mc-patrullen räddar liv",program_type,series,185071,episodeseason
@@ -434,7 +430,6 @@
 252,TvdbEN,"Steve Irwin: The Crocodile Hunter Diaries",program_type,series,70951,episodeseason
 252,TvdbEN,"Tribe (Bruce Parry)",program_type,series,79119,episodeseason
 252,TvdbEN,Executioners,program_type,series,85482,episodeseason
-256,Tvrage,"Antiques Roadshow",program_type,series,7762,episodeseason
 278,Tvdb,Masterminds,program_type,movie,79038,episodetitle
 254,TvdbEN,"Til Death",program_type,series,79384,episodeseason
 \N,Tvdb,"Without A Trace, TV8",program_type,series,77963,episodeseason
@@ -561,13 +556,13 @@
 735,Tvdb,^.*$,program_type,series,\N,episodeseason
 732,Tvdb,^.*$,program_type,series,\N,guess
 736,TvdbNO,^.*$,program_type,series,\N,episodeseason
-659,TvdbNO,^.*$,program_type,series,\N,episodetitle
-661,TvdbNO,^.*$,program_type,series,\N,episodetitle
-660,TvdbNO,^.*$,program_type,series,\N,episodetitle
-662,TvdbNO,^.*$,program_type,series,\N,episodetitle
-665,TvdbNO,^.*$,program_type,series,\N,episodetitle
-667,TvdbNO,^.*$,program_type,series,\N,episodetitle
-663,TvdbNO,^.*$,program_type,series,\N,episodetitle
+659,TvdbNO,^.*$,program_type,series,\N,guess
+661,TvdbNO,^.*$,program_type,series,\N,guess
+660,TvdbNO,^.*$,program_type,series,\N,guess
+662,TvdbNO,^.*$,program_type,series,\N,guess
+665,TvdbNO,^.*$,program_type,series,\N,guess
+667,TvdbNO,^.*$,program_type,series,\N,guess
+663,TvdbNO,^.*$,program_type,series,\N,guess
 664,TvdbNO,^.*$,program_type,series,\N,episodetitle
 711,TvdbNO,^.*$,program_type,series,\N,episodetitle
 506,TvdbNO,^.*$,program_type,series,\N,episodeseason
@@ -603,13 +598,13 @@
 289,TvdbDK,"The Newsroom",program_type,series,256227,episodeseason
 295,Tvdb,"The Newsroom",program_type,series,256227,episodetitle
 296,Tvdb,"The Newsroom",program_type,series,256227,episodetitle
-791,TvdbEN,^.*$,program_type,series,\N,episodetitle
-792,TvdbEN,^.*$,program_type,series,\N,episodetitle
-793,TvdbEN,^.*$,program_type,series,\N,episodetitle
+791,TvdbDK,^.*$,program_type,series,\N,guess
+792,TvdbDK,^.*$,program_type,series,\N,guess
+793,TvdbDK,^.*$,program_type,series,\N,guess
 794,TvdbEN,^.*$,program_type,series,\N,episodetitle
-795,TvdbEN,^.*$,program_type,series,\N,episodetitle
-796,TvdbEN,^.*$,program_type,series,\N,episodetitle
-797,TvdbEN,^.*$,program_type,series,\N,episodetitle
+795,TvdbDK,^.*$,program_type,series,\N,guess
+796,TvdbDK,^.*$,program_type,series,\N,guess
+797,TvdbDK,^.*$,program_type,series,\N,guess
 630,TvdbDK,^.*$,program_type,series,\N,guess
 287,TvdbNO,Castle,program_type,series,83462,guess
 392,TvdbNO,Castle,program_type,series,83462,guess
@@ -674,10 +669,10 @@
 \N,Fixups,"Desperate Housewives",subtitle,"God, That's Good","God, That's Good!",replacesubtitle
 478,Fixups,"^Futurama - .r.*$",program_type,series,Futurama,replacetitle
 391,TvdbEN,^.*$,program_type,series,\N,episodetitle
-790,TvdbEN,^.*$,program_type,series,\N,episodetitle
+790,TvdbDK,^.*$,program_type,series,\N,guess
 805,TvdbEN,^.*$,program_type,series,\N,episodetitle
-806,TvdbEN,^.*$,program_type,series,\N,episodetitle
-807,TvdbEN,^.*$,program_type,series,\N,episodetitle
+806,TvdbFI,^.*$,program_type,series,\N,guess
+807,TvdbFI,^.*$,program_type,series,\N,guess
 809,TvdbEN,^.*$,program_type,series,\N,episodetitle
 238,TvdbEN,^.*$,program_type,series,\N,episodeseason
 244,TvdbEN,^.*$,program_type,series,\N,episodeseason
@@ -720,7 +715,7 @@
 613,TvdbEN,^.*$,program_type,series,\N,episodeseason
 614,TvdbEN,^.*$,program_type,series,\N,episodeseason
 615,TvdbEN,^.*$,program_type,series,\N,episodeseason
-891,TvdbEN,^.*$,program_type,series,\N,episodetitle
+891,TvdbEN,^.*$,program_type,series,\N,guess
 893,TvdbFI,^.*$,program_type,series,\N,episodeseason
 899,TvdbFI,^.*$,program_type,series,\N,guess
 904,TvdbFI,^.*$,program_type,series,\N,guess
@@ -865,10 +860,7 @@
 489,Tvdb,"112 - på liv och död",program_type,series,164861,guess
 489,Tvdb,"The looney tunes show",program_type,series,248368,guess
 489,Tvdb,"The Scooby & Scrappy Doo show",program_type,series,78740,guess
-489,Tvrage,Pokémon,program_type,series,31,episodeseason
 489,Tvdb,"Teenage mutant ninja turtles",program_type,series,261451,guess
-489,Tvrage,"Hem till gården",program_type,series,3440,episodeseason
-259,Tvrage,"Hem till gården",program_type,series,3440,episodeseason
 260,Tvdb,"Se upp för Ellie",program_type,series,77250,guess
 260,Tmdb,"All star comedy jam I: Cedric the entertainer",program_type,movie,22788,movieid
 260,Tvdb,"Räkna med bråk",program_type,series,76732,guess
@@ -884,13 +876,9 @@
 262,Tvdb,^Beck\s+\-(.*)$,program_type,series,82796,guess
 262,Tvdb,^Beck\s+\-(.*)$,program_type,movie,82796,guess
 262,Tvdb,"Världens grymmaste",program_type,series,255160,guess
-262,Tvrage,"Live Here, Buy This",program_type,series,35707,episodeseason
-262,Tvrage,"Hela Sverige bakar",program_type,series,33116,episodeseason
 439,Tvdb,"En dag i mitt liv",program_type,series,257391,guess
-439,Tvrage,"Den arga planeten",program_type,series,26720,episodeseason
 439,Tvdb,"Cash cowboys",program_type,series,251800,guess
 439,Tvdb,"En dag i mitt liv:",program_type,series,257391,guess
-439,Tvrage,"Farligt vatten",program_type,series,37637,episodeseason
 439,Tvdb,"Maskiner genom tiderna",program_type,series,97821,guess
 732,Tvdb,"Extreme makeover weightloss",program_type,series,249085,guess
 732,Tvdb,"Kameran ser dig",program_type,series,262944,guess
@@ -995,17 +983,17 @@
 1262,TvdbNL,^.*$,program_type,series,\N,guess
 733,Tvdb,^.*$,program_type,series,\N,guess
 1052,Tvdb,"The Librarians",program_type,series,281709,guess
-1265,TvdbEN,^.*$,program_type,series,\N,episodetitle
-1266,TvdbEN,^.*$,program_type,series,\N,episodetitle
-1267,TvdbEN,^.*$,program_type,series,\N,episodetitle
-1268,TvdbEN,^.*$,program_type,series,\N,episodetitle
-1269,TvdbEN,^.*$,program_type,series,\N,episodetitle
-1270,TvdbEN,^.*$,program_type,series,\N,episodetitle
-1271,TvdbEN,^.*$,program_type,series,\N,episodetitle
-1272,TvdbEN,^.*$,program_type,series,\N,episodetitle
-1273,TvdbEN,^.*$,program_type,series,\N,episodetitle
-1274,TvdbEN,^.*$,program_type,series,\N,episodetitle
-1275,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1265,TvdbEN,^.*$,program_type,series,\N,guess
+1266,TvdbEN,^.*$,program_type,series,\N,guess
+1267,TvdbEN,^.*$,program_type,series,\N,guess
+1268,TvdbEN,^.*$,program_type,series,\N,guess
+1269,TvdbEN,^.*$,program_type,series,\N,guess
+1270,TvdbEN,^.*$,program_type,series,\N,guess
+1271,TvdbEN,^.*$,program_type,series,\N,guess
+1272,TvdbEN,^.*$,program_type,series,\N,guess
+1273,TvdbEN,^.*$,program_type,series,\N,guess
+1274,TvdbEN,^.*$,program_type,series,\N,guess
+1275,TvdbEN,^.*$,program_type,series,\N,guess
 1276,TvdbFI,^.*$,\N,\N,\N,guess
 1277,TvdbPL,^.*$,program_type,series,\N,guess
 1278,TvdbPL,^.*$,program_type,series,\N,guess
@@ -1050,7 +1038,7 @@
 1305,TvdbEN,"THE Producers",program_type,series,294814,guess
 1305,TvdbEN,"Immortal Songs 2",program_type,series,271760,guess
 1305,TvdbEN,"The Man in the Mask",program_type,series,295948,guess
-273,TvdbEN,"Scorned: Crimes of Passion",program_type,series,255307,episodetitle
+273,Tvdb,"Scorned: Crimes of Passion",program_type,series,255307,guess
 1354,TvdbDE,^.*$,program_type,series,\N,guess
 1355,Tvdb,^.*$,program_type,series,\N,guess
 1355,Tvdb,Stallkompisar,program_type,series,81993,guess
@@ -1100,11 +1088,11 @@
 912,TvdbDK,^.*$,program_type,series,\N,guess
 914,TvdbDK,^.*$,program_type,series,\N,guess
 912,TvdbDK,"Gumballs Fantastiske Verden",program_type,series,248482,guess
-912,TvdbDK,Clarence,program_type,series,271421,guess
+912,TvdbEN,Clarence,program_type,series,271421,guess
 912,TvdbDK,Eventyrtid,\N,\N,152831,guess
 912,TvdbDK,"Transformers: Robots In Disguise",program_type,series,292171,guess
 689,TvdbNO,"Ninjago: Spinjitzu-mesterne",\N,\N,253323,guess
-689,TvdbNO,Clarence,program_type,series,271421,guess
+689,TvdbEN,Clarence,program_type,series,271421,guess
 689,TvdbNO,"Onkel Farfar",program_type,series,263941,guess
 689,TvdbNO,Eventyrtid,\N,\N,152831,guess
 689,TvdbNO,"Gumballs Fantastiske Verden",program_type,series,248482,guess
@@ -1114,7 +1102,7 @@
 912,TvdbDK,"Onkel Morfar",program_type,series,263941,guess
 1395,Tvdb,^.*$,program_type,series,\N,guess
 1395,Tvdb,"Transformers: Robots In Disguise",program_type,series,292171,guess
-1395,Tvdb,Clarence,program_type,series,271421,guess
+1395,TvdbEN,Clarence,program_type,series,271421,guess
 1395,Tvdb,"Farbror Farfar",program_type,series,263941,guess
 1395,Tvdb,"Dreamworks Drakryttarna: Dräggös försvarare",\N,\N,261202,guess
 1395,Tvdb,"Dreamworks Drakryttarna Dräggös försvarare",\N,\N,261202,guess
@@ -1160,7 +1148,7 @@
 912,TvdbDK,"De nye Scooby Doo-film",program_type,,75661,guess
 912,Tmdb,"Scooby-Doo og Cyberjagten",\N,\N,15601,movieid
 912,TvdbDK,"Total Drama: Pahkitew Island",\N,\N,283127,guess
-913,TvdbEN,^.*$,program_type,series,\N,guess
+913,TvdbEN,^.*$,\N,\N,\N,guess
 913,TvdbEN,Clarence,program_type,series,271421,guess
 689,Fixups,"^.*(Lego Star Wars: The Yoda Chronicles)\s+(.*)$",\N,\N,\N,splittitle
 689,Fixups,"^.*(Lego Star Wars Yoda Krønikene)\s+-\s+(.*)$",\N,\N,\N,splittitle
@@ -1263,21 +1251,9 @@
 1395,Tvdb,"Total Drama: Revenge Of The Island",program_type,,260752,guess
 1395,Tmdb,"Billy & Mandys Stora Spökäventyr",\N,\N,17305,movieid
 1395,Tmdb,"Scooby Doo och monstret från Mexico",\N,\N,21956,movieid
-288,Tvrage,"Menneskets planet",program_type,series,27134,episodeabs
-288,Tvrage,"Water Rats",program_type,series,126,episodeabs
-288,Tvrage,"Parade's End",program_type,series,27900,episodeabs
 288,Fixups,"^.*(Ved du hvem du er\?)\s+-\s+(.*)$",\N,\N,\N,splittitle
-288,Tvrage,Halifax,program_type,series,3776,episodeabs
-288,Tvrage,"Der er noget i luften",program_type,series,1579,episodeabs
-288,Tvrage,"De flyvende læger",program_type,series,5788,episodeabs
-288,Tvrage,"Herskab og tjenestefolk",program_type,series,6490,episodeabs
-288,Tvrage,Luksuskrejlerne,program_type,series,20212,episodeabs
-288,Tvrage,Antikkrejlerne,program_type,series,25222,episodeabs
 288,Fixups,^.*(Bergerac):\s+(.*)$,\N,\N,\N,splittitle
-288,Tvrage,Forsyte-sagaen,program_type,series,5791,episodeabs
 288,Fixups,"^.*(Price inviterer)\s+-\s+(.*)$",\N,\N,\N,splittitle
-288,Tvrage,"Unge Morse",program_type,series,30378,episodeabs
-288,Tvrage,Kystvagten,program_type,series,16593,episodeabs
 288,Fixups,"^.*(Inspector Morse):\s+(.*)$",\N,\N,\N,splittitle
 288,Fixups,"^Inspector Morse.*$",program_type,movie,series,setprogram_type
 288,Fixups,"^.*(Søren Ryge præsenterer):\s+(.*)$",\N,\N,\N,splittitle
@@ -1291,34 +1267,19 @@
 288,Fixups,"^.*(Kriminalinspektør Banks):\s+(.*)$",\N,\N,\N,splittitle
 288,Fixups,"^Kriminalinspektør Banks.*$",program_type,movie,series,setprogram_type
 288,Fixups,"^.*(Forunderlige verden)\s+-\s+(.*)$",\N,\N,\N,splittitle
-288,Tvrage,"I farezonen",program_type,series,195,episodeabs
 288,Fixups,"^.*(Tobias på kageeventyr):\s+(.*)$",\N,\N,\N,splittitle
-288,Tvrage,"Kriminalkommissær Barnaby",program_type,series,4466,episodeabs
 288,Fixups,^.*(Vera):\s+(.*)$,\N,\N,\N,splittitle
 288,Fixups,^Vera.*$,program_type,movie,series,setprogram_type
-288,Tvrage,"Mord i centrum",program_type,series,17228,episodeabs
 288,Fixups,"^.*(Kyst til kyst)\s+-\s+(.*)$",\N,\N,\N,splittitle
 288,Fixups,"^.*(AftenTour 2015):\s+(.*)$",\N,\N,\N,splittitle
 288,Fixups,"^.*(er er dit liv):\s+(.*)$",\N,\N,\N,splittitle
 288,Fixups,"^.*(Her er dit liv):\s+(.*)$",\N,\N,\N,splittitle
 288,Fixups,^.*(Mistænkt)\s+\d+:\s+(.*)$,\N,\N,\N,splittitle
-288,Tvrage,"Det var i maj",program_type,series,5716,episodeabs
-288,Tvrage,"Mord på hjernen",program_type,series,939,episodeabs
-288,Tvrage,"Kode for mord",program_type,series,32530,episodeabs
 288,Fixups,^.*(Wallander):\s+(.*)$,\N,\N,\N,splittitle
 288,Fixups,^Wallander.*$,program_type,movie,series,setprogram_type
 289,Fixups,"DR2 Morgen (G)",\N,\N,"DR2 Morgen",replacetitle
-289,Tvrage,"Hairy Bikers store kokkedyst",program_type,series,26786,episodeabs
-289,Tvrage,"Jimmys madfabrik",program_type,series,24045,episodeabs
-289,Tvrage,"Når mænd er værst",program_type,series,4445,episodeabs
-289,Tvrage,Spooks,program_type,series,4458,episodeabs
-289,Tvrage,"Smack the Pony",program_type,series,402,episodeabs
-289,Tvrage,"Kode for mord",program_type,series,32530,episodeabs
 289,Fixups,"^.*(Arne Dahls A-gruppen):\s+(.*)$",\N,\N,\N,splittitle
 289,Tmdb,Citizenfour,\N,\N,293310,movieid
-289,Tvrage,"Monty Pythons bedste",program_type,series,45208,episodeabs
-289,Tvrage,"Halløj på badehotellet",program_type,series,3532,episodeabs
-289,Tvrage,"Da Sharon mødte Rob",program_type,series,42962,episodeabs
 289,Fixups,"^.*(Globe Trekker)\s+-\s+(.*)$",\N,\N,\N,splittitle
 289,Fixups,"^.*(80\'erne tur\/retur):\s+(.*)$",\N,\N,\N,splittitle
 289,Fixups,"^.*(90\'erne tur retur):\s+(.*)$",\N,\N,\N,splittitle
@@ -1329,18 +1290,12 @@
 289,Tmdb,"Casino Jack - superlobbyisten",\N,\N,45324,movieid
 289,Tmdb,"The Godfather",\N,\N,238,movieid
 289,Fixups,"^.*(Under fire øjne)\s+-\s+(.*)$",\N,\N,\N,splittitle
-289,Tvrage,Landmandsliv,program_type,series,27428,episodeabs
 289,Fixups,"^.*(Sans for humor)\s+-\s+(.*)$",\N,\N,\N,splittitle
 289,Fixups,"^.*(Det sejler)\s+-\s+(.*)$",\N,\N,\N,splittitle
 289,Fixups,"^.*(I følelsernes vold)\s+-\s+(.*)$",\N,\N,\N,splittitle
-289,Tvrage,"Politikerens mand",program_type,series,35373,episodeabs
-289,Tvrage,"Jimmy og den globale fødekæde",program_type,series,24853,episodeabs
-289,Tvrage,"^Hairy Bikers i.*$",program_type,series,31021,episodeabs
-289,Tvrage,"Helt hysterisk",program_type,series,2477,episodeabs
 289,Fixups,"^.*(Fauli, fed og færdig\?)\s+-\s+(.*)$",\N,\N,\N,splittitle
 289,Tmdb,"World's Greatest Dad",\N,\N,20178,movieid
 289,Fixups,"^.*(00\'erne tur\/retur):\s+(.*)$",\N,\N,\N,splittitle
-289,Tvrage,"Yotam Ottolenghis Middelhavsfest",program_type,series,34546,episodeabs
 289,Fixups,"^.*(Så er der mad)\s+-\s+(.*)$",\N,\N,\N,splittitle
 289,Fixups,^.*(Nærkontakt)\s+-\s+(.*)$,\N,\N,\N,splittitle
 472,Fixups,"^.*(Nordisk Rum)\s+-\s+(.*)$",\N,\N,\N,splittitle
@@ -1348,27 +1303,17 @@
 472,Fixups,^.*(Morgenthaler)\s+-\s+(.*)$,\N,\N,\N,splittitle
 472,Fixups,"^.*(Bergmans video)\s+-\s+(.*)$",\N,\N,\N,splittitle
 472,Fixups,"^.*(Store danskere)\s+-\s+(.*)$",\N,\N,\N,splittitle
-472,Tvrage,Verdenshistorien,program_type,series,32736,episodeabs
-472,Tvrage,"Det Osmanniske Rige",program_type,series,34699,episodeabs
-472,Tvrage,"Sahara rundt med Michael Palin",program_type,series,8030,episodeabs
-472,Tvrage,Forbudstiden,program_type,series,29073,episodeabs
-472,Tvrage,"Biblens begravede hemmeligheder",program_type,series,27673,episodeabs
 472,Fixups,"^.*(Vilde Hoteller)\s+-\s+(.*)$",\N,\N,\N,splittitle
 472,Fixups,"^.*(Liv i renæssancen)\s+-\s+(.*)$",\N,\N,\N,splittitle
 472,Fixups,"^.*(Britiske herregårde)\s+-\s+(.*)$",\N,\N,\N,splittitle
-472,Tvrage,"^Britiske herregårde.*$",program_type,series,28205,episodeabs
-472,Tvrage,"Dad's Army",program_type,series,3203,episodeabs
 472,Fixups,"^.*(Danske musiklegender):\s+(.*)$",\N,\N,\N,splittitle
 472,Fixups,"^.*(Danskernes Krønike)\s+-\s+(.*)$",\N,\N,\N,splittitle
-472,Tvrage,"Det fantastiske Italien",program_type,series,39444,episodeabs
 472,Fixups,"^.*(Forbudte fristelser):\s+(.*)$",\N,\N,\N,splittitle
 472,Fixups,^.*(Værtshushistorier)\s+-\s+(.*)$,\N,\N,\N,splittitle
 472,Fixups,"^.*(Jazzklubber i Norden)\s+-\s+(.*)$",\N,\N,\N,splittitle
 472,Fixups,^.*(Guldkorn)\s+-\s+(.*)$,\N,\N,\N,splittitle
-472,Tvrage,"USA i bedste sendetid",program_type,series,29072,episodeabs
 472,Fixups,"^.*(Det ender med en kvinde)\s+-\s+(.*)$",\N,\N,\N,splittitle
 472,Fixups,"^.*(Fra immigrant til millionær):\s+(.*)$",\N,\N,\N,splittitle
-472,Tvrage,"Herskab og tjenestefolk",program_type,series,6490,episodeabs
 472,Fixups,"^.*(Verdens fedeste byer)\s+-\s+(.*)$",\N,\N,\N,splittitle
 472,Tvdb,"Verdens fedeste byer",\N,\N,83411,guess
 472,Fixups,"^.*(Dengang i 1960\'erne)\s+-\s+(.*)$",\N,\N,\N,splittitle
@@ -1377,51 +1322,27 @@
 472,Fixups,"^.*(DR K Jazz):\s+(.*)$",\N,\N,\N,splittitle
 472,Fixups,"^.*(Myten genåbnes):\s+(.*)$",\N,\N,\N,splittitle
 472,Fixups,"^.*(Beatles forever)\s+-\s+(.*)$",\N,\N,\N,splittitle
-472,Tvrage,"Dronning Victorias børn",program_type,series,33623,episodeabs
 472,Fixups,"^.*(Mit London)\s+-\s+(.*)$",\N,\N,\N,splittitle
-472,Tvrage,"Menneskets historie",program_type,series,32230,episodeabs
 472,Fixups,"^.*(Min by New York)\s+-\s+(.*)$",\N,\N,\N,splittitle
 472,Fixups,"^.*(WEST 57)\s+-\s+(.*)$",\N,\N,\N,splittitle
-472,Tvrage,"^Briternes historie.*$",program_type,series,32470,episodeabs
-472,Tvrage,"Han, hun og godset",program_type,series,6391,episodeabs
 472,Fixups,^.*(Kunstnerportrætter)\s+-\s+(.*)$,\N,\N,\N,splittitle
-472,Tvrage,"Jerusalem - den hellige stad",program_type,series,30141,episodeabs
 510,Fixups,"^.*(Stress af med DR3)\s+-\s+(.*)$",\N,\N,\N,splittitle
 510,Fixups,^.*(Morgengymnastikken):\s+(.*)$,\N,\N,\N,splittitle
 510,Fixups,"^.*(Gennemsnitlig Krop)\s+-\s+(.*)$",\N,\N,\N,splittitle
-510,Tvrage,Glee,program_type,series,21704,episodeabs
 510,Fixups,"^.*(The Beast)\s+-\s+(.*)$",\N,\N,\N,splittitle
-510,Tvrage,"Karl Pilkington:The Moaning of Life",program_type,series,38171,episodeabs
-510,Tvrage,"Karl Pilkington: The Moaning of Life",program_type,series,38171,episodeabs
 510,Fixups,"^.*(DR3 Dok):\s+(.*)$",\N,\N,\N,splittitle
-510,Tvrage,"True Detective",program_type,series,31369,episodeabs
-510,Tvrage,"The Indestructibles",program_type,series,12770,episodeabs
-510,Tvrage,"Den frosne planet",program_type,series,27911,episodeabs
 510,Fixups,"^.*(Turismens mørke side)\s+-\s+(.*)$",\N,\N,\N,splittitle
 510,Fixups,"^.*(Fantastisk Sci-Fi)\s+-\s+(.*)$",\N,\N,\N,splittitle
-510,Tvrage,"Hello Ladies",program_type,series,32368,episodeabs
-510,Tvrage,Topshot,program_type,series,24826,episodeabs
 510,Fixups,"^.*(Min krig)\s+-\s+(.*)$",\N,\N,\N,splittitle
-510,Tvrage,"The Knick",program_type,series,36033,episodeabs
 510,Fixups,^.*(X-Fighters):\s+(.*)$,\N,\N,\N,splittitle
-510,Tvrage,"Ice Road Truckers",program_type,series,16471,episodeabs
-510,Tvrage,"Når vejr dræber",program_type,series,41759,episodeabs
 510,Fixups,"^.*(Fanget på kamera):\s+(.*)$",\N,\N,\N,splittitle
-510,Tvrage,"Dangerous Persuasions",program_type,series,31329,episodeabs
 510,Fixups,"^.*(Doctor Who):\s+(.*)$",\N,\N,\N,splittitle
 510,Fixups,^.*(Videnskabsmagasinet):\s+(.*)$,\N,\N,\N,splittitle
 510,Fixups,^.*(PerkerDansk)\s+-\s+(.*)$,\N,\N,\N,splittitle
-510,Tvrage,"Family Guy",program_type,series,3506,episodeabs
-630,Tvrage,Skyland,program_type,series,6822,episodeabs
 288,Fixups,"^.*(Hemmelige rum):\s+(.*)$",\N,\N,\N,splittitle
 288,Fixups,"^.*(DR1 Dokumentaren):\s+(.*)$",\N,\N,\N,splittitle
 1396,TvdbDE,^.*$,program_type,series,\N,guess
 1398,TvdbDK,^.*$,program_type,series,\N,episodeseason
-1398,Tvrage,"The A-Team",program_type,series,5516,episodeabs
-1398,Tvrage,"Cops Reloaded",program_type,series,34880,episodeabs
-1398,Tvrage,"Storm Chasers",program_type,series,17699,episodeabs
-1398,Tvrage,"Criminal Intent",program_type,series,4203,episodeabs
-1398,Tvrage,Monk,program_type,series,4514,episodeabs
 1398,TvdbEN,^.*$,program_type,series,\N,episodetitle
 443,TvdbEN,"Secrets and Lies",program_type,series,279214,episodetitle
 443,TvdbEN,CSI,program_type,series,72546,episodetitle
@@ -1429,102 +1350,41 @@
 443,Fixups,"^.*(KRIMI5 Tema):\s+(.*)$",\N,\N,\N,splittitle
 443,Fixups,"^.*(KRIMI5 Tema)\s+:\s+(.*)$",\N,\N,\N,splittitle
 443,TvdbEN,"Special Victims Unit",program_type,series,75692,episodetitle
-443,Tvrage,Perception,program_type,series,29470,episodeabs
 443,TvdbEN,Forever,program_type,series,281535,episodetitle
-443,Tvrage,"Criminal Minds",program_type,series,3171,episodeabs
-443,Tvrage,"Once Upon a Time",program_type,series,28385,episodeabs
 443,TvdbEN,"Once Upon a Time",program_type,series,248835,episodetitle
 443,Fixups,Arrow,subtitle,"HONOUR THY FATHER","Honor Thy Father",replacesubtitle
 443,Fixups,"Forsvundet sporløst",subtitle,22X42,"22 x 42",replacesubtitle
-443,Tvrage,"The Flash",program_type,series,36939,episodeabs
 443,Fixups,"Tvins Homeshopping",\N,\N,Homeshopping,replacetitle
-443,Tvrage,"Forsvundet sporløst",program_type,series,6628,episodeabs
-443,Tvrage,CSI,program_type,series,3183,episodeabs
 443,Tmdb,"Justice League: Crisis on Two Earths",\N,\N,30061,movieid
 443,Fixups,"America's funniest home videos",\N,\N,\N,replacesubtitle
 443,Tmdb,ATM,progam_type,movie,89691,movieid
-443,Tvrage,"Big Bang Theory",program_type,series,8511,episodeabs
-443,Tvrage,Forever,program_type,series,41038,episodeabs
 443,Tmdb,Chimpanzee,program-type,series,72334,movieid
-443,Tvrage,"The Neighbors",program_type,series,31677,episodeabs
-443,Tvrage,"Pretty Little Liars",program_type,series,25591,episodeabs
 443,Tmdb,"Batman: Under the Red Hood",\N,\N,40662,movieid
-442,Tvrage,"Once Upon a Time",program_type,series,28385,episodeabs
-442,Tvrage,"Caroline, karrieren og kærligheden",program_type,series,2994,episodeabs
-442,Tvrage,"Less Than Perfect",program_type,series,4221,episodeabs
-442,Tvrage,"Mike og Molly",program_type,series,25050,episodeabs
 442,TvdbEN,"Mike og Molly",program_type,series,164501,episodetitle
-442,Tvrage,"Kitchen Boss",program_type,series,27481,episodeabs
-442,Tvrage,"Greys hvide verden",program_type,series,3741,episodeabs
 442,TvdbEN,Scandal,program_type,series,248841,episodetitle
-442,Tvrage,Scandal,program_type,series,28398,episodeabs
-442,Tvrage,House,program_type,series,3908,episodeabs
-442,Tvrage,"Gilmore Girls",program_type,series,3683,episodeabs
-442,Tvrage,Missing,program_type,series,28396,episodeabs
 442,TvdbEN,Missing,program_type,series,248797,episodetitle
 442,Tmdb,"Jonas Brothers: The 3-D Concert Experience",program_type,series,40534,movieid
-442,Tvrage,"Hart of Dixie",program_type,series,28422,episodeabs
-442,Tvrage,"The Protector",program_type,series,28572,episodeabs
-442,Tvrage,Scouted,program_type,series,29770,episodeabs
 442,Fixups,"Tvins Homeshopping",\N,\N,Homeshopping,replacetitle
-442,Tvrage,"The Fabulous Baker Brothers",program_type,series,30388,episodeabs
 443,Fixups,"^.*(Big Fat Gypsy Weddings):\s+(.*)$",\N,\N,\N,splittitle
 442,Tmdb,"Scooby-Doo og Dæmonkongen",program_type,series,12903,movieid
 442,TvdbEN,"Teenager og dværg - videre i livet",program_type,series,250271,episodetitle
-442,Tvrage,"Trinny og Susannahs makeover mission: Holland",program_type,series,26467,episodeabs
-442,Tvrage,"Thelma's Gypsy Girls",program_type,series,32209,episodeabs
-441,Tvrage,"Destroyed in Seconds",program_type,series,19982,episodeabs
-441,Tvrage,"NY Ink",program_type,series,28521,episodeabs
-441,Tvrage,"Forbrydelse betaler sig",program_type,series,24779,episodeabs
-441,Tvrage,Intelligence,program_type,series,34469,episodeabs
 441,TvdbEN,Intelligence,program_type,series,267260,episodetitle
-441,Tvrage,"Special Victims Unit",program_type,series,4204,episodeabs
 441,TvdbEN,"Special Victims Unit",program_type,series,75692,episodetitle
-441,Tvrage,"Dirty Jobs",program_type,series,6920,episodeabs
-441,Tvrage,"Storm Chasers",program_type,series,17699,episodeabs
-441,Tvrage,"Auction Hunters",program_type,series,26960,episodeabs
-441,Tvrage,"LA Ink",program_type,series,16930,episodeabs
-441,Tvrage,"Chaos Caught on Camera",program_type,series,48347,episodeabs
-441,Tvrage,"Rap fyr i L.A.",program_type,series,5795,episodeabs
 441,TvdbEN,"Rap fyr i L.A.",program_type,series,76738,episodetitle
 441,Fixups,"Hardcore Pawn",subtitle,"LES' WAY OR THE HIGHWAY","Les Way or the Highway",replacesubtitle
-441,Tvrage,"Sullivan og Son",program_type,series,29677,episodeabs
 441,TvdbEN,"Sullivan og Son",program_type,series,253457,episodetitle
-441,Tvrage,"American Chopper - Senior vs Junior",program_type,series,25696,episodeabs
-441,Tvrage,Mythbusters,program_type,series,4605,episodeabs
 441,TvdbEN,"River Monsters",program_type,series,21955,episodetitle
-441,Tvrage,"Miami Ink",program_type,series,7177,episodeabs
 441,Fixups,"^.*(Asia Trophy):\s+(.*)$",\N,\N,\N,splittitle
-441,Tvrage,"Jungle Gold",program_type,series,33259,episodeabs
-441,Tvrage,"American Chopper",program_type,series,2593,episodeabs
-441,Tvrage,"Two and a Half Men",program_type,series,6454,episodeabs
 441,Tmdb,"Drive angry",program_type,series,47327,movieid
-441,Tvrage,"CSI: Miami",program_type,series,3184,episodeabs
-441,Tvrage,"Diamond Divers",program_type,series,30122,episodeabs
-441,Tvrage,"Gold Rush",program_type,series,26961,episodeabs
-441,Tvrage,Constantine,program_type,series,38109,episodeabs
-441,Tvrage,Sniper,program_type,series,18531,episodeabs
 441,Fixups,"Tvins Homeshopping",\N,\N,Homeshopping,replacetitle
-441,Tvrage,"Sams bar",program_type,series,3044,episodeabs
-441,Tvrage,"Hardcore Pawn",program_type,series,24709,episodeabs
-441,Tvrage,"One Car Too Far",program_type,series,31334,episodeabs
-1075,Tvrage,"Meldt savnet",program_type,series,19729,episodeabs
-1398,Tvrage,"American Guns",program_type,series,29746,episodeabs
-1398,Tvrage,"Fifth Gear",program_type,series,6740,episodeabs
-1398,Tvrage,M.A.S.H.,program_type,series,4315,episodeabs
 1398,TvdbEN,M.A.S.H.,program_type,series,70994,episodetitle
-1398,Tvrage,"Dirty Jobs",program_type,series,6920,episodeabs
 1398,TvdbEN,"Criminal Intent",program_type,series,71489,episodetitle
-1398,Tvrage,"Real rescues",program_type,series,20081,episodeabs
 1398,TvdbEN,"The A-Team",program_type,series,77904,episodetitle
 1398,Fixups,M.A.S.H.,subtitle,"L.i.p. (local indigenous personnel)",L.I.P.,replacesubtitle
 1398,Fixups,"^.*(UFC - Ultimate Fighting):\s+(.*)$",\N,\N,\N,splittitle
 1398,TvdbEN,"Storm Chasers",program_type,series,83498,episodetitle
-1398,Tvrage,"Doomsday - World War 1",program_type,series,40246,episodeabs
 1398,TvdbEN,"Extreme Fishing",program_type,series,258054,episodetitle
-443,Tvrage,"Special Victims Unit",program_type,series,4204,episodeabs
-443,Tvrage,Mom,program_type,series,33829,episodeabs
-270,TvdbEN,"Gold Rush",program_type,series,208111,episodetitle
+270,TvdbEN,"Gold Rush",program_type,series,208111,guess
 367,TvdbDE,^.*$,program_type,series,\N,guess
 1010,TvdbDE,^.*$,program_type,series,\N,guess
 1011,TvdbDE,^.*$,program_type,series,\N,guess
@@ -1539,3 +1399,37 @@
 1412,TvdbDK,^.*$,program_type,series,\N,guess
 1414,TvdbFI,^.*$,program_type,series,\N,guess
 1416,Tvdb,^.*$,program_type,series,\N,guess
+1395,TvdbEN,"Dexters Laboratorium",program_type,series,77992,guess
+1395,TvdbEN,"Dreamworks Drakryttarna: Dräggös försvarare",\N,\N,261202,guess
+1395,TvdbEN,"Dreamworks Drakryttarna Dräggös försvarare",\N,\N,261202,guess
+689,TvdbEN,"Ninjago: Spinjitzu-mesterne",\N,\N,253323,guess
+1395,TvdbEN,"Bara björnar",\N,\N,297271,guess
+689,TvdbEN,"Vi bare bjørner",\N,\N,297271,guess
+689,TvdbEN,"Dreamworks Dragerytterne: Borkøys beskyttere",\N,\N,261202,guess
+689,TvdbEN,"Dreamworks Dragerytterne Borkøys beskyttere",\N,\N,261202,guess
+1395,Tvdb,"Transformers - robotar i förklädnad",\N,\N,292171,guess
+1395,TvdbEN,"Transformers - robotar i förklädnad",\N,\N,292171,guess
+689,TvdbNO,"Transformers: Robots in Disguise",\N,\N,292171,guess
+689,TvdbEN,"Transformers: Robots in Disguise",\N,\N,292171,guess
+912,TvdbEN,"Ninjago: Masters of Spinjitzu",\N,\N,253323,guess
+912,TvdbEN,"Vi' bare bjørne",\N,\N,297271,guess
+912,TvdbDK,"Vi' bare bjørne",\N,\N,297271,guess
+1395,Tmdb,Balto,\N,\N,21032,movieid
+689,Tmdb,Balto,\N,\N,21032,movieid
+912,Tmdb,Balto,\N,\N,21032,movieid
+912,TvdbEN,"Transformers: Robots In Disguise",\N,\N,292171,guess
+912,TvdbEN,"Transformers - Robots in Disguise",\N,\N,292171,guess
+912,TvdbDK,"Transformers - Robots in Disguise",\N,\N,292171,guess
+1395,Tmdb,"Balto 2 - Flykten över det stora vattnet",\N,\N,25913,movieid
+912,Tmdb,"Balto 2 - Det store vand",\N,\N,25913,movieid
+689,Tmdb,"Balto 2 - Balto og ulveflokken",\N,\N,25913,movieid
+913,Tmdb,Balto,\N,\N,21032,movieid
+913,Tmdb,"Balto II: Wolf Quest",\N,\N,25913,movieid
+398,TvdbEN,^.*$,program_type,series,\N,episodeseason
+1222,TvdbNO,Louie,program_type,series,155201,guess
+843,TvdbFI,Louie,program_type,series,155201,guess
+1222,TvdbNO,"Fresh Prince Of Bel Air",program_type,series,76738,guess
+1222,TvdbNO,"Last Man Standing",program_type,series,248834,guess
+1002,TvdbDE,"Last Man Standing",program_type,series,248834,guess
+974,TvdbDE,"Last Man Standing",program_type,series,248834,guess
+666,TvdbNO,^.*$,program_type,series,\N,guess

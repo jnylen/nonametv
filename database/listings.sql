@@ -95,7 +95,8 @@ CREATE TABLE `programs` (
   `fanart` varchar(255) DEFAULT NULL,
   `external_ids` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`channel_id`,`start_time`),
-  KEY `batch` (`batch_id`,`start_time`)
+  KEY `batch` (`batch_id`,`start_time`),
+  KEY `title` (`title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `state`;

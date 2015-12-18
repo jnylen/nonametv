@@ -383,7 +383,7 @@
 874,"MTV Hits",hits.mtv.se,"TV,Sweden,Denmark,Finland,Poland",MTVde,1,46:sv:SE,1,tvshow,Music,en,0,http://www.mtv.se/,0
 875,"MTV Norway",mtv.no,"TV,Norway",MTVde,1,7:no:NO,1,series,Series,no,0,http://www.mtv.no/,0
 876,"MTV Sweden",mtv.se,"TV,Sweden",MTVde,1,6:sv:SE,1,series,Series,sv,0,http://www.mtv.se/,0
-877,"Nickelodeon Norway",nickelodeon.no,"TV,Norway",MTVde,1,30:no:NO,1,series,Children's,no,0,http://www.nickelodeon.no/,0
+877,"Nickelodeon Norway",nickelodeon.no,"TV,Norway",MTVde,1,29:no:NO,1,series,Children's,no,0,http://www.nickelodeon.no/,0
 878,"Nickelodeon Sweden",nickelodeon.se,"TV,Sweden",MTVde,1,30:sv:SE,1,series,Children's,sv,0,http://www.nickelodeon.se/,0
 879,"Nick Jr. Sweden",nickjr.se,"TV,Sweden",MTVde,1,20:sv:SE,1,series,Children's,sv,0,http://www.nickjr.se/,0
 880,"MTV Rocks Norway",rocks.mtv.no,"TV,Norway",MTVde,1,39:no:NO,1,tvshow,Music,no,0,http://www.mtv.no/,0
@@ -430,7 +430,7 @@
 929,"Eurosport 2 Finland",eurosport2.fi,"TV,Finland",EurosportFI,1,Eurosport2NE,1,sports,Sports,fi,0,http://www.eurosport.fi/,0
 930,"Visjon Norge",visjonnorge.com,"TV,Norway",VisjonNorge,1,,1,,,no,0,http://www.visjonnorge.com/,0
 932,"Comedy Central Norway",comedycentral.no,"TV,Norway",MTVde,1,22:no:NO,1,series,Comedy,no,0,http://www.comedycentral.no/,0
-933,"MTV Finland",musictelevision.fi,"TV,Finland",MTVde,1,7:fi:FI,1,series,Series,fi,0,http://www.musictelevision.fi/,0
+933,"MTV Finland",musictelevision.fi,"TV,Finland",MTVde,1,8:fi:FI,1,series,Series,fi,0,http://www.musictelevision.fi/,0
 934,"Nick Jr. Finland",nickjr.fi,"TV,Finland",MTVde,1,20:fi:FI,1,series,Children's,fi,0,http://www.nickjr.fi/,0
 935,"VH1 Denmark",vh1.mtv.dk,"TV,Denmark",MTVde,1,37:da:DK,1,tvshow,Music,da,0,http://www.mtv.dk/,0
 936,"Comedy Central Netherlands",comedycentral.nl,"TV,Netherlands",MTVde,1,35:nl:NL,1,series,Comedy,nl,0,http://www.comedycentral.nl/,0
@@ -802,3 +802,4 @@
 1415,"Viasat Film Hits Sweden",hits.film.viasat.se,"TV,Sweden",Viasat,1,viasat_film_hits_se_,0,movie,Movies,sv,0,http://www.viasat.se/,0
 1416,"Viasat Series Sweden",series.viasat.se,"TV,Sweden",Viasat,1,viasat_series_se_,0,series,Series,sv,0,http://www.viasat.se/,0
 1418,"TV 2/Bornholm",tv2bornholm.dk,"TV,Denmark",DigiTV,1,418,0,series,Series,da,0,http://www.tv2bornholm.dk/,0
+1419,"MTV Norway",dev.mtv.no,DEV,MTVdev,1,7:no:NO,0,series,Series,no,0,http://www.mtv.no/,0
