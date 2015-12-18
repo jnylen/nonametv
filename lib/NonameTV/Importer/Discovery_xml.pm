@@ -5,7 +5,7 @@ use warnings;
 
 =pod
 
-Import data for DiscoveryChannel in xml-format. 
+Import data for DiscoveryChannel in xml-format.
 
 =cut
 
@@ -67,7 +67,7 @@ sub ImportContent {
     f "No data found";
     return 0;
   }
-  
+
   foreach my $b ($ns->get_nodelist) {
     # Verify that there is only one PROGRAMME
     # Verify that there is only one TEXT.
@@ -77,10 +77,10 @@ sub ImportContent {
     my $title_lang = $b->findvalue( "BROADCAST_TITLE" );
     my $title_org = $b->findvalue( "PROGRAMME[1]/PROGRAMME_TITLE_ORIGINAL" );
     my $title = $title_lang || $title_org;
-    
+
     my $subtitle_lang = $b->findvalue( "BROADCAST_SUBTITLE" );
     my $subtitle_org = $b->findvalue( "PROGRAMME[1]/PROGRAMME_SUBTITLE_ORIGINAL" );
-    my $subtitle = $subtitle_org || $subtitle_lang;
+    my $season = $b->findvalue( "PROGRAMME[1]/SERIES_NUMBER" );
     my $episode = $b->findvalue( "PROGRAMME[1]/EPISODE_NUMBER" );
     my $desc = $b->findvalue( "PROGRAMME[1]/TEXT[1]/TEXT_TEXT" );
 
@@ -92,10 +92,20 @@ sub ImportContent {
       description => norm($desc),
     };
 
-    $ce->{subtitle} = norm($subtitle) if $subtitle ne "";
+    $ce->{subtitle} = norm($subtitle_lang) if $subtitle_lang ne "";
+    $ce->{original_subtitle} = norm($subtitle_org) if $subtitle_org ne "" and $subtitle_org ne $subtitle_lang;
     $ce->{original_title} = norm($title_org) if $ce->{title} ne $title_org and $title_org ne "";
 
-    $ce->{episode} = ". " . ($episode-1) . " ." if $episode ne "";
+    if( $episode and $episode ne "" ){
+      if( ($episode > 0) and ($season ne "" and $season > 0) )
+      {
+        $ce->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 );
+      }
+      elsif( $episode > 0 )
+      {
+        $ce->{episode} = sprintf( ". %d .", $episode-1 );
+      }
+    }
 
     p($start." $ce->{title}");
 
@@ -110,7 +120,7 @@ sub ImportContent {
 sub ParseDateTime {
   my( $str ) = @_;
 
-  my( $year, $month, $day, $hour, $minute ) = 
+  my( $year, $month, $day, $hour, $minute ) =
       ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+)$/ );
 
   my $dt = DateTime->new(
@@ -132,7 +142,7 @@ sub Object2Url {
   my( $objectname, $chd ) = @_;
 
   my $url = sprintf( "%s%s", $self->{UrlRoot}, $chd->{grabber_info} );
-  
+
   return( $url, undef );
 }
 
