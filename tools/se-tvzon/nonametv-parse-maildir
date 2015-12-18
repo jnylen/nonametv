@@ -260,12 +260,13 @@ sub guess_channel
 
     return "hd.natgeo.se" if $filename =~ /^ng\s*swe\s*hd\b/i;
 
-	# Nat geo wild sends in XLS format
+   	# Nat geo wild sends in XLS format
     return "wild.natgeo.se" if $filename =~ /^ngwscan\s*\b/i;
 
-	# History Channel
-	if($filename =~ /\.xml$/i and ($filename =~ /his.eur./ or $filename =~ /history\s+europe/i)) {
+	  # History Channel
+	  if($filename =~ /\.xml$/i and ($filename =~ /his.eur./ or $filename =~ /history.europe./ or $filename =~ /history\s+europe/i)) {
         return "historytv.se"  if $filename =~ /swe/i;
+        return "historytv.se"  if $filename =~ /fin/i;
         return "historytv.no"  if $filename =~ /nor/i;
         return "historytv.dk"  if $filename =~ /dan/i;
         return "historytv.eu"  if $filename =~ /eng/i;
@@ -279,7 +280,7 @@ sub guess_channel
     return "natgeotv.com" if $filename =~ /^ngswe_fin/i and $filename =~ /\.xls$/i and $filename !~ /^ngden/i;
     return "people.natgeo.dk" if $filename =~ /^ngppl\.den/i and $filename =~ /\.xls$/i;
 
-	# Travel Channel
+	  # Travel Channel
     return "travelchanneltv.se" if $filename =~ /^travel/i;
 
     # E! Entertainment
@@ -299,10 +300,11 @@ sub guess_channel
     return "foxtv.se"       if $filename =~ /^fox\s+sweden/i and $filename =~ /\.xls$/i;
 
     # H2
-    if($filename =~ /h2\s+europe/i and $filename =~ /\.xml$/i) {
+    if(($filename =~ /h2\s+europe/i or $filename =~ /h2.eur./i) and $filename =~ /\.xml$/i) {
         return "h2.historytv.se"  if $filename =~ /swe/i;
         return "h2.historytv.no"  if $filename =~ /nor/i;
         return "h2.historytv.dk"  if $filename =~ /dan/i;
+        return "h2.historytv.fi"  if $filename =~ /fin/i;
     }
 
     # Benelux schedules for Universal
@@ -319,11 +321,15 @@ sub guess_channel
     return "international.skynews.com" if $filename =~ /^SKYH/i and $filename =~ /\.xls$/i;
     return "international.skynews.com" if $subject =~ /^Sky News International/i and $filename =~ /\.xls$/i;
 
+    # horseandcountry
+    return "horseandcountry.tv" if $filename =~ /^H.C SWE/i and $filename =~ /\.xml/i;
+    return "horseandcountry.tv" if $filename =~ /^H.C SWE/i and $filename =~ /\.zip/i;
+
     # Poland
-    return "crimeandinvestigation.pl"   if $filename =~ /^CI\s+Polsat/i and $filename =~ /\.xml$/i;
-    return "h2.historytv.pl"            if $filename =~ /^h2\s+europe\s+polish/i and $filename =~ /\.xml$/i;
+    return "crimeandinvestigation.pl"   if $filename =~ /^CI\.Polsat/i and $filename =~ /\.xml$/i;
+    return "h2.historytv.pl"            if ($filename =~ /^h2\s+europe\s+polish/i or $filename =~ /^h2\.eur\.pol/i) and $filename =~ /\.xml$/i;
     return "historytv.pl"               if $filename =~ /^history\.pol/i and $filename =~ /\.xml$/i;
-    return "lifetimetv.pl"              if $filename =~ /^lifetime\s+poland/i and $filename =~ /\.xml$/i;
+    return "lifetimetv.pl"              if ($filename =~ /^lifetime\s+poland/i or $filename =~ /^lifetime\.pol/i) and $filename =~ /\.xml$/i;
     return "natgeo.pl"                  if $filename =~ /^NGpol/i and $filename =~ /\.xls$/i;
     return "wild.natgeo.pl"             if $filename =~ /^NGWPol/i and $filename =~ /\.xls$/i;
  }
