@@ -106,7 +106,7 @@ foreach my $dir (@folders) {
     my $subject = decode( 'MIME-Header', $message->get( 'Subject' ) ) || '';
     my $from = $message->get( 'From' );
 
-    d "Processing $from - $subject";
+    #d "Processing $from - $subject";
 
     if( process_parts( $message, $dir, $from, $subject ) ) {
       $message->label( 'flagged' => 1 );
