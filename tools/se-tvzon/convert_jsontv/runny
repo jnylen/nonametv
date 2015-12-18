@@ -33,7 +33,7 @@ rsync -c --delete -r $NROOT/xmltv_staging/ $NROOT/xmltv/
 tools/se-tvzon/nonametv-xmltv-gendatalist
 rsync -c --delete -r $NROOT/xmltv/datalist.xml.gz $NROOT/datalist.xml.gz
 
-tools/nonametv-localize-movies > /nonametv/movies.html
+#tools/nonametv-localize-movies > /nonametv/movies.html
 
 
 rsync -c --delete -r $NROOT/xmltv/ chaeun:/server/xmltv_files/xmltv/
