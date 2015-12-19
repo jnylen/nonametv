@@ -253,9 +253,15 @@ sub ImportXML
         $ce->{country} = join "/", @countries;
     }
 
+    # End of transmission
+    if( ($ce->{description} eq "Sendepause") )
+    {
+      $ce->{title} = "end-of-transmission";
+    }
+
     # Add it
     $ds->AddProgrammeRaw( $ce );
-    progress("$start - $title");
+    progress("$start - $ce->{title}");
   }
 
   $dsh->EndBatch( 1 );
