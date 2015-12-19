@@ -145,7 +145,7 @@ sub FillHash( $$$ ) {
       }
     }
   }
-  
+
   # MPAA - G, PG, PG-13, R, NC-17 - No rating is: NR or Unrated
 #  if(defined($doc->findvalue( '/OpenSearchDescription/movies/movie/certification' ) )) {
 #    my $rating = norm( $doc->findvalue( '/OpenSearchDescription/movies/movie/certification' ) );
@@ -153,7 +153,7 @@ sub FillHash( $$$ ) {
 #      $resultref->{rating} = $rating;
 #    }
 #  }
-  
+
   # No description when adding? Add the description from themoviedb
 #  if((!defined ($ceref->{description}) or ($ceref->{description} eq "")) and !$self->{OnlyAugmentFacts}) {
 #    my $desc = norm( $doc->findvalue( '/OpenSearchDescription/movies/movie/overview' ) );
@@ -222,6 +222,31 @@ sub AugmentProgram( $$$ ){
     $resultref = undef;
   } elsif( $ruleref->{matchby} eq 'movieid' ) {
     $self->FillHash( $resultref, $ruleref->{remoteref}, $ceref );
+  } elsif( $ruleref->{matchby} eq 'titleonly' ) {
+    my $searchTerm = $ceref->{title};
+
+    # escape ampersand, shouldn't the API do that?
+    $searchTerm =~ s|&|%26|g;
+    # filter characters that confuse the search api
+    # FIXME check again now that we encode umlauts & co.
+    $searchTerm =~ s|[-#\?\N{U+00BF}\(\)]||g;
+    $searchTerm =~ s|[:]| |g;
+
+    # TODO fix upstream instead of working around here
+    my @candidates = $self->{search}->movie( $searchTerm );
+    my $numResult = @candidates;
+
+    # Can only be one match
+    if( $numResult < 1 ) {
+      return( undef,  "No matching movie found when searching for: " . $searchTerm );
+    } elsif( $numResult == 1 ) {
+      my $movieId = $candidates[0]->{id};
+
+      $self->FillHash( $resultref, $movieId, $ceref );
+    } else {
+      return( undef,  "Too many movie matches found when searching for: " . $searchTerm );
+    }
+
   } elsif( $ruleref->{matchby} eq 'title' ) {
     # search by title and year (if present)
 
