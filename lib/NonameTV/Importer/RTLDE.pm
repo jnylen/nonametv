@@ -89,7 +89,7 @@ sub ImportContent {
   my $json = new JSON->allow_nonref;
   my $data = $json->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->decode($$cref)->{"items"};
 
-  my ($p, $start_of_week, $folge);
+  my ($p, $start_of_week, $folge, $subtitle2);
 
   foreach $p (@{$data}) {
     my $title = $p->{"title"};
@@ -109,23 +109,30 @@ sub ImportContent {
     };
 
     if(defined($subtitle) and $subtitle ne "") {
-      if( ( $folge ) = ($subtitle =~ m|^Folge (\d+)$| ) ){
+      if(($folge, $subtitle2) = ($subtitle =~ /^Folge (\d+)\: \'(.*?)\'$/i)) {
         $ce->{episode} = '. ' . ($folge - 1) . ' .';
+        $ce->{subtitle} = norm($subtitle2);
+        $ce->{program_type} = "series";
+      }elsif(($folge, $subtitle2) = ($subtitle =~ /^Folge (\d+)\: (.*?)$/i)) {
+        $ce->{episode} = '. ' . ($folge - 1) . ' .';
+        $ce->{subtitle} = norm($subtitle2);
+        $ce->{program_type} = "series";
+      }elsif( ( $folge ) = ($subtitle =~ m|^Folge (\d+)$| ) ){
+        $ce->{episode} = '. ' . ($folge - 1) . ' .';
+        $ce->{program_type} = "series";
+      }elsif(($subtitle2) = ($subtitle =~ /^\'(.*?)\'$/i)) {
+        $ce->{subtitle} = norm($subtitle2);
         $ce->{program_type} = "series";
       } else {
         $ce->{subtitle} = norm($subtitle);
         $ce->{program_type} = "series";
       }
-    }elsif($diff->in_units('minutes') > 90 and (!defined($p->{"movie"}) or !$p->{"movie"}) and (!defined($p->{"epgFormat"}->{"epgFormat"}) or $p->{"epgFormat"}->{"epgFormat"} eq "")) {
+    }elsif($diff->in_units('minutes') > 90 and (!defined($p->{"movie"}) or $p->{"movie"} eq "") and (!defined($p->{"epgFormat"}->{"defaultImage"}) or $p->{"epgFormat"}->{"defaultImage"} eq "")) {
       $ce->{program_type} = "movie";
     }
 
-
-    progress($start." $ce->{title}");
-
+    progress($start." - $ce->{title}");
     $dsh->AddProgramme( $ce );
-
-  #  $dsh->AddProgramme( $ce );
   }
   return 1;
 }
