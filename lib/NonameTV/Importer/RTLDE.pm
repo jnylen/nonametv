@@ -97,13 +97,15 @@ sub ImportContent {
 
     # Start and so on
     my $start = ParseDateTime( $p->{"startDate"} );
-    my $time = $start->hms(":");
+    my $end   = ParseDateTime( $p->{"endDate"} );
+    my $diff  = $end - $start;
 
     # Put everything in a array
     my $ce = {
         channel_id => $chd->{id},
-        start_time => $time,
-        title => norm($title),
+        start_time => $start->hms(":"),
+        end_time   => $end->hms(":"),
+        title      => norm($title),
     };
 
     if(defined($subtitle) and $subtitle ne "") {
@@ -114,6 +116,8 @@ sub ImportContent {
         $ce->{subtitle} = norm($subtitle);
         $ce->{program_type} = "series";
       }
+    }elsif($diff->in_units('minutes') > 90 and (!defined($p->{"movie"}) or !$p->{"movie"}) and (!defined($p->{"epgFormat"}->{"epgFormat"}) or $p->{"epgFormat"}->{"epgFormat"} eq "")) {
+      $ce->{program_type} = "movie";
     }
 
 
