@@ -264,12 +264,12 @@ sub guess_channel
     return "wild.natgeo.se" if $filename =~ /^ngwscan\s*\b/i;
 
 	  # History Channel
-	  if($filename =~ /\.xml$/i and ($filename =~ /his.eur./ or $filename =~ /history.europe./ or $filename =~ /history\s+europe/i)) {
-        return "historytv.se"  if $filename =~ /swe/i;
-        return "historytv.se"  if $filename =~ /fin/i;
-        return "historytv.no"  if $filename =~ /nor/i;
-        return "historytv.dk"  if $filename =~ /dan/i;
-        return "historytv.eu"  if $filename =~ /eng/i;
+	  if($filename =~ /\.xml$/i and ($filename =~ /his.eur./i or $filename =~ /history.eur./i or $filename =~ /history.europe./i or $filename =~ /history\s+europe/i)) {
+      return "historytv.se"  if $filename =~ /swe/i;
+      return "historytv.se"  if $filename =~ /fin/i;
+      return "historytv.no"  if $filename =~ /nor/i;
+      return "historytv.dk"  if $filename =~ /dan/i;
+      return "historytv.eu"  if $filename =~ /eng/i;
     }
 
     return "crimeandinvestigation.eu"  if $filename =~ /cai.eng/i and $filename =~ /\.xml$/i;
