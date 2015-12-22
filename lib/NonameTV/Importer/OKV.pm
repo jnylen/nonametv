@@ -156,9 +156,7 @@ sub ImportContent
     my $title    = norm($sc->findvalue( './title'   ));
     $title       =~ s/&amp;/&/g; # Wrong encoded char
     my $desc     = norm($sc->findvalue( './desc'    ));
-    my $year     = norm($sc->findvalue( './year'    ));
     my $duration = norm($sc->findvalue( './duration'    ));
-    my $genre    = norm($sc->findvalue( './genre'    ));
 
 	  my $ce = {
         channel_id 		=> $chd->{id},
@@ -216,19 +214,7 @@ sub ImportContent
     # norm it and replace it
     $ce->{title} = norm($title);
 
-    # Genre
-    if($genre ne "") {
-        my($program_type, $category ) = $ds->LookupCat( 'OKV', $genre );
-        AddCategory( $ce, $program_type, $category );
-    }
-
     progress( "OKV: $chd->{xmltvid}: $start - $title" );
-
-    # year
-    if($year =~ /(\d\d\d\d)/) {
-  	  $ce->{production_date} = "$1-01-01";
-  	}
-
 
   	# Add Programme
   	$dsh->AddProgramme( $ce );

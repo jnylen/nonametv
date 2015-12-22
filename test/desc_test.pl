@@ -5,16 +5,21 @@ use warnings;
 use Data::Dumper;
 use DateTime;
 
-my $text = "2015-08-20T22:45:00.000Z";
 
-print Dumper(ParseDateTime($text)->ymd("-"));
-print Dumper(ParseDateTime($text)->hms(":"));
+    my $start = ParseDateTime( "2015-12-26 20:10:00" );
+    my $end = ParseDateTime( "2015-12-26 22:10:00" );
+    my $diff  = $end - $start;
+
+    print Dumper($diff->in_units('minutes'));
+
+
+
 
 sub ParseDateTime {
   my( $str ) = @_;
 
   my( $year, $month, $day, $hour, $minute, $second ) =
-      ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)/ );
+      ($str =~ /^(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)/ );
 
   my $dt = DateTime->new(
     year => $year,

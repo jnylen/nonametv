@@ -29,7 +29,7 @@ my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
 use Data::Dumper;
 use File::Temp qw/tempfile/;
 
-use NonameTV qw/norm normUtf8 AddCategory/;
+use NonameTV qw/norm normUtf8 AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 
@@ -46,7 +46,7 @@ sub new {
 
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
   $self->{datastorehelper} = $dsh;
-  
+
   $self->{datastore}->{augment} = 1;
 
   return $self;
@@ -79,11 +79,11 @@ sub ImportXML {
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
   $self->{fileerror} = 1;
-  
-	# Do something beautiful here later on. 
-	
+
+	# Do something beautiful here later on.
+
 	error("From now on you need to convert XML files to XLS files.");
-	
+
 	return 0;
 }
 
@@ -119,8 +119,8 @@ my $ref = ReadData ($file);
 
   # main loop
   for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
-
     my $oWkS = $oBook->{Worksheet}[$iSheet];
+    next if $oWkS->{Name} ne "GMT";
 
     progress( "GOD_Channel: Processing worksheet: $oWkS->{Name}" );
 
@@ -162,10 +162,14 @@ my $ref = ReadData ($file);
 
       my $time = 0;  # fix for  12:00AM
       $time=$oWkC->{Val} if( $oWkC->Value );
+      print Dumper($time);
+      print Dumper(ExcelFmt('hh:mm', $time));
+      $time =~ s/\./:/;
+      print Dumper($time);
+      my ( $hour, $min ) = ( $time =~ /^(\d+):(\d+)$/ );
 
-	  #Convert Excel Time -> localtime
-      $time = ExcelFmt('hh:mm', $time);
-      $time =~ s/_/:/g; # They fail sometimes
+      # Strpad
+      $time = sprintf( "%02d:%02d", $hour, $min );
 
 
       # title
@@ -176,14 +180,14 @@ my $ref = ReadData ($file);
       $title =~ s/\(.*\)//g;
       $title =~ s/\[.*\]//g;
 
-      
+
 
       my $ce = {
         channel_id => $channel_id,
         start_time => $time,
         title => norm($title),
       };
-      
+
     my( $t, $st ) = ($ce->{title} =~ /(.*)\: (.*)/);
     if( defined( $st ) )
     {
@@ -199,13 +203,13 @@ my $ref = ReadData ($file);
     	$ce->{title} = norm($t1);
     	$ce->{presenters} = parse_person_list(norm($p));
     }
-      
+
       # Desc (only works on XLS files)
       	my $field = "E".$i;
       	my $desc = $ref->[1]{$field};
       	$ce->{description} = normUtf8($desc) if( $desc and $desc ne "WITHOUT SYNOPSIS" );
       	$desc = '';
-      
+
 	  progress("GOD_Channel: $time - $title") if $title;
       $dsh->AddProgramme( $ce ) if $title;
     }
@@ -234,17 +238,18 @@ sub parse_person_list
 sub ParseDate
 {
   my ( $dinfo ) = @_;
-  
-#  print Dumper($dinfo);
 
-  my( $month, $day, $year );
+  my( $month, $day, $year, $monthname );
 #      progress("Mdatum $dinfo");
-  if( $dinfo =~ /^\d{4}-\d{2}-\d{2}$/ ){ # format   '2010-04-22' 
+  if( $dinfo =~ /^\d{4}-\d{2}-\d{2}$/ ){ # format   '2010-04-22'
     ( $year, $month, $day ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
   } elsif( $dinfo =~ /^\d{2}.\d{2}.\d{4}$/ ){ # format '11/18/2011'
     ( $month, $day, $year ) = ( $dinfo =~ /^(\d+).(\d+).(\d+)$/ );
   } elsif( $dinfo =~ /^\d{1,2}-\d{1,2}-\d{2}$/ ){ # format '10-18-11' or '1-9-11'
     ( $month, $day, $year ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
+  } elsif( $dinfo =~ /^\d{1,2}-\S+-\d{2}$/ ){ # format '3-Jan-2016'
+    ( $day, $monthname, $year ) = ( $dinfo =~ /^(\d+)-(\S+)-(\d+)$/ );
+    $month = MonthNumber( $monthname , "ru" );
   } elsif( $dinfo =~ /^\d{1,2}\/\d{1,2}\/\d{2}$/ ){ # format '10-18-11' or '1-9-11'
     ( $month, $day, $year ) = ( $dinfo =~ /^(\d+)\/(\d+)\/(\d+)$/ );
   }

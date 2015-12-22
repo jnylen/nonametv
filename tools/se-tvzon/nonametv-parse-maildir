@@ -266,7 +266,7 @@ sub guess_channel
 	  # History Channel
 	  if($filename =~ /\.xml$/i and ($filename =~ /his.eur./i or $filename =~ /history.eur./i or $filename =~ /history.europe./i or $filename =~ /history\s+europe/i)) {
       return "historytv.se"  if $filename =~ /swe/i;
-      return "historytv.se"  if $filename =~ /fin/i;
+      return "historytv.fi"  if $filename =~ /fin/i;
       return "historytv.no"  if $filename =~ /nor/i;
       return "historytv.dk"  if $filename =~ /dan/i;
       return "historytv.eu"  if $filename =~ /eng/i;
