@@ -46,7 +46,7 @@ sub Object2Url {
   my( $objectname, $chd ) = @_;
 
 
-  my( $year, $week ) = ( $objectname =~ /(\d\d\d\d)-(\d\d)$/ );
+  my( $year, $week ) = ( $objectname =~ /(\d\d\d\d)-(\d+)$/ );
 
   my $url = sprintf( "%s%s/%d_%d/%s_Uge_%d.xml",
                      $self->{UrlRoot}, $chd->{grabber_info},
