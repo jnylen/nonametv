@@ -62,11 +62,11 @@ def copy_to_channels(file_name)
 
     channels.each do |c|
         # Each channel (create dir if it doesn't exist)
-        FileUtils::mkdir_p '/nonametv/channels/' + c[:xmltvid] if !File.directory?('/nonametv/channels/' + c[:xmltvid])
+        FileUtils::mkdir_p '/home/jnylen/content/channels/' + c[:xmltvid] if !File.directory?('/home/jnylen/content/channels/' + c[:xmltvid])
         file_basename = Pathname.new(file_name).basename.to_s
 
         # Remove if it already exists
-        FileUtils.rm('/nonametv/channels/' + c[:xmltvid] + '/' + file_basename) if File.exist?('/nonametv/channels/' + c[:xmltvid] + '/' + file_basename)
+        FileUtils.rm('/home/jnylen/content/channels/' + c[:xmltvid] + '/' + file_basename) if File.exist?('/home/jnylen/content/channels/' + c[:xmltvid] + '/' + file_basename)
 
         #puts "Cleaning up #{file_basename} for #{c[:xmltvid]}"
         # We are going to remove all data that isn't for that specified channel.
@@ -80,7 +80,7 @@ def copy_to_channels(file_name)
             end
         end
 
-        File.open('/nonametv/channels/' + c[:xmltvid] + '/' + file_basename, 'w') { |f| f.print(doc.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::AS_XML)) }
+        File.open('/home/jnylen/content/channels/' + c[:xmltvid] + '/' + file_basename, 'w') { |f| f.print(doc.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::AS_XML)) }
 
         # Verbose
         puts "Cleaned up and added #{file_basename} to #{c[:xmltvid]}"
@@ -106,28 +106,28 @@ a.get('http://info.sky.de/inhalt/de/programm_info_presseexport_start.jsp') do |h
       file_name = Pathname.new(link.href).basename.to_s.gsub(/\.gz$/, ".xml").gsub(/(\d\d)(\d\d)_(\d\d)(\d\d)(\d\d)_xml/, "").gsub(/(\d\d)(\d\d)_xml/, "")
 
       # If it exists, check if it differs otherwise just add it already
-      if File.exist?('/nonametv/skyde/' + file_name)
+      if File.exist?('/home/jnylen/content/skyde/' + file_name)
         File.open('/tmp/' + file_name, 'wb'){ |f| f << Zlib::GzipReader.new(StringIO.new(a.get('http://info.sky.de' + link.href).body.to_s)).read }
 
         # Check if it's changed or not
-        if !FileUtils.compare_file('/tmp/' + file_name, '/nonametv/skyde/' + file_name)
-          FileUtils.rm('/nonametv/skyde/' + file_name)
-          FileUtils.mv('/tmp/' + file_name, '/nonametv/skyde/' + file_name)
+        if !FileUtils.compare_file('/tmp/' + file_name, '/home/jnylen/content/skyde/' + file_name)
+          FileUtils.rm('/home/jnylen/content/skyde/' + file_name)
+          FileUtils.mv('/tmp/' + file_name, '/home/jnylen/content/skyde/' + file_name)
 
           puts "Updated #{file_name}"
 
           # Channels
-          copy_to_channels('/nonametv/skyde/' + file_name)
+          copy_to_channels('/home/jnylen/content/skyde/' + file_name)
         else
           FileUtils.rm('/tmp/' + file_name)
           puts "Not changed #{file_name}"
         end
       else
-        File.open('/nonametv/skyde/' + file_name, 'wb'){ |f| f << Zlib::GzipReader.new(StringIO.new(a.get('http://info.sky.de' + link.href).body.to_s)).read }
+        File.open('/home/jnylen/content/skyde/' + file_name, 'wb'){ |f| f << Zlib::GzipReader.new(StringIO.new(a.get('http://info.sky.de' + link.href).body.to_s)).read }
         puts "Downloaded #{file_name}"
 
         # Channels
-        copy_to_channels('/nonametv/skyde/' + file_name)
+        copy_to_channels('/home/jnylen/content/skyde/' + file_name)
       end
 
       #File.open(file_name, 'wb'){ |f| f << Zlib::GzipReader.new(StringIO.new(a.get('http://info.sky.de' + link.href).body.to_s)).read }

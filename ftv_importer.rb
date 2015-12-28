@@ -25,9 +25,9 @@ page = a.get('http://www.fashiontv.com/epg').body
   # Only add files that is this year or next.
   if url =~ /#{Date.today.year}/ or url =~ /#{Date.today.year + 1}/
     channels.each do |c|
-      next if file_name !~ /#{c[:info]}/i or file_name !~ /#{c[:info2]}/i or File.exist?('/nonametv/channels/' + c[:xmltvid] + '/' + file_name)
+      next if file_name !~ /#{c[:info]}/i or file_name !~ /#{c[:info2]}/i or File.exist?('/home/jnylen/content/channels/' + c[:xmltvid] + '/' + file_name)
 
-      File.open('/nonametv/channels/' + c[:xmltvid] + '/' + file_name, 'wb'){|f| f << a.get(url).body}
+      File.open('/home/jnylen/content/channels/' + c[:xmltvid] + '/' + file_name, 'wb'){|f| f << a.get(url).body}
       puts "Added #{file_name} to #{c[:xmltvid]}"
     end
   end

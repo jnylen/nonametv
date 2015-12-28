@@ -29,9 +29,9 @@ a.get('http://www.tv5monde.com/pro/lg-gb/Bienvenue-sur-TV5MONDE-PRO') do |home_p
 
     if e.css('a').text =~ /XLS Version/i
       file_name = e.css("a")[0]["title"][/: (.*?)$/, 1].strip
-      next if File.exist?('/nonametv/channels/tv5monde.org/' + file_name)
+      next if File.exist?('/home/jnylen/content/channels/tv5monde.org/' + file_name)
 
-      File.open('/nonametv/channels/tv5monde.org/' + file_name, 'wb'){|f| f << a.get("http://www.tv5monde.com" + e.css("a")[0]["href"]).body}
+      File.open('/home/jnylen/content/channels/tv5monde.org/' + file_name, 'wb'){|f| f << a.get("http://www.tv5monde.com" + e.css("a")[0]["href"]).body}
       puts "Added #{file_name} to tv5monde.org"
     end
 
