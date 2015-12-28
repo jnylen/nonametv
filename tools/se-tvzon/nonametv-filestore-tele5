@@ -29,18 +29,18 @@ my $filestore = $conf->{FileStore};
 
   # list files inside of the channel directory and check when they have been touched
   my( $cf ) = File::Util->new();
-  my( @cffiles ) = $cf->list_dir( "/nonametv/autoupload/tele5", '--no-fsdots' );
+  my( @cffiles ) = $cf->list_dir( "/home/jnylen/content/autoupload/tele5", '--no-fsdots' );
   foreach my $cff (@cffiles)
   {
     if($cff =~ /^\./) { next; }
 
-    my $cftype = join(',', File::Util->file_type( "/nonametv/autoupload/tele5/$cff" ) );
+    my $cftype = join(',', File::Util->file_type( "/home/jnylen/content/autoupload/tele5/$cff" ) );
 
     if( $cff !~ /\.xml$/i ){
         progress( "File $cff isn't a xml file - removing" );
-        unlink "/nonametv/autoupload/tele5/$cff";
+        unlink "/home/jnylen/content/autoupload/tele5/$cff";
     } else {
-      move( "/nonametv/autoupload/tele5/$cff", "$filestore/tele5.de/$cff" );
+      move( "/home/jnylen/content/autoupload/tele5/$cff", "$filestore/tele5.de/$cff" );
       print "$cff moved to tele5.de\n";
     }
 

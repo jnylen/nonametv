@@ -81,7 +81,11 @@ print OUT << "EOHEAD";
 </head>
 <body>
 <h1>Data status</h1>
-<p>E=Doesnt Exist - X=Exists</p>
+<p>
+  Please remember, these files are for personal usage. Any usage from that will result in your whole ip range being banned.<br/>
+  Any support not for personal usage won't happen.
+</p>
+<p>E=Doesn't Exist - X=Exists</p>
 <table>
 <thead>
   <tr>

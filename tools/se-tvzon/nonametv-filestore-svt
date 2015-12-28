@@ -39,7 +39,7 @@ $channel_data{ "SVTK" } = "kunskapskanalen.svt.se";
 
   # list files inside of the channel directory and check when they have been touched
   my( $cf ) = File::Util->new();
-  my( @cffiles ) = $cf->list_dir( "/nonametv/autoupload/svt", '--no-fsdots' );
+  my( @cffiles ) = $cf->list_dir( "/home/jnylen/content/autoupload/svt", '--no-fsdots' );
   foreach my $cff (@cffiles)
   {
     if($cff =~ /^\./) { next; }
@@ -48,15 +48,15 @@ $channel_data{ "SVTK" } = "kunskapskanalen.svt.se";
 
     my ( $id, $date, $enddate ) = split(/_/, $cff);
 
-    my $cftype = join(',', File::Util->file_type( "/nonametv/autoupload/svt/$cff" ) );
-    my $fsftype = join(',', File::Util->file_type( "/nonametv/autoupload/svt/$cff" ) );
+    my $cftype = join(',', File::Util->file_type( "/home/jnylen/content/autoupload/svt/$cff" ) );
+    my $fsftype = join(',', File::Util->file_type( "/home/jnylen/content/autoupload/svt/$cff" ) );
 
     if( not exists( $channel_data{$id} ) )
     {
         print "Files with name $id hasnt been specified as a channel.\n";
-        #unlink "/nonametv/autoupload/svt/$org_cff";
+        #unlink "/home/jnylen/content/autoupload/svt/$org_cff";
     } else {
-      move( "/nonametv/autoupload/svt/$org_cff", "$filestore/$channel_data{$id}/$org_cff" );
+      move( "/home/jnylen/content/autoupload/svt/$org_cff", "$filestore/$channel_data{$id}/$org_cff" );
       print "$cff moved to $channel_data{$id}\n";
     }
 

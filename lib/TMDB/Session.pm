@@ -73,7 +73,7 @@ sub new {
                 optional => 1,
                 default  => WWW::Mechanize::Cached->new(
                     cache => CHI->new( driver => 'File',
-                             root_dir => '/nonametv/contentcache/Tmdb3',
+                             root_dir => '/home/jnylen/content/contentcache/Tmdb3',
                              expires_in => '1 month', expires_variance => 0.25 ), agent => $default_ua, headers => $default_headers
                 ),
             },

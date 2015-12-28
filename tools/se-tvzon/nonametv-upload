@@ -1,6 +1,6 @@
 #!/bin/sh
 
-NROOT=/var/local/nonametv
+NROOT=/home/jnylen/content
 SC_OPT=-qq
 V=false
 
@@ -17,6 +17,6 @@ rsync -c --delete -r $NROOT/json_staging/ $NROOT/json/
 
 $V && echo "chaeun"
 
-rsync -c --delete -r $NROOT/json_extra/ chaeun:/server/xmltv_files/json_extra/
-rsync -c --delete -r $NROOT/json/ chaeun:/server/xmltv_files/json/
+#rsync -c --delete -r $NROOT/json_extra/ chaeun:/server/xmltv_files/json_extra/
+#rsync -c --delete -r $NROOT/json/ chaeun:/server/xmltv_files/json/
 #rsync -c --delete -r $NROOT/datalist.xml.gz chaeun:/server/xmltv_files/datalist.xml.gz

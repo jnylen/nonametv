@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NROOT=/var/local/nonametv
+NROOT=/home/jnylen/content
 PROOT=/home/jnylen/projects/nonametv
 
 rm -rf $NROOT/xmltv_compare

@@ -1,11 +1,11 @@
 #!/bin/sh
-NROOT=/var/local/nonametv
+NROOT=/home/jnylen/content
 
 # Python
 /usr/bin/python /home/jnylen/projects/nonametv/tools/se-tvzon/convert_jsontv/convert.py
 
 # Move to right folder.
-rsync -c --delete -r /tmp/xmltv_convert/xml/ /var/local/nonametv/xmltv_staging/
+rsync -c --delete -r /tmp/xmltv_convert/xml/ /home/jnylen/content/xmltv_staging/
 
 #  Perl
 tools/nonametv-export Xmltv --export-channels
@@ -36,12 +36,12 @@ rsync -c --delete -r $NROOT/xmltv/datalist.xml.gz $NROOT/datalist.xml.gz
 #tools/nonametv-localize-movies > /nonametv/movies.html
 
 
-rsync -c --delete -r $NROOT/xmltv/ chaeun:/server/xmltv_files/xmltv/
-rsync -c --delete -r $NROOT/datalist.xml.gz chaeun:/server/xmltv_files/datalist.xml.gz
+#rsync -c --delete -r $NROOT/xmltv/ chaeun:/server/xmltv_files/xmltv/
+#rsync -c --delete -r $NROOT/datalist.xml.gz chaeun:/server/xmltv_files/datalist.xml.gz
 
 # Compare
 tools/se-tvzon/nonametv-xmltv-compare-run
-rsync --delete -r /var/local/nonametv/xmltv_compare/ /var/www/html/compare/
+rsync --delete -r /home/jnylen/content/xmltv_compare/ /var/www/html/compare/
 
 # Combined files
 ruby /home/jnylen/notice.rb

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NROOT=/var/local/nonametv
+NROOT=/home/jnylen/content
 PROOT=/home/jnylen/projects/nonametv/
 
 #Q="--quiet --quiet"
@@ -39,7 +39,7 @@ then
   #perl -I lib tools/nonametv-remove-old
 
   # Generate the docs for the importers etc
-  tools/nonametv-generate-doc /nonametv/docs/
+  tools/nonametv-generate-doc /home/jnylen/content/docs/
 
   exit
 fi
@@ -100,10 +100,10 @@ $d perl -I lib/ tools/nonametv-export Json --remove-old
 $d tools/nonametv-icon-update --quiet --unattended
 
 # Export
-#$d tools/se-tvzon/nonametv-updatesite $Q
+$d tools/se-tvzon/nonametv-updatesite $Q
 
 # Upload to www - I don't know if I wanna run this here.
-#tools/se-tvzon/nonametv-upload $Q
+tools/se-tvzon/nonametv-upload $Q
 
 # This shouldn't produce any output, but there seems to be a bug
 # somewhere.
@@ -130,4 +130,4 @@ $d tools/se-tvzon/nonametv-upload $Q
 #$h tools/se-tvzon/nonametv-upload $Q
 
 # Run after, everything
-$d rsync --delete -r /var/local/nonametv/html/00status.html /var/www/html/
+$d rsync --delete -r /home/jnylen/content/html/00status.html /var/www/xmltv/

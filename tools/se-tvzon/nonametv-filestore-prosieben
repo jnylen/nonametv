@@ -42,13 +42,13 @@ $channel_data{ "SX" }  = "sixx.de";
 
   # list files inside of the channel directory and check when they have been touched
   my( $cf ) = File::Util->new();
-  my( @cffiles ) = $cf->list_dir( "/nonametv/autoupload/prosieben", '--no-fsdots' );
+  my( @cffiles ) = $cf->list_dir( "/home/jnylen/content/autoupload/prosieben", '--no-fsdots' );
   foreach my $cff (@cffiles)
   {
     if($cff =~ /^\./) { next; }
     my ( $id, $week, $year ) = split(/_/, $cff);
 
-    my $cftype = join(',', File::Util->file_type( "/nonametv/autoupload/prosieben/$cff" ) );
+    my $cftype = join(',', File::Util->file_type( "/home/jnylen/content/autoupload/prosieben/$cff" ) );
 
     if( $cff !~ /\.xml$/i ){
         #progress( "File $cff isn't a xml file - skipping" );
@@ -58,9 +58,9 @@ $channel_data{ "SX" }  = "sixx.de";
     if( not exists( $channel_data{$id} ) )
     {
         print "Files with name $id hasnt been specified as a channel.\n";
-        #unlink "/nonametv/autoupload/prosieben/$cff";
+        #unlink "/home/jnylen/content/autoupload/prosieben/$cff";
     } else {
-      move( "/nonametv/autoupload/prosieben/$cff", "$filestore/$channel_data{$id}/$cff" );
+      move( "/home/jnylen/content/autoupload/prosieben/$cff", "$filestore/$channel_data{$id}/$cff" );
       print "$cff moved to $channel_data{$id}\n";
     }
 
