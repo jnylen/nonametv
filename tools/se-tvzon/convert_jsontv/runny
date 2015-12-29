@@ -36,8 +36,8 @@ rsync -c --delete -r $NROOT/xmltv/datalist.xml.gz $NROOT/datalist.xml.gz
 #tools/nonametv-localize-movies > /nonametv/movies.html
 
 
-#rsync -c --delete -r $NROOT/xmltv/ chaeun:/server/xmltv_files/xmltv/
-#rsync -c --delete -r $NROOT/datalist.xml.gz chaeun:/server/xmltv_files/datalist.xml.gz
+rsync -c --delete -r $NROOT/xmltv/ chaeun:/server/xmltv_files/xmltv/
+rsync -c --delete -r $NROOT/datalist.xml.gz chaeun:/server/xmltv_files/datalist.xml.gz
 
 # Compare
 tools/se-tvzon/nonametv-xmltv-compare-run
