@@ -74,18 +74,22 @@ sub ImportContent {
   my $dsh = $self->{datastorehelper};
 
   # Clean it up
+  $$cref =~ s/<style>(.*)<\/style>//gi;
   $$cref =~ s/<col width="(.*?)">//g;
   $$cref =~ s/<br style='(.*?)'>/\n/g;
-  $$cref =~ s/&nbsp;//g;
+  $$cref =~ s/&nbsp;//gi;
   $$cref =~ s/&#39;/'/g;
   $$cref =~ s/&#65533;//g;
   $$cref =~ s/ & / &amp; /g;
-  $$cref =~ s/<The Return of Superman>//g;
-  $$cref =~ s/<The Human Condition - Urban Farmer>//g;
-  $$cref =~ s/<2015 K-POP WORLD FESTIVAL IN CHANGWON>//g;
+  $$cref =~ s/<The Return of Superman>/The Return of Superman/gi;
+  $$cref =~ s/<The Human Condition - Urban Farmer>/The Human Condition - Urban Farmer/gi;
+  $$cref =~ s/<The Wonders of Korea>/The Wonders of Korea/gi;
+  $$cref =~ s/<2015 K-POP WORLD FESTIVAL IN CHANGWON>/2015 K-POP WORLD FESTIVAL IN CHANGWON/gi;
 
   my $data = '<?xml version="1.0" encoding="utf-8"?>';
   $data .= $$cref;
+
+  #open (MYFILE, '>>data.xml'); print MYFILE $data; close (MYFILE);
 
   my $doc;
   my $xml = XML::LibXML->new;
@@ -107,13 +111,15 @@ sub ImportContent {
 
   # Programmes
   foreach my $row ($ns->get_nodelist) {
-    my $date = norm( $row->findvalue( "td[1]" ) );
-    my $time = norm( $row->findvalue( "td[2]" ) );
-    my $duration = norm( $row->findvalue( "td[3]" ) );
-    my $title = norm( $row->findvalue( "td[4]" ) );
+
+
+    my $date = $self->ParseDate(norm( $row->findvalue( "td[0]" ) ));
+    my $time = norm( $row->findvalue( "td[1]" ) );
+    my $duration = norm( $row->findvalue( "td[2]" ) );
+    my $title = norm( $row->findvalue( "td[3]" ) );
     my $genre = norm( $row->findvalue( "td[5]" ) );
-    my $episode = norm( $row->findvalue( "td[6]" ) );
-    my $desc = norm( $row->findvalue( "td[7]" ) );
+    my $episode = norm( $row->findvalue( "td[7]" ) );
+    my $desc = norm( $row->findvalue( "td[8]" ) );
 
     if($date ne $currdate ) {
         $dsh->StartDate( $date , "06:00" );
@@ -166,6 +172,40 @@ sub ImportContent {
   #$dsh->EndBatch( 1 );
 
   return 1;
+}
+
+sub ParseDate {
+  my( $text ) = @_;
+
+  return undef if( ! $text );
+print "ParseDate >$text<\n";
+
+  my( $day , $month , $year, $monthname );
+
+  if( $text =~ /^\d\d\/\d\d\/\d\d$/ ){
+    ( $day , $month , $year ) = ( $text =~ /^(\d\d)\/(\d\d)\/(\d\d)$/ );
+  } elsif( $text =~ /^(\d+)-(\S+)-(\d+)$/ ){ # Format: "30-Nov-10"
+    ( $day , $monthname , $year ) = ( $text =~ /^(\d+)-(\S+)-(\d+)$/ );
+    $month = MonthNumber( $monthname, "en" );
+  } elsif( $text =~ /^\d\d\d\d\d\d\d\d$/ ) {
+    ( $year, $month, $day ) = ( $text =~ /^(\d\d\d\d)(\d\d)(\d\d)$/ );
+  } else {
+    return undef;
+  }
+
+  $year += 2000 if $year lt 100;
+
+  my $date = DateTime->new( year   => $year,
+                            month  => $month,
+                            day    => $day,
+                            hour   => 0,
+                            minute => 0,
+                            second => 0,
+                            nanosecond => 0,
+                            time_zone => 'Europe/Paris',
+  );
+
+  return $date->ymd("-");
 }
 
 1;
