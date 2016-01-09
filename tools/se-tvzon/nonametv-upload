@@ -19,3 +19,8 @@ $V && echo "chaeun"
 
 rsync -c --delete -r $NROOT/json_extra/ chaeun:/server/xmltv_files/json_extra/
 rsync -c --delete -r $NROOT/json/ chaeun:/server/xmltv_files/json/
+
+$V && echo "honeybee"
+
+rsync -c --delete -r $NROOT/json_extra/ honeybee:/xmltv_files/json_extra/
+rsync -c --delete -r $NROOT/json/ honeybee:/xmltv_files/json/
