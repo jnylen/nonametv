@@ -23,6 +23,7 @@ my $augmenter = CreateAugmenter( 'Tmdb3', $ds, 'de' );
 #	'directors' => 'John Landis',
 #};
 
+# alias name of director
 #my $ce = {
 #	'title' => 'Mala',
 #	'production_date' => '2013-01-01',
@@ -30,10 +31,17 @@ my $augmenter = CreateAugmenter( 'Tmdb3', $ds, 'de' );
 #};
 
 # many aliases
+#my $ce = {
+#	'title' => 'Das Todesduell der Tigerkralle',
+#	'production_date' => '1977-01-01',
+#	'directors' => 'Chu Yuan',
+#};
+
+# the director really is the writer
 my $ce = {
-	'title' => 'Das Todesduell der Tigerkralle',
-	'production_date' => '1977-01-01',
-	'directors' => 'Chu Yuan',
+	'title' => 'Schneeweisschen und Rosenrot',
+	'production_date' => '2012-01-01',
+	'directors' => 'Mario Giordano',
 };
 
 

@@ -269,8 +269,9 @@ sub AugmentProgram( $$$ ){
 
         my $series;
         if( defined( $ruleref->{remoteref} ) ) {
-          my $seriesname = $self->{tvdb}->getSeriesName( $ruleref->{remoteref}, 0 );
-          $series = $self->{tvdb}->getSeries( $seriesname, 0 );
+#          my $seriesname = $self->{tvdb}->getSeriesName( $ruleref->{remoteref} );
+#          $series = $self->{tvdb}->getSeries( $seriesname );
+          $series = $self->{tvdb}->getSeries( $ruleref->{remoteref} );
         } else {
           $series = $self->{tvdb}->getSeries( $ceref->{title}, 0 );
 
@@ -308,8 +309,9 @@ sub AugmentProgram( $$$ ){
 
         my $series;
         if( defined( $ruleref->{remoteref} ) ) {
-          my $seriesname = $self->{tvdb}->getSeriesName( $ruleref->{remoteref}, 0 );
-          $series = $self->{tvdb}->getSeries( $seriesname, 0 );
+          #my $seriesname = $self->{tvdb}->getSeriesName( $ruleref->{remoteref}, 0 );
+          #$series = $self->{tvdb}->getSeries( $seriesname, 0 );
+          $series = $self->{tvdb}->getSeries( $ruleref->{remoteref} );
         } else {
           $series = $self->{tvdb}->getSeries( $ceref->{title}, 0 );
 
@@ -387,9 +389,11 @@ sub AugmentProgram( $$$ ){
 
     if( defined( $ceref->{subtitle} ) ) {
       my $series;
+      my $seriesname;
       if( defined( $ruleref->{remoteref} ) ) {
-        my $seriesname = $self->{tvdb}->getSeriesName( $ruleref->{remoteref}, 0 );
-        $series = $self->{tvdb}->getSeries( $seriesname, 0 );
+#        my $seriesname = $self->{tvdb}->getSeriesName( $ruleref->{remoteref} );
+#        $series = $self->{tvdb}->getSeries( $seriesname );
+        $series = $self->{tvdb}->getSeries( $ruleref->{remoteref} );
       } else {
         $series = $self->{tvdb}->getSeries( $ceref->{title}, 0 );
 
@@ -465,7 +469,11 @@ sub AugmentProgram( $$$ ){
           }
         }
       } else {
-        d( "series not found by title: " . $ceref->{title} );
+        if( defined( $seriesname ) ) {
+          d( 'series ' . $ruleref->{remoteref} . ' not found by title: ' . $seriesname );
+        } else {
+          d( 'series not found by title: ' . $ceref->{title} );
+        }
       }
     }
 
