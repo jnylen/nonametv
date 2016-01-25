@@ -162,7 +162,7 @@ sub ImportContentFile
 
     # Episodes
     if(my($episode2) = ($sc->findvalue ('./episode-num') =~ /Folge\s+(\d+)/i)) {
-        $ce->{episode} = sprintf( " . %d .", $episode2-1 );
+        $ce->{episode} = sprintf( " . %d .", $episode2-1 ) if $episode2 ne "0";
     }
 
     # Genre
