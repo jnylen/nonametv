@@ -32,7 +32,7 @@ Options:
   --verbose
     Show which datafiles are created.
 
-  --quiet 
+  --quiet
     Show only fatal errors.
 
   --export-channels
@@ -51,7 +51,7 @@ Options:
   --append-credits
     Append credits after the last event.
 
-=cut 
+=cut
 
 $XMLTV::ValidateFile::REQUIRE_CHANNEL_ID = 0;
 
@@ -70,14 +70,14 @@ sub new {
     $self->{MinDays} = $self->{MaxDays} unless defined $self->{MinDays};
     $self->{PastDays} = 8 unless defined $self->{PastDays};
 
-    $self->{LastRequiredDate} = 
+    $self->{LastRequiredDate} =
       DateTime->today->add( days => $self->{MinDays}-1 )->ymd("-");
 
-    $self->{OptionSpec} = [ qw/export-channels remove-old force-export append-credits 
+    $self->{OptionSpec} = [ qw/export-channels remove-old force-export append-credits
 			    channel-group=s
 			    verbose+ quiet+ help/ ];
 
-    $self->{OptionDefaults} = { 
+    $self->{OptionDefaults} = {
       'export-channels' => 0,
       'remove-old' => 0,
       'force-export' => 0,
@@ -95,7 +95,7 @@ sub new {
     my $ds = $self->{datastore};
 
     # Load language strings
-    $self->{lngstr} = LoadLanguage( $self->{Language}, 
+    $self->{lngstr} = LoadLanguage( $self->{Language},
                                    "exporter-xmltv", $ds );
 
     # if KeepXml is set, xml files are not deleted after gzip
@@ -153,7 +153,7 @@ EOH
     my $todo = {};
     my $update_started = time();
     my $last_update = $self->ReadState();
-    
+
     if( $p->{'append-credits'} ) {
       $self->{appendcredits} = 1;
     }
@@ -165,7 +165,7 @@ EOH
       $self->FindUpdated( $todo, $last_update );
       $self->FindUnexportedDays( $todo, $last_update );
     }
-    
+
     $self->ExportData( $todo );
 
     $self->WriteState( $update_started );
@@ -181,15 +181,15 @@ sub FindAll {
 
   my $ds = $self->{datastore};
 
-  my ( $res, $channels ) = $ds->sa->Sql( 
+  my ( $res, $channels ) = $ds->sa->Sql(
        "select id from channels where export=1");
 
   my $last_date = DateTime->today->add( days => $self->{MaxDays} -1 );
-  my $first_date = DateTime->today; 
+  my $first_date = DateTime->today;
 
   while( my $data = $channels->fetchrow_hashref() ) {
-    add_dates( $todo, $data->{id}, 
-               '1970-01-01 00:00:00', '2100-12-31 23:59:59', 
+    add_dates( $todo, $data->{id},
+               '1970-01-01 00:00:00', '2100-12-31 23:59:59',
                $first_date, $last_date );
   }
 
@@ -202,9 +202,9 @@ sub FindUpdated {
   my( $todo, $last_update ) = @_;
 
   my $ds = $self->{datastore};
- 
+
   my ( $res, $update_batches ) = $ds->sa->Sql( << 'EOSQL'
-    select programs.channel_id, programs.batch_id, 
+    select programs.channel_id, programs.batch_id,
            min(programs.start_time)as min_start, max(programs.start_time) as max_start
     from programs, channels
     where programs.batch_id in (
@@ -216,11 +216,11 @@ EOSQL
     , [$last_update] );
 
   my $last_date = DateTime->today->add( days => $self->{MaxDays} -1 );
-  my $first_date = DateTime->today; 
+  my $first_date = DateTime->today;
 
   while( my $data = $update_batches->fetchrow_hashref() ) {
-    add_dates( $todo, $data->{channel_id}, 
-               $data->{min_start}, $data->{max_start}, 
+    add_dates( $todo, $data->{channel_id},
+               $data->{min_start}, $data->{max_start},
                $first_date, $last_date );
   }
 
@@ -228,7 +228,7 @@ EOSQL
 }
 
 # Find all dates that should be exported
-# TODO but haven't been exported yet. 
+# TODO but haven't been exported yet.
 # TODO don't export past end of last program, once we don't grab there anymore
 sub FindUnexportedDays {
   my $self = shift;
@@ -243,17 +243,17 @@ sub FindUnexportedDays {
     # The previous export was done $days ago.
 
     my $last_date = DateTime->today->add( days => $self->{MaxDays} -1 );
-    my $first_date = $last_date->clone->subtract( days => $days-1 ); 
+    my $first_date = $last_date->clone->subtract( days => $days-1 );
 
-    my ( $res, $channels ) = $ds->sa->Sql( 
+    my ( $res, $channels ) = $ds->sa->Sql(
        "select id from channels where export=1");
-    
+
     while( my $data = $channels->fetchrow_hashref() ) {
-      add_dates( $todo, $data->{id}, 
-                 '1970-01-01 00:00:00', '2100-12-31 23:59:59', 
-                 $first_date, $last_date ); 
+      add_dates( $todo, $data->{id},
+                 '1970-01-01 00:00:00', '2100-12-31 23:59:59',
+                 $first_date, $last_date );
     }
-    
+
     $channels->finish();
   }
 }
@@ -283,7 +283,7 @@ sub ReadState {
   my $self = shift;
 
   my $ds = $self->{datastore};
- 
+
   my $last_update = $ds->sa->Lookup( 'state', { name => "xmltv_last_update" },
                                  'value' );
 
@@ -302,7 +302,7 @@ sub WriteState {
 
   my $ds = $self->{datastore};
 
-  $ds->sa->Update( 'state', { name => "xmltv_last_update" }, 
+  $ds->sa->Update( 'state', { name => "xmltv_last_update" },
                { value => $update_started } );
 }
 
@@ -315,18 +315,18 @@ sub add_dates {
 
   my $from_dt = create_dt( $from, 'UTC' )->truncate( to => 'day' );
   my $to_dt = create_dt( $to, 'UTC' )->truncate( to => 'day' );
- 
+
   $to_dt = $last->clone() if $last < $to_dt;
   $from_dt = $first->clone() if $first > $from_dt;
 
   my $first_dt = $from_dt->clone()->subtract( days => 1 );
- 
+
   for( my $dt = $first_dt->clone();
        $dt <= $to_dt; $dt->add( days => 1 ) ) {
     $h->{$chid}->{$dt->ymd('-')} = 1;
-  } 
+  }
 }
-  
+
 sub create_dt
 {
   my( $str, $tz ) = @_;
@@ -381,12 +381,12 @@ sub ExportFile {
 
   my( $res, $sth ) = $self->{datastore}->sa->Sql( "
         SELECT * from programs
-        WHERE (channel_id = ?) 
+        WHERE (channel_id = ?)
           and (start_time >= ?)
-          and (start_time < ?) 
-        ORDER BY start_time", 
+          and (start_time < ?)
+        ORDER BY start_time",
       [$chd->{id}, "$startdate 00:00:00", "$enddate 23:59:59"] );
-  
+
   my $w = $self->CreateWriter( $chd, $date );
 
   my $done = 0;
@@ -416,7 +416,7 @@ sub ExportFile {
       w "Adjusted endtime $d1->{end_time} => $d2->{start_time}";
 
       $d1->{end_time} = $d2->{start_time}
-    }        
+    }
 
     $self->WriteEntry( $w, $d1, $chd )
       unless $d1->{title} eq "end-of-transmission";
@@ -500,7 +500,7 @@ sub CreateWriter
   $self->{writer_entries} = 0;
   # Make sure that writer_entries is always true if we don't require data
   # for this date.
-  $self->{writer_entries} = "0 but true" 
+  $self->{writer_entries} = "0 but true"
     if( ($date gt $self->{LastRequiredDate}) or $chd->{empty_ok} );
 
   open( my $fh, '>:encoding(' . $self->{Encoding} . ')', "$path$filename.new")
@@ -508,9 +508,9 @@ sub CreateWriter
 
   my $w = new XMLTV::Writer( encoding => $self->{Encoding},
                              OUTPUT   => $fh );
-  
+
   $w->start({ 'generator-info-name' => 'Taiga XMLTV', 'generator-info-url' => 'http://xmltv.se' });
-    
+
   return $w;
 }
 
@@ -587,23 +587,23 @@ sub WriteEntry
 
   my $start_time = create_dt( $data->{start_time}, "UTC" );
   $start_time->set_time_zone( "Europe/Stockholm" );
-  
+
   my $end_time = create_dt( $data->{end_time}, "UTC" );
   $end_time->set_time_zone( "Europe/Stockholm" );
-  
+
   my $d = {
     channel => $chd->{xmltvid},
     start => $start_time->strftime( "%Y%m%d%H%M%S %z" ),
     stop => $end_time->strftime( "%Y%m%d%H%M%S %z" ),
     title => [ [ $data->{title}, $chd->{sched_lang} ] ],
   };
-  
-  $d->{desc} = [[ $data->{description},$chd->{sched_lang} ]] 
+
+  $d->{desc} = [[ $data->{description},$chd->{sched_lang} ]]
     if defined( $data->{description} ) and $data->{description} ne "";
-  
-  $d->{'sub-title'} = [[ $data->{subtitle}, $chd->{sched_lang} ]] 
+
+  $d->{'sub-title'} = [[ $data->{subtitle}, $chd->{sched_lang} ]]
     if defined( $data->{subtitle} ) and $data->{subtitle} ne "";
-  
+
   if( defined( $data->{episode} ) and ($data->{episode} =~ /\S/) )
   {
     my( $season, $ep, $part );
@@ -625,13 +625,13 @@ sub WriteEntry
     if( $ep =~ /\S/ ) {
       my( $ep_nr, $ep_max ) = split( "/", $ep );
       $ep_nr++;
-      
+
       my $ep_text = $self->{lngstr}->{episode_number} . " $ep_nr";
-      $ep_text .= " " . $self->{lngstr}->{of} . " $ep_max" 
+      $ep_text .= " " . $self->{lngstr}->{of} . " $ep_max"
 	  if defined $ep_max;
-      $ep_text .= " " . $self->{lngstr}->{episode_season} . " $season" 
+      $ep_text .= " " . $self->{lngstr}->{episode_season} . " $season"
 	  if( $season );
-      
+
       $d->{'episode-num'} = [[ norm($data->{episode}), 'xmltv_ns' ],
 			     [ $ep_text, 'onscreen'] ];
     }
@@ -660,7 +660,7 @@ sub WriteEntry
       }
     }
   }
-  
+
   if( defined( $data->{program_type} ) and ($data->{program_type} =~ /\S/) )
   {
     push @{$d->{category}}, [$data->{program_type}, 'en'];
@@ -679,7 +679,7 @@ sub WriteEntry
     push @{$d->{category}}, [$chd->{def_cat}, 'en'];
   }
 
-  if( defined( $data->{production_date} ) and 
+  if( defined( $data->{production_date} ) and
       ($data->{production_date} =~ /\S/) )
   {
     $d->{date} = substr( $data->{production_date}, 0, 4 );
@@ -709,7 +709,7 @@ sub WriteEntry
 
   if( defined( $data->{directors} ) and $data->{directors} =~ /\S/ )
   {
-    $d->{credits}->{director} = [split( ", ", $data->{directors})];
+    $d->{credits}->{director} = [split( ";", $data->{directors})];
   }
 
   if( defined( $data->{actors} ) and $data->{actors} =~ /\S/ )
@@ -723,7 +723,7 @@ sub WriteEntry
     # move comma in braces out of the way
     $actors =~ s|(\([^\(]*),([^\(]*\))|$1_$2|g;
     # split actors
-    my @actors = split( ", ", $data->{actors});
+    my @actors = split( ";", $data->{actors});
     foreach my $actor ( @actors ) {
       if( $actor =~ /^\s*$/ ) {
         w "Bad actor $data->{actors}";
@@ -738,32 +738,32 @@ sub WriteEntry
 
   if( defined( $data->{writers} ) and $data->{writers} =~ /\S/ )
   {
-    $d->{credits}->{writer} = [split( ", ", $data->{writers})];
+    $d->{credits}->{writer} = [split( ";", $data->{writers})];
   }
 
   if( defined( $data->{adapters} ) and $data->{adapters} =~ /\S/ )
   {
-    $d->{credits}->{adapter} = [split( ", ", $data->{adapters})];
+    $d->{credits}->{adapter} = [split( ";", $data->{adapters})];
   }
 
   if( defined( $data->{producers} ) and $data->{producers} =~ /\S/ )
   {
-    $d->{credits}->{producer} = [split( ", ", $data->{producers})];
+    $d->{credits}->{producer} = [split( ";", $data->{producers})];
   }
 
   if( defined( $data->{presenters} ) and $data->{presenters} =~ /\S/ )
   {
-    $d->{credits}->{presenter} = [split( ", ", $data->{presenters})];
+    $d->{credits}->{presenter} = [split( ";", $data->{presenters})];
   }
 
   if( defined( $data->{commentators} ) and $data->{commentators} =~ /\S/ )
   {
-    $d->{credits}->{commentator} = [split( ", ", $data->{commentators})];
+    $d->{credits}->{commentator} = [split( ";", $data->{commentators})];
   }
 
   if( defined( $data->{guests} ) and $data->{guests} =~ /\S/ )
   {
-    $d->{credits}->{guest} = [split( ", ", $data->{guests})];
+    $d->{credits}->{guest} = [split( ";", $data->{guests})];
   }
 
   if( $data->{url} )
@@ -775,7 +775,7 @@ sub WriteEntry
   {
     $d->{'star-rating'} = [ [ $data->{star_rating}, undef ] ];
   }
-  
+
   if( $data->{url_image_main} )
   {
     $d->{picture} = [ $data->{url_image_main} ];
@@ -789,7 +789,7 @@ sub WriteEntry
 
     $d->{'previously-shown'} = { start => $timestamp2->strftime( "%Y%m%d%H%M%S %z" ), channel => $channelname };
   }
-  
+
   $w->write_programme( $d );
 }
 
@@ -825,7 +825,7 @@ sub ExportChannelList
     my $dn = $odoc->createElement( 'display-name' );
     # FIXME why not $data->{sched_lang}?
     $dn->setAttribute( 'lang', $self->{Language} );
-    $dn->appendText( $data->{display_name} ); 
+    $dn->appendText( $data->{display_name} );
     $ch->appendChild( $dn );
 
     my $bu = $odoc->createElement( 'base-url' );
@@ -835,7 +835,7 @@ sub ExportChannelList
     if( $data->{logo} )
     {
       my $logo = $odoc->createElement( 'icon' );
-      $logo->setAttribute( 'src', $self->{IconRootUrl} . 
+      $logo->setAttribute( 'src', $self->{IconRootUrl} .
                            $data->{xmltvid} .  ".png"  );
       $ch->appendChild( $logo );
     }
@@ -867,14 +867,14 @@ sub ExportChannelList
 }
 
 #
-# Remove old xml-files and xml.gz-files. 
+# Remove old xml-files and xml.gz-files.
 #
 sub RemoveOld
 {
   my( $self ) = @_;
 
   my $ds = $self->{datastore};
- 
+
   # Keep files for the last PastDays. (default: one week)
   my $keep_date = DateTime->today->subtract( days => $self->{PastDays} )->ymd("-");
 
@@ -883,7 +883,7 @@ sub RemoveOld
 
   foreach my $file (@files)
   {
-    my($date) = 
+    my($date) =
       ($file =~ /(\d\d\d\d-\d\d-\d\d)\.xml(\.gz){0,1}/);
 
     if( defined( $date ) )
@@ -907,4 +907,3 @@ sub RemoveOld
 ## Local Variables:
 ## coding: utf-8
 ## End:
-  
