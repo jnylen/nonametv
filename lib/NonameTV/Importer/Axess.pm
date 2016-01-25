@@ -13,7 +13,7 @@ This is supposedly the format defined by TTSpektra.
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 
-use NonameTV qw/ParseXml ParseDescCatSwe AddCategory norm/;
+use NonameTV qw/ParseXml ParseDescCatSwe AddCategory norm normLatin1/;
 
 use DateTime;
 
@@ -146,8 +146,8 @@ sub ImportContent {
       'tt:TVRBroadcast/tt:BroadcastDateTime/tt:EndDateTime', $pb );
     my $url = $xp->findvalue(
       'tt:TVRBroadcast/tt:BroadcastInformation/tt:WebPage/@URL', $pb );
-    my $title = norm( $xp->findvalue( 'tt:TVRProgram/tt:Title', $pb ) );
-    my $subtitle = norm(
+    my $title = normLatin1( $xp->findvalue( 'tt:TVRProgram/tt:Title', $pb ) );
+    my $subtitle = normLatin1(
       $xp->findvalue( 'tt:TVRProgram/tt:VersionableInfo/tt:Version/tt:EpisodeTitle', $pb ) );
 
     if( $title eq $subtitle ) {
@@ -179,8 +179,8 @@ sub ImportContent {
     my $ce = {
       channel_id  => $chd->{id},
       start_time  => ParseDateTime( $start ),
-      title       => norm( $title ),
-      description => norm( "$intro $description" ),
+      title       => normLatin1( $title ),
+      description => normLatin1( "$intro $description" ),
       url         => $url,
     };
 
@@ -197,7 +197,7 @@ sub ImportContent {
     if( my( $dumperino2, $orgtitle ) = ($description =~ /(Originaltitel|Originatitel):\s+(.*?)\./) )
     {
         $ce->{description} =~ s/(Originaltitel|Originatitel):\s+(.*?)\.//i;
-        $ce->{original_title} = norm($orgtitle);
+        $ce->{original_title} = normLatin1($orgtitle);
     }
 
     if( $end ne "" ) {
@@ -205,10 +205,10 @@ sub ImportContent {
     }
 
     if( $subtitle ne "" ) {
-      $ce->{subtitle} = norm( $subtitle );
+      $ce->{subtitle} = normLatin1( $subtitle );
       $ce->{subtitle} =~ s/^\-//;
       $ce->{subtitle} =~ s/^://;
-      $ce->{subtitle} = norm( $ce->{subtitle} );
+      $ce->{subtitle} = normLatin1( $ce->{subtitle} );
     }
 
     if( $episodenum ne "" ) {
@@ -244,7 +244,7 @@ sub ImportContent {
       	$ce->{description} =~ s/Manus:\s*(.*?)\.//i;
     }
 
-    $ce->{description} = norm($ce->{description}) if defined $ce->{description};
+    $ce->{description} = normLatin1($ce->{description}) if defined $ce->{description};
 
     # Image
     if($url ne "") {
