@@ -34,7 +34,7 @@ my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
 
 #use Data::Dumper;
 
-use NonameTV qw/norm AddCategory MonthNumber/;
+use NonameTV qw/norm normLatin1 AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 use NonameTV::Config qw/ReadConfig/;
@@ -83,18 +83,18 @@ sub ImportFlatXLS
   my $currdate = "x";
 
   progress( "FTV FlatXLS: $chd->{xmltvid}: Processing flat XLS $file" );
-  
+
   my $oBook;
-  
+
   if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
   else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }   #  staro, za .xls
 
   my($iR, $oWkS, $oWkC);
-	
+
   my( $time, $episode );
   my( $program_title , $program_description );
   my @ces;
-  
+
   # main loop
   for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
 	# Not using this yet.
@@ -103,7 +103,7 @@ sub ImportFlatXLS
       progress( "FTV: $chd->{xmltvid}: Skipping (Not epg): $oWkS->{Name}" );
       next;
     }
-  
+
     progress( "FTV: Processing worksheet: $oWkS->{Name}" );
 
     # start from row 2
@@ -128,7 +128,7 @@ sub ImportFlatXLS
 		progress("SKIPPING :D");
 	  next;
 	  }
-	  
+
 	  if($date ne $currdate ) {
         if( $currdate ne "x" ) {
 			# save last day if we have it in memory
@@ -145,13 +145,13 @@ sub ImportFlatXLS
 
         progress("FTV: Date is: $date");
       }
-	  
+
 	  	#if($iR == 28) { next; }
-	  
+
 	# time (column 1)
 	 #  print "hejhejhej";
       $oWkC = $oWkS->{Cells}[$iR][1];
-      
+
       next if( ! $oWkC );
       #my $time = ParseTime( $oWkC->Value );
       my $time = 0;  # fix for  12:00AM
@@ -160,13 +160,13 @@ sub ImportFlatXLS
 	  #Convert Excel Time -> localtime
       $time = ExcelFmt('hh:mm', $time);
       next if( ! $time );
-	  
+
 	  #use Data::Dumper; print Dumper($oWkS->{Cells}[28]);
 
-	  
+
 	  my $title;
 	  my $test;
-	  
+
 	  # print "hejhej";
       # program_title (column 3)
       $oWkC = $oWkS->{Cells}[$iR][2];
@@ -174,41 +174,41 @@ sub ImportFlatXLS
       # Here's where the magic happends.
 	  # Love goes out to DrForr.
 	  $test = $oWkC->Value;
-	  
-	  $title = norm($test) if $test ne "";
+
+	  $title = normLatin1($test) if $test ne "";
 	  # If no series title, get it from episode name.
-	  
+
 	  # description
 	  $oWkC = $oWkS->{Cells}[$iR][3];
 	  my $desc = $oWkC->Value;
-	  
+
       if( $time and $title ){
-	  
+
 	  # empty last day array
       undef @ces;
-	  
+
         progress("$time $title");
 
         my $ce = {
           channel_id   => $chd->{id},
-		  title		   => norm($title),
+		      title		     => normLatin1($title),
           start_time   => $time,
-          description  => norm($desc),
+          description  => normLatin1($desc),
         };
 
 		## END
-		
+
         $dsh->AddProgramme( $ce );
-		
+
 		push( @ces , $ce );
       }
 
     } # next row
-	
+
   } # next worksheet
 
   $dsh->EndBatch( 1 );
-  
+
   return;
 }
 
@@ -226,7 +226,7 @@ sub ParseDate {
   # format '2011-05-16'
   } elsif( $text =~ /^\d{4}-\d{2}-\d{2}$/i ){
     ( $year, $month, $day ) = ( $text =~ /^(\d{4})-(\d{2})-(\d{2})$/i );
-    
+
   # format '03-11-2012'
   } elsif( $text =~ /^\d{1,2}-\d{1,2}-\d{4}$/i ){
     ( $day, $month, $year ) = ( $text =~ /^(\d+)-(\d+)-(\d{4})$/i );
