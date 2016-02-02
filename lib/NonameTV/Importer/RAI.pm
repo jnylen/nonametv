@@ -17,7 +17,7 @@ use XML::LibXML;
 use Roman;
 use Data::Dumper;
 
-use NonameTV qw/Html2Xml ParseXml AddCategory AddCountry norm normUtf8/;
+use NonameTV qw/Html2Xml ParseXml AddCategory AddCountry norm normUtf8 normLatin1/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/w f p/;
 
@@ -111,7 +111,7 @@ sub ImportContent {
     my $desc        = $pgm->findvalue( './/div[@class="eventDescription"]//text()' );
     my $desc_extra  = $pgm->findvalue( './/div[@class="eventDescription"]//span[@class="solotesto"]//text()' );
 
-    $desc =~ s/$desc_extra//i;
+    #$desc =~ s/$desc_extra//i;
 
     my $ce = {
       channel_id  => $chd->{id},
