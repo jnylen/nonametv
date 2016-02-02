@@ -28,7 +28,7 @@ use Spreadsheet::Read;
 use Text::Iconv;
 my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
 
-use NonameTV qw/norm AddCategory/;
+use NonameTV qw/norm normLatin1 AddCategory/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error /;
 use NonameTV::Config qw/ReadConfig/;
@@ -148,12 +148,12 @@ sub ImportXLS
       my $ce = {
         channel_id  => $chd->{channel_id},
         start_time  => $time,
-        title       => norm($title),
-        description => norm($desc)
+        title       => normLatin1($title),
+        description => normLatin1($desc)
       };
 
       # Extra info
-      $ce->{subtitle} = norm($eptitle) if defined $eptitle;
+      $ce->{subtitle} = normLatin1($eptitle) if defined $eptitle;
 
       # category
       if( $cate and $cate ne "" ) {
