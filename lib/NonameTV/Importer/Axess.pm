@@ -22,18 +22,21 @@ use NonameTV::Importer::BaseDaily;
 use base 'NonameTV::Importer::BaseDaily';
 
 sub new {
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
+  my $proto = shift;
+  my $class = ref($proto) || $proto;
+  my $self  = $class->SUPER::new( @_ );
+  bless ($self, $class);
 
-    defined( $self->{UrlRoot} ) or die "You must specify UrlRoot";
-    defined( $self->{LoginUrl} ) or die "You must specify LoginUrl";
-    defined( $self->{Username} ) or die "You must specify Username";
-    defined( $self->{Password} ) or die "You must specify Password";
+  defined( $self->{UrlRoot} ) or die "You must specify UrlRoot";
+  defined( $self->{LoginUrl} ) or die "You must specify LoginUrl";
+  defined( $self->{Username} ) or die "You must specify Username";
+  defined( $self->{Password} ) or die "You must specify Password";
 
-    $self->{datastore}->{SILENCE_END_START_OVERLAP} = 1;
-    return $self;
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Stockholm" );
+  $self->{datastorehelper} = $dsh;
+
+  $self->{datastore}->{SILENCE_END_START_OVERLAP} = 1;
+  return $self;
 }
 
 sub InitiateDownload {
@@ -123,6 +126,7 @@ sub ImportContent {
   my( $batch_id, $cref, $chd ) = @_;
 
   my $ds = $self->{datastore};
+  my $dsh = $self->{datastorehelper};
 
   my $doc = ParseXml( $cref );
   my $xp = XML::LibXML::XPathContext->new($doc);
@@ -138,12 +142,15 @@ sub ImportContent {
     return 0;
   }
 
+  my( $date ) = ($batch_id =~ /_(.*)$/);
+  $dsh->StartDate( $date, "00:00" );
+
   foreach my $pb ($ns->get_nodelist)
   {
-    my $start = $xp->findvalue(
-      'tt:TVRBroadcast/tt:BroadcastDateTime/tt:StartDateTime', $pb );
-    my $end = $xp->findvalue(
-      'tt:TVRBroadcast/tt:BroadcastDateTime/tt:EndDateTime', $pb );
+    my $start = ParseDateTime($xp->findvalue(
+      'tt:TVRBroadcast/tt:BroadcastDateTime/tt:StartDateTime', $pb ));
+    my $end = ParseDateTime($xp->findvalue(
+      'tt:TVRBroadcast/tt:BroadcastDateTime/tt:EndDateTime', $pb ));
     my $url = $xp->findvalue(
       'tt:TVRBroadcast/tt:BroadcastInformation/tt:WebPage/@URL', $pb );
     my $title = normLatin1( $xp->findvalue( 'tt:TVRProgram/tt:Title', $pb ) );
@@ -166,8 +173,8 @@ sub ImportContent {
       'tt:TVRProgram/tt:Description/tt:TextDesc', $pb );
     my $episodenum = $xp->findvalue( 'tt:TVRProgram/tt:EpisodeNumber', $pb );
 
-	# Del 3 av 13 in description - of_episod is not in use at the moment
-	my ( $ep_nr, $eps );
+    # Del 3 av 13 in description - of_episod is not in use at the moment
+	  my ( $ep_nr, $eps );
     ( $ep_nr, $eps ) = ($description =~ /Del\s+(\d+)\s+av\s+(\d+)/ );
     ( $ep_nr, $eps ) = ($subtitle =~ /Del\s+(\d+)\s+av\s+(\d+)/ ) if defined $subtitle and not defined $ep_nr;
 
@@ -178,7 +185,7 @@ sub ImportContent {
 
     my $ce = {
       channel_id  => $chd->{id},
-      start_time  => ParseDateTime( $start ),
+      start_time  => $start->hms(":"),
       title       => normLatin1( $title ),
       description => normLatin1( "$intro $description" ),
       url         => $url,
@@ -201,7 +208,7 @@ sub ImportContent {
     }
 
     if( $end ne "" ) {
-	    $ce->{end_time} = ParseDateTime( $end );
+	    $ce->{end_time} = $end->hms(":");
     }
 
     if( $subtitle ne "" ) {
@@ -253,7 +260,7 @@ sub ImportContent {
     }
 
 
-    $ds->AddProgramme( $ce );
+    $dsh->AddProgramme( $ce );
   }
 
   return 1;
@@ -274,7 +281,7 @@ sub ParseDateTime {
     day => $day,
     hour => $hour,
     minute => $minute,
-    time_zone => 'local' );
+    time_zone => 'Europe/Stockholm' );
   };
 
   error( "$@" ) if $@;
@@ -285,9 +292,9 @@ sub ParseDateTime {
     $dt->add( minutes => 1 );
   }
 
-  $dt->set_time_zone( 'UTC' );
+  #$dt->set_time_zone( 'UTC' );
 
-  return $dt->ymd() . " " . $dt->hms();
+  return $dt
 }
 
 sub parse_person_list
