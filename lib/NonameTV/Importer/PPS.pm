@@ -193,10 +193,10 @@ sub ImportXML
 
     my ($episode, $season);
     if($subtitle and ( $season, $episode ) = ($subtitle =~ m|\((\d+)\): Ep (\d+)$| ) ){
-        $ce->{episode} = ($season - 1) . ' . ' . ($episode - 1) . ' .';
+        $ce->{episode} = ($season - 1) . ' . ' . ($episode - 1) . ' .' if $episode > 0 and $season > 0;
         $subtitle = "";
     }elsif($subtitle and ( $episode ) = ($subtitle =~ m|^Folge (\d+)$| ) ){
-        $ce->{episode} = ' . ' . ($episode - 1) . ' .';
+        $ce->{episode} = ' . ' . ($episode - 1) . ' .' if $episode > 0;
         $subtitle = "";
     }
 
