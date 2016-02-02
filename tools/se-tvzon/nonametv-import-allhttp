@@ -70,3 +70,16 @@ $NONAMETV KiKA $1 $2 $3
 $NONAMETV Anixe $1 $2 $3
 $NONAMETV RTS $1 $2 $3
 $NONAMETV Arirang $1 $2 $3
+
+# Download files
+wget -O /home/jnylen/content/channels/tv_grab/ok54.xml http://epg.ok-rlp.de/xmltv/trier.xml
+wget -O /home/jnylen/content/channels/tv_grab/nahetv.xml http://epg.ok-rlp.de/xmltv/idar-oberstein.xml
+wget -O /home/jnylen/content/channels/tv_grab/okkl.xml http://epg.ok-rlp.de/xmltv/kaiserslautern.xml
+wget -O /home/jnylen/content/channels/tv_grab/ok4.xml http://epg.ok-rlp.de/xmltv/koblenz.xml
+wget -O /home/jnylen/content/channels/tv_grab/oklu.xml http://epg.ok-rlp.de/xmltv/ludwigshafen.xml
+wget -O /home/jnylen/content/channels/tv_grab/okmainz.xml http://epg.ok-rlp.de/xmltv/mainz.xml
+wget -O /home/jnylen/content/channels/tv_grab/okneustadt.xml http://epg.ok-rlp.de/xmltv/neustadt.xml
+wget -O /home/jnylen/content/channels/tv_grab/oksp.xml http://epg.ok-rlp.de/xmltv/rodalben.xml
+wget -O /home/jnylen/content/channels/tv_grab/okspeyer.xml http://epg.ok-rlp.de/xmltv/speyer.xml
+wget -O /home/jnylen/content/channels/tv_grab/worms.xml http://epg.ok-rlp.de/xmltv/worms.xml
+$NONAMETV TVGrabXX $1 $2 $3

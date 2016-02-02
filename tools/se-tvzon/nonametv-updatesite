@@ -2,6 +2,24 @@
 
 NROOT=/home/jnylen/content
 
+# Xmltv
+tools/nonametv-export Xmltv --export-channels
+tools/nonametv-export Xmltv --force-export $1 $2 $3
+tools/nonametv-export Xmltv --export-channels --channel-group TV
+tools/nonametv-export Xmltv --export-channels --channel-group RADIO
+tools/nonametv-export Xmltv --export-channels --channel-group DEV
+tools/nonametv-export Xmltv --export-channels --channel-group Norway
+tools/nonametv-export Xmltv --export-channels --channel-group Sweden
+tools/nonametv-export Xmltv --export-channels --channel-group Finland
+tools/nonametv-export Xmltv --export-channels --channel-group Denmark
+tools/nonametv-export Xmltv --export-channels --channel-group Netherlands
+tools/nonametv-export Xmltv --export-channels --channel-group Germany
+tools/nonametv-export Xmltv --export-channels --channel-group Austria
+tools/nonametv-export Xmltv --export-channels --channel-group Switzerland
+tools/nonametv-export Xmltv --export-channels --channel-group Poland
+
+
+# JSON
 tools/nonametv-export Json_extra --export-channels $1 $2 $3
 tools/nonametv-export Json_extra $1 --force-export $3
 tools/nonametv-export Json --export-channels $1 $2 $3

@@ -131,3 +131,7 @@ $d tools/se-tvzon/nonametv-upload $Q
 
 # Run after, everything
 $d rsync --delete -r /home/jnylen/content/html/00status.html /var/www/xmltv/
+
+# Combined files
+$d ruby /home/jnylen/notice.rb
+$d /home/jnylen/xmltv-grabber
