@@ -190,19 +190,20 @@ sub ImportXML
 
         my $subtitle = $xpc->findvalue( 's:titel/s:alias[@titelart="untertitel"]/@aliastitel' );
         my $subtitle_org = $xpc->findvalue( 's:titel/s:alias[@titelart="originaluntertitel"]/@aliastitel' );
+
         if( $subtitle ){
-          if( defined($season) and ( $folge ) = ($subtitle =~ m|^Episode (\d+)| ) ){
-            $ce->{episode} = ($season - 1) . ' . ' . ($folge - 1) . ' .';
-          } elsif( defined($season) and ( $folge ) = ($subtitle =~ m|^Eps\. (\d+)| ) ){
-            $ce->{episode} = ($season - 1) . ' . ' . ($folge - 1) . ' .';
+          if( (defined($season) and $season ne "0") and ( $folge ) = ($subtitle =~ m|^Episode (\d+)| ) ){
+            #$ce->{episode} = ($season - 1) . ' . ' . ($folge - 1) . ' .' if $season ne "0" and $folge ne "0";
+          } elsif( (defined($season) and $season ne "0") and ( $folge ) = ($subtitle =~ m|^Eps\. (\d+)| ) ){
+            #$ce->{episode} = ($season - 1) . ' . ' . ($folge - 1) . ' .' if $season ne "0" and $folge ne 0;
           } elsif( ( $folge, $staffel ) = ($subtitle =~ m|^Folge (\d+) \((\d+)\. Staffel\)$| ) ){
-            $ce->{episode} = ($staffel - 1) . ' . ' . ($folge - 1) . ' .';
+            #$ce->{episode} = ($staffel - 1) . ' . ' . ($folge - 1) . ' .' if $staffel ne "0" and $folge ne 0;
           } elsif( ( $folge, $staffel ) = ($subtitle =~ m|^Folge (\d+) \(Staffel (\d+)\)$| ) ){
-            $ce->{episode} = ($staffel - 1) . ' . ' . ($folge - 1) . ' .';
+            #$ce->{episode} = ($staffel - 1) . ' . ' . ($folge - 1) . ' .' if $staffel ne "0" and $folge ne 0;
           } elsif( ( $staffel, $folge ) = ($subtitle =~ m|^Staffel (\d+) Folge (\d+)$| ) ){
-            $ce->{episode} = ($staffel - 1) . ' . ' . ($folge - 1) . ' .';
+            #$ce->{episode} = ($staffel - 1) . ' . ' . ($folge - 1) . ' .' if $staffel ne "0" and $folge ne 0;
           } elsif( ( $folge ) = ($subtitle =~ m|^Folge (\d+)$| ) ){
-            $ce->{episode} = '. ' . ($folge - 1) . ' .';
+            #$ce->{episode} = '. ' . ($folge - 1) . ' .' if $folge ne 0;
           } else {
             # unify style of two or more episodes in one programme
             $subtitle =~ s|\s*/\s*| / |g;
@@ -215,11 +216,11 @@ sub ImportXML
 
         if( $subtitle_org ){
           if( ( $folge, $staffel ) = ($subtitle_org =~ m|^Folge (\d+) \(Staffel (\d+)\)$| ) ){
-            $ce->{episode} = ($staffel - 1) . ' . ' . ($folge - 1) . ' .';
+            #$ce->{episode} = ($staffel - 1) . ' . ' . ($folge - 1) . ' .' if $staffel ne "0" and $folge ne 0;
           } elsif( ( $staffel, $folge ) = ($subtitle_org =~ m|^Staffel (\d+) Folge (\d+)$| ) ){
-            $ce->{episode} = ($staffel - 1) . ' . ' . ($folge - 1) . ' .';
+            #$ce->{episode} = ($staffel - 1) . ' . ' . ($folge - 1) . ' .' if $staffel ne "0" and $folge ne 0;
           } elsif( ( $folge ) = ($subtitle_org =~ m|^Folge (\d+)$| ) ){
-            $ce->{episode} = '. ' . ($folge - 1) . ' .';
+            #$ce->{episode} = '. ' . ($folge - 1) . ' .' if $folge ne 0;
           } else {
             # unify style of two or more episodes in one programme
             $subtitle_org =~ s|\s*/\s*| / |g;
@@ -229,6 +230,15 @@ sub ImportXML
             $ce->{original_subtitle} = norm( $subtitle_org ) if defined $ce->{subtitle} and $ce->{subtitle} ne norm( $subtitle_org );
             $ce->{subtitle} = norm( $subtitle_org ) if not defined $ce->{subtitle};
           }
+        }
+
+        # Add it
+        if((defined($folge) and defined($season)) and ($folge ne "0" and $folge ne 0 and $season ne "0" and $season ne 0 and $season > 0)) {
+          $ce->{episode} = ($season - 1) . ' . ' . ($folge - 1) . ' .';
+        } elsif((defined($folge) and defined($staffel)) and ($folge ne "0" and $folge ne 0 and $staffel ne "0" and $staffel ne 0 and $staffel > 0)) {
+          $ce->{episode} = ($staffel - 1) . ' . ' . ($folge - 1) . ' .';
+        } elsif(defined($folge) and ($folge ne "0" and $folge ne 0)) {
+          $ce->{episode} = ' . ' . ($folge - 1) . ' .';
         }
 
         my $production_year = $xpc->findvalue( 's:infos/s:produktion[@gueltigkeit="sendung"]/s:produktionszeitraum/s:jahr/@von' );
