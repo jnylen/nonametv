@@ -160,10 +160,10 @@ sub ImportContentFile {
         $ce->{program_type} = 'movie';
     }
 
-    if( (defined($season_nr) and $season_nr ne "") and (defined($episode_nr) and $episode_nr ne "") ){
+    if( (defined($season_nr) and $season_nr ne "" and $season_nr ne "0") and (defined($episode_nr) and $episode_nr ne "" and $episode_nr ne "0") ){
         $ce->{episode} = ($season_nr - 1) . ' . ' . ($episode_nr - 1) . ' .';
         $ce->{program_type} = 'series';
-    } elsif( defined($episode_nr) and $episode_nr ne "" ){
+    } elsif( defined($episode_nr) and $episode_nr ne "" and $episode_nr ne "0" ){
         $ce->{episode} = '. ' . ($episode_nr - 1) . ' .';
         $ce->{program_type} = 'series';
     }
