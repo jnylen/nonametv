@@ -687,7 +687,7 @@ sub WriteEntry
 
   if( defined( $data->{aspect} ) and $data->{aspect} ne "unknown" )
   {
-    $d->{video}->{aspect} = $data->{aspect};
+    $d->{video}->{aspect} = $data->{aspect} if norm($data->{aspect}) ne "";
   }
 
   if( $data->{quality} )
@@ -729,9 +729,9 @@ sub WriteEntry
         w "Bad actor $data->{actors}";
       }
       if( $actor =~ m|^([^\(]*) \((.*)\)$| ){
-        push( @{$d->{credits}->{actor}}, [$1, $2 ]  );
+        push( @{$d->{credits}->{actor}}, [$1, $2 ]  ) if norm($1) ne "" and norm($2) ne "";
       } elsif( $actor =~ m|^([^\(]*)$| ){
-        push( @{$d->{credits}->{actor}},  $1  );
+        push( @{$d->{credits}->{actor}},  $1  ) if norm($1) ne "";
       }
     }
   }
