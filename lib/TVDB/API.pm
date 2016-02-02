@@ -47,9 +47,9 @@ $VERSION = "0.36";
 %Defaults = (
 	maxSeason		=> 50,
 	maxEpisode		=> 100,
-	minUpdateTime	=> 3600*6,		# 6 hours 
-	minBannerTime	=> 3600*24*7,	# 1 week 
-	minEpisodeTime	=> 3600*24*7,	# 1 week 
+	minUpdateTime	=> 3600*6,		# 6 hours
+	minBannerTime	=> 3600*24*7,	# 1 week
+	minEpisodeTime	=> 3600*24*7,	# 1 week
 );
 
 ###############################################################################
@@ -123,13 +123,13 @@ sub _updateUrls {
 	if(defined($self->{mirror}) and defined($self->{apikey})) {
 	    $self->{apiURL} = sprintf $Url{apiURL}, $self->{mirror}, $self->{apikey};
 	}
-	
+
 	if(defined($self->{banner})) {
         $self->{bannerURL} = sprintf $Url{bannerURL}, $self->{banner};
     }
-	
+
 	if(defined($self->{zip}) and defined($self->{apikey})) {
-        $self->{zipURL} = sprintf $Url{apiURL}, $self->{zip}, $self->{apikey}; 
+        $self->{zipURL} = sprintf $Url{apiURL}, $self->{zip}, $self->{apikey};
     }
 }
 sub setUserAgent {
@@ -444,7 +444,7 @@ sub getUpdates {
 	my $self = shift;
 	my $period = shift || 'guess';
 	$period = lc $period;
-	
+
 	&verbose(2, "TVDB::API: updates...\n");
 
 	# Determine which update xml file to download
@@ -572,15 +572,15 @@ sub haveSeries {
 # Get series/lang.xml for series
 sub getSeries {
 	my ($self, $name, $nocache) = @_;
-	
+
 	# If no name is found, return undef, as the language
 	# is probably wrong and is not translated (mostly norweigan series)
 	if(!defined($name)) {
 		&verbose(1, "TVDB::API: No translated seriesname found - try to change the language from $self->{lang}.\n");
 		return undef;
 	}
-	
-	&debug(2, "getSeries: $name, $nocache\n");
+
+	&debug(2, "getSeries: $name\n");
 
 	my $sid = $self->getSeriesId($name, $nocache?$nocache-1:0);
 	return undef unless $sid;
@@ -915,7 +915,7 @@ sub getMaxEpisode {
 	$self->getSeriesUpdate($name, $self->{now}, 1); # Update available episodes/seasons
 	my $data = $self->getSeason($name, $season, $nocache);
 	return undef unless $data;
-	my ($max, $maxe) = ($#$data, $self->getConf('maxEpisode')); 
+	my ($max, $maxe) = ($#$data, $self->getConf('maxEpisode'));
 	return $max < $maxe ? $max: $maxe;
 }
 
