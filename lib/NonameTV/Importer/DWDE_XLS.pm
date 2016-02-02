@@ -30,7 +30,7 @@ my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
 use Data::Dumper;
 use File::Temp qw/tempfile/;
 
-use NonameTV qw/norm normUtf8 AddCategory/;
+use NonameTV qw/norm normLatin1 AddCategory/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error d p w f/;
 
@@ -219,11 +219,11 @@ sub ImportXLS {
 
       # Desc
       $oWkC = $oWkS->{Cells}[$iR][$coldesc];
-      my $desc = norm($oWkC->Value) if( $oWkC );
+      my $desc = norm(normLatin1($oWkC->Value)) if( $oWkC );
 
       # genre
       $oWkC = $oWkS->{Cells}[$iR][$colgenre] if defined($colgenre);
-      my $genre = norm($oWkC->Value) if( $oWkC and defined($colgenre) );
+      my $genre = norm(normLatin1($oWkC->Value)) if( $oWkC and defined($colgenre) );
 
       # title
       $oWkC = $oWkS->{Cells}[$iR][$coltitle];
@@ -233,7 +233,7 @@ sub ImportXLS {
       my $ce = {
         channel_id => $channel_id,
         start_time => $time,
-        title	     => norm($title),
+        title	     => norm(normLatin1($title)),
         aspect     => '16:9',
       };
 
