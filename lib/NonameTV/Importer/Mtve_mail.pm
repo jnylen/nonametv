@@ -76,7 +76,7 @@ sub ImportXLS
   my $date;
   my $currdate = "x";
   my @ces;
-  
+
   progress( "Mtve_mail: $chd->{xmltvid}: Processing $file" );
 
 	my $oBook;
@@ -85,9 +85,9 @@ sub ImportXLS
 
   # main loop
   foreach my $oWkS (@{$oBook->{Worksheet}}) {
-  	
+
 		my $foundcolumns = 0;
-		
+
     # browse through rows
     for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
 
@@ -106,8 +106,8 @@ sub ImportXLS
 			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Title/ );
 			$columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
             $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time/ );
-          	
-          
+
+
           	$columns{'Description'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description/ );
           	$columns{'Description'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis/ );
 
@@ -141,11 +141,11 @@ sub ImportXLS
       	if( $currdate ne "x" ) {
 		    $dsh->EndBatch( 1 );
         }
-      
+
       	my $batchid = $chd->{xmltvid} . "_" . $date;
         $dsh->StartBatch( $batchid , $chd->{id} );
         progress("Mtve_mail: $chd->{xmltvid}: Date is $date");
-        $dsh->StartDate( $date , "00:00" ); 
+        $dsh->StartDate( $date , "00:00" );
         $currdate = $date;
       }
 
@@ -171,11 +171,11 @@ sub ImportXLS
         start_time => $time,
         description => norm( $desc ),
       };
-      
+
       # Seperate :
       my ( $subtitle ) = ($ce->{title} =~ /:\s*(.+)$/);
   	  $ce->{title} =~ s/:\s*(.+)//;
-      
+
       # Uc First it
       ( $ce->{subtitle} ) = (norm($subtitle)) if $subtitle;
 

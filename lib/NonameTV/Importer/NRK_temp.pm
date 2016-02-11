@@ -119,6 +119,7 @@ sub ImportContent {
         my $title  = $p->{"title"};
         my $desc   = $p->{"description"};
         my $start  = $p->{"start"};
+        my $end    = $p->{"end"};
         my $rerun  = $p->{"reRun"};
         $start =~ s/\./:/g;
 
@@ -165,9 +166,9 @@ sub ImportContent {
 
         # Put everything in a array
         my $ce = {
-            channel_id => $chd->{id},
-            start_time => $start,
-            title => norm($title),
+            channel_id  => $chd->{id},
+            start_time  => $start,
+            title       => norm($title),
             description => norm($desc),
         };
 
@@ -246,7 +247,7 @@ sub ImportContent {
         }
 
 
-        progress($start." $ce->{title}");
+        progress("$start - $end : $ce->{title}");
 
         $dsh->AddProgramme( $ce );
     }
