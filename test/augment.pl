@@ -13,7 +13,7 @@ use NonameTV::Augmenter;
 use NonameTV::Factory qw/CreateDataStore/;
 
 my $ds = CreateDataStore( );
-my $batchid = 'vox.de_2015-12-20';
+my $batchid = 'action.film.viasat.se_2015-52';
 printf( "augmenting %s...\n", $batchid );
 
 my $augmenter = NonameTV::Augmenter->new( $ds );
