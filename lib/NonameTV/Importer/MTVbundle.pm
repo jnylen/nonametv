@@ -41,7 +41,7 @@ sub new {
   bless ($self, $class);
 
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/London" );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Stockholm" );
   $self->{datastorehelper} = $dsh;
 
   return $self;
@@ -164,7 +164,7 @@ sub ParseDate
 
   my( $month, $day, $year );
   #    progress("Mdatum $dinfo");
-  if( $dinfo =~ /^\d{4}-\d{2}-\d{2}$/ ){ # format   '2010-04-22' 
+  if( $dinfo =~ /^\d{4}-\d{2}-\d{2}$/ ){ # format   '2010-04-22'
     ( $year, $month, $day ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
   } elsif( $dinfo =~ /^\d{2}.\d{2}.\d{4}$/ ){ # format '11/18/2011'
     ( $day, $month, $year ) = ( $dinfo =~ /^(\d+).(\d+).(\d+)$/ );
