@@ -97,7 +97,7 @@ sub ImportContentFile {
     $xpc->setContextNode( $p );
 
     my $service_ch = $xpc->findvalue( '@service' );
-    if($service_ch ne $service_id) { next; }
+    #if($service_ch ne $service_id) { next; }
 
     my $title      = norm($xpc->findvalue( '@eventTitel' ));
     my $title_org  = norm($xpc->findvalue( '@origTitel' ));
