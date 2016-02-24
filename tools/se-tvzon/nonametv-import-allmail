@@ -71,3 +71,4 @@ tools/nonametv-import XITE $1 $2 $3
 tools/nonametv-import KinoPolska $1 $2 $3
 tools/nonametv-import ATV $1 $2 $3
 tools/nonametv-import FightSports $1 $2 $3
+tools/nonametv-import YFE $1 $2 $3

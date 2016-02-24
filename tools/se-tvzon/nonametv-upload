@@ -9,6 +9,9 @@ then
   SC_OPT=
   V=true
 fi
+$V && echo "Exporting index file"
+tools/se-tvzon/nonametv-xmltv-genhtml $NROOT/xmltv_staging
+
 $V && echo "Local rsync"
 
 rsync -c --delete -r $NROOT/json_extra_staging/ $NROOT/json_extra/

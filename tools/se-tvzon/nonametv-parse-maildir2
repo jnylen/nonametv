@@ -82,6 +82,7 @@ my @folders = qw(		 NonameTV-Data.MTV
 		 NonameTV-Data.SSF
 		 NonameTV-Data.Discovery
      NonameTV-Data.FightSports
+     NonameTV-Data.YFE
         );
 
 # Flag messages AFTER they have been processed. Then I normally
@@ -177,11 +178,6 @@ sub process_parts
     my ($content);
 
     # Channels you only want it decoded, not fucked up
-    #$channel eq "rtl2.de" or $channel eq "historytv.se" or
-    #       $channel eq "historytv.no" or $channel eq "historytv.dk" or
-    #       $channel eq "historytv.eu" or $channel eq "crimeandinvestigation.eu" or
-    #       $channel eq "sonyentertainment.tv" or $channel eq "axntv.de" or $channel eq "animax.tv" or
-    #       $channel eq "familytv.de" or $channel eq "dasneue.tv" or $channel eq "tnt-tv.dk
     if($name =~ /\.xml$/i) {
         $content = decode_base64($part->body);
     } else {
@@ -448,6 +444,11 @@ sub guess_channel
     return "tlc.discovery.de" if $filename =~ /^tlc/i;
     return "animalplanet.discovery.de" if $filename =~ /^ap/i;
     #return "discovery.de" if $filename =~ /^dc/i;
+ }
+
+ if( $dir =~ /YFE/ and $filename =~ /\.xml$/i ) {
+    return "fixundfoxi.tv" if $filename =~ /Fix&Foxi/i;
+    return "rictv.de" if $filename =~ /RiC/i;
  }
 
   return undef;
