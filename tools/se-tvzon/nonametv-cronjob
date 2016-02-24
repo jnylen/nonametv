@@ -62,10 +62,6 @@ then
   h=
 fi
 
-
-# This runs by cronjob - seperately
-#tools/se-tvzon/nonametv-process-mail
-
 # Update tvdb
 $d perl -I lib tools/nonametv-update-tvdb sv
 $d perl -I lib tools/nonametv-update-tvdb en
@@ -95,19 +91,10 @@ $h tools/se-tvzon/nonametv-import-allhttp $Q --short-grab
 tools/se-tvzon/nonametv-import-allmail $Q
 
 # Remove old
+$d perl -I lib/ tools/nonametv-export Xmltv --remove-old
 $d perl -I lib/ tools/nonametv-export Json_extra --remove-old
 $d perl -I lib/ tools/nonametv-export Json --remove-old
 $d tools/nonametv-icon-update --quiet --unattended
-
-# Export
-#$d tools/se-tvzon/nonametv-updatesite $Q
-
-# Upload to www - I don't know if I wanna run this here.
-#tools/se-tvzon/nonametv-upload $Q
-
-# This shouldn't produce any output, but there seems to be a bug
-# somewhere.
-#$d perl -I lib tools/nonametv-export Xmltv --force-export --verbose
 
 # Update the Combiner-channels as well.
 $d perl -I lib tools/nonametv-import Combiner $Q
@@ -125,9 +112,6 @@ $d tools/se-tvzon/nonametv-updatesite $Q
 
 # Upload to www (daily)
 $d tools/se-tvzon/nonametv-upload $Q
-
-# Upload to www (at 13.00)
-#$h tools/se-tvzon/nonametv-upload $Q
 
 # Run after, everything
 $d rsync --delete -r /home/jnylen/content/html/00status.html /var/www/xmltv/
