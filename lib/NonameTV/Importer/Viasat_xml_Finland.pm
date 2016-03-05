@@ -146,12 +146,14 @@ sub ImportContent {
 	#$dsh->StartBatch( $batch_id, $channel_id );
 	$dsh->StartDate( $date , "00:00" );
 	$currdate = $date;
+  my $lastitem = 0;
 
 	progress("Viasat: $xmltvid: Date is $date");
 
     # Programmes
     my $ns2 = $sched_date->find('program');
     foreach my $emission ($ns2->get_nodelist) {
+      next if $lastitem == 1;
       # General stuff
       my $start_time = $emission->findvalue( 'startTime' );
       my $other_name = $emission->findvalue( 'name' );
@@ -163,11 +165,13 @@ sub ImportContent {
       if( ($name eq "END") )
       {
       	$name = "end-of-transmission";
+        $lastitem = 1;
       }
 
       if( ($name eq "GODNAT") )
       {
       	$name = "end-of-transmission";
+        $lastitem = 1;
       }
 
 
