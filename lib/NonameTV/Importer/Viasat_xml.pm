@@ -149,10 +149,12 @@ sub ImportContent {
 	$currdate = $date;
 
 	progress("Viasat: $xmltvid: Date is $date");
+  my $lastitem = 0;
 
     # Programmes
     my $ns2 = $sched_date->find('program');
     foreach my $emission ($ns2->get_nodelist) {
+      next if $lastitem == 1;
       # General stuff
       my $start_time = $emission->findvalue( 'startTime' );
       my $other_name = $emission->findvalue( 'name' );
@@ -165,16 +167,19 @@ sub ImportContent {
       if( ($name eq "END") )
       {
       	$name = "end-of-transmission";
+        $lastitem = 1;
       }
 
       if( ($name eq "GODNAT") )
       {
       	$name = "end-of-transmission";
+        $lastitem = 1;
       }
 
       if( $name =~ /^P.\s+GENSYN/)
       {
       	$name = "end-of-transmission";
+        $lastitem = 1;
       }
 
 
