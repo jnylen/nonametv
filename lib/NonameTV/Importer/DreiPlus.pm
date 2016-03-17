@@ -137,7 +137,7 @@ sub ImportXML
   if(!defined $year) {
     error( "DreiPlus: $chd->{xmltvid}: Failure to get year from file content" ) ;
     return;
-  } else { $year += 2000; }
+  } elsif($year < 1500) { $year += 2000; }
 
   my $batchid = $chd->{xmltvid} . "_" . $year . "-".$week;
 
