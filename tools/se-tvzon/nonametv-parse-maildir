@@ -319,9 +319,9 @@ sub guess_channel
     return "en.syfy.nl" if $filename =~ /^Syfy\s*Benelux/i and $filename =~ /ENG/;
 
     # Sky News
-    return "international.skynews.com" if $filename =~ /^SKYNI/i and $filename =~ /\.xls$/i;
-    return "international.skynews.com" if $filename =~ /^SKYH/i and $filename =~ /\.xls$/i;
-    return "international.skynews.com" if $subject =~ /^Sky News International/i and $filename =~ /\.xls$/i;
+    return "international.skynews.com" if $filename =~ /^SKYNI/i and $filename =~ /\.txt$/i;
+    return "international.skynews.com" if $filename =~ /^SKYH/i and $filename =~ /\.txt$/i;
+    return "international.skynews.com" if $subject =~ /^Sky News International/i and $filename =~ /\.txt$/i;
 
     # horseandcountry
     return "horseandcountry.tv" if $filename =~ /^H.C SWE/i and $filename =~ /\.xml/i;
@@ -373,12 +373,11 @@ sub guess_channel
      }
  }
 
- if( $dir =~ /Playboy/ and $filename =~ /\.doc$/i ) {
-     return "europe.playboytv.com" if $filename =~ /^playboy/i;
-     return "adultchannel.co.uk" if $filename =~ /^the\s*adult/i;
-     return "privatespice.com" if $filename =~ /^private/i;
-     return "brazzerstveurope.com" if $filename =~ /^brazzers/i;
-     return "viasat.spice.com" if $filename =~ /^spice\s*viasat/i;
+ if( $dir =~ /Playboy/ ) {
+     return "europe.playboytv.com" if $filename =~ /^playboy/i and $filename =~ /\.docx$/i;
+     return "adultchannel.co.uk" if $filename =~ /^the\s*adult/i and $filename =~ /\.doc$/i;
+     return "brazzerstveurope.com" if $filename =~ /^brazzers/i and $filename =~ /\.docx$/i;
+     return "europe.realitykings.com" if $filename =~ /^rktv/i and $filename =~ /\.docx$/i;
  }
 
  if( $dir =~ /Hustler/ and $filename =~ /\.(xls|xlsx)$/i ) {
