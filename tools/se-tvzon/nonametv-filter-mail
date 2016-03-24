@@ -60,6 +60,9 @@ foreach my $msg ($infolder->messages) {
   elsif( $fromaddr =~ /\@playboyplus.com/i ) {
     MoveMessage( $msg, "Playboy" );
   }
+  elsif( $fromaddr =~ /\@thefrontdoor.nl/i ) {
+    MoveMessage( $msg, "Playboy" );
+  }
   elsif( $fromaddr =~ /\@sapphiremedia.com/i ) {
     MoveMessage( $msg, "Hustler" );
   }
@@ -184,6 +187,12 @@ foreach my $msg ($infolder->messages) {
     MoveMessage( $msg, "ETVMedia" );
   }
   elsif( $fromaddr =~ /\@europeantvmedia.com/i ) {
+    MoveMessage( $msg, "ETVMedia" );
+  }
+  elsif( $fromaddr =~ /\@1tv.com/i ) {
+    MoveMessage( $msg, "ETVMedia" );
+  }
+  elsif( $fromaddr =~ /\@googlegroups.com/i ) {
     MoveMessage( $msg, "ETVMedia" );
   }
   elsif( $fromaddr =~ /\@1tvrus.com/i ) {
