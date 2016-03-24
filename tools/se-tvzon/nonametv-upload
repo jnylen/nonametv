@@ -22,14 +22,6 @@ rsync -c --delete -r $NROOT/xmltv_staging/ $NROOT/xmltv/
 tools/se-tvzon/nonametv-xmltv-gendatalist
 rsync -c --delete -r $NROOT/xmltv/datalist.xml.gz $NROOT/datalist.xml.gz
 
-$V && echo "chaeun"
-
-rsync -c --delete -r $NROOT/xmltv/ chaeun:/server/xmltv_files/xmltv/
-rsync -c --delete -r $NROOT/datalist.xml.gz chaeun:/server/xmltv_files/datalist.xml.gz
-
-rsync -c --delete -r $NROOT/json_extra/ chaeun:/server/xmltv_files/json_extra/
-rsync -c --delete -r $NROOT/json/ chaeun:/server/xmltv_files/json/
-
 $V && echo "honeybee"
 
 rsync -c --delete -r $NROOT/json_extra/ honeybee:/xmltv_files/json_extra/
