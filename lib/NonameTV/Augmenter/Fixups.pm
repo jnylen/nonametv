@@ -100,9 +100,23 @@ sub AugmentProgram( $$$ ){
   	# Used like:
   	# title: Jersey Shoe 2
   	# remoteref: Jersey Shoe|2
-  	my( $title, $season ) = split( /|/, $ruleref->{remoteref} );
-  	$resultref->{'title'} = $title;
-  	$resultref->{'season'} = $season;
+    if(defined($ceref->{episode})) {
+      my( $episode )=( $ceref->{episode} =~ m|\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*| );
+    	my( $title, $season ) = split( /\|/, $ruleref->{remoteref} );
+    	$resultref->{'title'} = $title;
+    	$resultref->{episode} = ($season - 1) . ' . ' . $episode . ' .';
+    }
+  }elsif( $ruleref->{matchby} eq 'setseasonminuseps' ) {
+  	# Used like:
+  	# title: Jersey Shoe 2
+  	# remoteref: Jersey Shoe|2|141
+    # Removes 141 episodes from the main one
+    if(defined($ceref->{episode})) {
+      my( $episode )=( $ceref->{episode} =~ m|\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*| );
+    	my( $title, $season, $minusepisodes ) = split( /\|/, $ruleref->{remoteref} );
+    	$resultref->{'title'} = $title;
+    	$resultref->{episode} = ($season - 1) . ' . ' . ($episode - $minusepisodes) . ' .';
+    }
   }elsif( $ruleref->{matchby} eq 'splittitlereverse_type' ) {
   	# Used like:
   	# real title: Dox 5 år: Buss 174
