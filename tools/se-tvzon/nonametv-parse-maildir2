@@ -367,7 +367,7 @@ sub guess_channel
  }
 
  if( $dir =~ /FightSports/ and $filename =~ /\.xls/i ) {
-     return "fsf.fightsports.tv" if $filename =~ /FSF/i; # Nordics, France and Baltics
+     return "fsf.fightsports.tv" if $filename =~ /(FSF|FR)/i; # Nordics, France and Baltics
      #return "eu.fightsports.tv" if $filename =~ /eu/i; # Spain and EX Yugo
  }
 
