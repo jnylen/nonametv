@@ -29,12 +29,12 @@ BEGIN {
     @EXPORT_OK   = qw/MyGet expand_entities
                       Html2Xml Htmlfile2Xml
                       Word2Xml Wordfile2Xml
-		              File2Xml Content2Xml
-		              FindParagraphs
+    		              File2Xml Content2Xml
+    		              FindParagraphs DOCXfile2Array
                       norm normLatin1 normUtf8 normUndef
                       AddCategory AddCountry
                       ParseDescCatSwe FixProgrammeData
-		              ParseXml ParseXmltv ParseJson
+    		              ParseXml ParseXmltv ParseJson
                       MonthNumber DayNumber
                       CompareArrays
                      /;
@@ -42,6 +42,7 @@ BEGIN {
 our @EXPORT_OK;
 
 my $wvhtml = 'wvHtml --charset=utf-8';
+my $unzip_print = 'unzip -p';
 # my $wvhtml = '/usr/bin/wvHtml';
 
 my $ua = LWP::UserAgent->new( agent => "nonametv (http://nonametv.org)",
@@ -238,6 +239,26 @@ sub Wordfile2Xml
   $html =~ s/\&hellip;/.../g;
 
   return Html2Xml( $html );
+}
+
+sub DOCXfile2Array
+{
+  my( $filename ) = @_;
+
+  my $lines = qx/docx2txt < "$filename" -/;
+  if( $? )
+  {
+    w "docx2txt < $filename - failed: $?";
+    return undef;
+  }
+
+  # Remove character that makes LibXML choke.
+  $lines =~ s/\&hellip;/.../g;
+  $lines =~ s/\&amp;/\&/g;
+
+  my @linesarray = split("\n", $lines);
+
+  return @linesarray;
 }
 
 sub File2Xml {
@@ -687,6 +708,7 @@ sub ParseXmltv {
   }
 
   foreach my $pgm ($ns->get_nodelist) {
+    print($pgm->findvalue( 'title' ) . " - " . $pgm->findvalue( '@start') . "\n" );
     my $start = $pgm->findvalue( '@start' );
     my $start_dt = create_dt( $start );
 
@@ -870,10 +892,14 @@ sub create_dt
 {
   my( $datetime ) = @_;
 
-  my( $year, $month, $day, $hour, $minute, $second, $tz ) =
-    ($datetime =~ /(\d{4})(\d{2})(\d{2})
-                   (\d{2})(\d{2})(\d{2})\s+
-                   (\S+)$/x);
+  my( $year, $month, $day, $hour, $minute, $second, $tz );
+
+  if( $datetime =~ /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\s+(\S+)$/x ){
+    ( $year, $month, $day, $hour, $minute, $second, $tz ) = ($datetime =~ /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\s+(\S+)$/x);
+  } elsif( $datetime =~ /(\d{4})(\d{2})(\d{2})(\d{2})$/x ) {
+    ( $year, $month, $day, $hour, $minute, $second ) = ($datetime =~ /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/x);
+    $tz = "Europe/Stockholm";
+  }
 
   my $dt = DateTime->new(
                           year => $year,
