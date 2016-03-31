@@ -15,9 +15,9 @@ use XML::LibXML;
 use Roman;
 use Data::Dumper;
 
-use NonameTV qw/norm/;
+use NonameTV qw/norm ParseXmltv AddCategory/;
 use NonameTV::DataStore::Helper;
-use NonameTV::Log qw/progress error/;
+use NonameTV::Log qw/progress error d/;
 
 use NonameTV::Importer::BaseOne;
 
@@ -41,7 +41,7 @@ sub Object2Url {
 
   my( $id, $lang ) = split( /:/, $chd->{grabber_info} );
 
-  my $url = 'http://amos.tv7.fi/exodus/public/programs.jsp?cid=' . $id . '&lang=' . $lang;
+  my $url = 'http://amos.tv7.fi/exodus-interfaces/xmltv.xml?channel=' . $id . '&lang=' . $lang . '&duration=3w';
 
   return( $url, undef );
 }
@@ -62,77 +62,65 @@ sub ImportContent
   my $ds = $self->{datastore};
   my $dsh = $self->{datastorehelper};
 
-  my $xml = XML::LibXML->new;
-  my $doc;
-  eval { $doc = $xml->parse_string($$cref); };
-  if( $@ ne "" )
-  {
-    error( "$batch_id: Failed to parse: $@" );
-    return 0;
-  }
+  my $prog = ParseXmltv (\$$cref);
+  my @shows = SortShows( @{$prog} );
+  foreach my $e (@shows) {
+    $e->{channel_id} = $chd->{id};
 
-  # Find all "program"-entries.
-  my $ns = $doc->find( "//day" );
-  if( $ns->size() == 0 )
-  {
-    error( "$batch_id: No days found" );
-    return 0;
-  }
+    # translate start end from DateTime to string
+    $e->{start_dt}->set_time_zone ('UTC');
+    $e->{start_time} = $e->{start_dt}->ymd('-') . " " . $e->{start_dt}->hms(':');
+    delete $e->{start_dt};
 
-  foreach my $day ($ns->get_nodelist) {
-    my $str = $day->findvalue( './@date' );
-    $str =~ s/(.*)\s+//;
+    # some XMLTV exports don't provide programme "stop" time
+    # helper is needed for such implementations
+    $e->{stop_dt}->set_time_zone ('UTC');
+    $e->{end_time} = $e->{stop_dt}->ymd('-') . " " . $e->{stop_dt}->hms(':');
+    delete $e->{stop_dt};
 
-    my( $dag, $month, $year ) = ( $str =~ /(\d+).(\d+).(\d+)/ );
-    my $date = $year."-".$month."-".$dag;
+    # translate channel specific program_type and category to common ones
+    my $pt = $e->{program_type};
+    delete $e->{program_type};
+    my $c = $e->{category};
+    delete $e->{category};
 
-    $dsh->StartDate( $date );
-
-    progress("$batch_id: Date is ".$date);
-
-    my $ns2  = $day->findnodes( ".//program" );
-
-    if( $ns2->size() == 0 )
-    {
-        error( "$batch_id: No programs found" );
-        return 0;
+    if( $pt ){
+      my($program_type, $category ) = $ds->LookupCat( "TV7", $pt );
+      AddCategory( $e, $program_type, $category );
+    }
+    if( $c ){
+      my($program_type, $category ) = $ds->LookupCat( "TV7", $c );
+      AddCategory( $e, $program_type, $category );
     }
 
-    foreach my $pgm ($ns2->get_nodelist)
-    {
-        my $starttime = $pgm->findvalue( 'time' );
-        my $title     = $pgm->findvalue( 'programName' );
-        my $subtitle  = $pgm->findvalue( 'episodeName' );
-        my $shortdesc = $pgm->findvalue( 'shortdesc' );
-        my $epdesc    = $pgm->findvalue( 'episodeShortdesc' );
-        my $desc      = $epdesc || $shortdesc;
+    progress( "TV7: $chd->{xmltvid}: $e->{start_time} - $e->{title}" );
+    $ds->AddProgramme($e);
 
-        $starttime =~ s/\./:/;
-
-        my $ce = {
-              title       	 => norm($title),
-              start_time  	 => $starttime,
-              description    => norm($desc),
-            };
-
-        $ce->{subtitle} = norm($subtitle) if defined($subtitle) and $subtitle ne "";
-
-        # Episode
-        if(defined $ce->{subtitle} and $ce->{subtitle} =~ /, del (\d+)$/i) {
-            my $episode = ($ce->{subtitle} =~ /, del (\d+)$/i);
-            $ce->{subtitle} =~ s/, del (\d+)$//i;
-            $ce->{episode} = sprintf( ". %d .", $episode-1 );
-        }
-
-        progress($date." ".$starttime." - ".$ce->{title});
-        $dsh->AddProgramme( $ce );
-    }
   }
 
 
 
   # Success
   return 1;
+}
+
+sub bytime {
+
+  my( $Y1, $M1, $D1, $h1, $m1, $s1 ) = ( $$a{start_dt} =~ /^(\d+)\-(\d+)\-(\d+)T(\d+)\:(\d+)\:(\d+)$/ );
+  my $t1 = int( sprintf( "%04d%02d%02d%02d%02d%02d", $Y1, $M1, $D1, $h1, $m1, $s1 ) );
+
+  my( $Y2, $M2, $D2, $h2, $m2, $s2 ) = ( $$b{start_dt} =~ /^(\d+)\-(\d+)\-(\d+)T(\d+)\:(\d+)\:(\d+)$/ );
+  my $t2 = int( sprintf( "%04d%02d%02d%02d%02d%02d", $Y2, $M2, $D2, $h2, $m2, $s2 ) );
+
+  $t1 <=> $t2;
+}
+
+sub SortShows {
+  my ( @shows ) = @_;
+
+  my @sorted = sort bytime @shows;
+
+  return @sorted;
 }
 
 
