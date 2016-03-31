@@ -166,7 +166,7 @@ my $ref = ReadData ($file);
       print Dumper(ExcelFmt('hh:mm', $time));
       $time =~ s/\./:/;
       print Dumper($time);
-      my ( $hour, $min ) = ( $time =~ /^(\d+):(\d+)$/ );
+      my ( $hour, $min ) = ( $time =~ /^(\d+):(\d\d)/ );
 
       # Strpad
       $time = sprintf( "%02d:%02d", $hour, $min );
