@@ -211,10 +211,10 @@ sub ImportXLS
         $oWkC = $oWkS->{Cells}[$iR][$columns{'ORGTitle'}];
         my $title_org = $oWkC->Value if( $oWkC->Value );
         $ce->{original_title} = ucfirst(lc(norm($title_org))) if defined($title_org) and $ce->{title} ne norm($title_org) and norm($title_org) ne "";
-        $ce->{original_title} =~ s/\((\d\d\d\d)\)$//;
-        $ce->{original_title} = norm($title);
+        $ce->{original_title} =~ s/\((\d\d\d\d)\)$// if defined($ce->{original_title});
+        $ce->{original_title} = norm($title) if defined($ce->{original_title});
 
-        if($ce->{original_title} =~ /, (the|a|an|i|il)$/i) {
+        if(defined($ce->{original_title}) and $ce->{original_title} =~ /, (the|a|an|i|il)$/i) {
             my ($word) = ($ce->{original_title} =~ /, (the|a|an|i|il)$/i);
             $ce->{original_title} =~ s/, (the|a|an|i|il)$//i;
             $ce->{original_title} = norm(ucfirst(lc($word)) . " ".$ce->{original_title});
