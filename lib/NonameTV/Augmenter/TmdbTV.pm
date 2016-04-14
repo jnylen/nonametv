@@ -302,12 +302,26 @@ sub AugmentProgram( $$$ ){
           my $season = undef;
 
           foreach my $seasons ( @{ $series->info->{seasons} } ){
+            next if($seasons->{season_number} == 0);
             $new_totaleps = $old_totaleps + $seasons->{episode_count};
 
             # Check if the episode num is in range
             if(($old_totaleps < $episodeabs) and ($new_totaleps >= $episodeabs)) {
               $season = $seasons->{season_number};
-              $episode = $new_totaleps-$episodeabs;
+
+              # Dont subtract if season is 1
+              if($seasons->{season_number} == 1) {
+                $episode = $episodeabs;
+              } else {
+                $episode = $new_totaleps-$episodeabs;
+              }
+
+              # Dbeug
+              if($episode == 0) {
+                w("got episode num zero, duno why. look into this.");
+                $episode = undef;
+              }
+
 
               $old_totaleps = $new_totaleps;
 
@@ -356,7 +370,7 @@ sub AugmentProgram( $$$ ){
         # It have an series id, so you don't need to search
         if( defined( $ruleref->{remoteref} ) ) {
           $series = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
-        } elsif($ceref->{extra_id_type} eq "thetvdb") {
+        } elsif(defined($ceref->{extra_id_type}) and $ceref->{extra_id_type} eq "thetvdb") {
           my @results = $self->{search}->find(
               id     => $ceref->{extra_id},
               source => 'tvdb_id'
@@ -419,7 +433,7 @@ sub AugmentProgram( $$$ ){
       my( $year, $episode )=( $ceref->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
 
       # It had episode and season!
-      if( (defined $episode) and (defined $year) ){
+      if( (defined $episode) and (defined $year) and $year > 1800 ){
         $episode += 1;
         $year += 1;
 
