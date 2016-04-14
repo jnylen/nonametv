@@ -369,6 +369,9 @@ sub AugmentProgram( $$$ ){
             } else {
               foreach my $a ( @directors ) {
                 foreach my $b ( @names ) {
+                  $a =~ s/(\.|\,)//;
+                  $b =~ s/(\.|\,)//;
+                  
                   if( lc norm( $a ) eq lc norm( $b ) ) {
                     $matches += 1;
                   }
