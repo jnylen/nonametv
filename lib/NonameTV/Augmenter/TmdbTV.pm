@@ -480,10 +480,91 @@ sub AugmentProgram( $$$ ){
   } elsif( $ruleref->{matchby} eq 'episodetitle' ) {
     ## You need to fetch first the show,
     ## then the season one by one to get the titles.
-    ##
 
+    if( defined($ceref->{subtitle}) or defined($ceref->{original_subtitle}) ){
+      my $series;
+      my @candidates;
+
+      # It have an series id, so you don't need to search
+      if( defined( $ruleref->{remoteref} ) ) {
+        $series = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
+      } else {
+        @candidates = $self->{search}->tv( $ceref->{title} );
+        my $resultnum = @candidates;
+
+        # Results?
+        if( $resultnum > 0 ) {
+          $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
+        }
+
+        # No data? Try the original title
+        if((!defined($resultnum) or $resultnum == 0) and (defined($ceref->{original_title}) and $ceref->{original_title} ne "")) {
+          @candidates = $self->{search}->tv( $ceref->{original_title} );
+          $resultnum = @candidates;
+
+          # Results?
+          if( $resultnum > 0 ) {
+            $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
+          }
+        }
+
+      }
+
+      # Match shit
+      if( (defined $series) ){
+        # Check if the year matches
+        my $season = undef;
+        my $episode = undef;
+
+        # Subtitles
+        my $subtitle = undef;
+        my $org_subtitle = undef;
+        if(defined $ceref->{subtitle}) {
+          $subtitle = clean_subtitle($ceref->{subtitle});
+        }
+        if(defined $ceref->{original_subtitle}) {
+          $org_subtitle = clean_subtitle($ceref->{original_subtitle});
+        }
+
+        # Each season check for eps
+        foreach my $seasons ( @{ $series->info->{seasons} } ){
+          my $episodes = $series->season($seasons->{season_number});
+
+          # Each episode
+          foreach my $eps ( @{ $episodes->{episodes} } ){
+            next if(!defined($eps->{name}) or $eps->{name} eq "");
+
+            # Check if it matches
+            next if(!(defined($subtitle) and lc $subtitle eq lc $eps->{name}) and !(defined($org_subtitle) and lc $org_subtitle eq lc $eps->{name}));
+
+            # it has found a match!
+            $season = $eps->{season_number};
+            $episode = $eps->{episode_number};
+            last; # So it doesn't keep running the foreach
+          }
+
+          last if(defined($season)); # Last here too.
+        }
+
+        # match
+        if(defined($season)) {
+          # Matched!
+          my $episode2 = $series->episode($season, $episode, {"append_to_response" => "credits"});
+
+          # Fil?
+          if( defined( $episode2 ) and !defined( $episode2->{status_code} ) ) {
+            $self->FillHash( $resultref, $series, $episode2, $ceref );
+          } else {
+            w( "episode not found by title nor org subtitle: " . $ceref->{title} . " - \"" . $subtitle . "\"" );
+          }
+        } else {
+          w( "episode not found by title nor org subtitle: " . $ceref->{title} . " - \"" . $subtitle . "\"" );
+        }
+
+      }
+    }
   } elsif( $ruleref->{matchby} eq 'episodeid' ) {
-    w( "TMDB doesnt provide an API CALL with episode ids." );
+    $result = "TMDB doesnt provide an API CALL with episode ids.";
   } else {
     $result = "don't know how to match by '" . $ruleref->{matchby} . "'";
   }
@@ -492,5 +573,36 @@ sub AugmentProgram( $$$ ){
   return( $resultref, $result );
 }
 
+
+sub clean_subtitle
+{
+  my( $str ) = @_;
+
+  $str =~ s|\s+-\s+Teil\s+(\d+)$| ($1)|;   # _-_Teil_#
+  $str =~ s|\s+\/\s+Teil\s+(\d+)$| ($1)|;  # _/_Teil_#
+  $str =~ s|,\s+Teil\s+(\d+)$| ($1)|;      # ,_Teil #
+  $str =~ s|\s+Teil\s+(\d+)$| ($1)|;       # _Teil #
+  $str =~ s|\s+\(Teil\s+(\d+)\)$| ($1)|;   # _(Teil_#)
+  $str =~ s|\s+-\s+(\d+)\.\s+Teil$| ($1)|; # _-_#._Teil
+
+  $str =~ s|\s*\(Part\s+(\d+)\)$| ($1)|;   # _(Part_#) for Comedy Central Germany
+  $str =~ s|\s+-\s+\((\d+)\)$| ($1)|;      # _-_(#) for Comedy Central Germany
+  $str =~ s|\bPart\s+(\d+)$| ($1)|;        # ...Part_# for Comedy Central Germany
+
+  $str =~ s|\s*-\s+part\s+(\d+)$| ($1)|;   # _(Part_#) for Al Jazeera International
+
+  $str =~ s|\s+-\s+(\d+)$| ($1)|;          # _-_# for ORF
+
+  # Discovery
+  $str =~ s|\s+\s+| |;           # Two spaces to one space
+  $str =~ s|\s+-\s+\(| \(|;      # " - (" to " ("
+  $str =~ s|,\s+\(| \(|;         # ", (" to " ("
+  $str =~ s|\:\s+\(| \(|;        # ": (" to " ("
+
+  # " - - " to " - " for Eisenbahnromantik on SWR, maybe happens when shuffling title/subtitle around
+  $str =~ s|\s+-\s+-\s+| - |;
+
+  return $str;
+}
 
 1;
