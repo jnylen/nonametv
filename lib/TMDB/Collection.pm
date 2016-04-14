@@ -19,6 +19,11 @@ use Params::Validate qw(validate_with :types);
 use TMDB::Session;
 
 #######################
+# VERSION
+#######################
+our $VERSION = '1.2.0';
+
+#######################
 # PUBLIC METHODS
 #######################
 
@@ -53,7 +58,9 @@ sub info {
         {
             method => 'collection/' . $self->id(),
             params => {
-                language => $self->session->lang ? $self->session->lang : undef,
+                language => $self->session->lang
+                ? $self->session->lang
+                : undef,
             },
         }
     );

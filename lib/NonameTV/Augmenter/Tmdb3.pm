@@ -371,7 +371,7 @@ sub AugmentProgram( $$$ ){
                 foreach my $b ( @names ) {
                   $a =~ s/(\.|\,)//;
                   $b =~ s/(\.|\,)//;
-                  
+
                   if( lc norm( $a ) eq lc norm( $b ) ) {
                     $matches += 1;
                   }

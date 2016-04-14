@@ -20,6 +20,11 @@ use Locale::Codes::Country qw(all_country_codes);
 use TMDB::Session;
 
 #######################
+# VERSION
+#######################
+our $VERSION = '1.2.0';
+
+#######################
 # PUBLIC METHODS
 #######################
 
@@ -72,7 +77,8 @@ sub alternative_titles {
 
     # Valid Country codes
     if ($country) {
-        my %valid_country_codes = map { $_ => 1 } all_country_codes('alpha-2');
+        my %valid_country_codes
+          = map { $_ => 1 } all_country_codes('alpha-2');
         $country = uc $country;
       return unless $valid_country_codes{$country};
     } ## end if ($country)
@@ -184,7 +190,9 @@ sub similar {
             method    => 'movie/' . $self->id() . '/similar_movies',
             max_pages => $max_pages,
             params    => {
-                language => $self->session->lang ? $self->session->lang : undef,
+                language => $self->session->lang
+                ? $self->session->lang
+                : undef,
             },
         }
     );
@@ -201,7 +209,9 @@ sub lists {
             method    => 'movie/' . $self->id() . '/lists',
             max_pages => $max_pages,
             params    => {
-                language => $self->session->lang ? $self->session->lang : undef,
+                language => $self->session->lang
+                ? $self->session->lang
+                : undef,
             },
         }
     );
@@ -217,7 +227,9 @@ sub reviews {
             method    => 'movie/' . $self->id() . '/reviews',
             max_pages => $max_pages,
             params    => {
-                language => $self->session->lang ? $self->session->lang : undef,
+                language => $self->session->lang
+                ? $self->session->lang
+                : undef,
             },
         }
     );
@@ -248,8 +260,14 @@ sub changes {
         {
             method => 'movie/' . $self->id() . '/changes',
             params => {
-                ( $options{start_date} ? ( start_date => $options{start_date} ) : () ),
-                ( $options{end_date}   ? ( end_date   => $options{end_date} )   : () ),
+                (
+                    $options{start_date}
+                    ? ( start_date => $options{start_date} )
+                    : ()
+                ), (
+                    $options{end_date} ? ( end_date => $options{end_date} )
+                    : ()
+                ),
             },
         }
     );
@@ -338,6 +356,7 @@ sub collection {
 sub genres {
     my $self = shift;
     my $info = $self->info();
+  return unless $info;
     my @genres;
     if ( exists $info->{genres} ) {
         foreach ( @{ $info->{genres} } ) { push @genres, $_->{name}; }
@@ -346,6 +365,30 @@ sub genres {
   return @genres if wantarray;
   return \@genres;
 } ## end sub genres
+
+# Homepage
+sub homepage {
+    my ($self) = @_;
+    my $info = $self->info();
+  return unless $info;
+  return $info->{homepage} || q();
+} ## end sub homepage
+
+# Studios
+sub studios {
+    my $self = shift;
+    my $info = $self->info();
+  return unless $info;
+    my @studios;
+    if ( exists $info->{production_companies} ) {
+        foreach ( @{ $info->{production_companies} } ) {
+            push @studios, $_->{name};
+        }
+    } ## end if ( exists $info->{production_companies...})
+
+  return @studios if wantarray;
+  return \@studios;
+} ## end sub studios
 
 ## ====================
 ## CAST/CREW HELPERS
@@ -374,27 +417,33 @@ sub writer { return shift->_crew_names('Screenplay|Writer|Author|Novel'); }
 # Poster
 sub poster {
     my $self = shift;
-  return $self->info()->{poster_path} || q();
+    my $info = $self->info();
+  return unless $info;
+  return $info->{poster_path} || q();
 } ## end sub poster
 
 # Posters
 sub posters {
     my $self     = shift;
     my $response = $self->images();
-    my $posters  = $response->{posters} || [];
+  return unless $response;
+    my $posters = $response->{posters} || [];
   return $self->_image_urls($posters);
 } ## end sub posters
 
 # Backdrop
 sub backdrop {
     my $self = shift;
-  return $self->info()->{backdrop_path} || q();
+    my $info = $self->info();
+  return unless $info;
+  return $info->{backdrop_path} || q();
 } ## end sub backdrop
 
 # Backdrops
 sub backdrops {
-    my $self      = shift;
-    my $response  = $self->images();
+    my $self     = shift;
+    my $response = $self->images();
+  return unless $response;
     my $backdrops = $response->{backdrops} || [];
   return $self->_image_urls($backdrops);
 } ## end sub backdrops

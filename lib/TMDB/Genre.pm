@@ -19,6 +19,11 @@ use Params::Validate qw(validate_with :types);
 use TMDB::Session;
 
 #######################
+# VERSION
+#######################
+our $VERSION = '1.2.0';
+
+#######################
 # PUBLIC METHODS
 #######################
 
@@ -54,7 +59,9 @@ sub list {
         {
             method => 'genre/list',
             params => {
-                language => $self->session->lang ? $self->session->lang : undef,
+                language => $self->session->lang
+                ? $self->session->lang
+                : undef,
             },
         }
     );
@@ -77,7 +84,9 @@ sub movies {
             method    => 'genre/' . $self->id() . '/movies',
             max_pages => $max_pages,
             params    => {
-                language => $self->session->lang ? $self->session->lang : undef,
+                language => $self->session->lang
+                ? $self->session->lang
+                : undef,
             },
         }
     );
