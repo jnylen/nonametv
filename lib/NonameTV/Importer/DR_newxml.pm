@@ -295,7 +295,14 @@ sub ImportContent {
         }
     }
 
-    $ce->{original_title} = norm($title_alt) if defined($title_alt) and $ce->{title} ne norm($title_alt) and norm($title_alt) ne ""; # Add original title
+    if( defined($title_alt) and my( $orgtit, $orgsubtit ) = ($title_alt =~ /^(.*)\:\s+(.*)$/) )
+    {
+      $ce->{original_title} = norm($orgtit) if defined($orgtit) and $ce->{title} ne norm($orgtit) and norm($orgtit) ne ""; # Add original title
+      $ce->{original_subtitle} = norm($orgsubtit) if defined($orgsubtit) and norm($orgsubtit) ne "";
+    } else {
+      $ce->{original_title} = norm($title_alt) if defined($title_alt) and $ce->{title} ne norm($title_alt) and norm($title_alt) ne "";
+    }
+
     $ce->{title} = "end-of-transmission" if $ce->{title} =~ /^Udsendelsesoph.*r$/i;
     $ce->{category} = "Movies" if defined($ce->{program_type}) and $ce->{program_type} eq "movie" and (defined($ce->{category}) and $ce->{category} eq "Series");
 
