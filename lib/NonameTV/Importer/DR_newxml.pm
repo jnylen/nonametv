@@ -31,7 +31,7 @@ sub new {
   bless ($self, $class);
 
   $self->{UrlRoot} = 'http://www.dr.dk/programoversigttiltryk/Sendeplaner/dr-epg-xml/';
-  $self->{MaxWeeks} = 3;
+  $self->{MaxWeeks} = 3 unless defined $self->{MaxWeeks};
 
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Copenhagen" );
   $self->{datastorehelper} = $dsh;
