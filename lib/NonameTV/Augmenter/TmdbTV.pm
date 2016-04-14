@@ -313,11 +313,12 @@ sub AugmentProgram( $$$ ){
               if($seasons->{season_number} == 1) {
                 $episode = $episodeabs;
               } else {
-                $episode = $new_totaleps-$episodeabs;
+                $episode = $episodeabs-$old_totaleps;
               }
 
               # Dbeug
               if($episode == 0) {
+                print Dumper($episodeabs, $season, $episode, $new_totaleps);
                 w("got episode num zero, duno why. look into this.");
                 $episode = undef;
               }
