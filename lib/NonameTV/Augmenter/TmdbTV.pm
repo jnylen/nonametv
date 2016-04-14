@@ -356,6 +356,19 @@ sub AugmentProgram( $$$ ){
         # It have an series id, so you don't need to search
         if( defined( $ruleref->{remoteref} ) ) {
           $series = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
+        } elsif($ceref->{extra_id_type} eq "thetvdb") {
+          my @results = $self->{search}->find(
+              id     => $ceref->{extra_id},
+              source => 'tvdb_id'
+          )->{tv_results};
+          my $resultnum = @results;
+
+          # Results?
+          if( $resultnum > 0 ) {
+            $series = $self->{themoviedb}->tv( id => $results[0][0]->{id} )
+          } else {
+            w( "no series found with tvdb_id " . $ceref->{extra_id} . " - \"" . $ceref->{title} . "\"" );
+          }
         } else {
           @candidates = $self->{search}->tv( $ceref->{title} );
           my $resultnum = @candidates;
@@ -416,6 +429,19 @@ sub AugmentProgram( $$$ ){
         # It have an series id, so you don't need to search
         if( defined( $ruleref->{remoteref} ) ) {
           $series = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
+        } elsif($ceref->{extra_id_type} eq "thetvdb") {
+          my @results = $self->{search}->find(
+              id     => $ceref->{extra_id},
+              source => 'tvdb_id'
+          )->{tv_results};
+          my $resultnum = @results;
+
+          # Results?
+          if( $resultnum > 0 ) {
+            $series = $self->{themoviedb}->tv( id => $results[0][0]->{id} )
+          } else {
+            w( "no series found with tvdb_id " . $ceref->{extra_id} . " - \"" . $ceref->{title} . "\"" );
+          }
         } else {
           @candidates = $self->{search}->tv( $ceref->{title} );
           my $resultnum = @candidates;
@@ -488,6 +514,19 @@ sub AugmentProgram( $$$ ){
       # It have an series id, so you don't need to search
       if( defined( $ruleref->{remoteref} ) ) {
         $series = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
+      } elsif($ceref->{extra_id_type} eq "thetvdb") {
+        my @results = $self->{search}->find(
+            id     => $ceref->{extra_id},
+            source => 'tvdb_id'
+        )->{tv_results};
+        my $resultnum = @results;
+
+        # Results?
+        if( $resultnum > 0 ) {
+          $series = $self->{themoviedb}->tv( id => $results[0][0]->{id} )
+        } else {
+          w( "no series found with tvdb_id " . $ceref->{extra_id} . " - \"" . $ceref->{title} . "\"" );
+        }
       } else {
         @candidates = $self->{search}->tv( $ceref->{title} );
         my $resultnum = @candidates;
@@ -520,10 +559,10 @@ sub AugmentProgram( $$$ ){
         my $subtitle = undef;
         my $org_subtitle = undef;
         if(defined $ceref->{subtitle}) {
-          $subtitle = clean_subtitle($ceref->{subtitle});
+          $subtitle = remove_special_chars(clean_subtitle($ceref->{subtitle}));
         }
         if(defined $ceref->{original_subtitle}) {
-          $org_subtitle = clean_subtitle($ceref->{original_subtitle});
+          $org_subtitle = remove_special_chars(clean_subtitle($ceref->{original_subtitle}));
         }
 
         # Each season check for eps
@@ -535,7 +574,7 @@ sub AugmentProgram( $$$ ){
             next if(!defined($eps->{name}) or $eps->{name} eq "");
 
             # Check if it matches
-            next if(!(defined($subtitle) and lc $subtitle eq lc $eps->{name}) and !(defined($org_subtitle) and lc $org_subtitle eq lc $eps->{name}));
+            next if(!(defined($subtitle) and lc $subtitle eq lc remove_special_chars($eps->{name})) and !(defined($org_subtitle) and lc $org_subtitle eq lc remove_special_chars($eps->{name})));
 
             # it has found a match!
             $season = $eps->{season_number};
@@ -573,7 +612,21 @@ sub AugmentProgram( $$$ ){
   return( $resultref, $result );
 }
 
+# Make it easier to match the episode titles to each other
+# if there is no special chars.
+sub remove_special_chars
+{
+  my( $str ) = @_;
 
+  $str =~ s|\.||g; # remove dot
+  $str =~ s|\'||g;
+  $str =~ s|\,||g;
+  $str =~ s|\"||g;
+
+  return $str;
+}
+
+# Make it pretty so it looks like classics
 sub clean_subtitle
 {
   my( $str ) = @_;
