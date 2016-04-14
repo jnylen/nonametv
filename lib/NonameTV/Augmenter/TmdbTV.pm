@@ -444,7 +444,7 @@ sub AugmentProgram( $$$ ){
         # It have an series id, so you don't need to search
         if( defined( $ruleref->{remoteref} ) ) {
           $series = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
-        } elsif($ceref->{extra_id_type} eq "thetvdb") {
+        } elsif(defined($ceref->{extra_id_type}) and $ceref->{extra_id_type} eq "thetvdb") {
           my @results = $self->{search}->find(
               id     => $ceref->{extra_id},
               source => 'tvdb_id'
@@ -529,7 +529,7 @@ sub AugmentProgram( $$$ ){
       # It have an series id, so you don't need to search
       if( defined( $ruleref->{remoteref} ) ) {
         $series = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
-      } elsif($ceref->{extra_id_type} eq "thetvdb") {
+      } elsif(defined($ceref->{extra_id_type}) and $ceref->{extra_id_type} eq "thetvdb") {
         my @results = $self->{search}->find(
             id     => $ceref->{extra_id},
             source => 'tvdb_id'
@@ -612,7 +612,7 @@ sub AugmentProgram( $$$ ){
             w( "episode not found by title nor org subtitle: " . $ceref->{title} . " - \"" . $subtitle . "\"" );
           }
         } else {
-          w( "episode not found by title nor org subtitle: " . $ceref->{title} . " - \"" . $subtitle . "\"" );
+          w( "episode not found by title nor org subtitle: " . $ceref->{title} );
         }
 
       }
