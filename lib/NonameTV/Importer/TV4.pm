@@ -273,8 +273,11 @@ sub ImportContent
     }
 
     if($episode) {
+      ( $episode ) = ($episode =~ /^(\d+)/ );
       if($season) {
+        ( $season ) = ($season =~ /^(\d+)/ );
       	if($eps and $eps ne "") {
+          ( $eps ) = ($eps =~ /^(\d+)/ );
       		$ce->{episode} = sprintf( "%d . %d/%d . ", $season-1, $episode-1, $eps );
       	} else {
       		$ce->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 );
