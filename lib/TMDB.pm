@@ -10,7 +10,7 @@ use Carp qw(croak carp);
 #######################
 # VERSION
 #######################
-our $VERSION = '0.08';
+our $VERSION = '1.2.0';
 
 #######################
 # LOAD CPAN MODULES
@@ -22,6 +22,7 @@ use Object::Tiny qw(session);
 #######################
 use TMDB::Genre;
 use TMDB::Movie;
+use TMDB::TV;
 use TMDB::Config;
 use TMDB::Person;
 use TMDB::Search;
@@ -59,6 +60,7 @@ sub company { return TMDB::Company->new( session => shift->session, @_ ); }
 sub config { return TMDB::Config->new( session => shift->session, @_ ); }
 sub genre { return TMDB::Genre->new( session => shift->session, @_ ); }
 sub movie { return TMDB::Movie->new( session => shift->session, @_ ); }
+sub tv { return TMDB::TV->new( session => shift->session, @_ ); }
 sub person { return TMDB::Person->new( session => shift->session, @_ ); }
 sub search { return TMDB::Search->new( session => shift->session, @_ ); }
 
@@ -101,6 +103,14 @@ TMDB - Perl wrapper for The MovieDB API
         printf( "%s:\t%s\n", $result->{id}, $result->{name} );
       }
 
+      # Search for a TV show
+      my @results = $tmdb->search->tv('The Big Bang Theory');
+      foreach my $result (@results) {
+        printf( "%s:\t%s (%s)\n",
+            $result->{id}, $result->{name},
+            split( /-/, $result->{first_air_date}, 1 ) );
+      }
+
       # Movie Data
       # ===========
 
@@ -112,8 +122,10 @@ TMDB - Perl wrapper for The MovieDB API
       my $movie_year      = $movie->year;
       my $movie_tagline   = $movie->tagline;
       my $movie_overview  = $movie->overview;
+      my $movie_website   = $movie->homepage();
       my @movie_directors = $movie->director;
       my @movie_actors    = $movie->actors;
+      my @studios         = $movie->studios;
 
       printf( "%s (%s)\n%s", $movie_title, $movie_year,
         '=' x length($movie_title) );
@@ -139,13 +151,22 @@ TMDB - Perl wrapper for The MovieDB API
       print("\nActed in:\n");
       printf( "\t-%s\n", $_ ) for @person_movies;
 
+      # TV Show Data
+      # ===========
+
+      # TV Show Object
+      my $show = $tmdb->tv( id => '1418' );
+
+      my $season = $show->season(5);
+      my $episode = $show->episode(2, 3);
+
 
 =head1 DESCRIPTION
 
 L<The MovieDB|http://www.themoviedb.org/> is a free and open movie
 database. This module provides a Perl wrapper to L<The MovieDB
-API|http://help.themoviedb.org/kb/api/about-3>. In order to use this
-module, you must first get an API key by L<signing
+API|http://docs.themoviedb.apiary.io/>. In order to use this module,
+you must first get an API key by L<signing
 up|http://www.themoviedb.org/account/signup>.
 
 B<NOTE:> TMDB-v0.04 and higher uses TheMoviDB API version C</3>. This
@@ -182,14 +203,18 @@ codes|http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes>.
 
 =item client
 
-You can provide your own L<HTTP::Client> object, otherwise a default
-one is used.
+You can provide your own L<HTTP::Tiny> object, otherwise a default one
+is used.
 
 =item json
 
 You can provide your own L<JSON> implementation that can C<decode>
-JSON. This will fall back to using L<JSON::Any>. However, L<JSON::XS>
-is recommended.
+JSON. This will fall back to using L<JSON::MaybeXS>. However,
+L<JSON::XS> is recommended.
+
+=item apiurl
+
+The API endpoint to use. Defaults to L<https://api.themoviedb.org/3>
 
 =back
 
@@ -225,12 +250,19 @@ L<http://docs.themoviedb.apiary.io/#configuration> for more details.
 
       # Search
       my $search  = $tmdb->search();
-      my @results = $search->movie('Snatch (2000)');    # Search for movies
-      my @results = $search->person('Brad Pitt');       # Search people by Name
-      my @results = $search->company('Sony Pictures');  # Search for companies
-      my @results = $search->keyword('thriller');       # Search for keywords
-      my @results = $search->collection('Star Wars');   # Search for collections
-      my @results = $search->list('top 250');           # Search lists
+      my @results = $search->movie('Snatch (2000)');          # Search for movies
+      my @results = $search->tv('The Big Bang Theory (2007)') # Search for TV shows
+      my @results = $search->person('Brad Pitt');             # Search people by Name
+      my @results = $search->company('Sony Pictures');        # Search for companies
+      my @results = $search->keyword('thriller');             # Search for keywords
+      my @results = $search->collection('Star Wars');         # Search for collections
+      my @results = $search->list('top 250');                 # Search lists
+
+      # Find using external sources
+      my @results = $search->find(
+          id     => 'tt12345',
+          source => 'imdb_id'
+      );
 
       # Discover
       my @results = $search->discover(
@@ -346,28 +378,53 @@ L<http://docs.themoviedb.apiary.io/#configuration> for more details.
 
 =head1 COMPANY
 
-		# Get the company object
-		my $company = $tmdb->company(id => '1');
+      # Get the company object
+      my $company = $tmdb->company(id => '1');
 
-		# Company info (as returned by the API)
-		use Data::Dumper qw(Dumper);
-		print Dumper $company->info;
-		print Dumper $company->movies;
+      # Company info (as returned by the API)
+      use Data::Dumper qw(Dumper);
+      print Dumper $company->info;
+      print Dumper $company->movies;
 
-		# Filtered company data
-		print $company->name; # Name of the Company
-		print $company->logo; # Logo
+      # Filtered company data
+      print $company->name; # Name of the Company
+      print $company->logo; # Logo
 
-		# Get TMDB's version to check if anything changed
-		print $company->version;
+      # Get TMDB's version to check if anything changed
+      print $company->version;
 
 =head1 GENRE
 
-		# Get a list
-		my @genres = $tmdb->genre->list();
+      # Get a list
+      my @genres = $tmdb->genre->list();
 
-		# Get a list of movies
-		my @movies = $tmdb->genre(id => '35')->movies;
+      # Get a list of movies
+      my @movies = $tmdb->genre(id => '35')->movies;
+
+=head1 TV SHOW
+
+      # Get the TV show object
+      my $show = $tmdb->tv( id => '1418' );
+
+      # TV Show Data (as returned by the API)
+      use Data::Dumper qw(Dumper);
+      print Dumper $show->info;
+      print Dumper $show->alternative_titles;
+      print Dumper $show->cast;
+      print Dumper $show->crew;
+      print Dumper $show->images;
+      print Dumper $show->keywords;
+      print Dumper $show->videos;
+      print Dumper $show->translations;
+      print Dumper $show->content_ratings;
+      print Dumper $show->changes;
+
+      # Get Season and Episode info
+      print Dumper $show->season(5);
+      print Dumper $show->episode(1, 1);
+
+      # Get TMDB's version to check if anything changed
+      print $show->version;
 
 
 =head1 DEPENDENCIES
@@ -378,7 +435,7 @@ L<http://docs.themoviedb.apiary.io/#configuration> for more details.
 
 =item L<HTTP::Tiny>
 
-=item L<JSON::Any>
+=item L<JSON::MaybeXS>
 
 =item L<Locale::Codes>
 
@@ -396,9 +453,8 @@ This module not (yet!) support POST-ing data to TheMovieDB
 
 All data returned is UTF-8 encoded
 
-Please report any bugs or feature requests to C<bug-tmdb@rt.cpan.org>,
-or through the web interface at
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=TMDB>
+Please report any bugs or feature requests at
+L<https://github.com/mithun/perl-tmdb/issues>
 
 =head1 SEE ALSO
 
@@ -418,7 +474,7 @@ Mithun Ayachit C<mithun@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013, Mithun Ayachit. All rights reserved.
+Copyright (c) 2015, Mithun Ayachit. All rights reserved.
 
 This module is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself. See L<perlartistic>.

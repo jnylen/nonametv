@@ -134,7 +134,7 @@ sub talk {
     # Debug
     if ( $self->debug ) {
         warn "DEBUG: Got a successful response\n" if $response->{success};
-        warn "DEBUG: Got Status -> $response->{status}\n";
+        warn "DEBUG: Got Status -> $response->{status}\n" if $response->{status};
         warn "DEBUG: Got Reason -> $response->{reason}\n"   if $response->{reason};
         warn "DEBUG: Got Content -> $response->{_content}\n" if $response->{content};
     } ## end if ( $self->debug )

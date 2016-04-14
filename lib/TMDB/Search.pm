@@ -19,6 +19,11 @@ use Object::Tiny qw(session include_adult max_pages);
 use TMDB::Session;
 
 #######################
+# VERSION
+#######################
+our $VERSION = '1.2.0';
+
+#######################
 # PUBLIC METHODS
 #######################
 
@@ -39,7 +44,8 @@ sub new {
                 optional  => 1,
                 default   => 'false',
                 callbacks => {
-                    'valid flag' => sub { lc $_[0] eq 'true' or lc $_[0] eq 'false' }
+                    'valid flag' =>
+                      sub { lc $_[0] eq 'true' or lc $_[0] eq 'false' }
                 },
             },
             max_pages => {
@@ -89,6 +95,39 @@ sub movie {
         }
     );
 } ## end sub movie
+
+## ====================
+## Search TV Shows
+## ====================
+sub tv {
+    my ( $self, $string ) = @_;
+
+    # Get Year
+    my $year;
+    if ( $string =~ m{.+\((\d{4})\)$} ) {
+        $year = $1;
+        $string =~ s{\($year\)$}{};
+    } ## end if ( $string =~ m{.+\((\d{4})\)$})
+
+    # Trim
+    $string =~ s{(?:^\s+)|(?:\s+$)}{};
+
+    # Search
+    my $params = {
+        query         => $string,
+        include_adult => $self->include_adult,
+    };
+    $params->{language} = $self->session->lang if $self->session->lang;
+    $params->{year} = $year if $year;
+
+    warn "DEBUG: Searching for $string\n" if $self->session->debug;
+  return $self->_search(
+        {
+            method => 'search/tv',
+            params => $params,
+        }
+    );
+} ## end sub tv
 
 ## ====================
 ## Search Person
@@ -189,7 +228,9 @@ sub upcoming {
         {
             method => 'movie/upcoming',
             params => {
-                language => $self->session->lang ? $self->session->lang : undef,
+                language => $self->session->lang
+                ? $self->session->lang
+                : undef,
             },
         }
     );
@@ -202,7 +243,9 @@ sub now_playing {
         {
             method => 'movie/now-playing',
             params => {
-                language => $self->session->lang ? $self->session->lang : undef,
+                language => $self->session->lang
+                ? $self->session->lang
+                : undef,
             },
         }
     );
@@ -215,7 +258,9 @@ sub popular {
         {
             method => 'movie/popular',
             params => {
-                language => $self->session->lang ? $self->session->lang : undef,
+                language => $self->session->lang
+                ? $self->session->lang
+                : undef,
             },
         }
     );
@@ -228,7 +273,9 @@ sub top_rated {
         {
             method => 'movie/top-rated',
             params => {
-                language => $self->session->lang ? $self->session->lang : undef,
+                language => $self->session->lang
+                ? $self->session->lang
+                : undef,
             },
         }
     );
@@ -241,7 +288,9 @@ sub popular_people {
         {
             method => 'person/popular',
             params => {
-                language => $self->session->lang ? $self->session->lang : undef,
+                language => $self->session->lang
+                ? $self->session->lang
+                : undef,
             },
         }
     );
@@ -282,7 +331,12 @@ sub discover {
             year => {
                 type     => SCALAR,
                 optional => 1,
-                regex    => qr/^\d{4}\-\d{2}\-\d{2}$/
+                regex    => qr/^\d{4}$/
+            },
+            primary_release_year => {
+                type     => SCALAR,
+                optional => 1,
+                regex    => qr/^\d{4}$/
             },
             'release_date.gte' => {
                 type     => SCALAR,
@@ -322,7 +376,9 @@ sub discover {
         {
             method => 'discover/movie',
             params => {
-                language => $self->session->lang ? $self->session->lang : undef,
+                language => $self->session->lang
+                ? $self->session->lang
+                : undef,
                 include_adult => $self->include_adult,
                 %options,
             },
@@ -330,6 +386,36 @@ sub discover {
     );
 
 } ## end sub discover
+
+#######################
+# FIND
+#######################
+sub find {
+    my ( $self, @args ) = @_;
+    my %options = validate_with(
+        params => [@args],
+        spec   => {
+            id => {
+                type => SCALAR,
+            },
+            source => {
+                type => SCALAR,
+            },
+        },
+    );
+
+  return $self->session->talk(
+        {
+            method => 'find/' . $options{id},
+            params => {
+                external_source => $options{source},
+                language        => $self->session->lang
+                ? $self->session->lang
+                : undef,
+            }
+        }
+    );
+} ## end sub find
 
 #######################
 # PRIVATE METHODS
