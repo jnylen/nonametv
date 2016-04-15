@@ -663,14 +663,14 @@ sub WriteEntry
     $d->{url} = [ $entry->{url} ];
 
     # MythTV in case of no episodeNum
-    if( $entry->{url} =~ m|^http://www.themoviedb.org/| ){
+    if( $entry->{url} =~ m|^http://www.themoviedb.org/movie/| ){
         ( $inetref )=( $entry->{url} =~ m|movie/(\d+)| );
         $system = 'themoviedb.org';
         $inetref = 'movie/' . $inetref;
     }
 
     # Only add if it exists
-    if( $system and !defined $d->{'episodeNum'} and $entry->{url} =~ m|^http://www.themoviedb.org/| ){
+    if( $system and !defined $d->{'episodeNum'} and $entry->{url} =~ m|^http://www.themoviedb.org/movie/| ){
         $d->{'episodeNum'} = { $system => $inetref };
     }
   }

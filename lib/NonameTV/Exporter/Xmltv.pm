@@ -647,7 +647,7 @@ sub WriteEntry
       ( $inetref )=( $data->{url} =~ m|seriesid=(\d+)| );
       $system = 'thetvdb.com';
       $inetref = 'series/' . $inetref;
-    }elsif( $data->{url} =~ m|^http://www.themoviedb.org/| ){
+    }elsif( $data->{url} =~ m|^http://www.themoviedb.org/movie/| ){
       ( $inetref )=( $data->{url} =~ m|movie/(\d+)| );
       $system = 'themoviedb.org';
       $inetref = 'movie/' . $inetref;
