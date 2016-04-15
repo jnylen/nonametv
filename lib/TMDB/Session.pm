@@ -18,7 +18,12 @@ use Params::Validate qw(validate_with :types);
 use Locale::Codes::Language qw(all_language_codes);
 use Object::Tiny qw(apikey apiurl lang debug client encoder json);
 use WWW::Mechanize::GZip;
-use HTTP::Cache::Transparent ( BasePath => '/home/jnylen/content/contentcache/Tmdbx', Verbose   => 0, NoUpdate  => 12*60*60 );
+
+### config
+use NonameTV::Config qw/ReadConfig/;
+use HTTP::Cache::Transparent ( BasePath => ReadConfig()->{ContentCachePath} . '/Tmdb', Verbose   => 0, NoUpdate  => 12*60*60 );
+
+
 
 #######################
 # VERSION
