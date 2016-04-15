@@ -20,6 +20,8 @@ use Object::Tiny qw(apikey apiurl lang debug client encoder json);
 use WWW::Mechanize::GZip;
 
 ### config
+### NoUpdate won't check the http server for updates in 12 hours after first fetch.
+### Verbose prints all calls even if its cached so a lot of spam.
 use NonameTV::Config qw/ReadConfig/;
 use HTTP::Cache::Transparent ( BasePath => ReadConfig()->{ContentCachePath} . '/Tmdb', Verbose   => 0, NoUpdate  => 12*60*60 );
 
@@ -78,7 +80,7 @@ sub new {
                 type     => OBJECT,
                 isa      => 'WWW::Mechanize',
                 optional => 1,
-                default  => WWW::Mechanize::GZip->new( agent => $default_ua ),
+                default  => WWW::Mechanize::GZip->new( agent => $default_ua, headers => $default_headers ),
             },
             encoder => {
                 type     => OBJECT,
