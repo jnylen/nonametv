@@ -259,6 +259,10 @@ sub AugmentProgram( $$$ ){
   }elsif( $ceref->{url} && $ceref->{url} =~ m|^http://tvrage\.com/| ) {
       #$result = "programme is already linked to tvrage.com, ignoring";
       #$resultref = undef;
+  }elsif( $ceref->{url} && $ceref->{url} =~ m|^https://www\.themoviedb\.org/tv/\d+| ) {
+    #$result = "programme is already linked to themoviedb.org, ignoring";
+    #$resultref = undef;
+
   }elsif( $ruleref->{matchby} eq 'episodeabs' ) {
     # match by absolute episode number from program hash. USE WITH CAUTION, NOT EVERYONE AGREES ON ANY ORDER!!!
 

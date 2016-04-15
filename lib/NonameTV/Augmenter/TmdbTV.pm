@@ -45,7 +45,6 @@ sub new {
     $self->{themoviedb} = TMDB->new(
         apikey => $self->{ApiKey},
         lang   => $self->{Language},
-        cache  => $cachedir,
     );
 
     $self->{search} = $self->{themoviedb}->search(
@@ -60,7 +59,7 @@ sub FillCast( $$$$$ ) {
   my( $self, $resultref, $credit, $series, $episode )=@_;
 
   my @credits = ( );
-  if(!defined($episode->{credits})) {
+  if(defined($episode->{credits})) {
     foreach my $castmember ( @{ $episode->{credits}->{cast} } ){
       my $name = $castmember->{'name'};
       my $role = $castmember->{'character'};
@@ -180,7 +179,7 @@ sub FillHash( $$$$ ) {
 
 
     # use episode title
-    $resultref->{subtitle} = norm( $episode->{name} ) if not defined $ceref->{original_subtitle};
+    $resultref->{subtitle} = norm( $episode->{name} ) if (norm( $episode->{name} ) ne "" and !(defined($ceref->{subtitle}))) or (norm( $episode->{name} ) ne "" and $ceref->{subtitle} eq "");
   }
 
   # Ratings
@@ -251,7 +250,7 @@ sub AugmentProgram( $$$ ){
   }
 
   # Match bys
-  if( $ceref->{url} && $ceref->{url} =~ m|^http://www\.themoviedb\.org/tv/\d+$| ) {
+  if( $ceref->{url} && $ceref->{url} =~ m|^https://www\.themoviedb\.org/tv/\d+| ) {
     $result = "programme is already linked to themoviedb.org, ignoring";
     $resultref = undef;
 
@@ -301,6 +300,8 @@ sub AugmentProgram( $$$ ){
           my $episode = undef;
           my $season = undef;
 
+          #print Dumper($series, $series->info);
+
           foreach my $seasons ( @{ $series->info->{seasons} } ){
             next if($seasons->{season_number} == 0);
             $new_totaleps = $old_totaleps + $seasons->{episode_count};
@@ -318,7 +319,7 @@ sub AugmentProgram( $$$ ){
 
               # Dbeug
               if($episode == 0) {
-                print Dumper($episodeabs, $season, $episode, $new_totaleps);
+                #print Dumper($episodeabs, $season, $episode, $new_totaleps);
                 w("got episode num zero, duno why. look into this.");
                 $episode = undef;
               }
