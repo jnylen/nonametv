@@ -202,7 +202,7 @@ sub _check_status {
         my $ok = eval {
 
             my $status = $self->json->decode(
-                Encode::decode( 'utf-8-strict', $response->{_content} ) );
+                Encode::decode( 'utf-8-strict', $response->content ) );
 
             $code    = $status->{status_code};
             $message = $status->{status_message};
