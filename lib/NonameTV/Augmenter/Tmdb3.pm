@@ -45,7 +45,6 @@ sub new {
     $self->{themoviedb} = TMDB->new(
         apikey => $self->{ApiKey},
         lang   => $self->{Language},
-        cache  => $cachedir,
     );
 
     $self->{search} = $self->{themoviedb}->search(

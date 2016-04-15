@@ -10,16 +10,20 @@ use Carp qw(croak carp);
 #######################
 # LOAD CPAN MODULES
 #######################
-use JSON::Any;
+use JSON::MaybeXS;
 use Data::Dumper;
 use Encode qw();
-use HTTP::Tiny qw();
 use URI::Encode qw();
 use Params::Validate qw(validate_with :types);
 use Locale::Codes::Language qw(all_language_codes);
 use Object::Tiny qw(apikey apiurl lang debug client encoder json);
-use WWW::Mechanize::Cached;
-use CHI;
+use WWW::Mechanize::GZip;
+use HTTP::Cache::Transparent ( BasePath => '/home/jnylen/content/contentcache/Tmdbx', Verbose   => 0, NoUpdate  => 12*60*60 );
+
+#######################
+# VERSION
+#######################
+our $VERSION = '1.2.0';
 
 #######################
 # PACKAGE VARIABLES
@@ -55,27 +59,21 @@ sub new {
             apiurl => {
                 type     => SCALAR,
                 optional => 1,
-                default  => 'http://api.themoviedb.org/3',
-            },
-            cache => {
-                type     => SCALAR,
+                default  => 'https://api.themoviedb.org/3',
             },
             lang => {
                 type      => SCALAR,
                 optional  => 1,
                 callbacks => {
-                    'valid language code' => sub { $valid_lang_codes{ lc $_[0] } },
+                    'valid language code' =>
+                      sub { $valid_lang_codes{ lc $_[0] } },
                 },
             },
             client => {
                 type     => OBJECT,
-                isa      => 'WWW::Mechanize::Cached',
+                isa      => 'WWW::Mechanize',
                 optional => 1,
-                default  => WWW::Mechanize::Cached->new(
-                    cache => CHI->new( driver => 'File',
-                             root_dir => '/home/jnylen/content/contentcache/Tmdb3',
-                             expires_in => '1 month', expires_variance => 0.25 ), agent => $default_ua, headers => $default_headers
-                ),
+                default  => WWW::Mechanize::GZip->new( agent => $default_ua ),
             },
             encoder => {
                 type     => OBJECT,
@@ -85,11 +83,9 @@ sub new {
             },
             json => {
                 type     => OBJECT,
-                can      => 'Load',
+                can      => [qw(decode)],
                 optional => 1,
-                default  => JSON::Any->new(
-                    utf8 => 1,
-                ),
+                default  => JSON::MaybeXS->new(),
             },
             debug => {
                 type     => BOOLEAN,
@@ -111,9 +107,12 @@ sub talk {
     my ( $self, $args ) = @_;
 
     # Build Call
-    my $url = $self->apiurl . '/' . $args->{method} . '?api_key=' . $self->apikey;
+    my $url
+      = $self->apiurl . '/' . $args->{method} . '?api_key=' . $self->apikey;
     if ( $args->{params} ) {
-        foreach my $param ( sort { lc $a cmp lc $b } keys %{ $args->{params} } ) {
+        foreach
+          my $param ( sort { lc $a cmp lc $b } keys %{ $args->{params} } )
+        {
           next unless defined $args->{params}->{$param};
             $url .= "&${param}=" . $args->{params}->{$param};
         } ## end foreach my $param ( sort { ...})
@@ -126,37 +125,27 @@ sub talk {
     warn "DEBUG: GET -> $url\n" if $self->debug;
     my $response = $self->client->get($url);
 
-    # Only sleep if the response isn't cached.
-    if(!$self->client->is_cached()) {
-        sleep (1);
-    }
-
     # Debug
     if ( $self->debug ) {
         warn "DEBUG: Got a successful response\n" if $response->{success};
         warn "DEBUG: Got Status -> $response->{status}\n" if $response->{status};
-        warn "DEBUG: Got Reason -> $response->{reason}\n"   if $response->{reason};
-        warn "DEBUG: Got Content -> $response->{_content}\n" if $response->{content};
+        warn "DEBUG: Got Reason -> $response->{reason}\n"
+          if $response->{reason};
+        warn "DEBUG: Got Content -> $response->{content}\n"
+          if $response->{content};
     } ## end if ( $self->debug )
 
     # Return
-  return unless $response->{_msg};  # Error
-    if ( $args->{want_headers} and exists $response->{_request}->{_headers} ) {
-
-        # Return headers only
-      return $response->{_request}->{_headers};
+    #print Dumper($response->{_content});
+    return unless $self->_check_status($response);
+    if ( $args->{want_headers} and exists $response->{_headers} ) {
+      # Return headers only
+      return $response->{_headers};
     } ## end if ( $args->{want_headers...})
   return unless $response->{_content};  # Blank Content
 
-  if($response->{_content} !~ /^</ ) {
-    return $self->json->decode( Encode::decode( 'utf-8-strict', $response->{_content} ) );  # Real Response
-  } else {
-    # Probably want to remove that file from cache when this happened than just return nothing.
-    # This is what happens when you do too many api requests
-    warn "Not an actual JSON. HTML found.";
-    return;
-  }
-
+  return $self->json->decode(
+        Encode::decode( 'utf-8-strict', $response->content ) ); # Real Response
 } ## end sub talk
 
 ## ====================
@@ -190,6 +179,39 @@ sub paginate_results {
   return @$results if wantarray;
   return $results;
 } ## end sub paginate_results
+
+#######################
+# INTERNAL
+#######################
+
+# Check Response status
+sub _check_status {
+    my ( $self, $response ) = @_;
+
+    if ( $response->{_msg} eq "OK" ) {
+      return 1;
+    }
+
+    if ( $response->{_content} ) {
+        my ( $code, $message );
+        my $ok = eval {
+
+            my $status = $self->json->decode(
+                Encode::decode( 'utf-8-strict', $response->{_content} ) );
+
+            $code    = $status->{status_code};
+            $message = $status->{status_message};
+
+            1;
+        };
+
+        if ( $ok and $code and $message ) {
+            carp sprintf( 'TMDB API Error (%s): %s', $code, $message );
+        }
+    } ## end if ( $response->{content...})
+
+  return;
+} ## end sub _check_status
 
 #######################
 1;
