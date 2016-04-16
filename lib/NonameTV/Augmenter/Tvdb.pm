@@ -222,8 +222,7 @@ sub AugmentProgram( $$$ ){
   my $resultref = {};
   # result string, empty/false for success, message/true for failure
   my $result = '';
-
-
+  my $matchby = undef;
 
   if( $ceref->{title} eq 'SOKO Leipzig' ){
     # broken dataset on Tvdb
@@ -235,22 +234,24 @@ sub AugmentProgram( $$$ ){
     # Subtitles, no episode
     if(defined($ceref->{subtitle}) && !defined($ceref->{episode})) {
     	# Match it by subtitle
-    	$ruleref->{matchby} = "episodetitle";
+    	$matchby = "episodetitle";
     } elsif(!defined($ceref->{subtitle}) && defined($ceref->{episode})) {
     	# The opposite, match it by episode
-    	$ruleref->{matchby} = "episodeseason";
+    	$matchby = "episodeseason";
     } elsif(defined($ceref->{subtitle}) && defined($ceref->{episode})) {
         # Check if it has season otherwise title.
         my( $season, $episode )=( $ceref->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
         if( (defined $episode) and (defined $season) ){
-            $ruleref->{matchby} = "episodeseason";
+            $matchby = "episodeseason";
         } else {
-            $ruleref->{matchby} = "episodetitle";
+            $matchby = "episodetitle";
         }
     } else {
     	# Match it by seriesname (only change series name) here later on maybe?
     	return( undef, 'couldn\'t guess the right matchby, sorry.' );
     }
+  } else {
+    $matchby = $ruleref->{matchby};
   }
 
   if( $ceref->{url} && $ceref->{url} =~ m|^http://thetvdb\.com/| ) {
@@ -263,7 +264,7 @@ sub AugmentProgram( $$$ ){
     #$result = "programme is already linked to themoviedb.org, ignoring";
     #$resultref = undef;
 
-  }elsif( $ruleref->{matchby} eq 'episodeabs' ) {
+  }elsif( $matchby eq 'episodeabs' ) {
     # match by absolute episode number from program hash. USE WITH CAUTION, NOT EVERYONE AGREES ON ANY ORDER!!!
 
     if( defined $ceref->{episode} ){
@@ -296,7 +297,7 @@ sub AugmentProgram( $$$ ){
         }
       }
     }
-  }elsif( $ruleref->{matchby} eq 'episodeseason' ) {
+  }elsif( $matchby eq 'episodeseason' ) {
     # match by episode and season - Note that the episode and season
     # must be the real episode and season, often on swedish channels
     # like TV4 the season is year, this will not work. As TheTVDb only
@@ -345,7 +346,7 @@ sub AugmentProgram( $$$ ){
         }
       }
     }
-  }elsif( $ruleref->{matchby} eq 'episodeseasontitle' ) {
+  }elsif( $matchby eq 'episodeseasontitle' ) {
     # Same as episodeseason except it also paste season from title
     # Used like:
   	# title: Jersey Shoe 2
@@ -388,7 +389,7 @@ sub AugmentProgram( $$$ ){
       	}
     	}
    	}
- }elsif( $ruleref->{matchby} eq 'episodetitle' ) {
+ }elsif( $matchby eq 'episodetitle' ) {
     # match by episode title from program hash
 
     if( defined( $ceref->{subtitle} ) ) {
@@ -481,7 +482,7 @@ sub AugmentProgram( $$$ ){
       }
     }
 
-  }elsif( $ruleref->{matchby} eq 'seriesname' ) {
+  }elsif( $matchby eq 'seriesname' ) {
     # get seriesname and set it (to the right name)
     # works for channels which don't have season or episode
     # or doesn't have the right one.
@@ -500,7 +501,7 @@ sub AugmentProgram( $$$ ){
         d( "series not found by title: " . $ceref->{title} );
       }
 
-  }elsif( $ruleref->{matchby} eq 'episodeid' ) {
+  }elsif( $matchby eq 'episodeid' ) {
       # match by episode id from remote_ref (sid|eid)
       my $series;
 
@@ -527,7 +528,7 @@ sub AugmentProgram( $$$ ){
       }
 
   }else{
-    $result = "don't know how to match by '" . $ruleref->{matchby} . "'";
+    $result = "don't know how to match by '" . $matchby . "'";
   }
 
   if( !scalar keys %{$resultref} ){

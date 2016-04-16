@@ -219,42 +219,40 @@ sub AugmentProgram( $$$ ){
   my $resultref = {};
   # result string, empty/false for success, message/true for failure
   my $result = '';
+  my $matchby = undef;
 
   # It guesses what it needs
   if( $ruleref->{matchby} eq 'guess' ) {
     # Subtitles, no episode
     if(defined($ceref->{subtitle}) && !defined($ceref->{episode})) {
     	# Match it by subtitle
-    	$ruleref->{matchby} = "episodetitle";
+    	$matchby = "episodetitle";
     } elsif(!defined($ceref->{subtitle}) && defined($ceref->{episode})) {
     	# The opposite, match it by episode
-    	$ruleref->{matchby} = "episodeseason";
+    	$matchby = "episodeseason";
     } elsif(defined($ceref->{subtitle}) && defined($ceref->{episode})) {
         # Check if it has season otherwise title.
         my( $season, $episode )=( $ceref->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
         if( (defined $episode) and (defined $season) ){
-          # Not all seasons are aired in different years so don't make it standard until some kind of
-          # solution is fixed for this.
-          #if($season > 1800) {
-          #  $ruleref->{matchby} = "episodeyear";
-          #} else {
-            $ruleref->{matchby} = "episodeseason";
-          #}
+            $matchby = "episodeseason";
         } else {
-            $ruleref->{matchby} = "episodetitle";
+            $matchby = "episodetitle";
         }
     } else {
     	# Match it by seriesname (only change series name) here later on maybe?
     	return( undef, 'couldn\'t guess the right matchby, sorry.' );
     }
+  } else {
+    $matchby = $ruleref->{matchby};
   }
+
 
   # Match bys
   if( $ceref->{url} && $ceref->{url} =~ m|^https://www\.themoviedb\.org/tv/\d+| ) {
     $result = "programme is already linked to themoviedb.org, ignoring";
     $resultref = undef;
 
-  } elsif( $ruleref->{matchby} eq 'episodeabs' ) {
+  } elsif( $matchby eq 'episodeabs' ) {
     # match by absolute episode number from program hash. USE WITH CAUTION, NOT EVERYONE AGREES ON ANY ORDER!!!
 
     if( defined $ceref->{episode} ){
@@ -355,7 +353,7 @@ sub AugmentProgram( $$$ ){
 
     }
 
-  } elsif( $ruleref->{matchby} eq 'episodeseason' ) {
+  } elsif( $matchby eq 'episodeseason' ) {
     # Find episode by season and episode.
 
     if( defined $ceref->{episode} ){
@@ -428,7 +426,7 @@ sub AugmentProgram( $$$ ){
 
     }
 
-  } elsif( $ruleref->{matchby} eq 'episodeyear' ) {
+  } elsif( $matchby eq 'episodeyear' ) {
     # Find episode by season and episode.
 
     if( defined $ceref->{episode} ){
@@ -519,7 +517,7 @@ sub AugmentProgram( $$$ ){
 
       }
     }
-  } elsif( $ruleref->{matchby} eq 'episodetitle' ) {
+  } elsif( $matchby eq 'episodetitle' ) {
     ## You need to fetch first the show,
     ## then the season one by one to get the titles.
 
@@ -618,7 +616,7 @@ sub AugmentProgram( $$$ ){
 
       }
     }
-  } elsif( $ruleref->{matchby} eq 'episodeid' ) {
+  } elsif( $matchby eq 'episodeid' ) {
     $result = "TMDB doesnt provide an API CALL with episode ids.";
   } else {
     $result = "don't know how to match by '" . $ruleref->{matchby} . "'";
