@@ -179,7 +179,8 @@ sub FillHash( $$$$ ) {
 
 
     # use episode title
-    $resultref->{subtitle} = norm( $episode->{name} ) if (norm( $episode->{name} ) ne "" and !(defined($ceref->{subtitle}))) or (norm( $episode->{name} ) ne "" and $ceref->{subtitle} eq "");
+    #print Dumper($episode);
+    $resultref->{subtitle} = norm( $episode->{name} ) if(norm( $episode->{name} ) ne "" and (!defined($ceref->{subtitle}) or $ceref->{subtitle} eq ""));
   }
 
   # Ratings
@@ -221,6 +222,9 @@ sub AugmentProgram( $$$ ){
   my $result = '';
   my $matchby = undef;
 
+  # episodeabs
+  my( $episodeabs );
+
   # It guesses what it needs
   if( $ruleref->{matchby} eq 'guess' ) {
     # Subtitles, no episode
@@ -242,21 +246,27 @@ sub AugmentProgram( $$$ ){
     	# Match it by seriesname (only change series name) here later on maybe?
     	return( undef, 'couldn\'t guess the right matchby, sorry.' );
     }
+  } elsif( $ruleref->{matchby} eq 'episodeabsnoseason') {
+    # WARNING: DONT USE THIS IF YOU ARENT SURE ITS ACTUALLY EPISODEABS, AS YOU ARE FUCKING EVERYTHING UP
+    my ($seasonxabs);
+    ( $seasonxabs, $episodeabs )=( $ceref->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
+
+    $matchby = 'episodeabs';
   } else {
     $matchby = $ruleref->{matchby};
   }
-
 
   # Match bys
   if( $ceref->{url} && $ceref->{url} =~ m|^https://www\.themoviedb\.org/tv/\d+| ) {
     $result = "programme is already linked to themoviedb.org, ignoring";
     $resultref = undef;
-
   } elsif( $matchby eq 'episodeabs' ) {
     # match by absolute episode number from program hash. USE WITH CAUTION, NOT EVERYONE AGREES ON ANY ORDER!!!
 
     if( defined $ceref->{episode} ){
-      my( $episodeabs )=( $ceref->{episode} =~ m|^\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
+      if( not defined $episodeabs ){
+        ( $episodeabs )=( $ceref->{episode} =~ m|^\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
+      }
 
       # Found!
       if( defined $episodeabs ){
@@ -636,6 +646,8 @@ sub remove_special_chars
   $str =~ s|\'||g;
   $str =~ s|\,||g;
   $str =~ s|\"||g;
+  $str =~ s|\!||g;
+  $str =~ s|\?||g;
 
   return $str;
 }

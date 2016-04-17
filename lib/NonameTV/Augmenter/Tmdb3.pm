@@ -111,7 +111,7 @@ sub FillHash( $$$ ) {
 #  print Dumper $movie->reviews;
 #  print Dumper $movie->changes;
 
-  if (not defined ($movie)) {
+  if (not defined ($movie) or not defined ($movie->info)) {
     w( $self->{Type} . ' failed to parse result.' );
     return;
   }
@@ -200,8 +200,8 @@ sub FillHash( $$$ ) {
   $self->FillCrew( $resultref, 'producers', $movie, 'Producer');
   $self->FillCrew( $resultref, 'writers', $movie, 'Screenplay');
 
-  $resultref->{extra_id} = $movie->info->{imdb_id} if $movie->info->{imdb_id} ne "";
-  $resultref->{extra_id} = $movie->{ id } if $movie->info->{imdb_id} eq "";
+  $resultref->{extra_id} = $movie->info->{imdb_id} if defined($movie->info->{imdb_id}) and $movie->info->{imdb_id} ne "";
+  $resultref->{extra_id} = $movie->{ id } if !defined($movie->info->{imdb_id}) or $movie->info->{imdb_id} eq "";
   $resultref->{extra_id_type} = "themoviedb";
 
 #  print STDERR Dumper( $apiresult );
