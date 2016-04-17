@@ -158,6 +158,9 @@ sub ImportXML
     $title =~ s/Film://;
     $title =~ s/Actiontorsdag://;
     $title =~ s/\.$//; # remove ending dot.
+    $title =~ s/^Toimintakomedia://;
+    $title =~ s/^Tosiputki://;
+    $title =~ s/^Kyttäputki://;
 
     $title = normLatin1($title);
 
@@ -343,6 +346,16 @@ sub ImportXML
         if($eperino1 ne "") {
           $sentences[$i2] = "";
         }
+      }elsif( my( $seasonerino22, $eperino22 ) = ($sentences[$i2] =~ /Kausi (\d+), osa (\d+)\./i ) )
+      {
+        # Sometimes its shit before Kausi so just match anything with Kausi in it in that format.
+        $episode = $eperino22;
+        $season = $seasonerino22;
+
+        # Only remove sentence if it could find a season
+        if($eperino22 ne "") {
+          $sentences[$i2] = "";
+        }
       }elsif( my( $episodetextnum3 ) = ($sentences[$i2] =~ /^Del (\d+)\./i ) )
       {
         $episode = $episodetextnum3;
@@ -431,6 +444,16 @@ sub ImportXML
       elsif( my( $actors6 ) = ($sentences[$i2] =~ /^I huvudrollerna\s*(.*)\./ ) )
       {
         $ce->{actors} = parse_person_list( $actors6 );
+        $sentences[$i2] = "";
+      }elsif( my( $original_titlerino, $counterino, $prodyerino, $dummerino ) = ($sentences[$i2] =~ /^(.*),\s+(.*),\s+(\d\d\d\d)(\.|)$/ ) )
+      {
+        # , The
+        if($original_titlerino =~ /, The$/) {
+          $original_titlerino =~ s/, The$//;
+          $original_titlerino = "The ".$original_titlerino;
+        }
+        $ce->{original_title} = norm($original_titlerino);
+        $ce->{production_date} = $prodyerino."-01-01";
         $sentences[$i2] = "";
       }
 
