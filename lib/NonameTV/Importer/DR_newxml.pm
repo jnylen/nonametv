@@ -16,7 +16,7 @@ use DateTime;
 use XML::LibXML;
 use Roman;
 
-use NonameTV qw/ParseXml AddCategory AddCountry norm/;
+use NonameTV qw/ParseXml AddCategory AddCountry norm ParseDescCatDan/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/w f p/;
 
@@ -146,27 +146,27 @@ sub ImportContent {
 
     $ce->{subtitle} = norm($subtitle) if norm($subtitle) ne "";
 
+    # Episode info in xmltv-format
+    if( ($episode ne "") and ( $of_episode ne "") ) {
+      $ce->{episode} = sprintf( ". %d/%d .", $episode-1, $of_episode );
+      $ce->{program_type} = "series";
+    } elsif( $episode ne "" ) {
+      $ce->{episode} = sprintf( ". %d .", $episode-1 );
+      $ce->{program_type} = "series";
+    }
+
     # Movie.
     if($ce->{title} =~ /^(Natbio|Filmperler|Fredagsfilm)\:/i) {
       $ce->{program_type} = "movie";
     }
 
     # Cleanup
+    $ce->{title} =~ s/\(G\)$//i;
   	$ce->{title} =~ s/Fredagsfilm: //i;
   	$ce->{title} =~ s/Dokumania: //i;
     $ce->{title} =~ s/Filmperler: //i;
     $ce->{title} =~ s/Natbio: //i;
     $ce->{title} = norm($ce->{title});
-
-    # Episode info in xmltv-format
-    if( ($episode ne "") and ( $of_episode ne "") )
-    {
-      $ce->{episode} = sprintf( ". %d/%d .", $episode-1, $of_episode );
-    }
-    elsif( $episode ne "" )
-    {
-      $ce->{episode} = sprintf( ". %d .", $episode-1 );
-    }
 
     # Country
     my($country2 ) = $ds->LookupCountry( "DR", norm($country) );
@@ -206,9 +206,13 @@ sub ImportContent {
     my($program_type, $category ) = $ds->LookupCat( 'DR', $genre );
 	  AddCategory( $ce, $program_type, $category );
 
+    ( $program_type, $category ) = ParseDescCatDan( $genretext );
+    AddCategory( $ce, $program_type, $category );
+
     ## Arrays
   	my @actors;
     my @directors;
+    my @writers;
 
     ## Split the text, add directors and more.
   	my @sentences = (split_text( $ce->{description} ), "");
@@ -243,7 +247,9 @@ sub ImportContent {
               $ce->{category} = undef;
             }
   				}
-  			} else {
+  			}elsif( $role =~ /Manuskript/i  ) {
+  				push @writers, $name;
+        } else {
   				push @actors, $name_new;
   			}
 
@@ -285,6 +291,12 @@ sub ImportContent {
     if( scalar( @directors ) > 0 )
     {
 		  $ce->{directors} = join ";", @directors;
+    }
+
+    # add writers
+    if( scalar( @writers ) > 0 )
+    {
+		  $ce->{writers} = join ";", @writers;
     }
 
     # DR fucks Family guy up and tags every episode as a movie, wtf?
