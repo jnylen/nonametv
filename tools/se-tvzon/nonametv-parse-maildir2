@@ -446,7 +446,7 @@ sub guess_channel
     #return "discovery.de" if $filename =~ /^dc/i;
  }
 
- if( $dir =~ /YFE/ and $filename =~ /\.xml$/i ) {
+ if( $dir =~ /YFE/ and $filename =~ /\.xls$/i ) {
     return "fixundfoxi.tv" if $filename =~ /Fix&Foxi/i;
     return "rictv.de" if $filename =~ /RiC/i;
  }
