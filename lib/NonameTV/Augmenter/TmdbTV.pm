@@ -8,7 +8,7 @@ use Encode;
 use utf8;
 use TMDB;
 
-use NonameTV qw/AddCategory AddCountry norm ParseXml/;
+use NonameTV qw/AddCategory AddCountry norm ParseXml remove_special_chars clean_subtitle/;
 use NonameTV::Augmenter::Base;
 use NonameTV::Config qw/ReadConfig/;
 use NonameTV::Log qw/w d/;
@@ -634,54 +634,6 @@ sub AugmentProgram( $$$ ){
 
 
   return( $resultref, $result );
-}
-
-# Make it easier to match the episode titles to each other
-# if there is no special chars.
-sub remove_special_chars
-{
-  my( $str ) = @_;
-
-  $str =~ s|\.||g; # remove dot
-  $str =~ s|\'||g;
-  $str =~ s|\,||g;
-  $str =~ s|\"||g;
-  $str =~ s|\!||g;
-  $str =~ s|\?||g;
-
-  return $str;
-}
-
-# Make it pretty so it looks like classics
-sub clean_subtitle
-{
-  my( $str ) = @_;
-
-  $str =~ s|\s+-\s+Teil\s+(\d+)$| ($1)|;   # _-_Teil_#
-  $str =~ s|\s+\/\s+Teil\s+(\d+)$| ($1)|;  # _/_Teil_#
-  $str =~ s|,\s+Teil\s+(\d+)$| ($1)|;      # ,_Teil #
-  $str =~ s|\s+Teil\s+(\d+)$| ($1)|;       # _Teil #
-  $str =~ s|\s+\(Teil\s+(\d+)\)$| ($1)|;   # _(Teil_#)
-  $str =~ s|\s+-\s+(\d+)\.\s+Teil$| ($1)|; # _-_#._Teil
-
-  $str =~ s|\s*\(Part\s+(\d+)\)$| ($1)|;   # _(Part_#) for Comedy Central Germany
-  $str =~ s|\s+-\s+\((\d+)\)$| ($1)|;      # _-_(#) for Comedy Central Germany
-  $str =~ s|\bPart\s+(\d+)$| ($1)|;        # ...Part_# for Comedy Central Germany
-
-  $str =~ s|\s*-\s+part\s+(\d+)$| ($1)|;   # _(Part_#) for Al Jazeera International
-
-  $str =~ s|\s+-\s+(\d+)$| ($1)|;          # _-_# for ORF
-
-  # Discovery
-  $str =~ s|\s+\s+| |;           # Two spaces to one space
-  $str =~ s|\s+-\s+\(| \(|;      # " - (" to " ("
-  $str =~ s|,\s+\(| \(|;         # ", (" to " ("
-  $str =~ s|\:\s+\(| \(|;        # ": (" to " ("
-
-  # " - - " to " - " for Eisenbahnromantik on SWR, maybe happens when shuffling title/subtitle around
-  $str =~ s|\s+-\s+-\s+| - |;
-
-  return $str;
 }
 
 1;
