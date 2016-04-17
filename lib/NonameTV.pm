@@ -33,6 +33,7 @@ BEGIN {
     		              FindParagraphs DOCXfile2Array
                       norm normLatin1 normUtf8 normUndef
                       AddCategory AddCountry
+                      ParseDescCatDan
                       ParseDescCatSwe FixProgrammeData
     		              ParseXml ParseXmltv ParseJson
                       MonthNumber DayNumber
@@ -582,6 +583,40 @@ sub ParseDescCatSwe
   return (undef, undef) if not defined $desc;
 
   my $res = $sm->Match( $desc );
+  if( defined( $res ) )
+  {
+    return @{$res};
+  }
+  else
+  {
+    return (undef,undef);
+  }
+}
+
+=item ParseDescCatDan
+
+Parse a program description in Swedish and return program_type
+and category that can be deduced from the description.
+
+  my( $pty, $cat ) = ParseDescCatDan( "Amerikansk dokumentarfilm fra 2004." );
+
+=cut
+
+my $dm = NonameTV::StringMatcher->new();
+$dm->AddRegexp( qr/dokumentarfilm/i,        [ 'movie', 'Documentary' ] );
+$dm->AddRegexp( qr/actionthriller/i,        [ 'movie', 'Action/Thriller' ] );
+$dm->AddRegexp( qr/psykologisk thriller/i,  [ 'movie', 'Thriller' ] );
+$dm->AddRegexp( qr/dokumentarserie/i,       [ 'series', 'Documentary' ] );
+$dm->AddRegexp( qr/dokumentarserie/i,       [ 'series', 'Documentary' ] );
+$sm->AddRegexp( qr/\bkomedie\b/i,           [ 'movie', "Comedy" ] );
+
+sub ParseDescCatDan
+{
+  my( $desc ) = @_;
+
+  return (undef, undef) if not defined $desc;
+
+  my $res = $dm->Match( $desc );
   if( defined( $res ) )
   {
     return @{$res};
