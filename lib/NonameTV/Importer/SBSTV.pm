@@ -224,6 +224,22 @@ sub ImportContent {
             $ce->{episode} = sprintf( " . %d .", $episode3-1 );
         }
 
+        # orgname - romanseason
+        if(!defined $original_title and $subtitle =~ /^(.*)\s+-\s+([IVX].*)$/) {
+            ( $original_title, $romanseason ) = ( $subtitle =~ /^(.*)\s+-\s+([IVX].*)$/ );
+        }
+
+        # title - romanseason
+        if($ce->{title} =~ /^(.*)\s+-\s+([IVX].*)$/) {
+            ( $titles, $romanseason ) = ( $ce->{title} =~ /^(.*)\s+-\s+([IVX].*)$/ );
+            $ce->{title} = $titles;
+
+            # MASH doesnt use season
+            if($titles eq "M.A.S.H.") {
+              $romanseason = undef;
+            }
+        }
+
         # Clean it up
         if(defined($romanseason)) {
             $romanseason =~ s/\(.*\)//g;
@@ -259,6 +275,11 @@ sub ImportContent {
     $subtitle =~ s|\bpt\s+(\d+)$| ($1)|;
     $subtitle =~ s|\((\d+)\:(\d+)\)$| ($1)|;
     $subtitle =~ s|\/pt(\d+)| ($1)|;
+    $subtitle =~ s|\bpt(\d+)$| ($1)|;
+    $subtitle =~ s|(.*), the$|The $1|i;
+    $subtitle =~ s|(.*), a$|A $1|i;
+    $subtitle =~ s|(.*),the$|The $1|i;
+    $subtitle =~ s|(.*),a$|A $1|i;
     $subtitle = norm($subtitle);
     $subtitle =~ s/ -$// if $subtitle;
     $subtitle =~ s/ b$// if $subtitle;
