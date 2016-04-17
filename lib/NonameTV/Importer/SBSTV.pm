@@ -66,6 +66,8 @@ sub FilterContent {
   my $self = shift;
   my( $cref, $chd ) = @_;
 
+  $$cref =~ s/<Copy>//g;
+
   my $doc = ParseXml( $cref );
 
   if( not defined $doc ) {
@@ -79,6 +81,14 @@ sub FilterContent {
 
   if( $ns->size() == 0 ) {
     return (undef, "No data found" );
+  }
+
+  # Remove all channels not with that channel
+  foreach my $b ($ns->get_nodelist) {
+    # Remove!
+    if($b->findvalue( "station" ) ne $grabber_info) {
+      $b->unbindNode;
+    }
   }
 
   my $str = $doc->toString(1);
@@ -132,18 +142,12 @@ sub ImportContent {
     my $rerun = $b->findvalue( "genudsendelse" );
 
   	if( $day ne $currdate ) {
+      #$dsh->StartBatch( $batch_id, $channel_id );
+      $dsh->StartDate( $day , "00:00" );
+      $currdate = $day;
 
-          #$dsh->StartBatch( $batch_id, $channel_id );
-          $dsh->StartDate( $day , "00:00" );
-          $currdate = $day;
-
-          progress("Date is $day");
+      progress("Date is $day");
     }
-
-  	# Skip if the channel_name aint right
-  	if($station ne $grabber_info) {
-  		next;
-  	}
 
   	my $title = $b->findvalue( "titel" );
 
@@ -220,6 +224,22 @@ sub ImportContent {
             $ce->{episode} = sprintf( " . %d .", $episode3-1 );
         }
 
+        # orgname - romanseason
+        if(!defined $original_title and $subtitle =~ /^(.*)\s+-\s+([IVX].*)$/) {
+            ( $original_title, $romanseason ) = ( $subtitle =~ /^(.*)\s+-\s+([IVX].*)$/ );
+        }
+
+        # title - romanseason
+        if($ce->{title} =~ /^(.*)\s+-\s+([IVX].*)$/) {
+            ( $titles, $romanseason ) = ( $ce->{title} =~ /^(.*)\s+-\s+([IVX].*)$/ );
+            $ce->{title} = $titles;
+
+            # MASH doesnt use season
+            if($titles eq "M.A.S.H.") {
+              $romanseason = undef;
+            }
+        }
+
         # Clean it up
         if(defined($romanseason)) {
             $romanseason =~ s/\(.*\)//g;
@@ -254,9 +274,16 @@ sub ImportContent {
     $subtitle =~ s/(\d\d\d\d\d\d)// if $subtitle;
     $subtitle =~ s|\bpt\s+(\d+)$| ($1)|;
     $subtitle =~ s|\((\d+)\:(\d+)\)$| ($1)|;
+    $subtitle =~ s|\/pt(\d+)| ($1)|;
+    $subtitle =~ s|\bpt(\d+)$| ($1)|;
+    $subtitle =~ s|(.*), the$|The $1|i;
+    $subtitle =~ s|(.*), a$|A $1|i;
+    $subtitle =~ s|(.*),the$|The $1|i;
+    $subtitle =~ s|(.*),a$|A $1|i;
     $subtitle = norm($subtitle);
     $subtitle =~ s/ -$// if $subtitle;
     $subtitle =~ s/ b$// if $subtitle;
+    $subtitle =~ s/EHDF// if $subtitle;
     $ce->{subtitle} = norm($subtitle) if $subtitle and $subtitle ne "" and $subtitle !~ /m2t$/i and $subtitle !~ /M2P$/i and $title ne "Homeshopping";
 
 
