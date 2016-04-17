@@ -184,7 +184,6 @@ sub ImportXML
   	  #AddCategory( $ce, $program_type, $category );
 
       # Season stuff
-
       my @sentences2 = (split_text( $genredesc ), "");
 
       for( my $i2=0; $i2<scalar(@sentences2); $i2++ )
@@ -200,14 +199,15 @@ sub ImportXML
 	      	$sentences2[$i2] = "";
 	      }
 	    }
-	    elsif( my( $seasontext ) = ($sentences2[$i2] =~ /^(.*) säsongen./ ) )
+  	    elsif( my( $seasontext ) = ($sentences2[$i2] =~ /\b(\S+)\b säsongen\.$/ ) )
 	    {
 	      $seasontext =~ s/ och sista//g;
 	      $seasontext = lc($seasontext);
+	      $seasontext = SeasonText($seasontext);
 
-	      $season = SeasonText($seasontext);
-
-	      #print("Text: $seasontext - Num: $season\n");
+        if($seasontext ne "") {
+          $season = $seasontext;
+        }
 
 	      # Only remove sentence if it could find a season
 	      if($season ne "") {
@@ -216,83 +216,84 @@ sub ImportXML
 	    }
 	 }
 
+   # Person
+   my @sentences = (split_text( $desc ), "");
 
-      # Person
-      my @sentences = (split_text( $desc ), "");
+   for( my $i=0; $i<scalar(@sentences); $i++ )
+   {
 
-      for( my $i=0; $i<scalar(@sentences); $i++ )
-  	  {
-        if( my( $originaltitle ) = ($sentences[$i] =~ /^\((.*)\)\.$/ ) )
-	    {
+     if( my( $originaltitle ) = ($sentences[$i] =~ /^\((.*)\)\.$/ ) )
+      {
           $ce->{original_title} = norm2($originaltitle) if norm2($originaltitle) ne $ce->{title};
           $sentences[$i] = "";
-	    }
-	    elsif( $sentences[$i] =~ /Del\s+\d+\.*/ )
-	    {
-	      # If this program has an episode-number, it is by definition
-		  # a series (?). Svt often miscategorize series as movie.
-		  $ce->{program_type} = 'series';
+      }
+      elsif( $sentences[$i] =~ /Del\s+\d+\.*/ )
+      {
+        # If this program has an episode-number, it is by definition
+        # a series (?). Svt often miscategorize series as movie.
+        $ce->{program_type} = 'series';
 
-	      my( $ep, $eps, $name, $episode, $dummy );
-	      # Del 2 av 3: Pilot (episodename)
-	 	  ( $ce->{subtitle} ) = ($sentences[$i] =~ /:\s*(.+)\./);
+        my( $ep, $eps, $name, $episode, $dummy );
+        # Del 2 av 3: Pilot (episodename)
+        ( $ce->{subtitle} ) = ($sentences[$i] =~ /:\s*(.+)\./);
 
-	 	  # norm2
-	 	  $ce->{subtitle} = norm2($ce->{subtitle});
+        # norm2
+        $ce->{subtitle} = norm2($ce->{subtitle});
 
-	 	  $sentences[$i] = "";
-	 	}
-  	  	elsif( my( $directors ) = ($sentences[$i] =~ /^Regi:\s*(.*)/) )
-    	{
-      		$ce->{directors} = parse_person_list( $directors );
-      		$sentences[$i] = "";
-    	}
-   		elsif( my( $actors ) = ($sentences[$i] =~ /^I rollerna:\s*(.*)/ ) )
-    	{
-      		$ce->{actors} = parse_person_list( $actors );
-      		$sentences[$i] = "";
-    	}
-    	elsif( my( $actors2 ) = ($sentences[$i] =~ /^Övriga\s+medverkande:\s*(.*)/ ) )
-    	{
-      		$ce->{actors} = parse_person_list( $actors2 );
-      		$sentences[$i] = "";
-    	}
-    	elsif( my( $actors3 ) = ($sentences[$i] =~ /^Medverkande:\s*(.*)/ ) )
+        $sentences[$i] = "";
+      }
+        elsif( my( $directors ) = ($sentences[$i] =~ /^Regi:\s*(.*)/) )
+      {
+          $ce->{directors} = parse_person_list( $directors );
+          $sentences[$i] = "";
+      }
+      elsif( my( $actors ) = ($sentences[$i] =~ /^I rollerna:\s*(.*)/ ) )
+      {
+          $ce->{actors} = parse_person_list( $actors );
+          $sentences[$i] = "";
+      }
+      elsif( my( $actors2 ) = ($sentences[$i] =~ /^Övriga\s+medverkande:\s*(.*)/ ) )
+      {
+          $ce->{actors} = parse_person_list( $actors2 );
+          $sentences[$i] = "";
+      }
+      elsif( my( $actors3 ) = ($sentences[$i] =~ /^Medverkande:\s*(.*)/ ) )
         {
             $ce->{actors} = parse_person_list( $actors3 );
             $sentences[$i] = "";
         }
-    	elsif( my( $commentators ) = ($sentences[$i] =~ /^Kommentator:\s*(.*)/ ) )
-    	{
-      		$ce->{commentators} = parse_person_list( $commentators );
-      		$sentences[$i] = "";
-    	}
-    	elsif( my( $commentators2 ) = ($sentences[$i] =~ /^Kommentatorer:\s*(.*)/ ) )
+      elsif( my( $commentators ) = ($sentences[$i] =~ /^Kommentator:\s*(.*)/ ) )
+      {
+          $ce->{commentators} = parse_person_list( $commentators );
+          $sentences[$i] = "";
+      }
+      elsif( my( $commentators2 ) = ($sentences[$i] =~ /^Kommentatorer:\s*(.*)/ ) )
         {
             $ce->{commentators} = parse_person_list( $commentators2 );
             $sentences[$i] = "";
         }
-    	elsif( my( $presenters ) = ($sentences[$i] =~ /^Programledare:\s*(.*)/ ) )
-    	{
-      		$ce->{presenters} = parse_person_list( $presenters );
-      		$sentences[$i] = "";
-    	}
-    	elsif( my( $guestartist ) = ($sentences[$i] =~ /^Gästartist:\s*(.*)/ ) )
-    	{
-      		$ce->{guests} = parse_person_list( $guestartist );
-      		$sentences[$i] = "";
-    	}
+      elsif( my( $presenters ) = ($sentences[$i] =~ /^Programledare:\s*(.*)/ ) )
+      {
+          $ce->{presenters} = parse_person_list( $presenters );
+          $sentences[$i] = "";
+      }
+      elsif( my( $guestartist ) = ($sentences[$i] =~ /^Gästartist:\s*(.*)/ ) )
+      {
+          $ce->{guests} = parse_person_list( $guestartist );
+          $sentences[$i] = "";
+      }
         elsif( my( $guests ) = ($sentences[$i] =~ /^Kvällens\s+gäster:\s*(.*)/ ) )
         {
             $ce->{guests} = parse_person_list( $guests );
             $sentences[$i] = "";
         }
-    	elsif( my( $guests2 ) = ($sentences[$i] =~ /^Gäster\s+ikväll:\s*(.*)/ ) )
+      elsif( my( $guests2 ) = ($sentences[$i] =~ /^Gäster\s+ikväll:\s*(.*)/ ) )
         {
             $ce->{guests} = parse_person_list( $guests2 );
             $sentences[$i] = "";
         }
-     }
+
+   }
 
       # Episode info in xmltv-format
       if( ($episode ne "0" and $episode ne "") and ( $of_episode ne "0" and $of_episode ne "") and ( $season ne "0" and $season ne "") )
