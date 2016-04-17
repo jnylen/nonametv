@@ -276,6 +276,8 @@ sub ImportContent {
     $subtitle =~ s|\((\d+)\:(\d+)\)$| ($1)|;
     $subtitle =~ s|\/pt(\d+)| ($1)|;
     $subtitle =~ s|\bpt(\d+)$| ($1)|;
+    $subtitle =~ s|\:\s+part\s+(\d+)$| ($1)|;
+    $subtitle =~ s|\s+part\s+(\d+)$| ($1)|;
     $subtitle =~ s|(.*), the$|The $1|i;
     $subtitle =~ s|(.*), a$|A $1|i;
     $subtitle =~ s|(.*),the$|The $1|i;
