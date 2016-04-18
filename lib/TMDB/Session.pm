@@ -214,6 +214,14 @@ sub _check_status {
 
         if ( $ok and $code and $message ) {
             carp sprintf( 'TMDB API Error (%s): %s', $code, $message );
+
+            # Error 25 is rate limit
+            if($code eq "25" or $code eq 25) {
+              # Sleep for x amount of seconds
+              # Travis: "We increased the rate limit to 40 requests every 10 seconds too, so there's a little bump."
+              carp("TMDB API RATE LIMIT: Sleeping for 10 seconds..");
+              sleep(10);
+            }
         }
     } ## end if ( $response->{content...})
 
