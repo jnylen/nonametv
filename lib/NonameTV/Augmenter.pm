@@ -79,7 +79,7 @@ use Data::Dumper;
 sub new( $$ ){
   my $class = ref( $_[0] ) || $_[0];
 
-  my $self = { }; 
+  my $self = { };
   bless $self, $class;
 
   $self->{datastore} = $_[1];
@@ -91,7 +91,7 @@ sub ReadLastUpdate( $ ){
   my $self = shift;
 
   my $ds = $self->{datastore};
- 
+
   my $last_update = $ds->sa->Lookup( 'state', { name => "augmenter_last_update" },
                                  'value' );
 
@@ -110,7 +110,7 @@ sub WriteLastUpdate( $$ ){
 
   my $ds = $self->{datastore};
 
-  $ds->sa->Update( 'state', { name => "augmenter_last_update" }, 
+  $ds->sa->Update( 'state', { name => "augmenter_last_update" },
                { value => $update_started } );
 }
 
@@ -244,10 +244,10 @@ sub AugmentBatch( $$ ) {
         SELECT p.* from programs p, batches b
         WHERE (p.batch_id = b.id)
           AND (b.name LIKE ?)
-        ORDER BY start_time asc, end_time desc", 
+        ORDER BY start_time asc, end_time desc",
   # name of batch to use for testing
       [$batchid] );
-  
+
   my $ce;
   while( defined( $ce = $sth->fetchrow_hashref() ) ) {
     # copy ruleset to working set
@@ -267,6 +267,11 @@ sub AugmentBatch( $$ ) {
       foreach( @rules ){
         my $score = 0;
         $_->{score} = undef;
+
+        # Episodeabs should not be above everything else.
+        if( defined( $_->{matchby} ) and $_->{matchby} eq "episodeabs" ) {
+          $score -= 2;
+        }
 
         # match by channel_id
         if( defined( $_->{channel_id} ) ) {

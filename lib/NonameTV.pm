@@ -116,6 +116,11 @@ sub clean_subtitle
   # " - - " to " - " for Eisenbahnromantik on SWR, maybe happens when shuffling title/subtitle around
   $str =~ s|\s+-\s+-\s+| - |;
 
+  # Fix errors
+  $str =~ s|(.*), The$|The $1|i;
+  $str =~ s|(.*), A$|A $1|i;
+  $str =~ s|(.*), An$|An $1|i;
+
   return $str;
 }
 

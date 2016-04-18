@@ -7,6 +7,7 @@ use Data::Dumper;
 use Encode;
 use utf8;
 use TMDB;
+use Text::LevenshteinXS qw(distance);
 
 use NonameTV qw/AddCategory AddCountry norm ParseXml remove_special_chars clean_subtitle/;
 use NonameTV::Augmenter::Base;
@@ -248,8 +249,8 @@ sub AugmentProgram( $$$ ){
     }
   } elsif( $ruleref->{matchby} eq 'episodeabsnoseason') {
     # WARNING: DONT USE THIS IF YOU ARENT SURE ITS ACTUALLY EPISODEABS, AS YOU ARE FUCKING EVERYTHING UP
-    my ($seasonxabs);
-    ( $seasonxabs, $episodeabs )=( $ceref->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
+    #my ($seasonxabs);
+    #( $seasonxabs, $episodeabs )=( $ceref->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
 
     $matchby = 'episodeabs';
   } else {
@@ -257,10 +258,11 @@ sub AugmentProgram( $$$ ){
   }
 
   # Match bys
-  if( $ceref->{url} && $ceref->{url} =~ m|^https://www\.themoviedb\.org/tv/\d+| ) {
-    $result = "programme is already linked to themoviedb.org, ignoring";
-    $resultref = undef;
-  } elsif( $matchby eq 'episodeabs' ) {
+  #if( $ceref->{url} && $ceref->{url} =~ m|^https://www\.themoviedb\.org/tv/\d+| ) {
+  #  $result = "programme is already linked to themoviedb.org, ignoring";
+  #  $resultref = undef;
+  #} els
+  if( $matchby eq 'episodeabs' ) {
     # match by absolute episode number from program hash. USE WITH CAUTION, NOT EVERYONE AGREES ON ANY ORDER!!!
 
     if( defined $ceref->{episode} ){
@@ -272,33 +274,7 @@ sub AugmentProgram( $$$ ){
       if( defined $episodeabs ){
         $episodeabs += 1;
 
-        my $series;
-        my @candidates;
-
-        # It have an series id, so you don't need to search
-        if( defined( $ruleref->{remoteref} ) ) {
-          $series = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
-        } else {
-          @candidates = $self->{search}->tv( $ceref->{title} );
-          my $resultnum = @candidates;
-
-          # Results?
-          if( $resultnum > 0 ) {
-            $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
-          }
-
-          # No data? Try the original title
-          if((!defined($resultnum) or $resultnum == 0) and (defined($ceref->{original_title}) and $ceref->{original_title} ne "")) {
-            @candidates = $self->{search}->tv( $ceref->{original_title} );
-            $resultnum = @candidates;
-
-            # Results?
-            if( $resultnum > 0 ) {
-              $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
-            }
-          }
-
-        }
+        my $series = $self->find_series($ceref, $ruleref);
 
         # Matched?
         if( (defined $series)){
@@ -374,46 +350,7 @@ sub AugmentProgram( $$$ ){
         $episode += 1;
         $season += 1;
 
-        my $series;
-        my @candidates;
-
-        # It have an series id, so you don't need to search
-        if( defined( $ruleref->{remoteref} ) ) {
-          $series = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
-        } elsif(defined($ceref->{extra_id_type}) and $ceref->{extra_id_type} eq "thetvdb") {
-          my @results = $self->{search}->find(
-              id     => $ceref->{extra_id},
-              source => 'tvdb_id'
-          )->{tv_results};
-          my $resultnum = @results;
-
-          # Results?
-          if( $resultnum > 0 ) {
-            $series = $self->{themoviedb}->tv( id => $results[0][0]->{id} )
-          } else {
-            w( "no series found with tvdb_id " . $ceref->{extra_id} . " - \"" . $ceref->{title} . "\"" );
-          }
-        } else {
-          @candidates = $self->{search}->tv( $ceref->{title} );
-          my $resultnum = @candidates;
-
-          # Results?
-          if( $resultnum > 0 ) {
-            $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
-          }
-
-          # No data? Try the original title
-          if((!defined($resultnum) or $resultnum == 0) and (defined($ceref->{original_title}) and $ceref->{original_title} ne "")) {
-            @candidates = $self->{search}->tv( $ceref->{original_title} );
-            $resultnum = @candidates;
-
-            # Results?
-            if( $resultnum > 0 ) {
-              $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
-            }
-          }
-
-        }
+        my $series = $self->find_series($ceref, $ruleref);
 
         # Matched?
         if( (defined $series)){
@@ -447,46 +384,7 @@ sub AugmentProgram( $$$ ){
         $episode += 1;
         $year += 1;
 
-        my $series;
-        my @candidates;
-
-        # It have an series id, so you don't need to search
-        if( defined( $ruleref->{remoteref} ) ) {
-          $series = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
-        } elsif(defined($ceref->{extra_id_type}) and $ceref->{extra_id_type} eq "thetvdb") {
-          my @results = $self->{search}->find(
-              id     => $ceref->{extra_id},
-              source => 'tvdb_id'
-          )->{tv_results};
-          my $resultnum = @results;
-
-          # Results?
-          if( $resultnum > 0 ) {
-            $series = $self->{themoviedb}->tv( id => $results[0][0]->{id} )
-          } else {
-            w( "no series found with tvdb_id " . $ceref->{extra_id} . " - \"" . $ceref->{title} . "\"" );
-          }
-        } else {
-          @candidates = $self->{search}->tv( $ceref->{title} );
-          my $resultnum = @candidates;
-
-          # Results?
-          if( $resultnum > 0 ) {
-            $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
-          }
-
-          # No data? Try the original title
-          if((!defined($resultnum) or $resultnum == 0) and (defined($ceref->{original_title}) and $ceref->{original_title} ne "")) {
-            @candidates = $self->{search}->tv( $ceref->{original_title} );
-            $resultnum = @candidates;
-
-            # Results?
-            if( $resultnum > 0 ) {
-              $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
-            }
-          }
-
-        }
+        my $series = $self->find_series($ceref, $ruleref);
 
         # Matched?
         if( (defined $series) and ($year ne "") and ($episode ne "")){
@@ -532,46 +430,8 @@ sub AugmentProgram( $$$ ){
     ## then the season one by one to get the titles.
 
     if( defined($ceref->{subtitle}) or defined($ceref->{original_subtitle}) ){
-      my $series;
-      my @candidates;
 
-      # It have an series id, so you don't need to search
-      if( defined( $ruleref->{remoteref} ) ) {
-        $series = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
-      } elsif(defined($ceref->{extra_id_type}) and $ceref->{extra_id_type} eq "thetvdb") {
-        my @results = $self->{search}->find(
-            id     => $ceref->{extra_id},
-            source => 'tvdb_id'
-        )->{tv_results};
-        my $resultnum = @results;
-
-        # Results?
-        if( $resultnum > 0 ) {
-          $series = $self->{themoviedb}->tv( id => $results[0][0]->{id} )
-        } else {
-          w( "no series found with tvdb_id " . $ceref->{extra_id} . " - \"" . $ceref->{title} . "\"" );
-        }
-      } else {
-        @candidates = $self->{search}->tv( $ceref->{title} );
-        my $resultnum = @candidates;
-
-        # Results?
-        if( $resultnum > 0 ) {
-          $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
-        }
-
-        # No data? Try the original title
-        if((!defined($resultnum) or $resultnum == 0) and (defined($ceref->{original_title}) and $ceref->{original_title} ne "")) {
-          @candidates = $self->{search}->tv( $ceref->{original_title} );
-          $resultnum = @candidates;
-
-          # Results?
-          if( $resultnum > 0 ) {
-            $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
-          }
-        }
-
-      }
+      my $series = $self->find_series($ceref, $ruleref);
 
       # Match shit
       if( (defined $series) ){
@@ -579,34 +439,11 @@ sub AugmentProgram( $$$ ){
         my $season = undef;
         my $episode = undef;
 
-        # Subtitles
-        my $subtitle = undef;
-        my $org_subtitle = undef;
-        if(defined $ceref->{subtitle}) {
-          $subtitle = remove_special_chars(clean_subtitle($ceref->{subtitle}));
-        }
-        if(defined $ceref->{original_subtitle}) {
-          $org_subtitle = remove_special_chars(clean_subtitle($ceref->{original_subtitle}));
-        }
-
-        # Each season check for eps
-        foreach my $seasons ( @{ $series->info->{seasons} } ){
-          my $episodes = $series->season($seasons->{season_number});
-
-          # Each episode
-          foreach my $eps ( @{ $episodes->{episodes} } ){
-            next if(!defined($eps->{name}) or $eps->{name} eq "");
-
-            # Check if it matches
-            next if(!(defined($subtitle) and lc $subtitle eq lc remove_special_chars($eps->{name})) and !(defined($org_subtitle) and lc $org_subtitle eq lc remove_special_chars($eps->{name})));
-
-            # it has found a match!
-            $season = $eps->{season_number};
-            $episode = $eps->{episode_number};
-            last; # So it doesn't keep running the foreach
-          }
-
-          last if(defined($season)); # Last here too.
+        # Find by episode title
+        my $eps = $self->find_episode_by_name($ceref, $ruleref, $series);
+        if(defined($eps)) {
+          $season = $eps->{season_number};
+          $episode = $eps->{episode_number};
         }
 
         # match
@@ -618,7 +455,13 @@ sub AugmentProgram( $$$ ){
           if( defined( $episode2 ) and !defined( $episode2->{status_code} ) ) {
             $self->FillHash( $resultref, $series, $episode2, $ceref );
           } else {
-            w( "episode not found by title nor org subtitle: " . $ceref->{title} . " - \"" . $subtitle . "\"" );
+            if(defined($ceref->{subtitle})) {
+              w( "episode not found by title nor org subtitle: " . $ceref->{title} . " - \"" . $ceref->{subtitle} . "\"" );
+            }
+
+            if(defined($ceref->{original_subtitle})) {
+              w( "episode not found by title nor org subtitle: " . $ceref->{title} . " - \"" . $ceref->{original_subtitle} . "\"" );
+            }
           }
         } else {
           w( "episode not found by title nor org subtitle: " . $ceref->{title} );
@@ -634,6 +477,104 @@ sub AugmentProgram( $$$ ){
 
 
   return( $resultref, $result );
+}
+
+# Find series
+sub find_series($$$ ) {
+  my( $self, $ceref, $ruleref )=@_;
+
+  my $series;
+  my @candidates;
+
+  # It have an series id, so you don't need to search
+  if( defined( $ruleref->{remoteref} ) ) {
+    $series = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
+  } elsif(defined($ceref->{extra_id_type}) and $ceref->{extra_id_type} eq "thetvdb") {
+    my @results = $self->{search}->find(
+        id     => $ceref->{extra_id},
+        source => 'tvdb_id'
+    )->{tv_results};
+    my $resultnum = @results;
+
+    # Results?
+    if( $resultnum > 0 ) {
+      $series = $self->{themoviedb}->tv( id => $results[0][0]->{id} )
+    } else {
+      w( "no series found with tvdb_id " . $ceref->{extra_id} . " - \"" . $ceref->{title} . "\"" );
+    }
+  } else {
+    @candidates = $self->{search}->tv( $ceref->{title} );
+    my $resultnum = @candidates;
+
+    # Results?
+    if( $resultnum > 0 ) {
+      $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
+    }
+
+    # No data? Try the original title
+    if((!defined($resultnum) or $resultnum == 0) and (defined($ceref->{original_title}) and $ceref->{original_title} ne "")) {
+      @candidates = $self->{search}->tv( $ceref->{original_title} );
+      $resultnum = @candidates;
+
+      # Results?
+      if( $resultnum > 0 ) {
+        $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
+      }
+    }
+
+  }
+
+  return $series;
+}
+
+# Find episode by name
+sub find_episode_by_name($$$$ ) {
+  my( $self, $ceref, $ruleref, $series )=@_;
+
+  my($season, $episode, $subtitle, $org_subtitle);
+
+  # Subtitles
+  if(defined $ceref->{subtitle}) {
+    $subtitle = lc(remove_special_chars(clean_subtitle($ceref->{subtitle})));
+  }
+  if(defined $ceref->{original_subtitle}) {
+    $org_subtitle = lc(remove_special_chars(clean_subtitle($ceref->{original_subtitle})));
+  }
+
+  # Each season check for eps
+  my $hitcount = 0;
+  my $hit;
+  foreach my $seasons ( @{ $series->info->{seasons} } ){
+    my $episodes = $series->season($seasons->{season_number});
+
+    # Each episode
+    foreach my $eps ( @{ $episodes->{episodes} } ){
+      next if(!defined($eps->{name}) or $eps->{name} eq "");
+      my $epsname = lc(remove_special_chars(clean_subtitle($eps->{name})));
+
+      # Match eps name
+      if( defined($subtitle) and distance( $epsname, $subtitle ) <= 2 ){
+ 				$hitcount ++;
+ 				$hit = $eps;
+        next;
+ 			}
+
+      # Match eps name
+      if( defined($org_subtitle) and distance( $epsname, $org_subtitle ) <= 2 ){
+ 				$hitcount ++;
+ 				$hit = $eps;
+        next;
+ 			}
+
+    }
+  }
+
+  # Return season and episode if found
+  if( $hitcount == 1){
+    return( $hit );
+  } else {
+    return undef;
+  }
 }
 
 1;
