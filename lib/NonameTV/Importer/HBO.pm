@@ -38,6 +38,8 @@ sub new {
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
   $self->{datastorehelper} = $dsh;
 
+  $self->{datastore}->{augment} = 1;
+
   return $self;
 }
 
@@ -118,6 +120,7 @@ sub ImportContent {
 
       my $title = $prg->findvalue( 'title' );
       next if not $title;
+      $title =~ s/\((.*?)\)$//;
 
       my $starttime = $prg->findvalue( 'start_time' );
       next if not $starttime;
@@ -129,6 +132,8 @@ sub ImportContent {
       my $channelid =     $prg->findvalue( 'channel_id' );
       my $category =      $prg->findvalue( 'content_type' );
       my $genre =         $prg->findvalue( 'primary_genre' );
+
+      my $imdbid = $prg->findvalue( './@imdb_id' );
 
       my $ce = {
         channel_id => $channel_id,
@@ -222,6 +227,12 @@ sub ImportContent {
       else
       {
         $ce->{new} = "1";
+      }
+
+      # IMDB ID
+      if(defined($imdbid) and $imdbid > 0) {
+        $ce->{extra_id} = "tt" . sprintf( "%07d", $imdbid );
+        $ce->{extra_id_type} = "imdb";
       }
 
       $dsh->AddProgramme( $ce );
