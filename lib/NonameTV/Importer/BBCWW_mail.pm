@@ -21,7 +21,6 @@ use DateTime;
 use XML::LibXML;
 use Spreadsheet::ParseExcel;
 use Data::Dumper;
-use Spreadsheet::Read;
 
 use Spreadsheet::XLSX;
 use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
@@ -138,7 +137,7 @@ sub ImportXLS
             $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /English Episode Title/ and not defined $columns{'Episode Title'} );
             $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(English\)/ and not defined $columns{'Episode Title'} );
             $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Title/ and not defined $columns{'Episode Title'} );
-          
+
             $columns{'Ser No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series No./ );
             $columns{'Ser No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series Number/ );
             $columns{'Ep No'}  = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode No./ );
@@ -207,11 +206,11 @@ sub ImportXLS
 		#	FlushDayData( $channel_xmltvid, $dsh , @ces );
 			$dsh->EndBatch( 1 );
         }
-      
+
       	my $batchid = $chd->{xmltvid} . "_" . $date;
         $dsh->StartBatch( $batchid , $chd->{id} );
         progress("BBCWW: $chd->{xmltvid}: Date is $date");
-        $dsh->StartDate( $date , "00:00" ); 
+        $dsh->StartDate( $date , "00:00" );
         $currdate = $date;
       }
 

@@ -18,11 +18,11 @@ use Carp qw/confess/;
 
 use NonameTV::Config qw/ReadConfig/;
 
-BEGIN 
+BEGIN
 {
   use Exporter   ();
   our (@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-  
+
   @ISA         = qw(Exporter);
   @EXPORT      = qw( );
   %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
@@ -30,7 +30,7 @@ BEGIN
                     d p w f
                     StartLogSection EndLogSection
                     SetVerbosity/;
-  
+
 }
 our @EXPORT_OK;
 
@@ -47,9 +47,9 @@ Logging is done at four different severities.
 
  Debug    - For debugging purposes
  Progress - Something has been updated.
- Warning  - Something unexpected has happened. 
-            Execution of this task continued anyway. 
- Fatal    - A fatal error has occured. 
+ Warning  - Something unexpected has happened.
+            Execution of this task continued anyway.
+ Fatal    - A fatal error has occured.
             Execution of this task will be aborted.
 
 The perl built-in "warn" is overridden by this module and will print a
@@ -77,7 +77,7 @@ message is prefixed with the severity and the current LogSection name.
 
 EndLogSection returns all messages with severity Warning and Fatal
 that have been issued since the matching call to StartLogSection. The
-messages are prefixed with the severity. 
+messages are prefixed with the severity.
 
 =cut
 
@@ -101,7 +101,7 @@ BEGIN {
   # warnings.
   binmode STDOUT, ":encoding(UTF8)";
   binmode STDERR, ":encoding(UTF8)";
-  
+
   my $conf = ReadConfig();
 
   $logfile = new IO::File "$conf->{LogFile}", O_WRONLY|O_APPEND|O_CREAT;
@@ -146,15 +146,15 @@ Print a log-message at severity Debug.
 
 Parameters:
 
-  $message - The message that shall be printed. 
+  $message - The message that shall be printed.
 
-Returns: 
+Returns:
 
 nothing
 
 =cut
 
-sub d #( $message ) 
+sub d #( $message )
 {
   my( $message ) = @_;
 
@@ -167,9 +167,9 @@ Print a log-message at severity Progress.
 
 Parameters:
 
-  $message - The message that shall be printed. 
+  $message - The message that shall be printed.
 
-Returns: 
+Returns:
 
 nothing
 
@@ -188,9 +188,9 @@ Print a log-message at severity Warning.
 
 Parameters:
 
-  $message - The message that shall be printed. 
+  $message - The message that shall be printed.
 
-Returns: 
+Returns:
 
 nothing
 
@@ -209,9 +209,9 @@ Print a log-message at severity Fatal.
 
 Parameters:
 
-  $message - The message that shall be printed. 
+  $message - The message that shall be printed.
 
-Returns: 
+Returns:
 
 nothing
 
@@ -242,7 +242,7 @@ sub writelog {
 
   # Print to STDERR if the verbosity level says so
   # or if the current logsection is not captured.
-  if( ($level >= $stderr_level) or 
+  if( ($level >= $stderr_level) or
       ($level >= WARNING and not $section[0][3]) ) {
     print STDERR "$levelstr: $pmessage\n";
   }
@@ -293,7 +293,7 @@ silences output that is captured elsewhere, i.e. in the database
 somewhere.
 
 =cut
- 
+
 sub SetVerbosity #( $verbose, $quiet )
 {
   my( $verbose, $quiet ) = @_;
@@ -321,10 +321,10 @@ sub SetVerbosity #( $verbose, $quiet )
   fatal errors in a section of code.
 
   Parameters:
-    
+
     $sectionname - A prefix that will be added to all messages.
-    $captured - False if warnings and fatal messages should be printed 
-                on STDERR even if the verbosity level is set to quiet. 
+    $captured - False if warnings and fatal messages should be printed
+                on STDERR even if the verbosity level is set to quiet.
                 True otherwise.
 
   Returns:
@@ -334,7 +334,7 @@ sub SetVerbosity #( $verbose, $quiet )
 This is for example used to catch
 log messages emitted for each batch in an importer.
 
- 
+
 >  StartLogSection( "batchname", 1 );
 >    (do stuff that may emit log messages)
 >  my( $messages, $highestpriority ) = EndLogSection( "batchname" );
@@ -343,7 +343,7 @@ log messages emitted for each batch in an importer.
 StartLogSection can be nested. An outer LogSection will NOT catch
 messages that are caught by the inner LogSection.
 
-=cut 
+=cut
 
 sub StartLogSection #( $sectionname, $captured )
 {
@@ -359,9 +359,9 @@ sub StartLogSection #( $sectionname, $captured )
 =begin nd
 
 Parameters:
-  $sectionname - Same name as in the matching call to StartLogSection. 
-    The name is only used to catch bugs where a call to StartLogSection 
-    is not followed by a matching call to EndLogSection. 
+  $sectionname - Same name as in the matching call to StartLogSection.
+    The name is only used to catch bugs where a call to StartLogSection
+    is not followed by a matching call to EndLogSection.
 
 Returns:
 
@@ -387,7 +387,7 @@ sub EndLogSection #( $sectionname )
       return $logstring;
     }
   }
-  else { 
+  else {
     confess "Mismatched LogSections, got $sectionname, expected $section[0][0]";
   }
 }
@@ -409,9 +409,9 @@ Print a log-message at severity Progress.
 
 Parameters:
 
-  $message - The message that shall be printed. 
+  $message - The message that shall be printed.
 
-Returns: 
+Returns:
 
 nothing
 
@@ -430,9 +430,9 @@ Print a log-message at severity Warning.
 
 Parameters:
 
-  $message - The message that shall be printed. 
+  $message - The message that shall be printed.
 
-Returns: 
+Returns:
 
 nothing
 

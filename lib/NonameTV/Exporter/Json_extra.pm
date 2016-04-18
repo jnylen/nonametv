@@ -644,17 +644,17 @@ sub WriteEntry
   	$d->{extra}->{type} = $entry->{extra_id_type};
   }
 
-    if( $entry->{url}) {
-        if( $entry->{url} =~ m|^http://thetvdb.com/| ){
-          ( $inetref )=( $entry->{url} =~ m|seriesid=(\d+)| );
-          $d->{extra}->{type} = 'thetvdb';
-          $d->{extra}->{id} = $inetref;
-        }elsif( $entry->{url} =~ m|^http://www.themoviedb.org/movie/| ){
-          ( $inetref )=( $entry->{url} =~ m|movie/(\d+)| );
-          $d->{extra}->{type} = 'themoviedb';
-          $d->{extra}->{id} = $inetref;
-        }
-	}
+  if( $entry->{url}) {
+      if( $entry->{url} =~ m|^http://thetvdb.com/| ){
+        ( $inetref )=( $entry->{url} =~ m|seriesid=(\d+)| );
+        $d->{extra}->{type} = 'thetvdb';
+        $d->{extra}->{id} = $inetref;
+      }elsif( $entry->{url} =~ m|^http://www.themoviedb.org/movie/| ){
+        ( $inetref )=( $entry->{url} =~ m|movie/(\d+)| );
+        $d->{extra}->{type} = 'themoviedb';
+        $d->{extra}->{id} = $inetref;
+      }
+  }
 
   if( $entry->{live} )
   {
