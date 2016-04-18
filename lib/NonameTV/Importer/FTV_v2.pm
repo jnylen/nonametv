@@ -234,8 +234,8 @@ sub ParseDate {
   } elsif( $text =~ /^\d{1,2}-\d{1,2}-\d{2}$/i ){
      ( $month, $day, $year ) = ( $text =~ /^(\d+)-(\d+)-(\d{2})$/i );
      # format '12-31-13'
-  } elsif( $text =~ /^(\d+)\/(\d+)\/(\d+)$/i ){
-    ( $month, $day, $year ) = ( $text =~ /^(\d+)\/(\d+)\/(\d{2})$/i );
+  } elsif( $text =~ /^\d{1,2}\/\d{1,2}\/\d{1,2}$/i ){
+    ( $day, $month, $year ) = ( $text =~ /^(\d+)\/(\d+)\/(\d{2})$/i );
   }
 
   $year += 2000 if $year < 100;
