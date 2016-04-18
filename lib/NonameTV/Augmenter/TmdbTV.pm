@@ -502,6 +502,19 @@ sub find_series($$$ ) {
     } else {
       w( "no series found with tvdb_id " . $ceref->{extra_id} . " - \"" . $ceref->{title} . "\"" );
     }
+  } elsif(defined($ceref->{extra_id_type}) and $ceref->{extra_id_type} eq "imdb") {
+    my @results = $self->{search}->find(
+        id     => $ceref->{extra_id},
+        source => 'imdb_id'
+    )->{tv_results};
+    my $resultnum = @results;
+
+    # Results?
+    if( $resultnum > 0 ) {
+      $series = $self->{themoviedb}->tv( id => $results[0][0]->{id} )
+    } else {
+      w( "no series found with imdb_id " . $ceref->{extra_id} . " - \"" . $ceref->{title} . "\"" );
+    }
   } else {
     @candidates = $self->{search}->tv( $ceref->{title} );
     my $resultnum = @candidates;

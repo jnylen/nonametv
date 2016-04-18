@@ -221,6 +221,21 @@ sub AugmentProgram( $$$ ){
     $resultref = undef;
   } elsif( $ruleref->{matchby} eq 'movieid' ) {
     $self->FillHash( $resultref, $ruleref->{remoteref}, $ceref );
+  } elsif( $ruleref->{matchby} eq 'imdbid' ) {
+    if(defined($ceref->{extra_id_type}) and $ceref->{extra_id_type} eq "imdb") {
+      my @results = $self->{search}->find(
+          id     => $ceref->{extra_id},
+          source => 'imdb_id'
+      )->{movie_results};
+      my $resultnum = @results;
+
+      # Results?
+      if( $resultnum > 0 ) {
+        $self->FillHash( $resultref, $results[0][0]->{id}, $ceref );
+      } else {
+        w( "no movie found with imdb_id " . $ceref->{extra_id} . " - \"" . $ceref->{title} . "\"" );
+      }
+    }
   } elsif( $ruleref->{matchby} eq 'titleonly' ) {
     my $searchTerm = $ceref->{title};
 
