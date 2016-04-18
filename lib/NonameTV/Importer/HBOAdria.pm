@@ -5,7 +5,7 @@ use warnings;
 
 =pod
 
-Importer for data from HBO Adria. 
+Importer for data from HBO Adria.
 One file per month downloaded from hbo.hr site.
 The downloaded file is in html-format.
 
