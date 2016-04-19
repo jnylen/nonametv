@@ -183,7 +183,6 @@ sub ImportXML
       title => norm($title),
       start_time => $start->ymd("-") . " " . $start->hms(":"),
       end_time   => $end->ymd("-")   . " " . $end->hms(":"),
-      description => norm($desc),
     };
 
     if($year =~ /(\d\d\d\d)/ )
@@ -254,7 +253,7 @@ sub ImportXML
     }
 
     # End of transmission
-    if( ($ce->{description} eq "Sendepause") )
+    if( (norm($desc) eq "Sendepause") )
     {
       $ce->{title} = "end-of-transmission";
     }
