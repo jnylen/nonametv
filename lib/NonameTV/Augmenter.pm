@@ -269,7 +269,7 @@ sub AugmentBatch( $$ ) {
         $_->{score} = undef;
 
         # Episodeabs should not be above everything else.
-        if( defined( $_->{matchby} ) and $_->{matchby} eq "episodeabs" ) {
+        if( defined( $_->{matchby} ) and !defined($_->{remoteref}) and $_->{matchby} eq "episodeabs" ) {
           $score -= 2;
         }
 
