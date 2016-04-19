@@ -258,11 +258,10 @@ sub AugmentProgram( $$$ ){
   }
 
   # Match bys
-  #if( $ceref->{url} && $ceref->{url} =~ m|^https://www\.themoviedb\.org/tv/\d+| ) {
-  #  $result = "programme is already linked to themoviedb.org, ignoring";
-  #  $resultref = undef;
-  #} els
-  if( $matchby eq 'episodeabs' ) {
+  if( $ceref->{url} && $ceref->{url} =~ m|^https://www\.themoviedb\.org/tv/\d+| ) {
+    $result = "programme is already linked to themoviedb.org, ignoring";
+    $resultref = undef;
+  } elsif( $matchby eq 'episodeabs' ) {
     # match by absolute episode number from program hash. USE WITH CAUTION, NOT EVERYONE AGREES ON ANY ORDER!!!
 
     if( defined $ceref->{episode} ){
