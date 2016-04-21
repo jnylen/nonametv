@@ -169,8 +169,10 @@ sub ImportXLS
       # Org Title
       $ce->{original_title} = clean_subtitle(norm($oWkS->{Cells}[$iR][$columns{'ORGTitle'}]->Value)) if defined($columns{'ORGTitle'}) and $oWkS->{Cells}[$iR][$columns{'ORGTitle'}];
 
-      # Prod year
-      #$ce->{production_date} = $year."-01-01" if defined($year) and $year ne "" and $year ne "0000";
+      # year
+      if(defined($year) and $year =~ /\((\d\d\d\d)\)/) {
+        $ce->{production_date} = "$1-01-01";
+      }
 
       # Episode
       if( $epino ){
