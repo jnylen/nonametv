@@ -83,6 +83,7 @@ sub ImportContent {
     my $season = $b->findvalue( "PROGRAMME[1]/SERIES_NUMBER" );
     my $episode = $b->findvalue( "PROGRAMME[1]/EPISODE_NUMBER" );
     my $desc = $b->findvalue( "PROGRAMME[1]/TEXT[1]/TEXT_TEXT" );
+    my $year = $b->findvalue( "PROGRAMME[1]/PROGRAMME_YEAR" );
 
     my $ce = {
       channel_id => $chd->{id},
@@ -105,6 +106,11 @@ sub ImportContent {
       {
         $ce->{episode} = sprintf( ". %d .", $episode-1 );
       }
+    }
+
+    # year
+    if(defined($year) and $year =~ /\((\d\d\d\d)\)/) {
+      $ce->{production_date} = "$1-01-01";
     }
 
     p($start." $ce->{title}");
