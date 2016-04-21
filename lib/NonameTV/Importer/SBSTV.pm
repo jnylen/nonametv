@@ -292,7 +292,7 @@ sub ImportContent {
     progress("$day $start - $titles");
 
     # Director (only movies)
-    my ( $duimmerino, $dir ) = ( $desc =~ /Instr(\.\:|\.|\:)\s+(.*)./ );
+    my ( $duimmerino, $dir ) = ( $desc =~ /Instr(\.\:|\.|\:)\s+(.*?)./ );
     if(defined($dir) and $dir ne "") {
     	$ce->{directors} = norm($dir);
     	$ce->{program_type} = 'movie';
