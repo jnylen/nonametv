@@ -484,59 +484,200 @@ sub find_series($$$ ) {
 
   my $series;
   my @candidates;
+  my @results;
+  my @ids = ();
+  my @keep = ();
+  my $candidate;
 
   # It have an series id, so you don't need to search
   if( defined( $ruleref->{remoteref} ) ) {
-    $series = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
+    return $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
   } elsif(defined($ceref->{extra_id_type}) and $ceref->{extra_id_type} eq "thetvdb") {
-    my @results = $self->{search}->find(
+    @results = @{$self->{search}->find(
         id     => $ceref->{extra_id},
         source => 'tvdb_id'
-    )->{tv_results};
+    )->{tv_results}};
     my $resultnum = @results;
 
     # Results?
     if( $resultnum > 0 ) {
-      $series = $self->{themoviedb}->tv( id => $results[0][0]->{id} )
+      return $self->{themoviedb}->tv( id => $results[0]->{id} );
     } else {
       w( "no series found with tvdb_id " . $ceref->{extra_id} . " - \"" . $ceref->{title} . "\"" );
     }
   } elsif(defined($ceref->{extra_id_type}) and $ceref->{extra_id_type} eq "imdb") {
-    my @results = $self->{search}->find(
+    @results = @{$self->{search}->find(
         id     => $ceref->{extra_id},
         source => 'imdb_id'
-    )->{tv_results};
+    )->{tv_results}};
     my $resultnum = @results;
 
     # Results?
     if( $resultnum > 0 ) {
-      $series = $self->{themoviedb}->tv( id => $results[0][0]->{id} )
+      return $self->{themoviedb}->tv( id => $results[0]->{id} );
     } else {
       w( "no series found with imdb_id " . $ceref->{extra_id} . " - \"" . $ceref->{title} . "\"" );
     }
   } else {
     @candidates = $self->{search}->tv( $ceref->{title} );
-    my $resultnum = @candidates;
-
-    # Results?
-    if( $resultnum > 0 ) {
-      $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
+    foreach my $c ( @candidates ){
+      if( defined( $c->{id} ) ) {
+        push( @ids, $c->{id} );
+      }
     }
 
-    # No data? Try the original title
-    if((!defined($resultnum) or $resultnum == 0) and (defined($ceref->{original_title}) and $ceref->{original_title} ne "")) {
-      @candidates = $self->{search}->tv( $ceref->{original_title} );
-      $resultnum = @candidates;
 
-      # Results?
-      if( $resultnum > 0 ) {
-        $series = $self->{themoviedb}->tv( id => $candidates[0]->{id} )
+    # No data? Try the original title
+    if(defined $ceref->{original_title} and $ceref->{original_title} ne "" and $ceref->{original_title} ne $ceref->{title}) {
+      my @org_candidates = $self->{search}->tv( $ceref->{original_title} );
+
+      foreach my $c2 ( @org_candidates ){
+        # It can't be added already
+        if ( !(grep $_ eq $c2->{id}, @ids) ) {
+          push( @candidates, $c2 );
+        }
       }
+    }
+
+    # no results?
+    my $numResult = @candidates;
+
+    if( $numResult < 1 ){
+      return undef;
+    }
+
+    # need to be the correct country if available
+    if( $ceref->{country} and $ceref->{country} ne "" ) {
+      my( @countries ) = split("/", $ceref->{country});
+
+      while( @candidates ) {
+        $candidate = shift( @candidates );
+        next if(scalar(@{$candidate->{origin_country}}) < 1);
+
+        foreach my $contri (@countries) {
+          # Matched!
+          if ( grep $_ eq $contri, @{$candidate->{origin_country}} ) {
+            push( @keep, $candidate );
+            last;
+          }
+        }
+      }
+
+      @candidates = @keep;
+      @keep = ();
+    }
+
+    # need to be the correct year if available
+    if( $ceref->{production_date} and $ceref->{production_date} ne "" ) {
+      my( $produced )=( $ceref->{production_date} =~ m|^(\d{4})\-\d+\-\d+$| );
+      while( @candidates ) {
+        $candidate = shift( @candidates );
+
+        # verify that production and release year are close
+        my $released = $candidate->{ first_air_date };
+        $released =~ s|^(\d{4})\-\d+\-\d+$|$1|;
+
+        # released
+        if( !$released ){
+          my $url = 'http://www.themoviedb.org/tv/' . $candidate->{ id };
+          w( "year of release not on record, removing candidate. Add it at $url." );
+        } elsif( $released >= ($produced+2) ){
+          # Sometimes the produced year is actually the produced year.
+          d( "first aired of the series '$released' is later than the produced '$produced'" );
+        } else {
+          push( @keep, $candidate );
+        }
+
+      }
+
+      @candidates = @keep;
+      @keep = ();
+    }
+
+    # Still more than x amount in array then try to get the correct show based on title or org title
+    if(scalar(@candidates) > 1) {
+      while( @candidates ) {
+        $candidate = shift( @candidates );
+
+        # So shit doesn't get added TWICE
+        my $match = 0;
+
+        # Title matched?
+        if(distance( lc(remove_special_chars($ceref->{title})), lc(remove_special_chars($candidate->{name})) ) <= 2) {
+          push( @keep, $candidate );
+          $match = 1;
+        }
+
+        if(!$match and distance( lc(remove_special_chars($ceref->{title})), lc(remove_special_chars($candidate->{original_name})) ) <= 2) {
+          push( @keep, $candidate );
+          $match = 1;
+        }
+
+        if(!$match and defined($ceref->{original_title}) and distance( lc(remove_special_chars($ceref->{original_title})), lc(remove_special_chars($candidate->{name})) ) <= 2) {
+
+          $match = 1;
+        }
+
+        if(!$match and defined($ceref->{original_title}) and distance( lc(remove_special_chars($ceref->{original_title})), lc(remove_special_chars($candidate->{original_name})) ) <= 2) {
+
+          $match = 1;
+        }
+      }
+
+      @candidates = @keep;
+      @keep = ();
+    }
+
+    # Still more than one result?
+    # Check more strictly on the first year
+    if(scalar(@candidates) > 1 and $ceref->{production_date} and $ceref->{production_date} ne "") {
+      my( $produced )=( $ceref->{production_date} =~ m|^(\d{4})\-\d+\-\d+$| );
+      while( @candidates ) {
+        $candidate = shift( @candidates );
+
+        # verify that production and release year are close
+        my $released2 = $candidate->{ first_air_date };
+        $released2 =~ s|^(\d{4})\-\d+\-\d+$|$1|;
+
+        # released
+        if( !$released2 ){
+          my $url = 'http://www.themoviedb.org/tv/' . $candidate->{ id };
+          w( "year of release not on record, removing candidate. Add it at $url." );
+        } elsif( abs( $released2 - $produced ) > 2 ){
+          # Sometimes the produced year is actually the produced year.
+          d( "year of production '$produced' to far away from year of first aired '$released2', removing candidate" );
+        } else {
+          push( @keep, $candidate );
+        }
+
+      }
+
+      @candidates = @keep;
+      @keep = ();
+    }
+
+    # Matches
+    if( ( @candidates == 0 ) || ( @candidates > 1 ) ){
+      my $warning = 'search for "' . $ceref->{title} . '"';
+      if( $ceref->{production_date} ){
+        $warning .= ' from ' . $ceref->{production_date} . '';
+      }
+      if( $ceref->{countries} ){
+        $warning .= ' in "' . $ceref->{countries} . '"';
+      }
+      if( @candidates == 0 ) {
+        $warning .= ' did not return any good hit, ignoring';
+      } else {
+        $warning .= ' did not return a single best hit, ignoring';
+      }
+      w( $warning );
+    } else {
+      return $self->{themoviedb}->tv( id => $candidates[0]->{id} );
     }
 
   }
 
-  return $series;
+  return undef;
 }
 
 # Find episode by name
