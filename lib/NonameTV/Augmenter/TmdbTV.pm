@@ -9,7 +9,7 @@ use utf8;
 use TMDB;
 use Text::LevenshteinXS qw(distance);
 
-use NonameTV qw/AddCategory AddCountry norm ParseXml remove_special_chars clean_subtitle/;
+use NonameTV qw/AddCategory AddCountry norm ParseXml RemoveSpecialChars CleanSubtitle/;
 use NonameTV::Augmenter::Base;
 use NonameTV::Config qw/ReadConfig/;
 use NonameTV::Log qw/w d/;
@@ -603,22 +603,22 @@ sub find_series($$$ ) {
         my $match = 0;
 
         # Title matched?
-        if(distance( lc(remove_special_chars($ceref->{title})), lc(remove_special_chars($candidate->{name})) ) <= 2) {
+        if(distance( lc(RemoveSpecialChars($ceref->{title})), lc(RemoveSpecialChars($candidate->{name})) ) <= 2) {
           push( @keep, $candidate );
           $match = 1;
         }
 
-        if(!$match and distance( lc(remove_special_chars($ceref->{title})), lc(remove_special_chars($candidate->{original_name})) ) <= 2) {
+        if(!$match and distance( lc(RemoveSpecialChars($ceref->{title})), lc(RemoveSpecialChars($candidate->{original_name})) ) <= 2) {
           push( @keep, $candidate );
           $match = 1;
         }
 
-        if(!$match and defined($ceref->{original_title}) and distance( lc(remove_special_chars($ceref->{original_title})), lc(remove_special_chars($candidate->{name})) ) <= 2) {
+        if(!$match and defined($ceref->{original_title}) and distance( lc(RemoveSpecialChars($ceref->{original_title})), lc(RemoveSpecialChars($candidate->{name})) ) <= 2) {
 
           $match = 1;
         }
 
-        if(!$match and defined($ceref->{original_title}) and distance( lc(remove_special_chars($ceref->{original_title})), lc(remove_special_chars($candidate->{original_name})) ) <= 2) {
+        if(!$match and defined($ceref->{original_title}) and distance( lc(RemoveSpecialChars($ceref->{original_title})), lc(RemoveSpecialChars($candidate->{original_name})) ) <= 2) {
 
           $match = 1;
         }
@@ -688,10 +688,10 @@ sub find_episode_by_name($$$$ ) {
 
   # Subtitles
   if(defined $ceref->{subtitle}) {
-    $subtitle = lc(remove_special_chars(clean_subtitle($ceref->{subtitle})));
+    $subtitle = lc(RemoveSpecialChars(CleanSubtitle($ceref->{subtitle})));
   }
   if(defined $ceref->{original_subtitle}) {
-    $org_subtitle = lc(remove_special_chars(clean_subtitle($ceref->{original_subtitle})));
+    $org_subtitle = lc(RemoveSpecialChars(CleanSubtitle($ceref->{original_subtitle})));
   }
 
   # Each season check for eps
@@ -703,7 +703,7 @@ sub find_episode_by_name($$$$ ) {
     # Each episode
     foreach my $eps ( @{ $episodes->{episodes} } ){
       next if(!defined($eps->{name}) or $eps->{name} eq "");
-      my $epsname = lc(remove_special_chars(clean_subtitle($eps->{name})));
+      my $epsname = lc(RemoveSpecialChars(CleanSubtitle($eps->{name})));
 
       # Match eps name
       if( defined($subtitle) and distance( $epsname, $subtitle ) <= 2 ){

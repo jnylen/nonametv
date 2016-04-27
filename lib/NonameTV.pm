@@ -6,6 +6,7 @@ use warnings;
 # Mark this source-file as encoded in utf-8.
 use utf8;
 use Env;
+use Data::Dumper;
 
 use Encode;
 use File::Slurp;
@@ -26,7 +27,7 @@ BEGIN {
     @ISA         = qw(Exporter);
     @EXPORT      = qw( );
     %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
-    @EXPORT_OK   = qw/MyGet expand_entities
+    @EXPORT_OK   = qw/MyGet MyPost expand_entities
                       Html2Xml Htmlfile2Xml
                       Word2Xml Wordfile2Xml
     		              File2Xml Content2Xml
@@ -38,7 +39,7 @@ BEGIN {
     		              ParseXml ParseXmltv ParseJson
                       MonthNumber DayNumber
                       CompareArrays
-                      remove_special_chars clean_subtitle
+                      RemoveSpecialChars CleanSubtitle FixSubtitle
                      /;
 }
 our @EXPORT_OK;
@@ -71,9 +72,27 @@ sub MyGet
   }
 }
 
+sub MyPost
+{
+  my( $url, $form ) = @_;
+  my $res = $ua->post( $url, $form );
+  #$res->content( format => 'text' );
+
+  print Dumper($res->{_headers});
+
+  if( $res->is_success )
+  {
+    return ($res->content, not defined( $res->header( 'X-Content-Unchanged' ) ) );
+  }
+  else
+  {
+    return (undef, $res->status_line );
+  }
+}
+
 # Make it easier to match the episode titles to each other
 # if there is no special chars.
-sub remove_special_chars
+sub RemoveSpecialChars
 {
   my( $str ) = @_;
 
@@ -84,28 +103,54 @@ sub remove_special_chars
   $str =~ s|\!||g;
   $str =~ s|\?||g;
 
+  # Fix errors
+  $str =~ s|(.*), The$|The $1|i;
+  $str =~ s|(.*), A$|A $1|i;
+  $str =~ s|(.*), An$|An $1|i;
+
+  return $str;
+}
+
+sub FixSubtitle
+{
+  my( $str ) = @_;
+
+  # Fix errors
+  $str =~ s|(.*), The$|The $1|i;
+  $str =~ s|(.*), A$|A $1|i;
+  $str =~ s|(.*), An$|An $1|i;
+  $str =~ s|\.$||i;
+  $str =~ s|\-$||i;
+  $str =~ s|\,$||i;
+
   return $str;
 }
 
 # Make it pretty so it looks like classics
-sub clean_subtitle
+sub CleanSubtitle
 {
   my( $str ) = @_;
 
-  $str =~ s|\s+-\s+Teil\s+(\d+)$| ($1)|;   # _-_Teil_#
-  $str =~ s|\s+\/\s+Teil\s+(\d+)$| ($1)|;  # _/_Teil_#
-  $str =~ s|,\s+Teil\s+(\d+)$| ($1)|;      # ,_Teil #
-  $str =~ s|\s+Teil\s+(\d+)$| ($1)|;       # _Teil #
-  $str =~ s|\s+\(Teil\s+(\d+)\)$| ($1)|;   # _(Teil_#)
-  $str =~ s|\s+-\s+(\d+)\.\s+Teil$| ($1)|; # _-_#._Teil
+  $str =~ s|\s+-\s+Teil\s+(\d+)$| ($1)|i;   # _-_Teil_#
+  $str =~ s|\s+\/\s+Teil\s+(\d+)$| ($1)|i;  # _/_Teil_#
+  $str =~ s|,\s+Teil\s+(\d+)$| ($1)|i;      # ,_Teil #
+  $str =~ s|\s+Teil\s+(\d+)$| ($1)|i;       # _Teil #
+  $str =~ s|\s+\(Teil\s+(\d+)\)$| ($1)|i;   # _(Teil_#)
+  $str =~ s|\s+-\s+(\d+)\.\s+Teil$| ($1)|i; # _-_#._Teil
 
-  $str =~ s|\s*\(Part\s+(\d+)\)$| ($1)|;   # _(Part_#) for Comedy Central Germany
+  $str =~ s|\s*\(Part\s+(\d+)\)$| ($1)|i;   # _(Part_#) for Comedy Central Germany
   $str =~ s|\s+-\s+\((\d+)\)$| ($1)|;      # _-_(#) for Comedy Central Germany
-  $str =~ s|\bPart\s+(\d+)$| ($1)|;        # ...Part_# for Comedy Central Germany
+  $str =~ s|\bPart\s+(\d+)$| ($1)|i;        # ...Part_# for Comedy Central Germany
 
   $str =~ s|\s*-\s+part\s+(\d+)$| ($1)|;   # _(Part_#) for Al Jazeera International
 
   $str =~ s|\s+-\s+(\d+)$| ($1)|;          # _-_# for ORF
+
+  $str =~ s/- Part One/\(1\)/i;
+  $str =~ s/- Part Two/\(2\)/i;
+  $str =~ s/, Part One/ \(1\)/i;
+  $str =~ s/, Part Two/ \(2\)/i;
+  $str =~ s|, Part (\d+)| ($1)|i;
 
   # Discovery
   $str =~ s|\s+\s+| |;           # Two spaces to one space
@@ -115,11 +160,6 @@ sub clean_subtitle
 
   # " - - " to " - " for Eisenbahnromantik on SWR, maybe happens when shuffling title/subtitle around
   $str =~ s|\s+-\s+-\s+| - |;
-
-  # Fix errors
-  $str =~ s|(.*), The$|The $1|i;
-  $str =~ s|(.*), A$|A $1|i;
-  $str =~ s|(.*), An$|An $1|i;
 
   return $str;
 }

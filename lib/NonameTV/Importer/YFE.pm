@@ -20,7 +20,7 @@ use Spreadsheet::XLSX;
 use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
 use Spreadsheet::Read;
 
-use NonameTV qw/norm AddCategory AddCountry clean_subtitle/;
+use NonameTV qw/norm AddCategory AddCountry CleanSubtitle/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error d p w f/;
 use NonameTV::Config qw/ReadConfig/;
@@ -164,10 +164,10 @@ sub ImportXLS
       my $year = $oWkS->{Cells}[$iR][$columns{'ProdYear'}]->Value if $oWkS->{Cells}[$iR][$columns{'ProdYear'}];
       my $genre = $oWkS->{Cells}[$iR][$columns{'Genre'}]->Value if $oWkS->{Cells}[$iR][$columns{'Genre'}];
       my $countrie = $oWkS->{Cells}[$iR][$columns{'ProdCountry'}]->Value if $oWkS->{Cells}[$iR][$columns{'ProdCountry'}];
-      $ce->{subtitle} = clean_subtitle(norm($oWkS->{Cells}[$iR][$columns{'EpTitle'}]->Value)) if $oWkS->{Cells}[$iR][$columns{'EpTitle'}];
+      $ce->{subtitle} = CleanSubtitle(norm($oWkS->{Cells}[$iR][$columns{'EpTitle'}]->Value)) if $oWkS->{Cells}[$iR][$columns{'EpTitle'}];
 
       # Org Title
-      $ce->{original_title} = clean_subtitle(norm($oWkS->{Cells}[$iR][$columns{'ORGTitle'}]->Value)) if defined($columns{'ORGTitle'}) and $oWkS->{Cells}[$iR][$columns{'ORGTitle'}];
+      $ce->{original_title} = CleanSubtitle(norm($oWkS->{Cells}[$iR][$columns{'ORGTitle'}]->Value)) if defined($columns{'ORGTitle'}) and $oWkS->{Cells}[$iR][$columns{'ORGTitle'}];
 
       # year
       if(defined($year) and $year =~ /\((\d\d\d\d)\)/) {
