@@ -150,6 +150,17 @@ sub AugmentProgram( $$$ ){
     $resultref->{'title'} = norm($resultref->{'title'});
     $resultref->{'subtitle'} = undef;
     $resultref->{'program_type'} = $ruleref->{remoteref};
+  }elsif( $ruleref->{matchby} eq 'subtitle_to_title' && $ceref->{'subtitle'} && $ceref->{'subtitle'} ne "") {
+    # Sets subtitle as the title and sets program type = series
+    $resultref->{'title'} = norm($ceref->{'subtitle'});
+    $resultref->{'subtitle'} = norm($ceref->{'title'});
+    $resultref->{'program_type'} = "series";
+  }elsif( $ruleref->{matchby} eq 'orgtitle_to_title' && $ceref->{'original_title'} && $ceref->{'original_title'} ne "") {
+    # Sets orgtitle as the title and sets program type = series
+    $resultref->{'title'} = norm($ceref->{'original_title'});
+    $resultref->{'original_title'} = undef;
+    $resultref->{'subtitle'} = norm($ceref->{'title'});
+    $resultref->{'program_type'} = "series";
   }elsif( $ruleref->{matchby} eq 'replacesubtitle' ) {
     $resultref->{'subtitle'} = $ruleref->{remoteref};
   }elsif( $ruleref->{matchby} eq 'setdescassubtitle' ) {

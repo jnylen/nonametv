@@ -166,6 +166,8 @@ sub ImportContent {
   	$ce->{title} =~ s/Dokumania: //i;
     $ce->{title} =~ s/Filmperler: //i;
     $ce->{title} =~ s/Natbio: //i;
+    $ce->{title} =~ s/Dokland: //i;
+    $ce->{title} =~ s/\.$//i;
     $ce->{title} = norm($ce->{title});
 
     # Country
@@ -315,7 +317,7 @@ sub ImportContent {
       $ce->{original_title} = norm($title_alt) if defined($title_alt) and $ce->{title} ne norm($title_alt) and norm($title_alt) ne "";
     }
 
-    $ce->{title} = "end-of-transmission" if $ce->{title} =~ /^Udsendelsesoph.*r$/i;
+    $ce->{title} = "end-of-transmission" if $ce->{title} =~ /^Udsendelsesoph.*r/i;
     $ce->{category} = "Movies" if defined($ce->{program_type}) and $ce->{program_type} eq "movie" and (defined($ce->{category}) and $ce->{category} eq "Series");
 
 	  p($start." $ce->{title}");

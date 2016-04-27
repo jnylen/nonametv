@@ -18,7 +18,7 @@ use XML::LibXML;
 use Roman;
 use Data::Dumper;
 
-use NonameTV qw/MyGet norm ParseDescCatSwe AddCategory FixProgrammeData/;
+use NonameTV qw/MyGet norm ParseDescCatSwe AddCategory FixProgrammeData FixSubtitle CleanSubtitle/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 
@@ -93,18 +93,23 @@ sub ImportContent
     error( "$batch_id: Failed to parse: $@" );
     return 0;
   }
-    # the grabber_data should point exactly to one worksheet
-    my $rows = $doc->findnodes( ".//programs/program" );
 
-    if( $rows->size() == 0 ) {
-      error( "TV2 Denmark: $chd->{xmltvid}: No Rows found" ) ;
-      return 0;
-    }
+  # XPC
+  my $xpc = XML::LibXML::XPathContext->new( );
+  my $ns = $xpc->findnodes( './/programs/program', $doc );
+  if( $ns->size() == 0 ) {
+    error ("TV2 Denmark: $chd->{xmltvid}: No data found");
+    return 0;
+  }
 
-	#$ds->StartBatch($batch_id);
+  # Sort by start
+  sub by_start {
+    return $xpc->findvalue('time', $a) cmp $xpc->findvalue('time', $b);
+  }
 
-  foreach my $pgm ($rows->get_nodelist)
-  {
+  foreach my $pgm (sort by_start $ns->get_nodelist) {
+    $xpc->setContextNode( $pgm );
+
     my $start  = ParseDateTime($pgm->findvalue( 'time' ));
   	my $date  = $start->ymd("-");
     my $title = $pgm->findvalue( 'title' );
@@ -129,9 +134,9 @@ sub ImportContent
   			#$ds->EndBatch( 1 );
   		}
 
-  		my $batchid = $chd->{xmltvid} . "_" . $date;
+  		#my $batchid = $chd->{xmltvid} . "_" . $date;
   		#$dsh->StartBatch( $batchid );
-  		$dsh->StartDate( $date );
+  		#$dsh->StartDate( $date, "00:00" );
   		$currdate = $date;
 
   		progress("TV2: Date is: $date");
@@ -139,8 +144,8 @@ sub ImportContent
 
     my $ce = {
         channel_id => $chd->{id},
-        title => norm($title),
-        start_time => $start->hms(":"),
+        title => norm(FixSubtitle($title)),
+        start_time => $start,
     };
 
     if(defined($pgm->findvalue( 'original_title' )) and $genre ne "Film"){
@@ -162,8 +167,6 @@ sub ImportContent
         }
   	}
 
-    progress( "TV2: $chd->{xmltvid}: $start - ".norm($ce->{title}) );
-
     # Desc
     if(defined($pgm->findvalue( 'description' )) and norm($pgm->findvalue( 'description' )) ne "") {
     	$ce->{description} = norm($pgm->findvalue( 'description' ));
@@ -173,14 +176,8 @@ sub ImportContent
     if(defined($pgm->findvalue( 'original_episode_title' ))) {
     	if(norm($pgm->findvalue( 'original_episode_title' )) ne "") {
     	  my $subtitle = norm($pgm->findvalue( 'original_episode_title' ));
-        $subtitle =~ s/- Part One/\(1\)/i;
-        $subtitle =~ s/- Part Two/\(2\)/i;
-        $subtitle =~ s/, Part One/ \(1\)/i;
-        $subtitle =~ s/, Part Two/ \(2\)/i;
-        $subtitle =~ s/\b, Part (\d+)\b/ \($1\)/i;
-        $subtitle =~ s/\:(\d+)\)$/\)/i;
-        $subtitle =~ s/\.$//i;
-         $ce->{subtitle} = norm($subtitle);
+        $ce->{subtitle} = norm(CleanSubtitle(FixSubtitle($subtitle)));
+        $ce->{subtitle} =~ s/\:(\d+)\)$/\)/i;
       }
     }
 
@@ -212,7 +209,7 @@ sub ImportContent
         $cast =~ s/Manuskript:\s*(.*)//i;
         $writers =~ s/, baseret(.*)//i;
         $writers =~ s/\((.*)//;
-        #$ce->{writers} = norm(parse_person_list( $writers ));
+        $ce->{writers} = norm(parse_person_list( $writers ));
     }
 
     my( $directors ) = (norm($cast) =~ /Instruktion:\s*(.*)/i );
@@ -258,19 +255,7 @@ sub ImportContent
       $ce->{episode} = sprintf( ". %d .", $episode-1 );
     }
 
-    $ce->{original_title} = norm($original_title) if defined($original_title) and $ce->{title} ne norm($original_title) and norm($original_title) ne "";
-
-    # , The to THE
-    if (defined $ce->{original_title} and $ce->{original_title} =~ /, The$/i) {
-        $ce->{original_title} =~ s/, The$//i;
-        $ce->{original_title} = "The ".$ce->{original_title};
-    }
-
-    # Subttile
-    if (defined $ce->{subtitle} and $ce->{subtitle} =~ /, The$/i) {
-        $ce->{subtitle} =~ s/, The$//i;
-        $ce->{subtitle} = "The ".$ce->{subtitle};
-    }
+    $ce->{original_title} = FixSubtitle(norm($original_title)) if defined($original_title) and $ce->{title} ne norm($original_title) and norm($original_title) ne "";
 
     ## Images
     my $images = $pgm->find( "./images/image" );
@@ -292,8 +277,10 @@ sub ImportContent
       $ce->{new} = 0;
     }
 
+    progress( "TV2: $chd->{xmltvid}: $start - ".norm($ce->{title}) );
+
     delete $ce->{directors} if defined $ce->{directors} and $ce->{directors} =~ /^\(/; # Failure to parse
-    $dsh->AddProgramme( $ce );
+    $ds->AddProgramme( $ce );
   }
 
   #$ds->EndBatch( 1 );

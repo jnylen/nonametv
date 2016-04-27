@@ -76,7 +76,7 @@ exporter-xmltv,episode_number,Episode,no
 exporter-xmltv,episode_number,Episode,pl
 exporter-xmltv,episode_number,Episode,ro
 exporter-xmltv,episode_number,Episode,ru
-exporter-xmltv,episode_number,epizoda,si
+exporter-xmltv,episode_number,epizoda,sl
 exporter-xmltv,episode_number,Del,sv
 exporter-xmltv,episode_part,part,ar
 exporter-xmltv,episode_part,Teil,de
@@ -89,7 +89,7 @@ exporter-xmltv,episode_part,deel,nl
 exporter-xmltv,episode_part,part,pl
 exporter-xmltv,episode_part,part,ro
 exporter-xmltv,episode_part,part,ru
-exporter-xmltv,episode_part,dio,si
+exporter-xmltv,episode_part,dio,sl
 exporter-xmltv,episode_part,Part,sv
 exporter-xmltv,episode_season,season,ar
 exporter-xmltv,episode_season,sæson,da
@@ -105,7 +105,7 @@ exporter-xmltv,episode_season,sesong,no
 exporter-xmltv,episode_season,season,pl
 exporter-xmltv,episode_season,season,ro
 exporter-xmltv,episode_season,season,ru
-exporter-xmltv,episode_season,sezona,si
+exporter-xmltv,episode_season,sezona,sl
 exporter-xmltv,episode_season,säsong,sv
 exporter-xmltv,of,of,ar
 exporter-xmltv,of,af,da
@@ -121,7 +121,7 @@ exporter-xmltv,of,av,no
 exporter-xmltv,of,of,pl
 exporter-xmltv,of,of,ro
 exporter-xmltv,of,of,ru
-exporter-xmltv,of,od,si
+exporter-xmltv,of,od,sl
 exporter-xmltv,of,av,sv
 exporter-xmltv2,episode_number,episode,en
 exporter-xmltv2,episode_number,epizoda,hr
