@@ -16,7 +16,7 @@ use IO::Uncompress::Unzip;
 use LWP;
 use Storable;
 use XML::Simple;
-use NonameTV qw/remove_special_chars clean_subtitle/;
+use NonameTV qw/RemoveSpecialChars CleanSubtitle/;
 
 use vars qw($VERSION %Defaults %Url);
 
@@ -1125,13 +1125,13 @@ sub getEpisodeByName {
     # Look for episode in cache
     my $cache = $self->{cache};
     unless ($nocache) {
-        my $match = remove_special_chars(clean_subtitle(lc($episodename)));
+        my $match = RemoveSpecialChars(CleanSubtitle(lc($episodename)));
         foreach my $season (@{$series->{Seasons}}) {
             foreach my $eid (@$season) {
                 next unless $eid;
                 my $ep = $cache->{Episode}->{$eid};
                 next unless $ep->{EpisodeName};
-                return $ep if remove_special_chars(clean_subtitle(lc($ep->{EpisodeName}))) eq $match;
+                return $ep if RemoveSpecialChars(CleanSubtitle(lc($ep->{EpisodeName}))) eq $match;
             }
         }
                 # try without part number, only accept a single hit (we don't use story arc numbering for uniquely named episodes over here)
@@ -1143,7 +1143,7 @@ sub getEpisodeByName {
                 next unless $eid;
                 my $ep = $cache->{Episode}->{$eid};
                 next unless $ep->{EpisodeName};
-                                if( remove_special_chars(clean_subtitle(lc($ep->{EpisodeName}))) =~ m|^$regexpmatch \(\d+\)$| ){
+                                if( RemoveSpecialChars(CleanSubtitle(lc($ep->{EpisodeName}))) =~ m|^$regexpmatch \(\d+\)$| ){
                     $hitcount ++;
                     $hit = $ep;
                 }
@@ -1162,7 +1162,7 @@ sub getEpisodeByName {
                     next unless $eid;
                     my $ep = $cache->{Episode}->{$eid};
                     next unless $ep->{EpisodeName};
-                                 if( distance( remove_special_chars(clean_subtitle(lc($ep->{EpisodeName}))), $match ) <= 2 ){
+                                 if( distance( RemoveSpecialChars(CleanSubtitle(lc($ep->{EpisodeName}))), $match ) <= 2 ){
                         $hitcount ++;
                         $hit = $ep;
                     }
