@@ -472,19 +472,21 @@ DR,actionfilm,Action,movie
 DR,"ãkonomi",News,
 DR,"bã¸rn & ungdom",Children's/Youth,
 DR,"børn & ungdom",Children's,
-DR,dokumentar,Documentary,
+DR,dokumentar,Documentary,tvshow
 DR,film,Movies,movie
 DR,"for de mindste",Kids,
 DR,"for stã¸rre bã¸rn",Adult,
-DR,"fritid & livsstil",Lifestyle,
+DR,"fritid & livsstil",Lifestyle,series
+DR,"historisk dokumentar",History/Documentary,
 DR,komedie,Comedy,
 DR,krigsfilm,War,movie
+DR,kultur,Culture,
 DR,kærlighedsfilm,Romance,movie
 DR,mode,Mode,
 DR,musik,Music,
 DR,"natur & miljã¸",Nature,
 DR,"natur & miljø",Nature,
-DR,"nyheder & aktualitet",News,
+DR,"nyheder & aktualitet",News,tvshow
 DR,quiz,Talk,
 DR,religion,Religion,
 DR,"science fiction-film",Sci-Fi,movie
@@ -819,6 +821,16 @@ Fatstone,snowboarding.,Snowboarding,sports
 Fatstone,snowboarding/skiing.,Snowboarding/Skiing,sports
 Fatstone,surfing.,Surfing,sports
 Fatstone,wintersports.,Winter,sports
+FightSports,boxing,Boxing,sports
+FightSports,bwf,"Martial Arts",series
+FightSports,documentary,Documentary,series
+FightSports,judo,Judo,sports
+FightSports,karate,Karate,sports
+FightSports,kickbox,Kickboxing,sports
+FightSports,mma,MMA,sports
+FightSports,reality,Reality,series
+FightSports,sumo,Sumowrestling,sports
+FightSports,xma,"Martial Arts",sports
 FOXTV,action,Action,
 FOXTV,cooking,Cooking,
 FOXTV,crime,Crime,
@@ -914,6 +926,9 @@ Kanal5_xml,film,\N,movie
 Kanal5_xml,program,\N,series
 Kanal5_xml,series,\N,series
 Kanal5_xml,sport,\N,sports
+KBSWorld,"drama series",Drama,series
+KBSWorld,entertainment,Entertainment,series
+KBSWorld,news/finance,News/Finance,tvshow
 MTVde,"action series",Action,series
 MTVde,barneserie,Children's,series
 MTVde,barnprogram,Children's,series
@@ -1997,6 +2012,7 @@ TV2NO,western,Western,
 TV2NO,westerndrama,Western/Drama,
 TV2NO,westernkomedie,Western/Comedy,
 TV4,aktuellt,\N,series
+TV4,animation,Animation,
 TV4,barnprogram,Children's,series
 TV4,dokumentär,Documentary,series
 TV4,drama,Drama,series
@@ -2010,6 +2026,7 @@ TV4,matlagning,Food,series
 TV4,miniserie,Mini-Series,series
 TV4,nyheter,News,tvshow
 TV4,övrigt,\N,series
+TV4,religiöst,Religion,
 TV4,resor,Travel,
 TV4,såpopera,Soap/Opera,series
 TV4,sitcom,Sitcom,series
@@ -2674,3 +2691,10 @@ Viasat_genre,underholdning,Entertainment,
 Viasat_genre,verklighets,"True Story",
 Viasat_genre,verklighets/underhållning,"True Story/Entertain",
 Viasat_genre,western,Western,
+YFE_genre,action,Action,
+YFE_genre,"action comedy",Action/Comedy,
+YFE_genre,adventure,Adventure,
+YFE_genre,comedy,Comedy,
+YFE_genre,detectives,Crime,
+YFE_genre,fantasy,Fantasy,
+YFE_genre,sci-fiction,Sci-Fi,

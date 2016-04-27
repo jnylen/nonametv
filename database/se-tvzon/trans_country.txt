@@ -108,28 +108,53 @@ CMore,"united kingdom",GB
 CMore,"united states",US
 CMore,unkari,HU
 CMore,usa,US
+DR,amerika,US
+DR,argentina,AR
 DR,australien,AU
 DR,"australien & oceanien",AU
+DR,bahrain,BH
 DR,belgien,BE
 DR,brasilien,BR
+DR,bulgarien,BG
 DR,canada,CA
+DR,chile,VL
 DR,danmark,DK
+DR,"dominikanske republik, den",DO
 DR,finland,FI
 DR,"frankrig & monaco",FR/MC
 DR,grækenland,GR
 DR,holland,NL
+DR,honduras,HN
+DR,indien,IN
+DR,indonesien,ID
+DR,iran,IR
 DR,irland,IE
+DR,island,IS
+DR,israel,IL
 DR,italien,IT
 DR,japan,JP
+DR,kina,CN
+DR,"korea (nord-)",KP
+DR,"korea (syd-)",KR
+DR,litauen,LT
+DR,malaysia,MY
+DR,marokko,MA
 DR,mexico,MX
+DR,"new zealand",NZ
 DR,norge,NO
 DR,polen,PL
+DR,qatar,QA
 DR,"restjugoslavien (serbien & monten.)",RS/ME
+DR,rumænien,RO
 DR,rusland,RU
 DR,"schweiz & lichtenstein",CH/LI
+DR,singapore,SG
 DR,spanien,ES
 DR,storbritannien,GB
 DR,sverige,SE
+DR,syd-afika,ZA
+DR,syrien,SY
+DR,thailand,TH
 DR,tyskland,DE
 DR,usa,US
 DR,østrig,AT
@@ -390,3 +415,25 @@ Viasat,uk,GB
 Viasat,us,US
 Viasat,za,ZA
 Viasat,zw,ZW
+YFE,australien,AU
+YFE,bg,BG
+YFE,canada,CA
+YFE,cdn,CA
+YFE,dänemark,DK
+YFE,dänmark,DK
+YFE,deutschland,DE
+YFE,frankreich,FR
+YFE,germany,DE
+YFE,"großbritannien",GB
+YFE,indien,IN
+YFE,italien,IT
+YFE,japan,JP
+YFE,kanada,CA
+YFE,korea,KR
+YFE,luxembourg,LU
+YFE,neuseeland,NZ
+YFE,pl,PL
+YFE,schweden,SE
+YFE,spanien,ES
+YFE,uk,GB
+YFE,usa,US
