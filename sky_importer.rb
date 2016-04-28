@@ -104,7 +104,11 @@ def copy_to_channels(file_name)
             end
         end
 
-        File.open('/home/jnylen/content/channels/' + c[:xmltvid] + '/' + file_basename, 'w') { |f| f.print(doc.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::AS_XML)) }
+        # File content
+        content = doc.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::AS_XML)
+        #content = content.gsub(/^\s+\s+\n$/, "")
+
+        File.open('/home/jnylen/content/channels/' + c[:xmltvid] + '/' + file_basename, 'w') { |f| f.print(content) }
 
         # Verbose
         puts "Cleaned up and added #{file_basename} to #{c[:xmltvid]}"
