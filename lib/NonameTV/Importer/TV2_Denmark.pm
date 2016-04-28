@@ -346,9 +346,9 @@ sub ParseDateTime {
     minute => $minute,
     second => $second,
 #    time_zone => "Europe/Copenhagen"
-      );
+  );
 
-#  $dt->set_time_zone( "UTC" );
+  $dt->set_time_zone( "UTC" );
 
   return $dt;
 }
