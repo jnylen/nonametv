@@ -18,11 +18,11 @@ use DateTime;
 use XML::LibXML;
 use Spreadsheet::ParseExcel;
 
-use Spreadsheet::Read;
 
 use Spreadsheet::XLSX;
 use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
 use Spreadsheet::Read;
+use Data::Dumper;
 
 use Text::Iconv;
 my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
@@ -61,7 +61,7 @@ sub ImportContentFile {
   if( $file =~ /\.xlsx$/i ){
     $self->ImportXLS( $file, $chd );
   } else {
-    error( "BBCWW: Unknown file format: $file" );
+    error( "Fatstone: Unknown file format: $file" );
   }
 
   return;
@@ -98,43 +98,8 @@ my $ref = ReadData ($file);
     # browse through rows
     for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
 
-      if( not %columns ){
-        # the column names are stored in the first row
-        # so read them and store their column positions
-        # for further findvalue() calls
-
-        for(my $iC = $oWkS->{MinCol} ; defined $oWkS->{MaxCol} && $iC <= $oWkS->{MaxCol} ; $iC++) {
-          if( $oWkS->{Cells}[$iR][$iC] ){
-            $columns{$oWkS->{Cells}[$iR][$iC]->Value} = $iC;
-
-            $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series/ );
-			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series \(Norwegian\)/ );
-
-			$columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode/ );
-            $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode \(Norwegian\)/ );
-
-            $columns{'Ser No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series No/ );
-            $columns{'Ep No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode No/ );
-
-            $columns{'Genre'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description/ );
-            $columns{'Genre'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(Norwegian\)/ );
-
-            $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
-            $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time \(CET\)/ );
-
-            $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
-          }
-        }
-
-        %columns = () if( $foundcolumns eq 0 );
-
-        next;
-      }
-
-
-
       # date - column 0 ('Date')
-      my $oWkC = $oWkS->{Cells}[$iR][$columns{'Date'}];
+      my $oWkC = $oWkS->{Cells}[$iR][0];
       next if( ! $oWkC );
       next if( ! $oWkC->Value );
       $date = ParseDate( $oWkC->Value );
@@ -143,9 +108,7 @@ my $ref = ReadData ($file);
 	  # Startdate
       if( $date ne $currdate ) {
       	if( $currdate ne "x" ) {
-			# save last day if we have it in memory
-		#	FlushDayData( $channel_xmltvid, $dsh , @ces );
-			$dsh->EndBatch( 1 );
+			       $dsh->EndBatch( 1 );
         }
 
       	my $batchid = $chd->{xmltvid} . "_" . $date;
@@ -156,49 +119,48 @@ my $ref = ReadData ($file);
       }
 
 	  # time
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Time'}];
+      $oWkC = $oWkS->{Cells}[$iR][5];
       next if( ! $oWkC );
       my $time = 0;  # fix for  12:00AM
       $time=$oWkC->{Val} if( $oWkC->Value );
       $time = ParseTime($time);
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
+      $oWkC = $oWkS->{Cells}[$iR][2];
       next if( ! $oWkC );
       my $title = $oWkC->Value if( $oWkC->Value );
-      $title = ucfirst(lc($title)); # Make it prettieh
 
-	  # episode and season
-      my $epino = $oWkS->{Cells}[$iR][$columns{'Ep No'}]->Value if $oWkS->{Cells}[$iR][$columns{'Ep No'}];
-      my $seano = $oWkS->{Cells}[$iR][$columns{'Ser No'}]->Value if $oWkS->{Cells}[$iR][$columns{'Ser No'}];
+      # desc
+      $oWkC = $oWkS->{Cells}[$iR][3];
+      next if( ! $oWkC );
+      my $desc = $oWkC->Value if( $oWkC->Value );
 
-	  # extra info
-	  my $genre = $oWkS->{Cells}[$iR][$columns{'Genre'}]->Value if $oWkS->{Cells}[$iR][$columns{'Genre'}];
-	  my $subtitle = $oWkS->{Cells}[$iR][$columns{'Episode Title'}]->Value if $oWkS->{Cells}[$iR][$columns{'Episode Title'}];
+  	  # extra info
+  	  my $genre = norm($oWkS->{Cells}[$iR][4]->{Val}) if $oWkS->{Cells}[$iR][4];
 
       progress("Fatstone: $chd->{xmltvid}: $time - $title");
 
       my $ce = {
         channel_id => $chd->{channel_id},
         title => norm( $title ),
+        description => norm( $desc ),
         start_time => $time,
       };
+
+      # parsing subtitles and ep
+      my ($episode, $subtitle);
+      if( ( $title, $episode ) = ($ce->{title} =~ /^(.*?) ep (\d+)$/i ) ) {
+        $ce->{title} = norm($title);
+        $ce->{episode} = sprintf( " . %d . ", $episode-1 );
+      } elsif( ( $title, $subtitle ) = ($ce->{title} =~ /^(.*?) - (.*?)$/i ) ) {
+        $ce->{title} = norm($title);
+        $ce->{subtitle} = norm($subtitle);
+      }
 
       # Genre
       if(defined($genre) and $genre and $genre ne "") {
         my ( $pty, $cat ) = $ds->LookupCat( 'Fatstone', $genre );
       	AddCategory( $ce, $pty, $cat );
-      }
-
-	  # Subtitle
-	  $ce->{subtitle} = norm( $subtitle ) if $subtitle;
-
-      if( $epino ){
-        if( $seano ){
-          $ce->{episode} = sprintf( "%d . %d .", $seano-1, $epino-1 );
-        } else {
-          $ce->{episode} = sprintf( ". %d .", $epino-1 );
-        }
       }
 
       $dsh->AddProgramme( $ce );

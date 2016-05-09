@@ -75,6 +75,7 @@ my @folders = qw(NonameTV-Data.GlobalListings
 		 NonameTV-Data.Hustler
 		 NonameTV-Data.YaS
 		 NonameTV-Data.ATV
+     NonameTV-Data.Fatstone
 		 NonameTV-Data.KinoPolska);
 
 # Flag messages AFTER they have been processed. Then I normally

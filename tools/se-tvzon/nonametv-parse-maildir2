@@ -296,10 +296,6 @@ sub guess_channel
      return "ginx.tv";
  }
 
- if( $dir =~ /Fatstone/ and $filename =~ /\.xlsx$/i ) {
-  #   return "fatstone.tv";
- }
-
  if( $dir =~ /Mezzo/ ) {
     if($filename =~ /\.xls$/i) {
         return "hd.mezzo.tv" if $filename =~ /hd/i; # import mezzo live hd channel
