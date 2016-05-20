@@ -17,7 +17,7 @@ use HTTP::Date;
 
 use Compress::Zlib;
 
-use NonameTV qw/ParseXml norm AddCategory AddCountry/;
+use NonameTV qw/ParseXml norm AddCategory AddCountry FixSubtitle/;
 use NonameTV::Log qw/w f p/;
 
 use NonameTV::Importer::BaseDaily;
@@ -133,8 +133,7 @@ sub ImportContent
     # Sanity check.
     # What does it mean if there are several programs?
     if( $sc->findvalue( 'count(.//Program)' ) != 1 ) {
-      f "Wrong number of Programs for Schedule " .
-          $sc->findvalue( '@Id' );
+      f "Wrong number of Programs for Schedule " . $sc->findvalue( '@Id' );
       return 0;
     }
 
@@ -143,69 +142,25 @@ sub ImportContent
     my $start = $self->create_dt( $sc->findvalue( './@CalendarDate' ) );
     if( not defined $start )
     {
-      w "Invalid starttime '"
-          . $sc->findvalue( './@CalendarDate' ) . "'. Skipping.";
+      w "Invalid starttime '" . $sc->findvalue( './@CalendarDate' ) . "'. Skipping.";
       next;
-    }
-
-    my $next_start = $self->create_dt( $sc->findvalue( './@NextStart' ) );
-
-    # NextStart is sometimes off by one day.
-    if( defined( $next_start ) and $next_start < $start )
-    {
-      $next_start = $next_start->add( days => 1 );
-    }
-
-    my $length  = $sc->findvalue( './Program/@Duration ' );
-    w "$length is not numeric."
-      if( $length !~ /^\d*$/ );
-
-    my $end;
-
-    if( ($length eq "") or ($length == 0) )
-    {
-      if( not defined $next_start ) {
-	w "Neither next_start nor length for " . $start->ymd() . " " .
-	    $start->hms() . " " . $title;
-	next;
-      }
-      $end = $next_start;
-    }
-    else
-    {
-      $end = $start->clone()->add( minutes => $length );
-
-      # Sometimes the claimed length of the movie makes the movie end
-      # a few minutes after the next movie is supposed to start.
-      # Assume that next_start is correct.
-      if( (defined $next_start ) and ($end > $next_start)
-          and ($next_start > $start) )
-      {
-        $end = $next_start;
-      }
     }
 
     my $series_title = $sc->findvalue( './Program/@SeriesTitle' );
     my $org_title = $sc->findvalue( './Program/@Title' );
 
+    my $bline = $sc->findvalue( './Program/Synopsis/ExtraShort' );
     my $org_desc = $sc->findvalue( './Program/Synopsis/Short' );
     my $med_desc = $sc->findvalue( './Program/Synopsis/Medium' );
     my $epi_desc = $sc->findvalue( './Program/Synopsis/Long' );
     my $desc  = $med_desc || $epi_desc || $org_desc;
 
     my $genre = norm($sc->findvalue( './Program/@GenreKey' ));
-#    my $country = $sc->findvalue( './Program/@Country' );
-
-    # LastChance is 0 or 1.
-#    my $lastchance = $sc->findvalue( '/Program/@LastChance' );
-
-    # PremiereDate can be compared with CalendarDate
-    # to see if this is a premiere.
-#    my $premieredate = $sc->findvalue( './Program/@PremiereDate' );
 
     # Premiere? Live?
     my $premiere = $sc->findvalue( './@IsPremiere' );
     my $type     = $sc->findvalue( './@Type' );
+    my $dubbed   = $sc->findvalue( './@IsDubbed' );
 
     # program_type can be partially derived from this:
     my $class = $sc->findvalue( './Program/@Class' );
@@ -224,14 +179,63 @@ sub ImportContent
     my $actors = norm( $sc->findvalue( './Program/@Actors' ) );
     my $direcs = norm( $sc->findvalue( './Program/@Directors' ) );
 
+    # ids
+    my $assetid  = $sc->findvalue( './Program/@PlayAssetId1' );
+    my $seriesid = $sc->findvalue( './Program/@SeriesId' );
+    my $vod      = $sc->findvalue( './Program/@Vod' );
+
     my $ce = {
       channel_id  => $chd->{id},
       description => norm($desc),
       start_time  => $start->ymd("-") . " " . $start->hms(":"),
     };
 
-    #      end_time    => $end->ymd("-") . " " . $end->hms(":"),
+    # Extra
+    my $extra = {};
+    $extra->{descriptions} = [];
+    $extra->{qualifiers} = [];
+    $extra->{images} = [];
 
+    # descriptions
+    if($bline and defined($bline) and norm($bline) ne "") {
+      push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($bline), type => "bline" };
+    }
+    if($epi_desc and defined($epi_desc) and norm($epi_desc) ne "") {
+      my $seriesdesc = $epi_desc;
+      $seriesdesc =~ s/$med_desc//i;
+
+      # Season / series
+      if($seriesdesc =~ /(säsong|sæson|kausi|sesong)/i) {
+        push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($seriesdesc), type => "season" };
+      } else {
+        push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($seriesdesc), type => "series" };
+      }
+
+    }
+    if($med_desc and defined($med_desc) and norm($med_desc) ne "") {
+      push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($med_desc), type => "episode" };
+    }
+
+    # Movie got another way of external id
+    if($cate eq 'Film') {
+      $extra->{external} = {type => "cmore_movie", id => $assetid};
+    } elsif($class eq "Sport" && $cate eq 'Game') {
+      $extra->{external} = {type => "cmore_sport", id => $assetid};
+    } elsif($type eq 'EpisodeProgram') {
+      $extra->{external} = {type => "cmore_series", id => $seriesid};
+    }
+
+    # Sport event stuff
+    if($class eq "Sport" && $cate eq 'Game') {
+      # Ice hockey, soccer etc (team specific)
+      #$extra->{sports} = {teams => [], event => undef, location => undef, type => undef};
+
+    } elsif($class eq "Sport" && $cate eq 'Event') {
+      # Golf
+      # SHL Awards (prisceromoni)
+    }
+
+    # Series stuff
     if( $series_title =~ /\S/ )
     {
       $ce->{title} = norm($series_title);
@@ -248,17 +252,16 @@ sub ImportContent
     }
     else
     {
-	# Remove everything inside ()
-	$org_title =~ s/\(.*\)//g;
+	    # Remove everything inside ()
+	    $org_title =~ s/\(.*\)//g;
       $ce->{title} = norm($org_title) || norm($title);
     }
 
+    # Categories and genres
     my($program_type, $category ) = $ds->LookupCat( "CMore_genre", $genre );
     AddCategory( $ce, $program_type, $category );
-
     my($program_type2, $category2 ) = $ds->LookupCat( "CMore_category", $cate );
     AddCategory( $ce, $program_type2, $category2 );
-
     my($country ) = $ds->LookupCountry( "CMore", $production_country );
     AddCountry( $ce, $country );
 
@@ -267,6 +270,7 @@ sub ImportContent
       $ce->{production_date} = "$1-01-01";
     }
 
+    # Episodes
     if( $epino ){
         if( $seano ){
           $ce->{episode} = sprintf( "%d . %d .", $seano-1, $epino-1 );
@@ -312,20 +316,10 @@ sub ImportContent
     if($ce->{program_type} eq 'series') {
         $ce->{subtitle} = norm($title_org);
     } elsif($ce->{program_type} eq 'movie') {
-        $ce->{original_title} = norm($title_org) if $ce->{title} ne $title_org and norm($title_org) ne "";
+        $ce->{original_title} = norm(FixSubtitle(norm($title_org))) if $ce->{title} ne $title_org and norm($title_org) ne "";
     }
 
     p( "CMore: $chd->{xmltvid}: $start - $title" );
-
-    if(defined $ce->{original_title} and $ce->{original_title} =~ /, The$/i) {
-        $ce->{original_title} =~ s/, The$//i;
-        $ce->{original_title} = norm("The ".$ce->{original_title});
-    }
-
-    if(defined $ce->{original_title} and $ce->{original_title} =~ /, A$/i) {
-        $ce->{original_title} =~ s/, A$//i;
-        $ce->{original_title} = norm("A ".$ce->{original_title});
-    }
 
     # No sports image as CMore told us we can't include those
     if($class ne "Sport" && $cate ne 'Game')
@@ -338,9 +332,16 @@ sub ImportContent
       {
         # Cover / Poster
         if($ic->findvalue( './@Category' ) eq 'Cover') {
-            $ce->{poster} = 'http://cdn01.img.cmore.se/' . $ic->findvalue( './@Id' ) . '/8.img';
+          push $extra->{images}, { url => 'http://cdn01.img.cmore.se/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'cover', title => undef, copyright => undef, source => "CMore" };
+          $ce->{poster} = 'http://cdn01.img.cmore.se/' . $ic->findvalue( './@Id' ) . '/8.img';
         } elsif($ic->findvalue( './@Category' ) eq 'Primary') {
-            $ce->{fanart} = 'http://cdn01.img.cmore.se/' . $ic->findvalue( './@Id' ) . '/8.img';
+          if($cate eq "Film") {
+            push $extra->{images}, { url => 'http://cdn01.img.cmore.se/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'landscape', title => undef, copyright => undef, source => "CMore" };
+          } else {
+            push $extra->{images}, { url => 'http://cdn01.img.cmore.se/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'episode', title => undef, copyright => undef, source => "CMore" };
+          }
+
+          $ce->{fanart} = 'http://cdn01.img.cmore.se/' . $ic->findvalue( './@Id' ) . '/8.img';
         }
       }
     }
@@ -348,6 +349,7 @@ sub ImportContent
     # Live?
     if($type eq "Live") {
       $ce->{live} = 1;
+      push $extra->{qualifiers}, "live";
     } else {
       $ce->{live} = 0;
     }
@@ -355,9 +357,23 @@ sub ImportContent
     # Premiere
     if($premiere eq "true") {
       $ce->{new} = 1;
+      push $extra->{qualifiers}, "new";
     } else {
       $ce->{new} = 0;
+      push $extra->{qualifiers}, "repeat";
     }
+
+    # Dubbed?
+    if($dubbed eq "true") {
+      push $extra->{qualifiers}, "dubbed";
+    }
+
+    # VOD?
+    if($vod eq "true") {
+      push $extra->{qualifiers}, "catchup";
+    }
+
+    $ce->{extra} = $extra;
 
     $ds->AddProgramme( $ce );
   }
