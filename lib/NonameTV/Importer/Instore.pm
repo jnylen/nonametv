@@ -33,7 +33,7 @@ sub new {
     my $self = $class->SUPER::new( @_ );
     bless ($self, $class);
 
-    $self->{UrlRoot} = "http://login.instorebroadcast.com/previews/outtv/Webadvance/" if !defined( $self->{UrlRoot} );
+    $self->{UrlRoot} = "http://login.ibbroadcast.nl/previews/outtv/Webadvance/" if !defined( $self->{UrlRoot} );
 
     $self->{datastore}->{augment} = 1;
 
