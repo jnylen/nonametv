@@ -49,14 +49,14 @@ The callbackobject must implement the following methods:
   undef means that the content is valid. A string is treated as an
   error message.
 
-  my( $filtered_ref, $error ) = $co->FilterContent( $content_ref, 
+  my( $filtered_ref, $error ) = $co->FilterContent( $content_ref,
                                                     $callbackdata )
 
   Filter the content to remove any unnecessary data. The resulting data
   is compared to the previous filtered data to see if the filtered data
   has changed before it is returned by GetContent.
 
-  Both these methods can return (undef, "errorstring") if an error 
+  Both these methods can return (undef, "errorstring") if an error
   occured for some reason. The error will be handled in the same way as
   errors from the http-server.
 
@@ -70,8 +70,8 @@ The callbackobject must implement the following methods:
 
 sub new {
   my $class = ref( $_[0] ) || $_[0];
-  
-  my $self = { }; 
+
+  my $self = { };
   bless $self, $class;
 
   # Copy the parameters supplied in the constructor.
@@ -80,14 +80,17 @@ sub new {
   }
 
   eval {
-    require WWW::Mechanize;
-    $self->{ua} = WWW::Mechanize->new( onerror => \&d );
+    require WWW::Mechanize::GZip;
+    $self->{ua} = WWW::Mechanize::GZip->new( onerror => \&d );
   };
 
   if( not defined $self->{ua} ) {
     require LWP::UserAgent;
     $self->{ua} = LWP::UserAgent->new( cookie_jar => {} );
   }
+
+  my $can_accept = HTTP::Message::decodable;
+  $self->{ua}->add_header('Accept-Encoding' => $can_accept);
 
   $self->{ua}->agent( $self->{useragent} );
   $self->{ua}->env_proxy( );
@@ -107,8 +110,8 @@ sub new {
 
 =pod
 
-    my( $dataref, $errormsg ) = $cc->GetContent( $objectname, 
-                                                 $callbackdata, 
+    my( $dataref, $errormsg ) = $cc->GetContent( $objectname,
+                                                 $callbackdata,
                                                  $force );
 
 Fetch a an object from a url. Returns undef if the object was unchanged
@@ -119,21 +122,21 @@ are possible:
   (dataref, undef) - Data was downloaded and needs to be processed.
   (undef, errormsg) - Download failed and the caller should notify the user
                       of the error.
-  (undef, undef) - The content or filtered content was the same as the last time 
+  (undef, undef) - The content or filtered content was the same as the last time
         it was downloaded.
 
      If $force is true, (undef, undef) is never returned.
 
 =cut
- 
+
 sub GetContent {
   my $self = shift;
   my( $objectname, $data, $force ) = @_;
 
   $force = 0 if not defined $force;
-  
+
   my $co = $self->{callbackobject};
-  
+
   my( $url, $objerror ) = $co->Object2Url( $objectname, $data );
   if( not defined( $url ) ) {
     return( undef, $objerror );
@@ -182,7 +185,7 @@ sub GetContent {
 
     # Treat undef as an empty string.
     $$cref = "" if not defined $$cref;
-    
+
     w "Content is not a sequence of bytes."
 	if is_utf8( $$cref );
 
@@ -196,7 +199,7 @@ sub GetContent {
     }
 
     $self->WriteReference( $self->Filename( $objectname, "content",
-                           $co->ContentExtension() ), 
+                           $co->ContentExtension() ),
 			   $cref );
 
     # Filter content
@@ -205,7 +208,7 @@ sub GetContent {
       $cref = \$empty;
     }
 
-    my( $filtered_ref, $filter_error ) = 
+    my( $filtered_ref, $filter_error ) =
 	$co->FilterContent( $cref, $data );
 
     if( not defined $filtered_ref ) {
@@ -224,24 +227,24 @@ sub GetContent {
       return (undef, undef);
     }
 
-    $self->WriteReference( $self->Filename( $objectname, "filtered", 
-                                            $co->FilteredExtension() ), 
+    $self->WriteReference( $self->Filename( $objectname, "filtered",
+                                            $co->FilteredExtension() ),
 			   $filtered_ref );
-    
+
     return ($filtered_ref, undef);
   }
   else {
     # No content was returned for this url.
 
     if( defined( $state->{error} ) and ($state->{error} eq $geterror) ) {
-      # Same error as last time. No point in reporting 
+      # Same error as last time. No point in reporting
       # it again.
       return (undef, undef);
     }
     else {
-      unlink( $self->Filename( $objectname, "content", 
+      unlink( $self->Filename( $objectname, "content",
 			       $co->ContentExtension() ) );
-      unlink( $self->Filename( $objectname, "filtered", 
+      unlink( $self->Filename( $objectname, "filtered",
 			       $co->FilteredExtension() ) );
       $self->SetState( $objectname, { error => $geterror } );
       return (undef, $geterror );
@@ -253,11 +256,11 @@ sub GetContent {
 
   my( $dataref, $error ) = $cc->GetUrl( $url );
 
-Fetch a url. Returns (undef, "error message")  if the server 
+Fetch a url. Returns (undef, "error message")  if the server
 returned an error.
 
 =cut
- 
+
 sub GetUrl {
   my $self = shift;
   my( $url ) = @_;
@@ -266,24 +269,24 @@ sub GetUrl {
   my( $host )  = ($surl =~ m%://(.*?)/%);
   if( defined( $self->{credentials}->{$host} ) ) {
     my $cred = $self->{credentials}->{$host};
-    
+
     $surl =~ s%://(.*?)/%://$cred\@$1/%;
   }
 
   my $res = $self->{ua}->get( $surl );
 
 #  if( defined( $self->{wantuncompress} ) ) {
-    if( defined( $res->header( 'Content-Encoding' ) ) ) {
-      # Content-Encoding: gzip
-      if ($res->header( 'Content-Encoding' ) =~ m|^gzip$| ) {
-        d( "uncompressing gzip" );
-        my $newc;
-        # try to gunzip
-        gunzip $res->content_ref => \$newc
-          or return (undef, 'failure in gunzipping content: ' . $GunzipError);
-        ${$res->content_ref} = $newc; 
-      }
-    }
+#    if( defined( $res->header( 'Content-Encoding' ) ) ) {
+#      # Content-Encoding: gzip
+#      if ($res->header( 'Content-Encoding' ) =~ m|^gzip$| ) {
+#        d( "uncompressing gzip" );
+#        my $newc;
+#        # try to gunzip
+#        gunzip $res->content_ref => \$newc
+#          or return (undef, 'failure in gunzipping content: ' . $GunzipError);
+#        ${$res->content_ref} = $newc;
+#      }
+#    }
 #  }
 
   if( defined( $self->{wantdecode} ) ) {
@@ -376,7 +379,7 @@ sub CalculateMD5 {
 sub Filename {
   my $self = shift;
   my( $objectname, $type, $extension ) = @_;
-  
+
   if( defined( $extension ) ) {
     $extension = ".$extension";
   }
