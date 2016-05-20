@@ -192,6 +192,33 @@ sub ImportContent {
       my $desc_episode = $emission->findvalue( 'synopsisThisEpisode' );
       my $desc_series = $emission->findvalue( 'synopsis' );
       my $desc_logline = $emission->findvalue( 'logline' );
+
+      my ($eps, $episode2, $season2, $episode3);
+
+      if($desc_episode =~ /Del\s+(\d+):(\d+)/i) {
+        ( $episode3, $eps ) = ($desc_episode =~ /Del\s+(\d+):(\d+)/i );
+        $desc_episode =~ s/Del (\d+):(\d+)//gi;
+      }
+
+      if($desc_logline =~ /\(S(\d+), Ep(\d+)\)$/i) {
+        ( $season2, $episode2 ) = ($desc_logline =~ /\(S(\d+), Ep(\d+)\)$/i );
+        $desc_logline =~ s/\(S(\d+), Ep(\d+)\)$//gi;
+      }
+
+      # Sometimes episode3 is correct rather than episode2
+      if(defined($episode3)) {
+        if(defined($episode2)) {
+          # Ep2 is defined
+          if($episode2 > $episode3) {
+            $episode2 = $episode3;
+          }
+        } else {
+          # Ep2 isn't defined
+          $episode2 = $episode3;
+        }
+      }
+
+
       my $desc = $desc_episode || $desc_series || $desc_logline;
 
       # Season and episode
@@ -204,11 +231,6 @@ sub ImportContent {
         $name =~ s/$season$//;
         $name = norm($name);
       }
-
-      my $eps = "";
-      my $episode2 = "";
-      ( $episode2, $eps ) = ($desc =~ /Del\s+(\d+):(\d+)/i );
-      $desc =~ s/Del (\d+):(\d+)//gi;
 
       # Extra stuff
       my $prodyear = $emission->findvalue( 'productionYear' );
@@ -241,7 +263,25 @@ sub ImportContent {
 	      start_time  => $start_time,
       };
 
-      $ce->{bline} = $bline if $bline;
+      my $extra = {};
+      $extra->{descriptions} = [];
+      $extra->{external} = { type => "viasat", id => $emission->findvalue( 'uniqueId' )};
+      $extra->{qualifiers} = [];
+
+      # descriptions
+      if($bline and defined($bline) and norm($bline) ne "") {
+        push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($bline), type => "bline" };
+      }
+      if($desc_series and defined($desc_series) and norm($desc_series) ne "") {
+        push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($desc_series), type => "series" };
+      }
+      if($desc_logline and defined($desc_logline) and norm($desc_logline) ne "") {
+        push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($desc_logline), type => "logline" };
+      }
+      if($desc_episode and defined($desc_episode) and norm($desc_episode) ne "") {
+        push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($desc_episode), type => "episode" };
+      }
+
 
       # Send back original swedish title
       if(norm($name) ne norm($original_name)) {
@@ -267,30 +307,35 @@ sub ImportContent {
         $ce->{production_date} = "$1-01-01";
       }
 
-	  # Find aspect-info
+	  # Find aspect-info ( they dont appear to actually use this correctly )
 	  if( $widescreen eq "true" )
 	  {
 	    $ce->{aspect} = "16:9";
+      #push $extra->{qualifiers}, "widescreen";
 	  }
 	  else
 	  {
 	    $ce->{aspect} = "4:3";
+      #push $extra->{qualifiers}, "smallscreen";
 	  }
 
 	  # Find rerun-info
 	  if( $rerun eq "true" )
 	  {
 	    $ce->{new} = "0";
+      push $extra->{qualifiers}, "repeat";
 	  }
 	  else
 	  {
 	    $ce->{new} = "1";
+      push $extra->{qualifiers}, "new";
 	  }
 
 	  # Find live-info
 	  if( $live eq "true" )
 	  {
 	    $ce->{live} = "1";
+      push $extra->{qualifiers}, "live";
 	  }
 	  else
 	  {
@@ -333,17 +378,18 @@ sub ImportContent {
 
       # Genres and category
       my( $pty, $cat );
-	  if(defined($genre) and $genre and $genre ne "") {
-	      ( $pty, $cat ) = $ds->LookupCat( 'Viasat2_genre', $genre );
-	  	  AddCategory( $ce, $pty, $cat );
-	  }
+  	  if(defined($genre) and $genre and $genre ne "") {
+  	      ( $pty, $cat ) = $ds->LookupCat( 'Viasat2_genre', $genre );
+  	  	  AddCategory( $ce, $pty, $cat );
+  	  }
 
-	  if(defined($category) and $category and $category ne "") {
-	      ( $pty, $cat ) = $ds->LookupCat( 'Viasat2_category', $category );
-	  	  AddCategory( $ce, $pty, $cat );
-	  }
+  	  if(defined($category) and $category and $category ne "") {
+  	      ( $pty, $cat ) = $ds->LookupCat( 'Viasat2_category', $category );
+  	  	  AddCategory( $ce, $pty, $cat );
+  	  }
 
-	  $ce->{external_ids} = 'viasat_' . $emission->findvalue( 'uniqueId' );
+  	  $ce->{external_ids} = 'viasat_' . $emission->findvalue( 'uniqueId' );
+      $ce->{extra} = $extra;
 
       progress( "Viasat: $chd->{xmltvid}: $start_time - $name" );
       $dsh->AddProgramme( $ce );
