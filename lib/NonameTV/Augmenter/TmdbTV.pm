@@ -253,6 +253,57 @@ sub AugmentProgram( $$$ ){
     #( $seasonxabs, $episodeabs )=( $ceref->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
 
     $matchby = 'episodeabs';
+  } elsif( $ruleref->{matchby} eq 'absorepsea' ) {
+    # Season?
+    if($ceref->{episode} =~ /^\s*(\d+)\s*\.\s*(\d+)\s*/) {
+      my( $seasonss, $episodess )=( $ceref->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
+
+      # Check if the episode number is above the count of eps on that season
+      my $serie = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
+      my $epcount = 0;
+
+      # check seasons
+      foreach my $seasons ( @{ $serie->info->{seasons} } ){
+        next if($seasons->{season_number} == 0);  # Skip specials
+
+        # Seasons before the wanted season..
+        if($seasons->{season_number} != ($seasonss + 1)) {
+          if($epcount < $seasons->{episode_count}) {
+            $epcount = $seasons->{episode_count};
+          }
+
+          next;
+        }
+
+        # is the episode number within the episode count or more?
+        if(($episodess + 1) > $seasons->{episode_count}) {
+          # Its more but check if its less than the past episode counts
+          if(($episodess + 1) < $epcount) {
+            if($ceref->{subtitle}) {
+              print("$ceref->{title} - match by episodetitle (epcount: $epcount, number: $episodess, season: $seasonss)\n");
+              $matchby = 'episodetitle';
+            } else {
+              print("$ceref->{title} - match by nothing (epcount: $epcount, number: $episodess, season: $seasonss)\n");
+              $matchby = "nothing";
+            }
+
+          } else {
+            print("$ceref->{title} - match by episodeabs (epcount: $epcount, number: $episodess, season: $seasonss)\n");
+            $matchby = 'episodeabs';
+            $episodeabs = $episodess;
+          }
+
+        } else {
+          $matchby = 'episodeseason';
+        }
+
+      }
+
+    } else {
+      # Right now it just defaults to episode abs if it doesn't have a season number
+      ( $episodeabs )=( $ceref->{episode} =~ m|\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
+      $matchby = 'episodeabs';
+    }
   } else {
     $matchby = $ruleref->{matchby};
   }
@@ -614,12 +665,12 @@ sub find_series($$$ ) {
         }
 
         if(!$match and defined($ceref->{original_title}) and distance( lc(RemoveSpecialChars($ceref->{original_title})), lc(RemoveSpecialChars($candidate->{name})) ) <= 2) {
-
+          push( @keep, $candidate );
           $match = 1;
         }
 
         if(!$match and defined($ceref->{original_title}) and distance( lc(RemoveSpecialChars($ceref->{original_title})), lc(RemoveSpecialChars($candidate->{original_name})) ) <= 2) {
-
+          push( @keep, $candidate );
           $match = 1;
         }
       }
