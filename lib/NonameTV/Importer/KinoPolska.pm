@@ -125,6 +125,7 @@ sub ImportXLS
             $columns{'Synopsis'} = $iC if( norm($oWkS->{Cells}[$iR][$iC]->Value) =~ /^Opis$/i );
             $columns{'Synopsis'} = $iC if( norm($oWkS->{Cells}[$iR][$iC]->Value) =~ /^Synopsis$/i );
             $columns{'Synopsis'} = $iC if( norm($oWkS->{Cells}[$iR][$iC]->Value) =~ /^Synopsis CZ$/i );
+            $columns{'Synopsis'} = $iC if( norm($oWkS->{Cells}[$iR][$iC]->Value) =~ /^Synopsis ROM$/i );
             $columns{'Synopsis'} = $iC if( norm($oWkS->{Cells}[$iR][$iC]->Value) =~ /^Opis \(synopsis\)$/i );
 
             $foundcolumns = 1 if( defined($columns{'Date'}) or defined($columns{'DateTime'}) );
@@ -175,10 +176,14 @@ sub ImportXLS
       $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
       next if( ! $oWkC );
       my $title = ucfirst(lc(norm($oWkC->Value))) if( $oWkC->Value );
-      $title =~ s/\((\d\d\d\d)\)$//;
-      $title = norm($title);
 
-      if($title =~ /, (the|a|an|i|il)$/i) {
+      # dont output errors if there is no title (End of program)
+      if($title) {
+        $title =~ s/\((\d\d\d\d)\)$//;
+        $title = norm($title);
+      }
+
+      if($title and $title =~ /, (the|a|an|i|il)$/i) {
         my ($word2) = ($title =~ /, (the|a|an|i|il)$/i);
         $title =~ s/, (the|a|an|i|il)$//i;
         $title = norm(ucfirst(lc($word2)) . " ".$title);
