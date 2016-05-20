@@ -3,6 +3,8 @@ package NonameTV::DataStore;
 use strict;
 use utf8;
 use warnings;
+use JSON;
+use Data::Dumper;
 
 use NonameTV qw/FixProgrammeData/;
 use NonameTV::Augmenter;
@@ -86,7 +88,7 @@ sub new {
 
 =item Creating a new batch
 
-To create a new batch or replace an old batch completely, 
+To create a new batch or replace an old batch completely,
 do the following steps:
 
   StartBatch( $batch_id );
@@ -99,7 +101,7 @@ do the following steps:
 
 Called by an importer to signal the start of a batch of updates.
 Takes a single parameter containing a string that uniquely identifies
-a set of programmes.  
+a set of programmes.
 
 =cut
 
@@ -159,7 +161,7 @@ sub CommitPrograms {
 =item EndBatch
 
 Called by an importer to signal the end of a batch of updates.
-Takes two parameters: 
+Takes two parameters:
 
 An integer containing 1 if the batch was processed
 successfully, 0 if the batch failed and the database should
@@ -252,7 +254,7 @@ about the programme.
 The times must be in UTC. The strings must be properly encoded perl-strings.
 
 To specify a period of no programmes, either set the end_time of the last
-programme explicitly, or add a special program like this: 
+programme explicitly, or add a special program like this:
 
   $ds->AddProgramme( {
     channel_id => 1,
@@ -385,6 +387,11 @@ sub AddProgrammeRaw {
     $data->{description} =~ s/\s+$//;
   }
 
+  # Encode json
+  if ( exists( $data->{extra} ) and defined( $data->{extra} ) ) {
+    $data->{extra} = encode_json \%{$data->{extra}};
+  }
+
   if ( $self->{sa}->Add( 'programs', $data, 0 ) == -1 ) {
     my $err = $self->{dbh_errstr};
 
@@ -463,7 +470,7 @@ sub ClearChannel {
   return $deleted;
 }
 
-=item FindGrabberChannels 
+=item FindGrabberChannels
 
 Returns an array with all channels associated with a specific channel.
 Each channel is described by a hashref with keys matching the database.
@@ -758,12 +765,12 @@ sub ParsePrograms {
     ( $res, $sth ) = $self->sa->Sql( "
         SELECT p.* from programs p, channels c
         WHERE (c.xmltvid = ?)
-          and (p.channel_id = c.id) 
+          and (p.channel_id = c.id)
           and (p.start_time >= ?)
-          and (p.start_time <= ?) 
-        ORDER BY start_time asc, end_time desc", 
+          and (p.start_time <= ?)
+        ORDER BY start_time asc, end_time desc",
       [$xmltv_id, $date . ' 00:00:00', $next_date . ' 23:59:59'] );
-  
+
   my @result;
 
   my $done;
@@ -814,7 +821,7 @@ sub ParsePrograms {
   return \@result;
 }
 
-=back 
+=back
 
 =head1 COPYRIGHT
 
