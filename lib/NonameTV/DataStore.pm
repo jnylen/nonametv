@@ -3,7 +3,7 @@ package NonameTV::DataStore;
 use strict;
 use utf8;
 use warnings;
-use JSON;
+use JSON -support_by_pp;
 use Data::Dumper;
 
 use NonameTV qw/FixProgrammeData/;
@@ -389,7 +389,8 @@ sub AddProgrammeRaw {
 
   # Encode json
   if ( exists( $data->{extra} ) and defined( $data->{extra} ) ) {
-    $data->{extra} = encode_json \%{$data->{extra}};
+    my $json = new JSON->allow_nonref;
+    $data->{extra} = $json->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->encode($data->{extra});
   }
 
   if ( $self->{sa}->Add( 'programs', $data, 0 ) == -1 ) {
