@@ -18,6 +18,7 @@ use strict;
 use warnings;
 
 use DateTime;
+use JSON -support_by_pp;
 
 use NonameTV qw/MyGet ParseXmltv norm/;
 use NonameTV::Log qw/d w/;
@@ -57,21 +58,28 @@ sub ImportContent {
 
   foreach my $e (@{$data})
   {
+    #print("$e->{batch_id}\n");
     $e->{channel_id} = $chd->{id};
 
     $e->{start_dt}->set_time_zone( 'UTC' );
-    $e->{start_time} = $e->{start_dt}->ymd('-') . ' ' . 
+    $e->{start_time} = $e->{start_dt}->ymd('-') . ' ' .
         $e->{start_dt}->hms(':');
     delete $e->{start_dt};
 
     $e->{stop_dt}->set_time_zone( 'UTC' );
-    $e->{end_time} = $e->{stop_dt}->ymd('-') . ' ' . 
+    $e->{end_time} = $e->{stop_dt}->ymd('-') . ' ' .
         $e->{stop_dt}->hms(':');
     delete $e->{stop_dt};
-    
+
     # prev shown
     if(defined($e->{previously_shown})) {
     	$e->{previously_shown} = undef;
+    }
+
+    # json
+    if(defined($e->{extra})) {
+      my $json = new JSON->allow_nonref;
+    	$e->{extra} = $json->allow_nonref->utf8(0)->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->decode($e->{extra});
     }
 
     foreach my $flag (@flags) {
@@ -93,7 +101,7 @@ sub ImportContent {
 
     $ds->AddProgrammeRaw( $e );
   }
-  
+
   # Success
   return 1;
 }
