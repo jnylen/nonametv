@@ -15,9 +15,16 @@ Features:
 use utf8;
 
 use DateTime;
-use Spreadsheet::ParseExcel;
 use Data::Dumper;
 use Archive::Zip qw/:ERROR_CODES/;
+
+use Spreadsheet::ParseExcel;
+use Spreadsheet::XLSX;
+use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
+use Spreadsheet::Read;
+
+use Text::Iconv;
+my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
 
 use NonameTV qw/norm AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
@@ -76,15 +83,15 @@ sub ImportContentFile {
     my @members = $zip->members();
     foreach my $member (@members) {
       if($chd->{sched_lang} eq "sv") {
-        push( @swedish_files, $member->{fileName} ) if $member->{fileName} =~ /swe/i and $member->{fileName} =~ /\.xls$/i;
+        push( @swedish_files, $member->{fileName} ) if $member->{fileName} =~ /swe/i and $member->{fileName} =~ /\.(xls|xlsx)$/i;
       } elsif($chd->{sched_lang} eq "da") {
-        push( @swedish_files, $member->{fileName} ) if $member->{fileName} =~ /dan/i and $member->{fileName} =~ /\.xls$/i;
+        push( @swedish_files, $member->{fileName} ) if $member->{fileName} =~ /dan/i and $member->{fileName} =~ /\.(xls|xlsx)$/i;
       } elsif($chd->{sched_lang} eq "fi") {
-        push( @swedish_files, $member->{fileName} ) if $member->{fileName} =~ /fin/i and $member->{fileName} =~ /\.xls$/i;
+        push( @swedish_files, $member->{fileName} ) if $member->{fileName} =~ /fin/i and $member->{fileName} =~ /\.(xls|xlsx)$/i;
       } elsif($chd->{sched_lang} eq "no") {
-        push( @swedish_files, $member->{fileName} ) if $member->{fileName} =~ /nor/i and $member->{fileName} =~ /\.xls$/i ;
+        push( @swedish_files, $member->{fileName} ) if $member->{fileName} =~ /nor/i and $member->{fileName} =~ /\.(xls|xlsx)$/i ;
       } elsif($chd->{sched_lang} eq "en") {
-        push( @swedish_files, $member->{fileName} ) if $member->{fileName} =~ /eng*.*xls$/i and $member->{fileName} !~ /swe*.*xls$/i;
+        push( @swedish_files, $member->{fileName} ) if $member->{fileName} =~ /eng*.*xls$/i and $member->{fileName} !~ /swe*.*(xls|xlsx)$/i;
       }
     }
 
@@ -132,7 +139,9 @@ sub ImportFlatXLS
 
   progress( "Disney FlatXLS: $chd->{xmltvid}: Processing flat XLS $file" );
 
-  my $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );
+  my $oBook;
+  if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
+  else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
 
   my($iR, $oWkS, $oWkC);
   my( $time, $episode );
