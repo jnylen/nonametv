@@ -19,7 +19,7 @@ use IO::Uncompress::Unzip qw/unzip/;
 use Data::Dumper;
 use Encode qw/encode decode/;
 
-use NonameTV qw/ParseXml norm AddCountry AddCategory/;
+use NonameTV qw/ParseXml norm AddCountry AddCategory FixSubtitle/;
 use NonameTV::Log qw/progress error/;
 
 use NonameTV::DataStore::Helper;
@@ -102,8 +102,27 @@ sub ImportContent
       aspectRatio     => norm($mi->findvalue( 'aspectRatio' )),
       videoFormat     => norm($mi->findvalue( 'videoFormat' )),
       audio_lang      => norm($mi->findvalue( 'audioList/format/@language' )),
-      audio_format    => norm($mi->findvalue( 'audioList/format' ))
+      audio_format    => norm($mi->findvalue( 'audioList/format' )),
+      catchup         => 0,
+      startover       => 0
     };
+
+    # Rights
+    my $rights       = $mi->findnodes( 'rightsCategoryList/rightsCategory' );
+    foreach my $right ($rights->get_nodelist)
+    {
+       # devicetypes
+       foreach my $device ($right->findnodes( 'deviceTypeList/deviceType' )->get_nodelist)
+       {
+         # STB?
+         if($device->to_literal eq "stb" and ($right->findvalue( 'catchUpRights/@fastForward' ) eq "true" or $right->findvalue( 'catchUpRights/@rewind' ) eq "true" or $right->findvalue( 'catchUpRights/@pause' ) eq "true")) {
+           $m->{catchup} = 1;
+         }
+         if($device->to_literal eq "stb" and ($right->findvalue( 'startOverRights/@fastForward' ) eq "true" or $right->findvalue( 'startOverRights/@rewind' ) eq "true" or $right->findvalue( 'startOverRights/@pause' ) eq "true")) {
+           $m->{startover} = 1;
+         }
+       }
+    }
 
     $materials{$mid} = $m;
   }
@@ -147,7 +166,7 @@ sub ImportContent
     my $desc   = $xpc->findvalue( 'descriptionList/description[@type="content"]' );
 
     my $title        = $xpc->findvalue( 'genericTitleList/title' );
-    my $title_orgs   = $xpc->findnodes( 'titleList/title[@original="true"]' );
+    my $titles       = $xpc->findnodes( 'titleList/title' );
 
     # extra
     my $season       = $xpc->findvalue( 'seasonNumber' );
@@ -160,6 +179,12 @@ sub ImportContent
         start_time   => $start->hms(":"),
         description  => norm($desc),
     };
+
+    # extra
+    my $extra = {};
+    $extra->{titles} = [];
+    $extra->{descriptions} = [];
+    $extra->{qualifiers} = [];
 
     # Season and episode
     if($season and $episode) {
@@ -175,29 +200,13 @@ sub ImportContent
     }
 
     # Org title
-    foreach my $title_org2 ($title_orgs->get_nodelist)
+    foreach my $titles2 ($titles->get_nodelist)
     {
-      my $title_org = $title_org2->findvalue("title");
+      my $titler = $titles2->to_literal;
 
-      # Fix?
-      if($title_org2->findvalue( './@language' ) eq "eng" and defined($title_org) and $title_org ne "") {
-        if($title_org =~ /, The$/i)
-        {
-          $title_org =~ s/, The$//i;
-          $title_org = "The " . $title_org;
-        }
-        if($title_org =~ /, A$/i)
-        {
-          $title_org =~ s/, A$//i;
-          $title_org = "A " . $title_org;
-        }
-        if($title_org =~ /, An$/i)
-        {
-          $title_org =~ s/, An$//i;
-          $title_org = "An " . $title_org;
-        }
-
-        $ce->{original_title} = norm($title_org) if norm($title_org) ne norm($title);
+      # original?
+      if($titles2->findvalue('./@original') eq "true" and $titles2->findvalue( './@language' ) eq "eng" and defined($titler) and $titler ne "") {
+        $ce->{original_title} = FixSubtitle(norm($titler)) if norm($titler) ne norm($title);
       }
     }
 
@@ -223,13 +232,16 @@ sub ImportContent
     # Rerun?
     if($rerun eq "true") {
       $ce->{new} = "0";
+      push $extra->{qualifiers}, "repeat";
     } else {
       $ce->{new} = "1";
+      push $extra->{qualifiers}, "new";
     }
 
     # Live?
     if($live eq "true") {
       $ce->{live} = "1";
+      push $extra->{qualifiers}, "live";
     } else {
       $ce->{live} = "0";
     }
@@ -237,15 +249,19 @@ sub ImportContent
     # Audio?
     if(defined($a_format) and $a_format eq "mono") {
       $ce->{stereo} = "mono";
+      push $extra->{qualifiers}, "mono";
     } elsif(defined($a_format) and $a_format eq "stereo") {
       $ce->{stereo} = "stereo";
+      push $extra->{qualifiers}, "stereo";
     }
 
     # Aspect
     if(defined($aspect) and $aspect eq "16:9") {
       $ce->{aspect} = "16:9";
+      push $extra->{qualifiers}, "widescreen";
     } elsif(defined($aspect) and $aspect eq "4:3") {
       $ce->{aspect} = "4:3";
+      push $extra->{qualifiers}, "smallscreen";
     }
 
     # credits
