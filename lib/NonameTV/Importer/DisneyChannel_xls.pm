@@ -26,7 +26,7 @@ use Spreadsheet::Read;
 use Text::Iconv;
 my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
 
-use NonameTV qw/norm AddCategory MonthNumber/;
+use NonameTV qw/norm AddCategory MonthNumber FixSubtitle/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error d p w f/;
 use NonameTV::Config qw/ReadConfig/;
@@ -252,7 +252,7 @@ sub ImportFlatXLS
   	  $title =~ s/S(\d+)$//;
 
       # Clean it
-	     $title = norm($title);
+	    $title = FixSubtitle(norm($title));
 
       $oWkC = $oWkS->{Cells}[$iR][$columns{'ORGTitle'}];
       $title_org = norm($oWkC->Value);
@@ -261,72 +261,50 @@ sub ImportFlatXLS
       my $desc = $oWkC->Value if( $oWkC );
 
       if( $time and $title ){
-
-	  # empty last day array
-      undef @ces;
-
-        progress("$time - $title");
-
         my $ce = {
           channel_id   => $chd->{id},
 		      title		   => norm($title),
           start_time   => $time,
         };
 
-		## Episode
-		$oWkC = $oWkS->{Cells}[$iR][$columns{'Episode'}];
-     	my $episode = $oWkC->Value;
+  		  ## Episode
+  		  $oWkC = $oWkS->{Cells}[$iR][$columns{'Episode'}];
+       	my $episode = $oWkC->Value if( $oWkC );
 
-     	$oWkC = $oWkS->{Cells}[$iR][$columns{'Season'}];
-     	my $season = $oWkC->Value;
+       	$oWkC = $oWkS->{Cells}[$iR][$columns{'Season'}];
+       	my $season = $oWkC->Value if( $oWkC );
 
-     	# genre (column 6)
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Genre'}];
-	    my $genre = norm($oWkC->Value) if( $oWkC );
+       	# genre (column 6)
+        $oWkC = $oWkS->{Cells}[$iR][$columns{'Genre'}];
+  	    my $genre = norm($oWkC->Value) if( $oWkC );
 
-      if(defined($episode) and $episode ne "" and $episode > 0) {
-      	$ce->{episode} = ". " . ($episode-1) . " ." if $episode ne "";
-		  }
+        if(defined($episode) and $episode ne "" and $episode > 0) {
+        	$ce->{episode} = ". " . ($episode-1) . " ." if $episode ne "";
+  		  }
 
         # Genre
-		if( defined($genre) and $genre ne "" ){
-			my ($program_type2, $category2 ) = $ds->LookupCat( 'DisneyChannel_xls', $genre );
-			AddCategory( $ce, $program_type2, $category2 );
-		}
+    		if( defined($genre) and $genre ne "" ){
+    			my ($program_type2, $category2 ) = $ds->LookupCat( 'DisneyChannel_xls', $genre );
+    			AddCategory( $ce, $program_type2, $category2 );
+    		}
 
-        # movie
-		#if($episode eq 1 and $season eq 0) {
-		#	$ce->{episode} = undef;
-		#	$ce->{program_type} = "movie";
-		#}
+    		if(defined($ce->{episode}) and $season > 0) {
+    			$ce->{episode} = $season-1 . $ce->{episode};
+    		}
+		    ## END
 
-		if(defined($ce->{episode}) and $season > 0) {
-			$ce->{episode} = $season-1 . $ce->{episode};
-		}
-		## END
+    		# Desc
+    		$ce->{description} = norm($desc) if defined($desc);
 
-		# Desc
-		$ce->{description} = norm($desc) if defined($desc);
+		    # Find production year from description.
+  	    if(defined($desc) and $ce->{description} =~ /\((\d\d\d\d)\)/)
+  	    {
+  	    	$ce->{description} =~ s/\((\d\d\d\d)\) //;
+  	    	$ce->{production_date} = "$1-01-01";
+  	    }
 
-		# Find production year from description.
-	    if(defined($desc) and $ce->{description} =~ /\((\d\d\d\d)\)/)
-	    {
-	    	$ce->{description} =~ s/\((\d\d\d\d)\) //;
-	    	$ce->{production_date} = "$1-01-01";
-	    }
-
-	    $ce->{original_title} = norm($title_org) if $ce->{title} ne norm($title_org) and norm($title_org) ne "";
-        # , The
-        if(defined($ce->{original_title}) and $ce->{original_title} =~ /, The$/) {
-            $ce->{original_title} =~ s/, The$//;
-            $ce->{original_title} = "The ".$ce->{original_title};
-        }
-
-        # Eng title
-        if($ce->{title} =~ /, The$/) {
-            $ce->{title} =~ s/, The$//;
-            $ce->{title} = "The ".$ce->{title};
-        }
+        # Org title
+        $ce->{original_title} = FixSubtitle(norm($title_org)) if $ce->{title} ne norm($title_org) and norm($title_org) ne "";
 
         # Production Year
         if(defined $columns{'Year'}) {
@@ -339,9 +317,9 @@ sub ImportFlatXLS
             }
         }
 
+        progress("$time - $title");
         $dsh->AddProgramme( $ce );
 
-		#push( @ces , $ce );
       }
 
     } # next row
