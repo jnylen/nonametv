@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use utf8;
 use Unicode::String;
+use Roman;
 
 =pod
 
@@ -14,11 +15,10 @@ Import data for DR in xml-format.
 
 use DateTime;
 use XML::LibXML;
-use Roman;
 
 use NonameTV qw/ParseXml AddCategory AddCountry norm ParseDescCatDan/;
 use NonameTV::DataStore::Helper;
-use NonameTV::Log qw/w f p/;
+use NonameTV::Log qw/f p w/;
 
 use NonameTV::Importer::BaseDaily;
 
@@ -36,8 +36,6 @@ sub new {
     $self->{UrlRoot} = 'http://www.dr.dk/Tjenester/epglive/epg.';
   }
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
-  $self->{datastorehelper} = $dsh;
   $self->{NO_DUPLICATE_SKIP} = 1;
   $self->{datastore}->{augment} = 1;
 
@@ -80,16 +78,12 @@ sub ImportContent {
   my $self = shift;
   my( $batch_id, $cref, $chd ) = @_;
 
-  #$$cref = Unicode::String::latin1 ($$cref)->utf8 ();
-
   $self->{batch_id} = $batch_id;
 
   my $xmltvid=$chd->{xmltvid};
   my $channel_id = $chd->{id};
-  my $currdate = "x";
 
   my $ds = $self->{datastore};
-  my $dsh = $self->{datastorehelper};
 
   my $doc = ParseXml( $cref );
 
@@ -106,16 +100,8 @@ sub ImportContent {
   }
 
   foreach my $b ($ns->get_nodelist) {
-  	# Start and so on
+    # Start and so on
     my $start = ParseDateTime( $b->findvalue( "pro_publish[1]/ppu_start_timestamp_announced" ) );
-
-    if( $start->ymd("-") ne $currdate ){
-  		p("Date is ".$start->ymd("-"));
-
-  		#$dsh->StartDate( $start->ymd("-") , "06:00" );
-  		$currdate = $start->ymd("-");
-  	}
-
     my $title = $b->findvalue( "pro_title" );
     my $title_alt = $b->findvalue( "pro_publish[1]/ppu_title_alt" );
     my $subtitle = $b->findvalue( "pro_publish[1]/pro_punchline" );
@@ -136,17 +122,17 @@ sub ImportContent {
 	# Put everything in a array
     my $ce = {
       channel_id => $chd->{id},
-      start_time => $start->ymd("-") . " " . $start->hms(":"),
+      start_time => $start,
       title => norm($title),
       description => norm($desc),
     };
 
+    $ce->{subtitle} = norm($subtitle) if norm($subtitle) ne "";
+
     my $extra = {};
     $extra->{qualifiers} = [];
 
-    $ce->{subtitle} = norm($subtitle) if norm($subtitle) ne "";
-
-    # Episode info in xmltv-format
+	  # Episode info in xmltv-format
     if( ($episode ne "") and ( $of_episode ne "") ) {
       $ce->{episode} = sprintf( ". %d/%d .", $episode-1, $of_episode );
       $ce->{program_type} = "series";
@@ -154,7 +140,6 @@ sub ImportContent {
       $ce->{episode} = sprintf( ". %d .", $episode-1 );
       $ce->{program_type} = "series";
     }
-
 
     # Movie.
     if($ce->{title} =~ /^(Natbio|Filmperler|Fredagsfilm)\:/i) {
@@ -174,32 +159,54 @@ sub ImportContent {
     my($country2 ) = $ds->LookupCountry( "DR", norm($country) );
     AddCountry( $ce, $country2 );
 
-    $ce->{aspect} = '4:3';
-
+    # Video aspect and quality
     my $widescreen =  $b->findvalue( 'pro_publish[1]/ppu_video' );
     if( $widescreen eq '16:9' ){
-     	 	$ce->{aspect} = '16:9';
-        push $extra->{qualifiers}, "widescreen";
+     	$ce->{aspect} = '16:9';
+      push $extra->{qualifiers}, "widescreen";
   	} elsif( $widescreen eq 'HD' ){
-     	 	$ce->{quality} = "HDTV";
-        push $extra->{qualifiers}, "HD";
-  	}
+      $ce->{quality} = "HDTV";
+      push $extra->{qualifiers}, "HD";
+  	} elsif( $widescreen eq '4:3' ){
+      $ce->{aspect} = '4:3';
+      push $extra->{qualifiers}, "smallscreen";
+    }
 
-  	my $live = $b->findvalue( 'pro_publish[1]/ppu_islive' );
-  	if( $live eq "TRUE" ) {
-  		$ce->{live} = "1";
+
+    my $live = $b->findvalue( 'pro_publish[1]/ppu_islive' );
+    if( $live eq "TRUE" ) {
+      $ce->{live} = "1";
       push $extra->{qualifiers}, "live";
-  	} else {
-  		$ce->{live} = "0";
-  	}
+    } else {
+      $ce->{live} = "0";
+    }
 
-  	my $rerun = $b->findvalue( 'pro_publish[1]/ppu_isrerun' );
-  	if( $rerun eq "TRUE" ) {
-  		$ce->{rerun} = "1";
+    my $rerun = $b->findvalue( 'pro_publish[1]/ppu_isrerun' );
+    if( $rerun eq "TRUE" ) {
+      $ce->{rerun} = "1";
       push $extra->{qualifiers}, "rerun";
-  	} else {
-  		$ce->{rerun} = "0";
-  	}
+    } else {
+      $ce->{rerun} = "0";
+    }
+
+    my $subtitled = $b->findvalue( 'pro_publish[1]/ppu_subtext_type' );
+    if( $subtitled eq "TTV" ) {
+      push $extra->{qualifiers}, "CC";
+    }
+
+    my $catchup = $b->findvalue( 'pro_publish[1]/ppu_streaming_od' );
+    if( $catchup eq "TRUE" ) {
+      push $extra->{qualifiers}, "catchup";
+    }
+
+    my $audio = $b->findvalue( 'pro_publish[1]/ppu_audio' );
+    if( $audio eq "Stereo" ) {
+      push $extra->{qualifiers}, "stereo";
+    } elsif( $audio eq "Surround" ) {
+      push $extra->{qualifiers}, "surround";
+    } elsif( $audio eq "5.1" ) {
+      push $extra->{qualifiers}, "DD 5.1";
+    }
 
     # Prod year
     $ce->{production_date} = "$year-01-01" if $year ne "";
@@ -222,6 +229,7 @@ sub ImportContent {
     my @actors;
     my @directors;
     my @writers;
+    my $saeson;
 
     ## Split the text, add directors and more.
     my @sentences = (split_text( $ce->{description} ), "");
@@ -263,6 +271,10 @@ sub ImportContent {
         }
 
         $sentences[$i] = "";
+      } elsif(defined($ce->{episode}) and ( $saeson ) = ($sentences[$i] =~ /^S.son (\d+)\.$/)) {
+        $ce->{episode} = $saeson-1 . $ce->{episode};
+
+        $sentences[$i] = "";
       }
     }
 
@@ -270,7 +282,7 @@ sub ImportContent {
     $ce->{description} = join_text( @sentences );
 
     # episodes is in the title
-    if(defined($ce->{episode})) {
+    if(!$saeson and defined($ce->{episode})) {
       my ( $original_title, $romanseason ) = ( $ce->{title} =~ /^(.*)\s+(.*)$/ );
 
       # Roman season found
@@ -328,7 +340,6 @@ sub ImportContent {
     $ce->{category} = "Movies" if defined($ce->{program_type}) and $ce->{program_type} eq "movie" and (defined($ce->{category}) and $ce->{category} eq "Series");
 
     p($start." $ce->{title}");
-
     $ce->{extra} = $extra;
 
     $ds->AddProgramme( $ce );
@@ -352,12 +363,12 @@ sub ParseDateTime {
     hour => $hour,
     minute => $minute,
     second => $second,
-    time_zone => 'Europe/Copenhagen',
-  );
+    time_zone => "Europe/Copenhagen"
+      );
 
-  #$dt->set_time_zone( "UTC" );
+  $dt->set_time_zone( "UTC" );
 
-  return $dt;
+  return $dt->ymd("-") . " " . $dt->hms(":");
 }
 
 sub Object2Url {
