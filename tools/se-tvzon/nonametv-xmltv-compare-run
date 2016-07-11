@@ -1,13 +1,13 @@
 #!/bin/bash
 
-NROOT=/home/jnylen/content
+NROOT=/content
 PROOT=/home/jnylen/projects/nonametv
 
 rm -rf $NROOT/xmltv_compare
 mkdir $NROOT/xmltv_compare
 cd $NROOT/xmltv_compare
-$PROOT/tools/se-tvzon/nonametv-xmltv-compare $NROOT/xmltv_staging $NROOT/xmltv_old
+$PROOT/tools/se-tvzon/nonametv-xmltv-compare $NROOT/staging/xmltv $NROOT/old/xmltv
 
-rm -rf $NROOT/xmltv_old
-mkdir $NROOT/xmltv_old
-rsync -a $NROOT/xmltv_staging/ $NROOT/xmltv_old
+rm -rf $NROOT/old/xmltv
+mkdir $NROOT/old/xmltv
+rsync -a $NROOT/staging/xmltv/ $NROOT/old/xmltv

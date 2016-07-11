@@ -56,7 +56,7 @@ EOHELP
 
 my $ds = CreateDataStore();
 
-my $root = "/home/jnylen/maildir/.Projects/";
+my $root = "/content/maildir/.Projects/";
 my @folders = qw(NonameTV-Data.GlobalListings
 		 NonameTV-Data.France24
 		 NonameTV-Data.CNBC
@@ -76,8 +76,8 @@ my @folders = qw(NonameTV-Data.GlobalListings
 		 NonameTV-Data.YaS
 		 NonameTV-Data.ATV
      NonameTV-Data.Fatstone
-		 NonameTV-Data.KinoPolska);
-
+		 );
+# NonameTV-Data.KinoPolska
 # Flag messages AFTER they have been processed. Then I normally
 # only have to move the message to the correct folder.
 
@@ -89,6 +89,7 @@ StartLogSection( "nonametv-parse-maildir", 0 );
 
 foreach my $dir (@folders) {
   my $folder = $mgr->open( "$root.$dir",
+                           create => 1,
                            access => 'rw',
                            extract => 'ALWAYS' );
 
@@ -314,13 +315,13 @@ sub guess_channel
     }
 
     # Benelux schedules for Universal
-    return "13thstreet.nl" if $filename =~ /^13\.Ben\.Dut/i;
-    return "en.13thstreet.nl" if $filename =~ /^13\.Ben\.Eng/i;
-    return "syfy.nl" if $filename =~ /^Syfy\.Ben\.Dut/i;
-    return "en.syfy.nl" if $filename =~ /^Syfy\.Ben\.Eng/i;
+    #return "13thstreet.nl" if $filename =~ /^13\.Ben\.Dut/i;
+    #return "en.13thstreet.nl" if $filename =~ /^13\.Ben\.Eng/i;
+    #return "syfy.nl" if $filename =~ /^Syfy\.Ben\.Dut/i;
+    #return "en.syfy.nl" if $filename =~ /^Syfy\.Ben\.Eng/i;
 
-    return "syfy.nl" if $filename =~ /^Syfy\s*Benelux/i and $filename =~ /DUT/;
-    return "en.syfy.nl" if $filename =~ /^Syfy\s*Benelux/i and $filename =~ /ENG/;
+    #return "syfy.nl" if $filename =~ /^Syfy\s*Benelux/i and $filename =~ /DUT/;
+    #return "en.syfy.nl" if $filename =~ /^Syfy\s*Benelux/i and $filename =~ /ENG/;
 
     # Sky News
     return "international.skynews.com" if $filename =~ /^SKYNI/i and $filename =~ /\.txt$/i;
@@ -378,10 +379,10 @@ sub guess_channel
  }
 
  if( $dir =~ /Playboy/ ) {
-     return "europe.playboytv.com" if $filename =~ /^playboy/i and $filename =~ /\.docx$/i;
+     #return "europe.playboytv.com" if $filename =~ /^playboy/i and $filename =~ /\.docx$/i;
      return "adultchannel.co.uk" if $filename =~ /^the\s*adult/i and $filename =~ /\.doc$/i;
-     return "brazzerstveurope.com" if $filename =~ /^brazzers/i and $filename =~ /\.docx$/i;
-     return "europe.realitykings.com" if $filename =~ /^rktv/i and $filename =~ /\.docx$/i;
+     #return "brazzerstveurope.com" if $filename =~ /^brazzers/i and $filename =~ /\.docx$/i;
+     #return "europe.realitykings.com" if $filename =~ /^rktv/i and $filename =~ /\.docx$/i;
  }
 
  if( $dir =~ /Hustler/ and $filename =~ /\.(xls|xlsx)$/i ) {

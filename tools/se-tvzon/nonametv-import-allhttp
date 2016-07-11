@@ -14,7 +14,7 @@ $NONAMETV CMoreFI $1 $2 $3
 $NONAMETV Discovery_xml $1 $2 $3
 $NONAMETV Discovery_xmltv $1 $2 $3
 $NONAMETV DR $1 $2 $3
-$NONAMETV DR_radio $1 $2 $3
+#$NONAMETV DR_radio $1 $2 $3
 $NONAMETV DK4 $1 $2 $3
 $NONAMETV DigiTV $1 $2 $3
 $NONAMETV DreiSat $1 $2 $3
@@ -35,7 +35,7 @@ $NONAMETV KanalGlobal $1 $2 $3
 $NONAMETV MTVde $1 $2 $3 # vg media license/foreign channels
 $NONAMETV MTV_novg $1 $2 $3 # no vg media license
 $NONAMETV Mtve $1 $2 $3
-$NONAMETV MTGRadio $1 $2 $3
+#$NONAMETV MTGRadio $1 $2 $3
 #$NONAMETV MTGRadioNO $1 $2 $3
 $NONAMETV NRK $1 $2 $3
 $NONAMETV ORF $1 $2 $3
@@ -46,6 +46,7 @@ $NONAMETV RBBDE $1 $2 $3
 $NONAMETV RAI $1 $2 $3
 $NONAMETV SBSRadio $1 $2 $3
 $NONAMETV SBSTV $1 $2 $3
+$NONAMETV SBSTVSWE $1 $2 $3
 $NONAMETV SBSEurosport $1 $2 $3
 $NONAMETV SRF $1 $2 $3
 $NONAMETV SverigesRadio $1 $2 $3
@@ -54,6 +55,7 @@ $NONAMETV ViasatDK $1 $2 $3
 $NONAMETV ViasatNO $1 $2 $3
 $NONAMETV ViasatFI $1 $2 $3
 $NONAMETV TV2 $1 $2 $3
+$NONAMETV TV2NO $1 $2 $3
 $NONAMETV TV2Reg $1 $2 $3
 $NONAMETV TV4 $1 $2 $3
 $NONAMETV TV7 $1 $2 $3
@@ -66,20 +68,22 @@ $NONAMETV EurosportPL $1 $2 $3
 $NONAMETV KBSWorld $1 $2 $3
 $NONAMETV Horse1 $1 $2 $3
 $NONAMETV RTLDE $1 $2 $3
+$NONAMETV RTLDE_HTML $1 $2 $3
 $NONAMETV KiKA $1 $2 $3
 $NONAMETV Anixe $1 $2 $3
 $NONAMETV RTS $1 $2 $3
 $NONAMETV Arirang $1 $2 $3
+$NONAMETV ServusTV $1 $2 $3
 
 # Download files
-wget -O /home/jnylen/content/channels/tv_grab/ok54.xml http://epg.ok-rlp.de/xmltv/trier.xml
-wget -O /home/jnylen/content/channels/tv_grab/nahetv.xml http://epg.ok-rlp.de/xmltv/idar-oberstein.xml
-wget -O /home/jnylen/content/channels/tv_grab/okkl.xml http://epg.ok-rlp.de/xmltv/kaiserslautern.xml
-wget -O /home/jnylen/content/channels/tv_grab/ok4.xml http://epg.ok-rlp.de/xmltv/koblenz.xml
-wget -O /home/jnylen/content/channels/tv_grab/oklu.xml http://epg.ok-rlp.de/xmltv/ludwigshafen.xml
-wget -O /home/jnylen/content/channels/tv_grab/okmainz.xml http://epg.ok-rlp.de/xmltv/mainz.xml
-wget -O /home/jnylen/content/channels/tv_grab/okneustadt.xml http://epg.ok-rlp.de/xmltv/neustadt.xml
-wget -O /home/jnylen/content/channels/tv_grab/oksp.xml http://epg.ok-rlp.de/xmltv/rodalben.xml
-wget -O /home/jnylen/content/channels/tv_grab/okspeyer.xml http://epg.ok-rlp.de/xmltv/speyer.xml
-wget -O /home/jnylen/content/channels/tv_grab/worms.xml http://epg.ok-rlp.de/xmltv/worms.xml
+wget -O /content/channels/tv_grab/ok54.xml http://epg.ok-rlp.de/xmltv/trier.xml
+wget -O /content/channels/tv_grab/nahetv.xml http://epg.ok-rlp.de/xmltv/idar-oberstein.xml
+wget -O /content/channels/tv_grab/okkl.xml http://epg.ok-rlp.de/xmltv/kaiserslautern.xml
+wget -O /content/channels/tv_grab/ok4.xml http://epg.ok-rlp.de/xmltv/koblenz.xml
+wget -O /content/channels/tv_grab/oklu.xml http://epg.ok-rlp.de/xmltv/ludwigshafen.xml
+wget -O /content/channels/tv_grab/okmainz.xml http://epg.ok-rlp.de/xmltv/mainz.xml
+wget -O /content/channels/tv_grab/okneustadt.xml http://epg.ok-rlp.de/xmltv/neustadt.xml
+wget -O /content/channels/tv_grab/oksp.xml http://epg.ok-rlp.de/xmltv/rodalben.xml
+wget -O /content/channels/tv_grab/okspeyer.xml http://epg.ok-rlp.de/xmltv/speyer.xml
+wget -O /content/channels/tv_grab/worms.xml http://epg.ok-rlp.de/xmltv/worms.xml
 $NONAMETV TVGrabXX $1 $2 $3

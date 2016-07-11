@@ -15,11 +15,11 @@ use XML::LibXML;
 use NonameTV qw(ParseXml);
 
 # sources
-my $channelsxml = '/home/jnylen/content/xmltv/channels.xml.gz';
-my $xmltvdir    = '/home/jnylen/content/xmltv';
+my $channelsxml = '/content/full/xmltv/channels.xml.gz';
+my $xmltvdir    = '/content/full/xmltv';
 
 # target
-my $datalistxml = '/home/jnylen/content/xmltv/datalist.xml.gz';
+my $datalistxml = '/content/full/xmltv/datalist.xml.gz';
 
 my $xml;
 gunzip $channelsxml => \$xml

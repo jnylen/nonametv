@@ -8,6 +8,8 @@ use lib "$FindBin::Bin/../lib";
 use DateTime;
 use File::Util;
 use File::Copy qw/copy move/;
+use File::Basename;
+use File::Path qw/make_path/;
 
 use NonameTV;
 use NonameTV::DataStore;
@@ -41,14 +43,14 @@ $channel_data{ "S1G" } = "gold.sat1.de";
 $channel_data{ "SX" }  = "sixx.de";
 
   # list files inside of the channel directory and check when they have been touched
-  my( $cf ) = File::Util->new();
-  my( @cffiles ) = $cf->list_dir( "/home/jnylen/content/autoupload/prosieben", '--no-fsdots' );
-  foreach my $cff (@cffiles)
+  opendir(DIR, "/content/ftp/prosieben/");
+
+  foreach my $cff (readdir(DIR))
   {
     if($cff =~ /^\./) { next; }
     my ( $id, $week, $year ) = split(/_/, $cff);
 
-    my $cftype = join(',', File::Util->file_type( "/home/jnylen/content/autoupload/prosieben/$cff" ) );
+    my $cftype = join(',', File::Util->file_type( "/content/ftp/prosieben/$cff" ) );
 
     if( $cff !~ /\.xml$/i ){
         #progress( "File $cff isn't a xml file - skipping" );
@@ -58,9 +60,10 @@ $channel_data{ "SX" }  = "sixx.de";
     if( not exists( $channel_data{$id} ) )
     {
         print "Files with name $id hasnt been specified as a channel.\n";
-        #unlink "/home/jnylen/content/autoupload/prosieben/$cff";
+        #unlink "/content/ftp/prosieben/$cff";
     } else {
-      move( "/home/jnylen/content/autoupload/prosieben/$cff", "$filestore/$channel_data{$id}/$cff" );
+      make_path(dirname("$filestore/$channel_data{$id}/$cff"));
+      move( "/content/ftp/prosieben/$cff", "$filestore/$channel_data{$id}/$cff" );
       print "$cff moved to $channel_data{$id}\n";
     }
 

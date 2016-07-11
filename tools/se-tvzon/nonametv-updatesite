@@ -1,6 +1,6 @@
 #!/bin/sh
 
-NROOT=/home/jnylen/content
+NROOT=/content
 
 # Xmltv
 tools/nonametv-export Xmltv --export-channels

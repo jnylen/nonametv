@@ -16,7 +16,6 @@ tools/nonametv-import Gospel $1 $2 $3
 tools/nonametv-import TVChile $1 $2 $3
 tools/nonametv-import Svt $1 $2 $3
 tools/nonametv-import Venetsia $1 $2 $3
-tools/nonametv-import SBSTVSWE $1 $2 $3
 tools/nonametv-import BBCWW $1 $2 $3
 tools/nonametv-import ChannelOneRussia $1 $2 $3
 tools/nonametv-import WFC $1 $2 $3
@@ -57,7 +56,6 @@ tools/nonametv-import FoxTV $1 $2 $3
 tools/nonametv-import Nonstop $1 $2 $3
 tools/nonametv-import NonstopXLS $1 $2 $3
 tools/nonametv-import OKG $1 $2 $3
-tools/nonametv-import ServusTV $1 $2 $3
 tools/nonametv-import RussiaToday $1 $2 $3
 tools/nonametv-import SkyNews $1 $2 $3
 tools/nonametv-import DreiPlus $1 $2 $3

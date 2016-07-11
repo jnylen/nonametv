@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NROOT=/home/jnylen/content
+NROOT=/content
 PROOT=/home/jnylen/projects/nonametv/
 
 #Q="--quiet --quiet"
@@ -44,6 +44,15 @@ then
   exit
 fi
 
+if [ $1x = --skydex ]
+then
+  # Run SkyDE specific commands
+  ruby sky_importer.rb
+  perl -I lib tools/nonametv-import SkyDE $Q
+
+  exit
+fi
+
 if [ $1x = --dailyx ]
 then
   # Run daily commands
@@ -83,12 +92,12 @@ $d tools/se-tvzon/nonametv-filestore-carusmedia $Q
 
 # Ruby importers for files
 $d ruby ftv_importer.rb
-$d ruby tv5_importer.rb
+#$d ruby tv5_importer.rb
 
 # Import everything
 $d tools/se-tvzon/nonametv-import-allhttp $Q
 $h tools/se-tvzon/nonametv-import-allhttp $Q --short-grab
-tools/se-tvzon/nonametv-import-allmail $Q
+$d tools/se-tvzon/nonametv-import-allmail $Q
 
 # Remove old
 $d perl -I lib/ tools/nonametv-export Xmltv --remove-old
@@ -114,8 +123,8 @@ $d tools/se-tvzon/nonametv-updatesite $Q
 $d tools/se-tvzon/nonametv-upload $Q
 
 # Run after, everything
-$d rsync --delete -r /home/jnylen/content/html/00status.html /var/www/xmltv/
+#$d rsync --delete -r /content/html/00status.html /var/www/xmltv/
 
 # Combined files
-$d ruby /home/jnylen/notice.rb
-$d /home/jnylen/xmltv-grabber
+#$d ruby /home/jnylen/notice.rb
+#$d /home/jnylen/xmltv-grabber

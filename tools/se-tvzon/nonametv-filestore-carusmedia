@@ -8,6 +8,8 @@ use lib "$FindBin::Bin/../lib";
 use DateTime;
 use File::Util;
 use File::Copy qw/copy move/;
+use File::Basename;
+use File::Path qw/make_path/;
 
 use NonameTV;
 use NonameTV::DataStore;
@@ -34,15 +36,14 @@ $channel_data{ "bongusto" } = "bongusto.tv";
 $channel_data{ "marcopolo" } = "marcopolo.de";
 
   # list files inside of the channel directory and check when they have been touched
-  my( $cf ) = File::Util->new();
-  my( @cffiles ) = $cf->list_dir( "/home/jnylen/content/autoupload/carusmedia", '--no-fsdots' );
-  foreach my $cff (@cffiles)
+  opendir(DIR, "/content/ftp/carusmedia/");
+  foreach my $cff (readdir(DIR))
   {
     if($cff =~ /^\./) { next; }
 
-    my ( $id, $date ) = split(/_/, $cff);
+    my ( $id, $pls, $date ) = split(/_/, $cff);
 
-    my $cftype = join(',', File::Util->file_type( "/home/jnylen/content/autoupload/carusmedia/$cff" ) );
+    my $cftype = join(',', File::Util->file_type( "/content/ftp/carusmedia/$cff" ) );
     if( $cftype !~ /PLAIN/ ){
       progress( "File $cff is $cftype - skipping" );
       next;
@@ -51,9 +52,10 @@ $channel_data{ "marcopolo" } = "marcopolo.de";
     if( not exists( $channel_data{$id} ) )
     {
         print "Files with name $id hasnt been specified as a channel.\n";
-        #unlink "/home/jnylen/content/autoupload/carusmedia/$cff";
+        #unlink "/content/ftp/carusmedia/$cff";
     } else {
-      move( "/home/jnylen/content/autoupload/carusmedia/$cff", "$filestore/$channel_data{$id}/$cff" );
+      make_path(dirname("$filestore/$channel_data{$id}/$cff"));
+      move( "/content/ftp/carusmedia/$cff", "$filestore/$channel_data{$id}/$cff" );
       print "$cff moved to $channel_data{$id}\n";
     }
 

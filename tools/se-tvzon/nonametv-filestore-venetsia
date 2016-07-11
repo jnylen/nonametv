@@ -8,6 +8,8 @@ use lib "$FindBin::Bin/../lib";
 use DateTime;
 use File::Util;
 use File::Copy qw/copy move/;
+use File::Basename;
+use File::Path qw/make_path/;
 
 use NonameTV;
 use NonameTV::DataStore;
@@ -15,6 +17,7 @@ use NonameTV::Config qw/ReadConfig/;
 use NonameTV::Log qw/progress error d p w f/;
 
 use Getopt::Long;
+use Data::Dumper;
 
 my $opt = { 'verbose' => 0 };
 
@@ -69,19 +72,16 @@ $channel_data{ "r04" } = "vega.radio.yle.fi";
 $channel_data{ "r02" } = "x.radio.yle.fi";
 $channel_data{ "r44" } = "x3m.radio.yle.fi";
 
+  opendir(DIR, "/content/ftp/venetsia/");
 
-
-  # list files inside of the channel directory and check when they have been touched
-  my( $cf ) = File::Util->new();
-  my( @cffiles ) = $cf->list_dir( "/home/jnylen/content/autoupload/venetsia", '--no-fsdots' );
-  foreach my $cff (@cffiles)
+  foreach my $cff (readdir(DIR))
   {
     if($cff =~ /^\./) { next; }
 
     my ( $id, $date ) = split(/_/, $cff);
 
-    my $cftype = join(',', File::Util->file_type( "/home/jnylen/content/autoupload/venetsia/$cff" ) );
-    my $fsftype = join(',', File::Util->file_type( "/home/jnylen/content/autoupload/venetsia/$cff" ) );
+    my $cftype = join(',', File::Util->file_type( "/content/ftp/venetsia/$cff" ) );
+    my $fsftype = join(',', File::Util->file_type( "/content/ftp/venetsia/$cff" ) );
     if( $cftype !~ /PLAIN/ ){
       progress( "File $cff is $fsftype - skipping" );
       next;
@@ -90,9 +90,10 @@ $channel_data{ "r44" } = "x3m.radio.yle.fi";
     if( not exists( $channel_data{$id} ) )
     {
         print "Files with name $id hasnt been specified as a channel.\n";
-        #unlink "/home/jnylen/content/autoupload/venetsia/$cff";
+        #unlink "/content/ftp/venetsia/$cff";
     } else {
-      move( "/home/jnylen/content/autoupload/venetsia/$cff", "$filestore/$channel_data{$id}/$cff" );
+      make_path(dirname("$filestore/$channel_data{$id}/$cff"));
+      move( "/content/ftp/venetsia/$cff", "$filestore/$channel_data{$id}/$cff" );
       print "$cff moved to $channel_data{$id}\n";
     }
 
