@@ -75,12 +75,14 @@ sub ImportContent
     my $eid = $ei->findvalue( 'contentIdRef' );
 
     my $e = {
-      startTime       => norm($ei->findvalue( 'timeList/time/startTime' )),
-      endTime         => norm($ei->findvalue( 'timeList/time/endTime' )),
+      startTime       => norm($ei->findvalue( 'timeList/startTime' )),
+      endTime         => norm($ei->findvalue( 'timeList/endTime' )),
       live            => norm($ei->findvalue( 'live' )),
       rerun           => norm($ei->findvalue( 'rerun' )),
       materialIdRef   => norm($ei->findvalue( 'materialIdRef' ))
     };
+
+    #print Dumper($e);
 
     $events{$i} = $e;
     $i++;
@@ -324,6 +326,8 @@ sub AddCredits
 sub ParseDateTime {
   my( $str ) = @_;
 
+  #print Dumper($str);
+
   my( $year, $month, $day, $hour, $minute, $second ) =
       ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)/ );
 
@@ -346,9 +350,11 @@ sub Object2Url {
 
   my( $date ) = ($batch_id =~ /_(.*)/);
 
-  #my $url = sprintf( "http://clipsource.se/epg/api?key=%s&date=%s&channelId=%s", $self->{ApiKey}, $date, $data->{grabber_info});
-  my $url = sprintf( "http://clipsource.se/epg/xml/%s/%s/%s/download", $date, $date, $data->{grabber_info} );
+  my $url = sprintf( "http://clipsource.se/epg/api?key=%s&date=%s&channelId=%s", $self->{ApiKey}, $date, $data->{grabber_info});
+  #my $url = sprintf( "http://clipsource.se/epg/xml/%s/%s/%s/download", $date, $date, $data->{grabber_info} );
   #my $url = "http://converter.xmltv.se/contentcache/Clipsource/dev.kanal5.se_2015-08-22.content.zip";
+
+ progress("Fetching $url...");
 
   return( $url, undef );
 }

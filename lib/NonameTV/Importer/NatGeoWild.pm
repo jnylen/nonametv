@@ -34,7 +34,7 @@ sub new {
 
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
   $self->{datastorehelper} = $dsh;
-  
+
   $self->{datastore}->{augment} = 1;
 
   return $self;
@@ -86,7 +86,7 @@ sub ImportFlatXLS
   }
 
   # Danish
-  if($chd->{sched_lang} eq "dk") {
+  if($chd->{sched_lang} eq "da") {
     $coltitle = 3;
     $coldesc = 11;
   }
@@ -106,7 +106,7 @@ sub ImportFlatXLS
 		progress("SKIPPING :D");
 	  next;
 	  }
-	  
+
 	  if($date ne $currdate ) {
         if( $currdate ne "x" ) {
 			# save last day if we have it in memory
@@ -121,19 +121,19 @@ sub ImportFlatXLS
 
         progress("NatGeoWild: Date is: $date");
       }
-	  
+
 	  	#if($iR == 28) { next; }
-	  
+
 	# time (column 1)
 	 #  print "hejhejhej";
       $oWkC = $oWkS->{Cells}[$iR][1];
       next if( ! $oWkC );
       my $time = ParseTime( $oWkC->Value );
       next if( ! $time );
-	  
+
 	  #use Data::Dumper; print Dumper($oWkS->{Cells}[28]);
 
-	  
+
 	  my $title;
 	  my $test;
 	  my $season;
@@ -152,7 +152,7 @@ sub ImportFlatXLS
 		next if( ! $oWkl );
 		$test = $oWkl->Value if $oWkl->Value;
 	  }
-	  
+
 	  $title = norm($test) if !defined($title);
 
 	  # Desc
@@ -160,10 +160,10 @@ sub ImportFlatXLS
       my $desc = $oWkC->Value;
 
       if( $time and $title ){
-	  
+
 	  # empty last day array
       undef @ces;
-	  
+
         progress("$time $title");
 
         my $ce = {
@@ -178,7 +178,7 @@ sub ImportFlatXLS
 		my $episode = $oWkC->Value if( $oWkC );
 		$oWkC = $oWkS->{Cells}[$iR][14];
 		my $season = $oWkC->Value if( $oWkC );
-      
+
         # Try to extract episode-information from the description.
 		if(($season) and ($season ne "")) {
 			# Episode info in xmltv-format
@@ -186,24 +186,24 @@ sub ImportFlatXLS
 			{
 				$ce->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 );
 			}
-  
+
 			if( defined $ce->{episode} ) {
 				$ce->{program_type} = 'series';
 			}
 		}
 		## END
-		
+
         $dsh->AddProgramme( $ce );
-		
+
 		push( @ces , $ce );
       }
 
     } # next row
-	
+
   } # next worksheet
 
   $dsh->EndBatch( 1 );
-  
+
   return;
 }
 
@@ -232,10 +232,10 @@ sub ParseDate {
 	    day => $day,
 	    time_zone => "Europe/Stockholm"
 	);
-	
+
 	$dt->set_time_zone( "UTC" );
-	
-	
+
+
 	return $dt->ymd("-");
   }
 }

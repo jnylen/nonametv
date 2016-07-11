@@ -183,6 +183,7 @@ sub ImportXML
       title => norm($title),
       start_time => $start->ymd("-") . " " . $start->hms(":"),
       end_time   => $end->ymd("-")   . " " . $end->hms(":"),
+      description => norm($desc),
     };
 
     if($year =~ /(\d\d\d\d)/ )

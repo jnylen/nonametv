@@ -37,13 +37,13 @@ use base 'NonameTV::Importer::BaseFile';
 # FATAL = 5
 my $BATCH_LOG_LEVEL = 4;
 
-sub new 
+sub new
 {
   my $proto = shift;
   my $class = ref($proto) || $proto;
   my $self  = $class->SUPER::new( @_ );
   bless ($self, $class);
-  
+
 
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
   $self->{datastorehelper} = $dsh;
@@ -52,6 +52,30 @@ sub new
 }
 
 sub ImportContentFile
+{
+  my $self = shift;
+  my( $file, $chd ) = @_;
+
+  # Depending on the file end its different import ways
+  if( $file =~ /.doc$/i ) {
+    #$self->ImportDOC( $file, $chd );
+  } elsif( $file =~ /.docx$/i ) {
+    $self->ImportDOCX( $file, $chd );
+  } else {
+    error("unknown file: $file");
+  }
+
+}
+
+sub ImportDOCX
+{
+  my $self = shift;
+  my( $file, $chd ) = @_;
+
+
+}
+
+sub ImportDOC
 {
   my $self = shift;
   my( $file, $chd ) = @_;
@@ -93,18 +117,18 @@ sub ImportFull
 {
   my $self = shift;
   my( $filename, $doc, $channel_xmltvid, $channel_id, $lang ) = @_;
-  
+
   my $dsh = $self->{datastorehelper};
 
   # Find all div-entries.
   my $ns = $doc->find( "//div" );
-  
+
   if( $ns->size() == 0 )
   {
     error( "PlayboyTV: $channel_xmltvid: No programme entries found in $filename" );
     return;
   }
-  
+
   progress( "PlayboyTV: $channel_xmltvid: Processing $filename" );
 
   # States
@@ -115,23 +139,23 @@ sub ImportFull
     ST_FDESC  => 3,   # Found description
     ST_EPILOG => 4,   # After END-marker
   };
-  
+
   use constant {
     T_HEAD => 10,
     T_DATE => 11,
     T_TEXT => 12,
     T_STOP => 13,
   };
-  
+
   my $state=ST_START;
   my $currdate;
 
   my $start;
   my $title;
   my $date;
-  
+
   my $ce = {};
-  
+
   foreach my $div ($ns->get_nodelist)
   {
 
@@ -170,7 +194,7 @@ sub ImportFull
       $type = T_TEXT;
 
     }
-    
+
     if( $state == ST_START ){
 
       if( $type == T_TEXT ) {
@@ -220,7 +244,7 @@ sub ImportFull
 
       }
     }
-    
+
     if( $state == ST_FDATE ){
 
       if( $type == T_HEAD ){
@@ -336,7 +360,7 @@ sub ParseDate
   }
 
   $year+= 2000 if $year< 100;
-  
+
   return sprintf( '%d-%02d-%02d', $year, $month, $day );
 }
 

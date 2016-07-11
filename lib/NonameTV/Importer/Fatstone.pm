@@ -96,7 +96,7 @@ my $ref = ReadData ($file);
 	my $foundcolumns = 0;
 
     # browse through rows
-    for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+    for(my $iR = 1 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
 
       # date - column 0 ('Date')
       my $oWkC = $oWkS->{Cells}[$iR][0];
@@ -129,6 +129,7 @@ my $ref = ReadData ($file);
       $oWkC = $oWkS->{Cells}[$iR][2];
       next if( ! $oWkC );
       my $title = $oWkC->Value if( $oWkC->Value );
+      $title =~ s/&quot;/"/ig;
 
       # desc
       $oWkC = $oWkS->{Cells}[$iR][3];
@@ -137,8 +138,6 @@ my $ref = ReadData ($file);
 
   	  # extra info
   	  my $genre = norm($oWkS->{Cells}[$iR][4]->{Val}) if $oWkS->{Cells}[$iR][4];
-
-      progress("Fatstone: $chd->{xmltvid}: $time - $title");
 
       my $ce = {
         channel_id => $chd->{channel_id},
@@ -162,6 +161,8 @@ my $ref = ReadData ($file);
         my ( $pty, $cat ) = $ds->LookupCat( 'Fatstone', $genre );
       	AddCategory( $ce, $pty, $cat );
       }
+
+      progress("Fatstone: $chd->{xmltvid}: $time - $ce->{title}");
 
       $dsh->AddProgramme( $ce );
 

@@ -240,7 +240,7 @@ sub ParseDate
   my ( $dinfo ) = @_;
 
   my( $month, $day, $year, $monthname );
-#      progress("Mdatum $dinfo");
+      progress("Mdatum $dinfo");
   if( $dinfo =~ /^\d{4}-\d{2}-\d{2}$/ ){ # format   '2010-04-22'
     ( $year, $month, $day ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
   } elsif( $dinfo =~ /^\d{2}.\d{2}.\d{4}$/ ){ # format '11/18/2011'
@@ -249,7 +249,7 @@ sub ParseDate
     ( $month, $day, $year ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
   } elsif( $dinfo =~ /^\d{1,2}-\S+-\d{2}$/ ){ # format '3-Jan-2016'
     ( $day, $monthname, $year ) = ( $dinfo =~ /^(\d+)-(\S+)-(\d+)$/ );
-    $month = MonthNumber( $monthname , "ru" );
+    $month = MonthNumber( $monthname , "en" );
   } elsif( $dinfo =~ /^\d{1,2}\/\d{1,2}\/\d{2}$/ ){ # format '10-18-11' or '1-9-11'
     ( $month, $day, $year ) = ( $dinfo =~ /^(\d+)\/(\d+)\/(\d+)$/ );
   }

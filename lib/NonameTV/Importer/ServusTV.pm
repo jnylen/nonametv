@@ -56,6 +56,8 @@ sub ImportContentFile
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
 
+  print("Processing $file...\n");
+
   my $cref=`cat \"$file\"`;
 
   $cref =~ s|
@@ -103,12 +105,12 @@ sub ImportContentFile
 
         if($start->ymd("-") ne $currdate ) {
           if( $currdate ne "x" ){
-            $dsh->EndBatch( 1 );
+          #  $dsh->EndBatch( 1 );
           }
 
           my $batch_id = $chd->{xmltvid} . "_" . $start->ymd("-");
-          $dsh->StartBatch( $batch_id, $chd->{id} );
-          $dsh->StartDate( $start->ymd("-") , "00:00" );
+          #$dsh->StartBatch( $batch_id, $chd->{id} );
+          #$dsh->StartDate( $start->ymd("-") , "06:00" );
           $currdate = $start->ymd("-");
           progress("ServusTV: $chd->{xmltvid}: Date is: ".$start->ymd("-"));
         }

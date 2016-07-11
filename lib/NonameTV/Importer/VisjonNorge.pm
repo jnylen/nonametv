@@ -139,11 +139,13 @@ sub ImportXLS
 	  $oWkC = $oWkS->{Cells}[$iR][$columns{'StartTime'}];
       next if( ! $oWkC );
       my $time = $oWkC->Value if( $oWkC->Value );
+      $time =~ s/\./:/;
       if($time eq "24:00") { $time = "00:00"}
 
       # end time
-	  $oWkC = $oWkS->{Cells}[$iR][$columns{'EndTime'}];
+	     $oWkC = $oWkS->{Cells}[$iR][$columns{'EndTime'}];
       my $endtime = $oWkC->Value if( $oWkC->Value );
+      $endtime =~ s/\./:/;
       if($endtime eq "24:00") { $endtime = "00:00"}
 
       # title

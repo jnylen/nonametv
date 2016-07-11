@@ -5,8 +5,8 @@ use warnings;
 
 =pod
 
-Abstract base-class for an Importer that downloads data in one 
-file per week and channel. 
+Abstract base-class for an Importer that downloads data in one
+file per week and channel.
 
 =cut
 
@@ -22,19 +22,19 @@ sub new {
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
 
-    $self->{MaxWeeks} = 52 unless defined $self->{MaxWeeks};
+    $self->{MaxWeeks} = 4 unless defined $self->{MaxWeeks};
     $self->{MaxWeeksShort} = 1 unless defined $self->{MaxWeeksShort};
 
     return $self;
 }
 
-sub BatchPeriods { 
+sub BatchPeriods {
   my $self = shift;
   my( $shortgrab ) = @_;
 
   my $start_dt = DateTime->today(time_zone => 'local' );
 
-  my $maxweeks = $shortgrab ? $self->{MaxWeeksShort} : 
+  my $maxweeks = $shortgrab ? $self->{MaxWeeksShort} :
     $self->{MaxWeeks};
 
   my @periods;

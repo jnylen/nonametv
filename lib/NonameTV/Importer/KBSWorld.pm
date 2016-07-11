@@ -15,8 +15,9 @@ Format is "Excel". It's mostly just XLSX so it's XML.
 use Data::Dumper;
 use DateTime;
 use XML::LibXML;
+use HTML::Laundry;
 
-use NonameTV qw/AddCategory norm normUtf8 ParseXml/;
+use NonameTV qw/AddCategory MyPost norm normUtf8 ParseXml/;
 use NonameTV::Importer::BaseWeekly;
 use NonameTV::Log qw/d progress w error f/;
 use NonameTV::DataStore::Helper;
@@ -58,10 +59,19 @@ sub FetchDataFromSite {
   my $datefirst = first_day_of_week( $year, $week )->add( days => 0 )->ymd('-'); # monday
   my $datelast  = first_day_of_week( $year, $week )->add( days => 6 )->ymd('-'); # sunday
 
-  my $mech = $self->{cc}->UserAgent();
+  my ( $content, $code ) = MyPost( "http://211.233.93.86/schedule/down_schedule_.php", { 'wlang' => 'e', 'down_time_add' => '0', 'start_date' => $datefirst, 'end_date' => $datelast } );
 
-  my $response = $mech->post( "http://kbsworld.kbs.co.kr/schedule/down_schedule_.php", { 'wlang' => 'e', 'down_time_add' => '0', 'start_date' => $datefirst, 'end_date' => $datelast, 'ftype' => 'xls' } );
-  my $content  = $response->content( format => 'text' );
+  open(my $fh, '>', '/home/jnylen/content/contentcache/KBSWorld/notcleaned.html');
+  print $fh $content;
+  close $fh;
+
+  my $l = HTML::Laundry->new();
+  $l->add_acceptable_element(['tr', 'td', 'table', 'tbody'], { empty => 1 });
+  $content =  $l->clean( $content );
+
+  open($fh, '>', '/home/jnylen/content/contentcache/KBSWorld/cleaned.html');
+  print $fh $content;
+  close $fh;
 
   return ($content, undef);
 }

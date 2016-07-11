@@ -5,7 +5,7 @@ use warnings;
 
 =pod
 
-Importer for data from ZDF. 
+Importer for data from ZDF.
 One file per channel and week downloaded from their site.
 The downloaded file is in xml-format.
 Same format as DreiSat.
@@ -55,13 +55,13 @@ sub new {
 #
 # programme weeks run sat-fri instead of mon-sun
 #
-sub BatchPeriods { 
+sub BatchPeriods {
   my $self = shift;
   my( $shortgrab ) = @_;
 
   my $start_dt = DateTime->today(time_zone => 'local' );
 
-  my $maxweeks = $shortgrab ? $self->{MaxWeeksShort} : 
+  my $maxweeks = $shortgrab ? $self->{MaxWeeksShort} :
     $self->{MaxWeeks};
 
   my @periods;
@@ -99,7 +99,6 @@ sub InitiateDownload {
   $password_rsa_base64 =~ s/\n//g;
   my $password_rsaauth = 'rsa:' . $password_rsa_base64;
 
-
   $response = $mech->get('https://presseportal.zdf.de/start/');
 
   if (!($mech->success())) {
@@ -124,7 +123,7 @@ sub Object2Url {
   my( $objectname, $chd ) = @_;
 
   my( $year, $week ) = ( $objectname =~ /(\d+)-(\d+)$/ );
- 
+
   my $station;
   if( $chd->{grabber_info} ){
     $station = $chd->{grabber_info};
@@ -192,7 +191,7 @@ sub FilterContent {
 
   if( not defined $doc ) {
     return (undef, 'ParseXml failed' );
-  } 
+  }
 
   # <programmdaten sender="ZDF" woche="201149" erstelldatum="05.12.2011 19:02:10">
 
@@ -215,7 +214,7 @@ sub FilterContent {
     $node->removeChildNodes();
     $node->appendTextNode( $attribute );
   }
-  
+
   my $str = $doc->toString( 1 );
 
   return( \$str, undef );

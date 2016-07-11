@@ -30,7 +30,7 @@ sub new {
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
 
-    defined( $self->{UrlRoot} ) or die "You must specify UrlRoot";
+    #defined( $self->{UrlRoot} ) or die "You must specify UrlRoot";
 
     # use augment
     $self->{datastore}->{augment} = 1;
@@ -155,15 +155,17 @@ sub ImportContent
         $ce->{title} = norm($ce->{title});
     }
 
-	my($program_type, $category ) = undef;
+    $ce->{title} =~ s/ - Sesongavslutning!//i;
 
-	if(defined($genre)) {
-	    foreach my $g ($genre->get_nodelist)
-        {
-		    ($program_type, $category ) = $ds->LookupCat( "TV2NO", $g->to_literal );
-		    AddCategory( $ce, $program_type, $category );
-		}
-	}
+  	my($program_type, $category ) = undef;
+
+  	if(defined($genre)) {
+  	    foreach my $g ($genre->get_nodelist)
+          {
+  		    ($program_type, $category ) = $ds->LookupCat( "TV2NO", $g->to_literal );
+  		    AddCategory( $ce, $program_type, $category );
+  		}
+  	}
 
     if( defined( $production_year ) and ($production_year =~ /(\d\d\d\d)/) )
     {
