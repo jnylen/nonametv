@@ -16,9 +16,9 @@ NonameTV.
 
 =head1 DESCRIPTION
 
-NonameTV looks for the configuration file first at 
+NonameTV looks for the configuration file first at
 
-    $HOME/.nonametv.conf
+    $HOME/nonametv.conf
 
 and if that file is not found then it looks at
 
@@ -54,7 +54,7 @@ use NonameTV::Path;
 BEGIN {
     use Exporter   ();
     our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-    
+
     # set the version for version checking
     $VERSION     = 0.3;
 
@@ -73,14 +73,14 @@ sub ReadConfig {
   return $Conf if defined $Conf;
 
   my $file;
-  if (defined( $ENV{HOME} ) and (-e "$ENV{HOME}/.nonametv.conf")) {
-  	$file = "$ENV{HOME}/.nonametv.conf";
+  if (defined( $ENV{HOME} ) and (-e "$ENV{HOME}/nonametv.conf")) {
+  	$file = "$ENV{HOME}/nonametv.conf";
   } elsif (-e "/etc/nonametv.conf") {
   	$file = "/etc/nonametv.conf";
   } else {
-  	die "No configuration file found in $ENV{HOME}/.nonametv.conf or /etc/nonametv.conf"
+  	die "No configuration file found in $ENV{HOME}/nonametv.conf or /etc/nonametv.conf"
   }
-  
+
   my $config = read_file( $file );
 
   my $conf = eval( $config );
@@ -118,7 +118,7 @@ sub MergeHash {
       MergeHash( $src->{$key}, $add->{$key} );
     }
   }
-  
+
 }
 
 1;
