@@ -616,6 +616,7 @@ sub getSeries {
 # Get series/all/lang.zip for series
 sub getSeriesAll {
 	my ($self, $name, $nocache) = @_;
+	return undef if !defined($name);
 	&debug(2, "getSeriesAll: $name, $nocache\n");
 
 	my $sid = $self->getSeriesId($name, $nocache?$nocache-1:0);
