@@ -3,6 +3,7 @@ use Carp;
 
 use strict;
 use warnings;
+use Data::Dumper;
 
 =head1 NAME
 
@@ -324,8 +325,12 @@ sub Lookup {
   my $row2 = $sth->fetchrow_hashref;
   $sth->finish();
 
-  die "More than one record returned from $table"
-      if ( defined $row2 );
+  if ( defined $row2 ) {
+    print Dumper($table, $args, $field);
+    die "More than one record returned from $table"
+  }
+
+
 
   return $row->{$field} if defined $field;
   return $row;
