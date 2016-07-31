@@ -18,6 +18,7 @@ TODO handle regional programmes on DRS
 use Encode qw/decode encode/;
 use utf8;
 use Data::Dumper;
+use IO::Uncompress::Unzip qw/unzip/;
 
 use NonameTV qw/AddCategory AddCountry normLatin1 norm ParseXml/;
 use NonameTV::DataStore::Helper;
@@ -31,9 +32,6 @@ sub new {
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
 
-    defined( $self->{Username} ) or die "You must specify Username";
-    defined( $self->{Password} ) or die "You must specify Password";
-
     $self->{datastorehelper} = NonameTV::DataStore::Helper->new( $self->{datastore}, 'Europe/Zurich' );
 
     $self->{datastore}->{augment} = 1;
@@ -45,35 +43,53 @@ sub Object2Url {
   my $self = shift;
   my( $objectname, $chd ) = @_;
   my( $xmltvid, $date ) = ( $objectname =~ /^(.+)_(\d+-\d+-\d+)$/ );
+  my ($year, $month, $day) = ( $date =~ /(\d+)-(\d+)-(\d+)$/ );
 
   if (!defined ($chd->{grabber_info})) {
     return (undef, 'Grabber info must contain channel id!');
   }
 
-  my $url = sprintf( 'http://programmdatenwebservice.srf.ch/app/programinfo.asmx/getProgramInfoExtendedHD' .
-    '?username=%s&password=%s&channel=%s&fromDate=%s&toDate=%s', $self->{Username}, $self->{Password}, $chd->{grabber_info}, $date, $date );
+  my $dt = DateTime->new( year => $year, month => $month, day => $day );
+
+  # http://www.srf.ch/medien/programm/?xml=1&from=20.07.2016&to=20.07.2016&channel=1
+  my $url = sprintf( 'http://www.srf.ch/medien/programm/?xml=1&from=%s&to=%s&channel=%s', $dt->dmy('.'), $dt->dmy('.'), $chd->{grabber_info} );
 
   # Only one url to look at and no error
   return ([$url], undef);
 }
 
-sub FilterContent {
-  my $self = shift;
-  my( $cref, $chd ) = @_;
-
-  $$cref = decode( 'utf-8', $$cref );
-
-  $$cref =~ s|\x{0d}$||g;      # strip carriage return from the line endings
-  $$cref =~ s|\x{a0}+(?=<)||g; # strip trailing non-breaking whitespace
-  $$cref = normLatin1( $$cref );
-
-  $$cref = encode( 'utf-8', $$cref );
-
-  return( $cref, undef);
+sub ContentExtension {
+  return 'zip';
 }
 
-sub ContentExtension {
-  return 'xml';
+sub FilterContent {
+  my $self = shift;
+  my( $zref, $chd ) = @_;
+
+  if (!($$zref =~ m/^PK/)) {
+    return (undef, "returned data is not a zip file");
+  }
+
+  my $cref;
+  unzip $zref => \$cref;
+
+  #$cref = decode( 'utf-8', $cref );
+
+  #$cref =~ s|\x{0d}$||g;      # strip carriage return from the line endings
+  #$cref =~ s|\x{a0}+(?=<)||g; # strip trailing non-breaking whitespace
+  #$cref = normLatin1( $$cref );
+
+  #$cref = encode( 'utf-8', $cref );
+
+  my $doc = ParseXml( \$cref );
+
+  if( not defined $doc ) {
+    return (undef, "Parse2Xml failed" );
+  }
+
+  my $str = $doc->toString(1);
+
+  return (\$str, undef);
 }
 
 sub FilteredExtension {
