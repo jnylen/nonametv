@@ -216,6 +216,12 @@ sub guess_channel
     elsif( $subject =~ /junior/i ) {
       return "junior.disney.se";
     }
+    elsif( $subject =~ /drj/i ) {
+      return "junior.disney.se";
+    }
+    elsif( $subject =~ /djr/i ) {
+      return "junior.disney.se";
+    }
     elsif( $subject =~ /disney\s*channel/i ) {
       return "disneychannel.se";
     }
