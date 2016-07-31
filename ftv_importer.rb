@@ -15,9 +15,9 @@ channels = [
   { :xmltvid => "hd.ftv.com", :info => "fashiontvHD_", info2: "HotBird" },
 ]
 
-page = a.get('http://www.fashiontv.com/epg').body
+page = a.get('http://company.fashiontv.com/program-guide/').body
 @main_noko = Nokogiri::HTML page rescue nil
-@main_noko.css('div#articlecontent > ul > li > a').map do |e|
+@main_noko.css('div.downloadable_EPG_files_inner > ul > li > a').map do |e|
   url = e["href"]
   file_name = Pathname.new(url).basename.to_s
   next if !url.end_with? "xlsx"
@@ -25,9 +25,9 @@ page = a.get('http://www.fashiontv.com/epg').body
   # Only add files that is this year or next.
   if url =~ /#{Date.today.year}/ or url =~ /#{Date.today.year + 1}/
     channels.each do |c|
-      next if file_name !~ /#{c[:info]}/i or file_name !~ /#{c[:info2]}/i or File.exist?('/home/jnylen/content/channels/' + c[:xmltvid] + '/' + file_name)
+      next if file_name !~ /#{c[:info]}/i or file_name !~ /#{c[:info2]}/i or File.exist?('/content/channels/' + c[:xmltvid] + '/' + file_name)
 
-      File.open('/home/jnylen/content/channels/' + c[:xmltvid] + '/' + file_name, 'wb'){|f| f << a.get(url).body}
+      File.open('/content/channels/' + c[:xmltvid] + '/' + file_name, 'wb'){|f| f << a.get(url).body}
       puts "Added #{file_name} to #{c[:xmltvid]}"
     end
   end
