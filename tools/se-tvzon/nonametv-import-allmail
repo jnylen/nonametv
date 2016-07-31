@@ -20,7 +20,7 @@ tools/nonametv-import BBCWW $1 $2 $3
 tools/nonametv-import ChannelOneRussia $1 $2 $3
 tools/nonametv-import WFC $1 $2 $3
 tools/nonametv-import HustlerTV $1 $2 $3
-tools/nonametv-import Playboy $1 $2 $3
+tools/nonametv-import EBS_DOC $1 $2 $3
 tools/nonametv-import LifestyleTV $1 $2 $3
 tools/nonametv-import FuelTV $1 $2 $3
 tools/nonametv-import FTV $1 $2 $3

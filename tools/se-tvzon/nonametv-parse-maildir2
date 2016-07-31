@@ -310,6 +310,7 @@ sub guess_channel
      return "hightv.tv" if $filename =~ /epg/i;
  }
 
+ # BBC
  if( $dir =~ /EBS/ and $filename =~ /\.xls$/i ) {
     # ENT. (BRIT) NORDIC
     return "bbcentertainment.com" if $filename =~ /brit\s+scandi/i;
@@ -330,6 +331,44 @@ sub guess_channel
 
     # Lifestyle
     return "bbclifestyle.com" if $filename =~ /lifestyle\s+scandi/i;
+ }
+
+ # Discovery
+ if( $dir =~ /EBS/ and $filename =~ /\.doc$/i ) {
+   # sweden
+   return "animalplanet.se"     if $filename =~ /^ap.eu.swe/i;
+   return "discoverychannel.se" if $filename =~ /discovery\s+sweden\s+swe/i;
+   return "discoverychannel.se" if $filename =~ /discovery\s+channel\s+sweden\s+swe/i;
+   return "discoverychannel.se" if $filename =~ /^dc.swe.swe/i;
+   return "tlcsverige.se"       if $filename =~ /tlc\s+sweden\s+swedish/i;
+   return "investigation.discoverychannel.se" if $filename =~ /^id.swe.swe/i;
+   return "hdshowcase.discoverychannel.com"   if $filename =~ /^dc.hd.swe/i;
+   return "science.discoverychannel.com"      if $filename =~ /^sc.eu.swe/i;
+
+   # denmark
+   return "animalplanet.discovery.dk"     if $filename =~ /^ap.eu.dan/i;
+   return "discovery.dk"                  if $filename =~ /discovery\s+channel\s+denmark/i;
+   return "tlc.discovery.dk"              if $filename =~ /tlc\s+denmark/i;
+   return "hdshowcase.discovery.dk"       if $filename =~ /^dc.hd.dan/i;
+   return "science.discovery.dk"          if $filename =~ /^sc.eu.dan/i;
+
+   # finland
+   return "discovery.fi"                  if $filename =~ /discovery\s+finland/i and $filename =~ /\(fin\)/i;
+   return "discovery.fi"                  if $filename =~ /^dc.eu.fin/i;
+   return "animalplanet.discovery.fi"     if $filename =~ /^ap.eu.fin/i;
+
+   # norway
+   return "animalplanet.discovery.no"     if $filename =~ /^ap.eu.nor/i;
+   return "discovery.no"                  if $filename =~ /discovery\s+channel\s+norway/i;
+   return "hdshowcase.discovery.no"       if $filename =~ /^dc.hd.nor/i;
+   return "tlc.discovery.no"              if $filename =~ /tlc\s+norway/i;
+   return "investigation.discovery.no"    if $filename =~ /dc.id.nor/i;
+   return "science.discovery.no"          if $filename =~ /^sc.eu.nor/i;
+
+   # english (europe)
+   return "animalplanet.discovery.eu"     if $filename =~ /^ap.eu.eng/i;
+   return "en.discoverychannel.se"        if $filename =~ /^dc.swe.eng/i;
+
  }
 
  if( $dir =~ /RTL2/ and $filename =~ /\.xml$/i ) {
