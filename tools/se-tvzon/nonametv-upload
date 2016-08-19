@@ -21,7 +21,9 @@ rsync -c --delete -r $NROOT/staging/json/ $NROOT/full/json/
 rsync -c --delete -r $NROOT/staging/xmltv/ $NROOT/full/xmltv/
 tools/se-tvzon/nonametv-xmltv-gendatalist
 rsync -c --delete -r $NROOT/full/xmltv/datalist.xml.gz $NROOT/full/datalist.xml.gz
-rsync -c --delete -r /content/headers/HEADER_xmltv.txt $NROOT/full/xmltv/HEADER.txt
+#rsync -c --delete -r /content/headers/HEADER_xmltv.txt $NROOT/full/xmltv/HEADER.txt
+rsync -c --delete -r /content/headers/displayfile.html $NROOT/full/xmltv/displayfile.html
+rsync -c --delete -r /content/headers/listing.xsl $NROOT/full/xmltv/listing.xsl
 
 # upload
 rsync -c --delete -r $NROOT/full/xmltv/ /var/www/xmltv/
