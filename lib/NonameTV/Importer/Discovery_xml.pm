@@ -134,11 +134,10 @@ sub ParseDateTime {
     month => $month,
     day => $day,
     hour => $hour,
-    minute => $minute,
-    time_zone => "Europe/Stockholm"
-      );
+    minute => $minute
+  );
 
-  $dt->set_time_zone( "UTC" );
+  #$dt->set_time_zone( "UTC" );
 
   return $dt->ymd("-") . " " . $dt->hms(":");
 }
@@ -147,7 +146,7 @@ sub Object2Url {
   my $self = shift;
   my( $objectname, $chd ) = @_;
 
-  my $url = sprintf( "%s%s", $self->{UrlRoot}, $chd->{grabber_info} );
+  my $url = sprintf( "%s%s-UTC.xml", $self->{UrlRoot}, $chd->{grabber_info} );
 
   return( $url, undef );
 }
