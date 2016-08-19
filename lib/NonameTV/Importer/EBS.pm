@@ -146,7 +146,7 @@ sub ImportContent
     if(norm($subtitle2) =~ /Serie (\d+), aflevering (\d+)/i) {
         $subtitle2 = undef;
     }
-    if (!isdigit($subtitle2)) {
+    if (defined($subtitle2) and !isdigit($subtitle2)) {
         $subtitle = $subtitle2; # Only set the subtitle if its not a number.
     }
 
