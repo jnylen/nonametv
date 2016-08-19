@@ -70,7 +70,6 @@ my @folders = qw(		 NonameTV-Data.MTV
 		 NonameTV-Data.HaC
 		 NonameTV-Data.ETVMedia
 		 NonameTV-Data.VisjonNorge
-		 NonameTV-Data.Disney
 		 NonameTV-Data.Turner
 		 NonameTV-Data.DMB
 		 NonameTV-Data.PPS
@@ -196,39 +195,6 @@ sub guess_channel
 {
   my( $dir, $from, $subject, $filename, $type, $size ) = @_;
 
-  if( $dir =~ /Disney/ ) {
-    # The Disney filenames are very unreliable.
-    if( $filename =~ /\bxd/i ) {
-      return "xd.disneychannel.se";
-    }
-    if( $filename =~ /\bdxd/i ) {
-      return "xd.disneychannel.se";
-    }
-    elsif( $filename =~ /playhouse/i ) {
-      return "junior.disney.se";
-    }
-    elsif( $filename =~ /junior/i ) {
-      return "junior.disney.se";
-    }
-    elsif( $filename =~ /disney\s*channel/i ) {
-      return "disneychannel.se";
-    }
-    elsif( $filename eq "noname" ) {
-      return undef;
-    }
-    elsif( $subject =~ /playhouse/i ) {
-      return "junior.disney.se";
-    }
-    elsif( $subject =~ /junior/i ) {
-      return "junior.disney.se";
-    }
-    elsif( $subject =~ /disney\s*channel/i ) {
-      return "disneychannel.se";
-    }
-
-    return undef;
-  }
-
  if( $dir =~ /Turner/ ) {
     # Word files
 	return "cartoonnetwork.se" if $filename =~ /^cn\s*nordic\s+\(swe\)\s*\b/i;
@@ -344,6 +310,7 @@ sub guess_channel
    return "investigation.discoverychannel.se" if $filename =~ /^id.swe.swe/i;
    return "hdshowcase.discoverychannel.com"   if $filename =~ /^dc.hd.swe/i;
    return "science.discoverychannel.com"      if $filename =~ /^sc.eu.swe/i;
+   return "world.discoveryworld.se" if $filename =~ /^dw.eu.swe/i;
 
    # denmark
    return "animalplanet.discovery.dk"     if $filename =~ /^ap.eu.dan/i;
@@ -351,6 +318,7 @@ sub guess_channel
    return "tlc.discovery.dk"              if $filename =~ /tlc\s+denmark/i;
    return "hdshowcase.discovery.dk"       if $filename =~ /^dc.hd.dan/i;
    return "science.discovery.dk"          if $filename =~ /^sc.eu.dan/i;
+   return "world.discovery.dk"            if $filename =~ /^dw.eu.dan/i;
 
    # finland
    return "discovery.fi"                  if $filename =~ /discovery\s+finland/i and $filename =~ /\(fin\)/i;
@@ -364,10 +332,12 @@ sub guess_channel
    return "tlc.discovery.no"              if $filename =~ /tlc\s+norway/i;
    return "investigation.discovery.no"    if $filename =~ /dc.id.nor/i;
    return "science.discovery.no"          if $filename =~ /^sc.eu.nor/i;
+   return "world.discovery.no"            if $filename =~ /^dw.eu.nor/i;
 
    # english (europe)
    return "animalplanet.discovery.eu"     if $filename =~ /^ap.eu.eng/i;
    return "en.discoverychannel.se"        if $filename =~ /^dc.swe.eng/i;
+   return "hd.discovery.eu"               if $filename =~ /^dc.hd.eng/i;
 
  }
 
