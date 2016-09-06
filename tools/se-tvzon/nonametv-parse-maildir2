@@ -224,11 +224,19 @@ sub guess_channel
 	}
 
   # XLS Nordic
-  if( $filename =~ /\.(xls|xlsx)$/i ) {
+  if( $filename =~ /\.(xls|xlsx|xlsm)$/i ) {
 	  return "tnt-tv.dk" if $filename =~ /^TNT/i and $filename =~ /DAN/i;
     return "tnt-tv.dk" if $filename =~ /^TNT/i and $filename =~ /DEN/i;
 	  return "tnt-tv.se" if $filename =~ /^TNT/i and $filename =~ /SWE/i;
 	  return "tnt-tv.no" if $filename =~ /^TNT/i and $filename =~ /NOR/i;
+
+    # Subject title
+    if( $subject =~ /TNT NORDIC/i ) {
+      return "tnt-tv.dk" if $filename =~ /DAN/i;
+      return "tnt-tv.dk" if $filename =~ /DEN/i;
+      return "tnt-tv.se" if $filename =~ /SWE/i;
+      return "tnt-tv.no" if $filename =~ /NOR/i;
+    }
   }
  }
 

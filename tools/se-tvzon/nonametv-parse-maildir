@@ -76,6 +76,7 @@ my @folders = qw(NonameTV-Data.GlobalListings
 		 NonameTV-Data.YaS
 		 NonameTV-Data.ATV
      NonameTV-Data.Fatstone
+     NonameTV-Data.Disney
 		 );
 # NonameTV-Data.KinoPolska
 # Flag messages AFTER they have been processed. Then I normally
@@ -192,7 +193,13 @@ sub guess_channel
 
   if( $dir =~ /Disney/ ) {
     # The Disney filenames are very unreliable.
-    if( $filename =~ /\bxd/i ) {
+    if( $filename eq "noname" ) {
+      return undef;
+    }
+    elsif( $filename eq /\.(jpg|png|jpeg|gif|bmp)$/ ) {
+      return undef;
+    }
+    elsif( $filename =~ /\bxd/i ) {
       return "xd.disneychannel.se";
     }
     if( $filename =~ /\bdxd/i ) {
@@ -207,9 +214,6 @@ sub guess_channel
     elsif( $filename =~ /disney\s*channel/i ) {
       return "disneychannel.se";
     }
-    elsif( $filename eq "noname" ) {
-      return undef;
-    }
     elsif( $subject =~ /playhouse/i ) {
       return "junior.disney.se";
     }
@@ -223,6 +227,9 @@ sub guess_channel
       return "junior.disney.se";
     }
     elsif( $subject =~ /disney\s*channel/i ) {
+      return "disneychannel.se";
+    }
+    elsif( $filename =~ /^DC/i ) {
       return "disneychannel.se";
     }
 
