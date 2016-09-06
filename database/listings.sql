@@ -5,7 +5,8 @@ CREATE TABLE `batches` (
   `last_update` int(11) NOT NULL DEFAULT '0',
   `message` text NOT NULL,
   `abort_message` text NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `channels`;
@@ -94,6 +95,7 @@ CREATE TABLE `programs` (
   `poster` varchar(255) DEFAULT NULL,
   `fanart` varchar(255) DEFAULT NULL,
   `external_ids` varchar(255) DEFAULT NULL,
+  `extra` text,
   PRIMARY KEY (`channel_id`,`start_time`),
   KEY `batch` (`batch_id`,`start_time`),
   KEY `title` (`title`)

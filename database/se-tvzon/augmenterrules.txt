@@ -960,7 +960,7 @@
 1215,TvdbDE,^.*$,program_type,series,\N,guess
 1217,TvdbDE,^.*$,program_type,series,\N,guess
 1218,TvdbDE,^.*$,program_type,series,\N,guess
-1222,TvdbNO,^.*$,program_type,series,\N,guess
+1222,TmdbTV,^.*$,program_type,series,\N,guess
 1223,TvdbFI,^.*$,program_type,series,\N,guess
 1019,TvdbDE,^.*$,program_type,series,\N,guess
 1226,TvdbFI,^.*$,program_type,series,\N,guess
@@ -1605,7 +1605,65 @@
 472,Tmdb,"Den lange vej hjem",program_type,movie,242458,movieid
 472,Tmdb,^.*$,program_type,tvshow,\N,title
 288,Tmdb,^.*$,program_type,tvshow,\N,title
-289,Tmdb,^.*$,program_type,tvshow,\N,title
 473,Tmdb,^.*$,program_type,tvshow,\N,title
 510,Tmdb,^.*$,program_type,tvshow,\N,title
 630,Tmdb,^.*$,program_type,tvshow,\N,title
+1584,TvdbEN,^.*$,program_type,series,\N,guess
+1545,TvdbDK,^.*$,program_type,series,\N,guess
+1545,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1547,TvdbFI,^.*$,program_type,series,\N,guess
+1547,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1548,TvdbNO,^.*$,program_type,series,\N,guess
+1548,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1549,Tvdb,^.*$,program_type,series,\N,guess
+1549,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1551,TvdbDK,^.*$,program_type,series,\N,guess
+1551,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1552,TvdbFI,^.*$,program_type,series,\N,guess
+1552,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1553,TvdbNO,^.*$,program_type,series,\N,guess
+1553,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1554,Tvdb,^.*$,program_type,series,\N,guess
+1554,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1557,TvdbEN,^.*$,program_type,series,\N,guess
+1561,TvdbDK,^.*$,program_type,series,\N,guess
+1561,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1565,TvdbDK,^.*$,program_type,series,\N,guess
+1565,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1566,TvdbNO,^.*$,program_type,series,\N,guess
+1566,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1567,Tvdb,^.*$,program_type,series,\N,guess
+1567,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1568,TvdbNO,^.*$,program_type,series,\N,guess
+1568,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1569,Tvdb,^.*$,program_type,series,\N,guess
+1569,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1570,TvdbDK,^.*$,program_type,series,\N,guess
+1570,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1572,TvdbNO,^.*$,program_type,series,\N,guess
+1572,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1573,Tvdb,^.*$,program_type,series,\N,guess
+1573,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1574,TvdbDK,^.*$,program_type,series,\N,guess
+1574,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1576,TvdbNO,^.*$,program_type,series,\N,guess
+1576,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1577,Tvdb,^.*$,program_type,series,\N,guess
+1577,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1578,TvdbDK,^.*$,program_type,series,\N,guess
+1578,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1580,TvdbNO,^.*$,program_type,series,\N,guess
+1580,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1581,Tvdb,^.*$,program_type,series,\N,guess
+1581,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1587,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1605,TvdbDE,^.*$,program_type,series,\N,guess
+289,Fixups,"Dyret skal dø",\N,\N,series,setprogram_type
+289,Tmdb,^.*$,program_type,tvshow,\N,title
+289,Fixups,"^(Smag på)\s+(.*)$",\N,\N,\N,splittitle
+289,Fixups,"^(Smag på)\s+(.*)$",\N,\N,series,setprogram_type
+472,Fixups,"Huset på Christianshavn",\N,\N,series,setprogram_type
+472,TmdbTV,"Huset på Christianshavn",program_type,series,8988,episodeabs
+295,Fixups,^.*(Poirot):\s+(.*)$,\N,\N,\N,splittitle
+295,TvdbNO,Poirot,program_type,series,76133,episodeseason
+472,Fixups,"^(Huset på Christianshavn):\s+(.*)$",\N,\N,\N,splittitle
