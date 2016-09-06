@@ -17,7 +17,7 @@ use DateTime;
 use XML::LibXML;
 use Encode qw/encode decode/;
 
-use NonameTV qw/MyGet norm AddCountry AddCategory/;
+use NonameTV qw/ParseXml MyGet norm AddCountry AddCategory/;
 use NonameTV::Log qw/progress error/;
 
 use NonameTV::Importer::BaseWeekly;
@@ -38,6 +38,28 @@ sub new {
     return $self;
 }
 
+sub FilterContent {
+  my $self = shift;
+  my( $cref, $chd ) = @_;
+
+  $$cref =~ s/[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]//go; # Sometimes have invalid chars.
+
+  my $doc = ParseXml( $cref );
+
+  if( not defined $doc ) {
+    return (undef, "ParseXml failed" );
+  }
+  my $ns = $doc->find( "//programme" );
+
+  if( $ns->size() == 0 ) {
+    return (undef, "No data found" );
+  }
+
+  my $str = $doc->toString(1);
+
+  return (\$str, undef);
+}
+
 sub ImportContent
 {
   my $self = shift;
@@ -47,12 +69,10 @@ sub ImportContent
   my $ds = $self->{datastore};
   $ds->{SILENCE_END_START_OVERLAP}=1;
 
-  my $xml = XML::LibXML->new;
-  my $doc;
-  eval { $doc = $xml->parse_string($$cref); };
-  if( $@ ne "" )
-  {
-    error( "$batch_id: Failed to parse $@" );
+  my $doc = ParseXml( $cref );
+
+  if( not defined( $doc ) ) {
+    error "Failed to parse XML.";
     return 0;
   }
 

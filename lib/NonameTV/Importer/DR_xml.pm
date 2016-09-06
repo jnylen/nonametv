@@ -101,7 +101,10 @@ sub ImportContent {
 
   foreach my $b ($ns->get_nodelist) {
     # Start and so on
-    my $start = ParseDateTime( $b->findvalue( "pro_publish[1]/ppu_start_timestamp_announced" ) );
+    my($start);
+    $start = ParseDateTime( $b->findvalue( "pro_publish[1]/ppu_start_timestamp_announced" ) ) if($b->findvalue( "pro_publish[1]/ppu_start_timestamp_announced" ));
+    $start = ParseDateTime( $b->findvalue( "pro_publish[1]/ppu_start_timestamp_presentation_utc" ) ) if($b->findvalue( "pro_publish[1]/ppu_start_timestamp_presentation_utc" ) and !defined($start));
+
     my $title = $b->findvalue( "pro_title" );
     my $title_alt = $b->findvalue( "pro_publish[1]/ppu_title_alt" );
     my $subtitle = $b->findvalue( "pro_publish[1]/pro_punchline" );
@@ -222,8 +225,8 @@ sub ImportContent {
     my($program_type, $category ) = $ds->LookupCat( 'DR', $genre );
     AddCategory( $ce, $program_type, $category );
 
-    ( $program_type, $category ) = ParseDescCatDan( $genretext );
-    AddCategory( $ce, $program_type, $category );
+    my( $program_type2, $category2 ) = ParseDescCatDan( $genretext );
+    AddCategory( $ce, $program_type2, $category2 );
 
     ## Arrays
     my @actors;
@@ -352,21 +355,36 @@ sub ImportContent {
 # and are expressed in the local timezone.
 sub ParseDateTime {
   my( $str ) = @_;
+  my( $year, $month, $day, $hour, $minute, $second, $dt );
 
-  my( $year, $month, $day, $hour, $minute, $second ) =
-      ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)$/ );
+  if( $str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)$/i ){
+    ( $year, $month, $day, $hour, $minute, $second ) = ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)$/ );
 
-  my $dt = DateTime->new(
-    year => $year,
-    month => $month,
-    day => $day,
-    hour => $hour,
-    minute => $minute,
-    second => $second,
-    time_zone => "Europe/Copenhagen"
-      );
+    $dt = DateTime->new(
+      year => $year,
+      month => $month,
+      day => $day,
+      hour => $hour,
+      minute => $minute,
+      second => $second,
+      time_zone => "Europe/Copenhagen"
+    );
 
-  $dt->set_time_zone( "UTC" );
+    $dt->set_time_zone( "UTC" );
+
+  } elsif( $str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z$/i ) {
+    ( $year, $month, $day, $hour, $minute, $second ) = ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z$/ );
+
+    $dt = DateTime->new(
+      year => $year,
+      month => $month,
+      day => $day,
+      hour => $hour,
+      minute => $minute,
+      second => $second,
+      time_zone => "UTC"
+    );
+  }
 
   return $dt->ymd("-") . " " . $dt->hms(":");
 }

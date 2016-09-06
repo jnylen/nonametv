@@ -304,7 +304,7 @@ sub ImportExcel
       $desc = '';
 
       # Find production year from description.
-      if(defined($desc) and $ce->{description} =~ /\((\d\d\d\d)\)/)
+      if(defined($desc) and defined($ce->{description}) and $ce->{description} =~ /\((\d\d\d\d)\)/)
       {
         $ce->{description} =~ s/\((\d\d\d\d)\) //;
         $ce->{production_date} = "$1-01-01";

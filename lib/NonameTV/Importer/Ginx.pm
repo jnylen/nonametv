@@ -44,7 +44,7 @@ sub new {
   bless ($self, $class);
 
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/London" );
   $self->{datastorehelper} = $dsh;
 
   #$self->{datastore}->{augment} = 1;
@@ -102,11 +102,11 @@ sub ImportXLS {
 	my %columns = ();
   my $date;
   my $currdate = "x";
-  my $coldate = 0;
-  my $coltime = 1;
-  my $coltitle = 2;
-  my $colepisode = 3;
-  my $coldesc = 5;
+  my $coldate = 1;
+  my $coltime = 2;
+  my $coltitle = 5;
+  my $colepisode = 6;
+  my $coldesc = 7;
 
 my $oBook;
 

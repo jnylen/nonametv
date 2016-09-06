@@ -61,7 +61,7 @@ sub ImportContentFile {
 
   $self->{fileerror} = 0;
 
-  if( $file =~ /\.xlsx$/i ){
+  if( $file =~ /\.(xlsx|xlsm)$/i ){
     $self->ImportXLS( $file, $chd );
   } else {
     error( "Nonstop_XLS: Unknown file format: $file" );
@@ -83,9 +83,10 @@ sub ImportXLS
   my $currdate = "x";
   my $oBook;
 
-  if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
+  progress( "Nonstop_XLS: $chd->{xmltvid}: Processing $file" );
+  if ( $file =~ /\.(xlsx|xlsm)$/i ){ $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
   else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
-  my $ref = ReadData ($file);
+  #my $ref = ReadData ($file);
 
   # fields
   my $num_date = 0;
@@ -147,6 +148,7 @@ sub ImportXLS
       my $title = $oWkC->{Val} if( $oWkC->{Val} );
       $title =~ s/&amp;/&/ if( $oWkC->{Val} );
       next if( ! $title );
+      $title =~ s/- Season (\d+)(.*)//i;
 
 	  # extra info
 	  my $desc = $oWkS->{Cells}[$iR][$num_desc]->Value if $oWkS->{Cells}[$iR][$num_desc];
