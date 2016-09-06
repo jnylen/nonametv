@@ -703,6 +703,7 @@ $dm->AddRegexp( qr/psykologisk thriller/i,  [ 'movie', 'Thriller' ] );
 $dm->AddRegexp( qr/dokumentarserie/i,       [ 'series', 'Documentary' ] );
 $dm->AddRegexp( qr/dokumentarserie/i,       [ 'series', 'Documentary' ] );
 $sm->AddRegexp( qr/\bkomedie\b/i,           [ 'movie', "Comedy" ] );
+$dm->AddRegexp( qr/madserie/i,              [ 'series', 'Food' ] );
 
 sub ParseDescCatDan
 {
@@ -1149,6 +1150,15 @@ sub MonthNumber {
     @months_2 = qw/januar februar mars april mai juni juli august september oktober november desember/;
     @months_3 = qw/januar februar marts april maj juni juli august september oktober november december/;
     @months_4 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
+    @months_5 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
+    @months_6 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
+    @months_7 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
+    @months_8 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
+  } elsif( $lang =~ /^fi$/ ){
+    @months_1 = qw/jan feb mar apr maj jun jul aug sep okt nov dec/;
+    @months_2 = qw/januari februari mars april maj juni juli augusti september oktober november december/;
+    @months_3 = qw/jan feb mar apr maj jun jul aug sept okt nov dec/;
+    @months_4 = qw/tammikuu helmikuu maaliskuu huhtikuu toukokuu kesäkuu heinäkuu elokuu syyskuu lokakuu marraskuu joulukuu/;
     @months_5 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_6 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_7 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
