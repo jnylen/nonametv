@@ -106,9 +106,11 @@ foreach my $fsf (@fsfiles)
   }
 
   # list files inside of the channel directory and check when they have been touched
-  my( $cf ) = File::Util->new();
-  my( @cffiles ) = $cf->list_dir( "$filestore/$fsf/old", '--no-fsdots' );
-  foreach my $cff (@cffiles)
+  #my( $cf ) = File::Util->new();
+  #my( @cffiles ) = $cf->list_dir( "$filestore/$fsf/old", '--no-fsdots' );
+  opendir(DIR, "$filestore/$fsf/old");
+
+  foreach my $cff (readdir(DIR))
   {
 
     my $cftype = join(',', File::Util->file_type( "$filestore/$fsf/old/$cff" ) );
