@@ -108,7 +108,7 @@ sub ImportContentFile {
       } elsif($chd->{sched_lang} eq "no") {
         push( @filess, $member->{fileName} ) if $member->{fileName} =~ /nor/i and $member->{fileName} =~ /\.(xls|xlsx|xml)$/i ;
       } elsif($chd->{sched_lang} eq "en") {
-        push( @filess, $member->{fileName} ) if $member->{fileName} =~ /eng*.*(xls|xml)$/i and $member->{fileName} !~ /swe*.*(xls|xlsx|xml)$/i;
+        push( @filess, $member->{fileName} ) if $member->{fileName} =~ /eng*.*(xls|xml|xlsx)$/i and $member->{fileName} !~ /swe*.*(xls|xlsx|xml)$/i;
       }
     }
 
