@@ -35,10 +35,12 @@ def copy_to_channels(file_name)
 
     { :xmltvid => "3d.sky.de", :info => "SKY HD-3D" }, { :xmltvid => "action.sky.de", :info => "Sky Action" },
     { :xmltvid => "actionhd.sky.de", :info => "Sky Action HD" }, { :xmltvid => "atlantic.sky.de", :info => "SKY ATLANTIC" },
+    { :xmltvid => "atlanticp1.sky.de", :info => "SKY ATLANTIC +1 HD" }, { :xmltvid => "arts.sky.de", :info => "SKY ARTS HD" },
     { :xmltvid => "atlantichd.sky.de", :info => "SKY ATLANTIC HD" }, { :xmltvid => "cinema.sky.de", :info => "SKY CINEMA" },
     { :xmltvid => "cinemahd.sky.de", :info => "SKY CINEMA HD" }, { :xmltvid => "p1.cinema.sky.de", :info => "Sky Cinema +1" },
     { :xmltvid => "p1hd.cinema.sky.de", :info => "Sky Cinema +1 HD" }, { :xmltvid => "p24.cinema.sky.de", :info => "Sky Cinema +24" },
-    { :xmltvid => "p24hd.cinema.sky.de", :info => "Sky Cinema +24 HD" }, { :xmltvid => "comedy.sky.de", :info => "SKY COMEDY" },
+    { :xmltvid => "p24hd.cinema.sky.de", :info => "Sky Cinema +24 HD" }, { :xmltvid => "family.cinema.sky.de", :info => "SKY CINEMA FAMILY" },
+    { :xmltvid => "familyhd.cinema.sky.de", :info => "SKY CINEMA FAMILY HD" },{ :xmltvid => "comedy.sky.de", :info => "SKY COMEDY" },
     { :xmltvid => "emotion.sky.de", :info => "SKY EMOTION" }, { :xmltvid => "hits.sky.de", :info => "SKY HITS" },
     { :xmltvid => "hitshd.sky.de", :info => "SKY HITS HD" }, { :xmltvid => "krimi.sky.de", :info => "SKY KRIMI" },
     { :xmltvid => "nostalgie.sky.de", :info => "SKY NOSTALGIE" }, { :xmltvid => "select.sky.de", :info => "Sky Select" },
@@ -81,6 +83,7 @@ def copy_to_channels(file_name)
 
     { :xmltvid => "boomerangtv.de", :info => "BOOMERANG" },
     { :xmltvid => "cartoonnetwork.de", :info => "CARTOON NETWORK" },
+    { :xmltvid => "de.eonline.com", :info => "E! ENTERTAINMENT HD" }
 
     ]
 
