@@ -100,17 +100,17 @@ sub ImportContentFile
         my $ce = ();
         $ce->{channel_id} = $chd->{id};
 
-        $ce->{start_time} = $start->ymd("-") . " " . $start->hms(":");
-        $ce->{end_time} = $end->ymd("-") . " " . $end->hms(":");
+        $ce->{start_time} = $start->hms(":");
+        #$ce->{end_time} = $end->ymd("-") . " " . $end->hms(":");
 
         if($start->ymd("-") ne $currdate ) {
           if( $currdate ne "x" ){
-          #  $dsh->EndBatch( 1 );
+            $dsh->EndBatch( 1 );
           }
 
           my $batch_id = $chd->{xmltvid} . "_" . $start->ymd("-");
-          #$dsh->StartBatch( $batch_id, $chd->{id} );
-          #$dsh->StartDate( $start->ymd("-") , "06:00" );
+          $dsh->StartBatch( $batch_id, $chd->{id} );
+          $dsh->StartDate( $start->ymd("-") , "00:00" );
           $currdate = $start->ymd("-");
           progress("ServusTV: $chd->{xmltvid}: Date is: ".$start->ymd("-"));
         }
@@ -207,13 +207,11 @@ sub ImportContentFile
         ParseCredits( $ce, 'presenters', $xpc, 's:mitwirkende/s:mitwirkender[@funktion="Moderation"]/s:mitwirkendentyp/s:person/s:name' );
         ParseCredits( $ce, 'guests',     $xpc, 's:mitwirkende/s:mitwirkender[@funktion="Gast"]/s:mitwirkendentyp/s:person/s:name' );
 
-        #print Dumper($ce);
 
         $ce->{description} = norm($desc) if $self->{KeepDesc} and $desc and $desc ne "";
 
-        $ds->AddProgrammeRaw( $ce );
-
         progress("ServusTV: $chd->{xmltvid}: ".$ce->{start_time}." - ".$ce->{title});
+        $dsh->AddProgramme( $ce );
   }
 
   $dsh->EndBatch( 1 );
