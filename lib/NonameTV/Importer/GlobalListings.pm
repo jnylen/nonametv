@@ -41,17 +41,18 @@ my $BATCH_LOG_LEVEL = 1;
 my $command_re = "ÄNDRA|RADERA|TILL|INFOGA|EJ ÄNDRAD|FLYTTA TILL|" .
     "CHANGE|DELETE|TO|INSERT|UNCHANGED|" .
     "ENDRE|SLETT|TIL|SETT IN|UENDRET|FLYTT TIL|" .
+    "ÆNDRING|SLET|TIL|UÆNDRET" .
     "PROMIJENI|BRISI|U|UMETNI|NEPROMIJENJENO";
 
 my $time_re = '\d\d[\.:]\d\d';
 
-sub new 
+sub new
 {
   my $proto = shift;
   my $class = ref($proto) || $proto;
   my $self  = $class->SUPER::new( @_ );
   bless ($self, $class);
-  
+
 
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
   $self->{datastorehelper} = $dsh;
@@ -115,18 +116,18 @@ sub ImportFull
 {
   my $self = shift;
   my( $filename, $doc, $channel_xmltvid, $channel_id, $lang ) = @_;
-  
+
   my $dsh = $self->{datastorehelper};
 
   # Find all div-entries.
   my $ns = $doc->find( "//div" );
-  
+
   if( $ns->size() == 0 )
   {
     error( "GlobalListings: $channel_xmltvid: No programme entries found in $filename" );
     return;
   }
-  
+
   progress( "GlobalListings: $channel_xmltvid: Processing $filename" );
 
   # States
@@ -137,7 +138,7 @@ sub ImportFull
     ST_FDESC  => 3,   # Found description
     ST_EPILOG => 4,   # After END-marker
   };
-  
+
   use constant {
     T_HEAD => 10,
     T_DATE => 11,
@@ -145,16 +146,16 @@ sub ImportFull
     T_STOP => 13,
     T_HEAD_ENG => 14,
   };
-  
+
   my $state=ST_START;
   my $currdate;
 
   my $start;
   my $title;
   my $date;
-  
+
   my $ce = {};
-  
+
   foreach my $div ($ns->get_nodelist)
   {
     # Ignore English titles in National Geographic.
@@ -199,7 +200,7 @@ sub ImportFull
     {
       $type = T_TEXT;
     }
-    
+
     if( $state == ST_START )
     {
       if( $type == T_TEXT )
@@ -248,7 +249,7 @@ sub ImportFull
 	$state = ST_FDATE;
       }
     }
-    
+
     if( $state == ST_FDATE )
     {
       if( $type == T_HEAD )
@@ -304,7 +305,7 @@ sub ImportAmendments
 
   # Find all div-entries.
   my $ns = $doc->find( "//div" );
-  
+
   if( $ns->size() == 0 )
   {
     error( "GlobalListings: $channel_xmltvid: $filename: No programme entries found." );
@@ -319,7 +320,7 @@ sub ImportAmendments
   my $state=ST_HEAD;
 
   my( $date, $prevtime, $e );
-  
+
   foreach my $div ($ns->get_nodelist)
   {
     my( $text ) = norm( $div->findvalue( './/text()' ) );
@@ -331,12 +332,14 @@ sub ImportAmendments
 
     if( ($text =~ /^sida \d+ av \d+$/i) or
         ($text =~ /^side \d+ av \d+$/i) or
+        ($text =~ /^side \d+ af \d+$/i) or
         ($text =~ /tablån fortsätter som tidigare/i) or
         ($text =~ /Programoversikten forblir den samme som tidligere/i) or
         ($text =~ /slut på tablå/i) or
         ($text =~ /^page \d+ of \d+$/i) or
         ($text =~ /^pagina \d+ van \d+$/i) or
         ($text =~ /chema gaat verder zoals eerder gepubliceerd met/i) or
+        ($text =~ /Programoversigten fortsætter i overensstemmelse med tidligere udsendt program/i) or
         ($text =~ /schedule resumes as/i)
         )
     {
@@ -354,7 +357,7 @@ sub ImportAmendments
           if( defined( $e ) );
         $e = undef;
         $dsu->EndBatchUpdate( 1 )
-          if( $self->{process_batch} ); 
+          if( $self->{process_batch} );
       }
 
       $date = ParseDate( $text, $lang );
@@ -364,14 +367,14 @@ sub ImportAmendments
 
       $state = ST_FOUND_DATE;
 
-      $self->{process_batch} = 
+      $self->{process_batch} =
         $dsu->StartBatchUpdate( "${channel_xmltvid}_$date", $channel_id ) ;
-      
+
       $self->AddDate( $date ) if $self->{process_batch};
       $self->start_date( $date );
       progress("GlobalListings: $channel_xmltvid: Date is: $date");
     }
-    elsif( ($command, $title) = 
+    elsif( ($command, $title) =
            ($text =~ /^($command_re)\s
                        (.*?)\s*
                        ( \( [^)]* \) )*
@@ -389,7 +392,7 @@ sub ImportAmendments
       $e = $self->parse_command( $prevtime, $command, $title );
     }
 # the next regexp is not ok for Croatian yet
-    elsif( ($time, $command, $title) = 
+    elsif( ($time, $command, $title) =
            ($text =~ /^($time_re)\s
                        ($command_re)\s+
                        ([A-ZÅÄÖ].*?)\s*
@@ -431,7 +434,7 @@ sub ImportAmendments
     if( defined( $e ) );
 
   $dsu->EndBatchUpdate( 1 )
-    if( $self->{process_batch} ); 
+    if( $self->{process_batch} );
 }
 
 sub parse_command
@@ -446,7 +449,7 @@ sub parse_command
   $e->{title} = $title;
   $e->{desc} = "";
 
-  if( $command eq "ÄNDRA" or $command eq "RADERA" or $command eq "ENDRE" or $command eq "SLETT" or $command eq "WIJZIG")
+  if( $command eq "ÄNDRA" or $command eq "ÆNDRING" or $command eq "SLET" or $command eq "RADERA" or $command eq "ENDRE" or $command eq "SLETT" or $command eq "WIJZIG")
   {
     $e->{command} = "DELETEBLIND";
   }
@@ -471,7 +474,7 @@ sub parse_command
   {
     $e->{command} = "INSERT";
   }
-  elsif( $command eq "EJ ÄNDRAD" or $command eq "UNCHANGED" or $command eq "NEPROMIJENJENO" or $command eq "ONVERANDERD" )
+  elsif( $command eq "EJ ÄNDRAD" or $command eq "UÆNDRET" or $command eq "UNCHANGED" or $command eq "NEPROMIJENJENO" or $command eq "ONVERANDERD" )
   {
     $e->{command} = "IGNORE";
   }
@@ -503,7 +506,7 @@ sub process_command
     my $ce = {
       channel_id => $channel_id,
       start_time => $dt->ymd('-') . " " . $dt->hms(':'),
-    };      
+    };
 
     $self->{del_e} = $dsu->DeleteProgramme( $ce, 1 );
   }
@@ -680,7 +683,7 @@ sub isDate {
   # format 'Tuesday July 01, 2008'
   if( $text =~ /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s*\D+\s*\d+,\s*\d+$/i ){
     return 1;
-  } 
+  }
 
   #
   # Croatian formats
@@ -783,7 +786,7 @@ sub ParseDate
    } else {
     return undef;
   }
-  
+
 #print "WDAY: >$weekday<\n";
 #print "DAY : >$day<\n";
 #print "MON : >$monthname<\n";
@@ -804,7 +807,7 @@ sub start_date
 #  print "StartDate: $date\n";
 
   my( $year, $month, $day ) = split( '-', $date );
-  $self->{curr_date} = DateTime->new( 
+  $self->{curr_date} = DateTime->new(
                                       year   => $year,
                                       month  => $month,
                                       day    => $day,
@@ -821,7 +824,7 @@ sub create_dt
   my( $time ) = @_;
 
   my $dt = $self->{curr_date}->clone();
-  
+
   my( $hour, $minute ) = split( /[:\.]/, $time );
 
   error( $self->{batch_id} . ": Unknown starttime $time" )
