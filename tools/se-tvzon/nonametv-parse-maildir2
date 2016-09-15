@@ -65,24 +65,24 @@ my @folders = qw(		 NonameTV-Data.MTV
                  		 NonameTV-Data.TV8Norge
                  		 NonameTV-Data.PokerChannel
                  		 NonameTV-Data.Gospel
-		 NonameTV-Data.RTL2
-		 NonameTV-Data.DWDE
-		 NonameTV-Data.HaC
-		 NonameTV-Data.ETVMedia
-		 NonameTV-Data.VisjonNorge
-		 NonameTV-Data.Turner
-		 NonameTV-Data.DMB
-		 NonameTV-Data.PPS
-
-		 NonameTV-Data.DreiPlus
-		 NonameTV-Data.Classica
-		 NonameTV-Data.HopeChannel
-		 NonameTV-Data.SSF
-		 NonameTV-Data.Discovery
-     NonameTV-Data.FightSports
-     NonameTV-Data.YFE
+                		 NonameTV-Data.RTL2
+                		 NonameTV-Data.DWDE
+                		 NonameTV-Data.HaC
+                		 NonameTV-Data.ETVMedia
+                		 NonameTV-Data.VisjonNorge
+                		 NonameTV-Data.Turner
+                		 NonameTV-Data.DMB
+                		 NonameTV-Data.PPS
+                     NonameTV-Data.ServusTV
+                		 NonameTV-Data.DreiPlus
+                		 NonameTV-Data.Classica
+                		 NonameTV-Data.HopeChannel
+                		 NonameTV-Data.Discovery
+                     NonameTV-Data.FightSports
+                     NonameTV-Data.YFE
+                     NonameTV-Data.Tele5
         );
-# NonameTV-Data.ServusTV
+#
 # Flag messages AFTER they have been processed. Then I normally
 # only have to move the message to the correct folder.
 
@@ -361,7 +361,7 @@ sub guess_channel
     return "visjonnorge.com";
  }
 
- if( $dir =~ /DWDE/ and $filename =~ /\.xls|.xlsx$/i ) {
+ if( $dir =~ /DWDE/ and $filename =~ /\.(xls|.xlsx)$/i ) {
     return "dw.de" if $filename =~ /Europa/i;
     return "asien.dw.de" if $filename =~ /Asien/i and $filename !~ /Afrika/i;
     return "english.dw.de" if $filename =~ /English/i;
@@ -421,6 +421,10 @@ sub guess_channel
     return "disneychannel.de" if $filename =~ /\.(xml|zip)$/i;
  }
 
+ if( $dir =~ /Tele5/ and $filename =~ /\.xml$/i ) {
+    return "tele5.de";
+ }
+
  if( $dir =~ /ServusTV/ and $filename =~ /\.xml$/i and $filename =~ /struppi/i ) {
     return "servustv.de" if $filename =~ /DE/i;
     return "servustv.com" if $filename !~ /DE/i;
@@ -442,10 +446,6 @@ sub guess_channel
 
  if( $dir =~ /HopeChannel/ and $filename =~ /\.xml$/i ) {
    return "hope-channel.de";
- }
-
- if( $dir =~ /SSF/ and $filename =~ /\.xlsx$/i ) {
-  # return "ssfmedia.ch";
  }
 
  if( $dir =~ /Discovery/ and $filename =~ /\.(xml|zip)$/i ) {

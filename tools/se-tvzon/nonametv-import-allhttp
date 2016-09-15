@@ -84,6 +84,5 @@ wget -O /content/channels/tv_grab/oklu.xml http://epg.ok-rlp.de/xmltv/ludwigshaf
 wget -O /content/channels/tv_grab/okmainz.xml http://epg.ok-rlp.de/xmltv/mainz.xml
 wget -O /content/channels/tv_grab/okneustadt.xml http://epg.ok-rlp.de/xmltv/neustadt.xml
 wget -O /content/channels/tv_grab/oksp.xml http://epg.ok-rlp.de/xmltv/rodalben.xml
-wget -O /content/channels/tv_grab/okspeyer.xml http://epg.ok-rlp.de/xmltv/speyer.xml
 wget -O /content/channels/tv_grab/worms.xml http://epg.ok-rlp.de/xmltv/worms.xml
 $NONAMETV TVGrabXX $1 $2 $3
