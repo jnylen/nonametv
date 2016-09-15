@@ -177,6 +177,8 @@ sub ImportXLS
       next if( ! $oWkC );
       my $title = ucfirst(lc(norm($oWkC->Value))) if( $oWkC->Value );
 
+      next if(!defined($title));
+
       # dont output errors if there is no title (End of program)
       if($title) {
         $title =~ s/\((\d\d\d\d)\)$//;
@@ -188,6 +190,8 @@ sub ImportXLS
         $title =~ s/, (the|a|an|i|il)$//i;
         $title = norm(ucfirst(lc($word2)) . " ".$title);
       }
+
+      next if(!defined($title));
 
       # # End of airtime
       if( ($title eq "End of program" or $title eq "Konec vysílání") )
