@@ -181,8 +181,9 @@ sub ImportXML
       channel_id  => $chd->{id},
       title       => norm($title),
       start_time  => $start,
-      end_time    => $end,
     };
+
+    #      end_time    => $end,
 
     if(defined($description) and $description ne "") {
       $ce->{description} = $description;
