@@ -264,6 +264,12 @@ sub guess_channel
     	  return "hd.mtv.se" if $filename =~ /listings/i;
     	}
     }
+
+    # XML
+    if($filename =~ /\.xml$/i) {
+      return "vh1.eu" if $filename =~ /^VH1E_UK/i;
+
+    }
  }
 
  if( $dir =~ /PokerChannel/ and $filename =~ /\.xlsx$/i ) {

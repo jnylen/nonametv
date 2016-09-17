@@ -140,6 +140,7 @@ sub ImportXLS
       $oWkC = $oWkS->{Cells}[$iR][$num_title];
       next if( ! $oWkC );
       my $title = $oWkC->{Val} if( $oWkC->{Val} );
+      $title =~ s/’/'/;
 
       # subtitle
       $oWkC = $oWkS->{Cells}[$iR][$num_subtitle];
@@ -150,9 +151,8 @@ sub ImportXLS
 
       my $ce = {
         channel_id => $chd->{channel_id},
-        title => norm( $title ),
+        title => norm( $subtitle ),
         start_time => $time,
-        subtitle => norm( $subtitle )
       };
 
       # Episode number

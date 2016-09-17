@@ -37,7 +37,26 @@ sub new {
   return $self;
 }
 
-sub ImportContentFile
+sub ImportContentFile {
+  my $self = shift;
+  my( $file, $chd ) = @_;
+
+  $self->{fileerror} = 0;
+
+  if( $file =~ /\.xml$/i ) {
+    if($file =~ /Startzeiten/) {
+      print("amendment.\n");
+    } else {
+      $self->ImportFullXML( $file, $chd );
+    }
+  } else {
+    error( "Tele5_xml: Unknown file format: $file" );
+  }
+
+  return;
+}
+
+sub ImportFullXML
 {
   my $self = shift;
   my( $file, $chd ) = @_;

@@ -13,7 +13,7 @@ tools/nonametv-import NGScan $1 $2 $3
 tools/nonametv-import TravelChannel $1 $2 $3
 tools/nonametv-import God $1 $2 $3
 tools/nonametv-import Gospel $1 $2 $3
-tools/nonametv-import TVChile $1 $2 $3
+#tools/nonametv-import TVChile $1 $2 $3
 tools/nonametv-import Svt $1 $2 $3
 tools/nonametv-import Venetsia $1 $2 $3
 tools/nonametv-import BBCWW $1 $2 $3
@@ -36,7 +36,6 @@ tools/nonametv-import Turner $1 $2 $3
 tools/nonametv-import TCM_doc $1 $2 $3
 tools/nonametv-import VH1Classic $1 $2 $3
 tools/nonametv-import GlobalListings_xls $1 $2 $3
-tools/nonametv-import NBCUniversal $1 $2 $3
 tools/nonametv-import History_xml $1 $2 $3
 tools/nonametv-import VisjonNorge $1 $2 $3
 tools/nonametv-import SonyDE $1 $2 $3
@@ -61,7 +60,6 @@ tools/nonametv-import SkyNews $1 $2 $3
 tools/nonametv-import DreiPlus $1 $2 $3
 tools/nonametv-import Classica $1 $2 $3
 tools/nonametv-import HopeChannel $1 $2 $3
-tools/nonametv-import SSF $1 $2 $3
 tools/nonametv-import DMAX $1 $2 $3
 tools/nonametv-import WildTV $1 $2 $3
 tools/nonametv-import BibelTV $1 $2 $3
@@ -70,4 +68,5 @@ tools/nonametv-import KinoPolska $1 $2 $3
 tools/nonametv-import ATV $1 $2 $3
 tools/nonametv-import FightSports $1 $2 $3
 tools/nonametv-import YFE $1 $2 $3
-tools/nonametv-import Uptown $1 $2 $3
+#tools/nonametv-import Uptown $1 $2 $3 # Issue with illegal utf8 chars
+tools/nonametv-import MTV_xmltv $1 $2 $3

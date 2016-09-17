@@ -292,6 +292,7 @@ sub guess_channel
     return "crimeandinvestigation.pl"  if $filename =~ /cai.pol/i and $filename =~ /\.xml$/i;
 
     return "natgeo.dk" if $filename =~ /^ngden/i and $filename =~ /\.xls$/i;
+    return "natgeo.no" if $filename =~ /^ngnor/i and $filename =~ /\.xls$/i;
     return "natgeotv.com" if $filename =~ /^ngscan/i and $filename =~ /\.xls$/i and $filename !~ /^ngden/i;
     return "natgeotv.com" if $filename =~ /^ngswe_fin/i and $filename =~ /\.xls$/i and $filename !~ /^ngden/i;
     return "people.natgeo.dk" if $filename =~ /^ngppl\.den/i and $filename =~ /\.xls$/i;
@@ -399,6 +400,11 @@ sub guess_channel
      if($filename =~ /\.xml$/i) {
         return "bibeltv.de" if $filename =~ /bibeltv/i;
      }
+
+     # Gospel
+     if($from =~ /sigrun\.ei/i and $filename =~ /\.xls$/i) {
+       return "gospel.tv";
+     }
  }
 
  if( $dir =~ /Playboy/ ) {
@@ -415,8 +421,8 @@ sub guess_channel
      return "europe.daringtv.com" if $filename =~ /^private.*gmt.*\b/i;
  }
 
- if( $dir =~ /YaS/ and $filename =~ /\.xls$/i ) {
-     return "nauticalchannel.net" if $filename =~ /nc/i;
+ if( $dir =~ /YaS/ and $filename =~ /\.(xlsx|xls)$/i ) {
+     return "nauticalchannel.net";
  }
 
  if( $dir =~ /Motors/ and $filename =~ /\.xls$/i ) {

@@ -396,6 +396,9 @@ print "ParseDate: >$text<\n";
     } elsif( $text =~ /^(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\d+\s+(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d+$/i ){
       ( $dayname, $day, $monthname, $year ) = ( $text =~ /^(sunday|monday|tuesday|wednesday|thursday|friday|saturday)(\d+)\s+(\S+)\s+(\d+)$/i );
       $month = MonthNumber( $monthname, "en" );
+    } elsif( $text =~ /^(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\s+\d+\s+(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d+$/i ){
+      ( $dayname, $day, $monthname, $year ) = ( $text =~ /^(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\s+(\d+)\s+(\S+)\s+(\d+)$/i );
+      $month = MonthNumber( $monthname, "en" );
     } elsif( $text =~ /^\d+\s+(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d+$/i ){
       ( $day, $monthname, $year ) = ( $text =~ /^(\d+)\s+(\S+)\s+(\d+)$/i );
       $month = MonthNumber( $monthname, "en" );

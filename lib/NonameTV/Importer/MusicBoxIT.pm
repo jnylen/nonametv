@@ -17,6 +17,9 @@ use utf8;
 use DateTime;
 use Spreadsheet::ParseExcel;
 
+use Text::Iconv;
+my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
+
 use NonameTV qw/norm AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
@@ -69,14 +72,16 @@ sub ImportFlatXLS
 
   progress( "YaS: $chd->{xmltvid}: Processing $file" );
 
-  my $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );
+  my $oBook;
+  if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
+  else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }   #  staro, za .xls
 
     my($iR, $oWkS, $oWkC);
-	
+
 	  my( $time, $episode );
   my( $program_title , $program_description );
     my @ces;
-  
+
   # main loop
   foreach my $oWkS (@{$oBook->{Worksheet}}) {
 
@@ -102,7 +107,7 @@ sub ImportFlatXLS
 
           my $batch_id = "${xmltvid}_" . $date;
           $dsh->StartBatch( $batch_id, $channel_id );
-          $dsh->StartDate( $date , "00:00" ); 
+          $dsh->StartDate( $date , "00:00" );
           $currdate = $date;
         }
       }
@@ -119,43 +124,43 @@ sub ImportFlatXLS
   					my ( $epi ) = ( $subtitle =~ /Ep.\s*(\d+)$/ );
   					$episode = sprintf( " . %d . ", $epi-1 ) if defined $epi;
   					# Remove it from title
-  					$subtitle =~ s/Ep.\s*(\d+)$//; 
-  					
+  					$subtitle =~ s/Ep.\s*(\d+)$//;
+
   					# norm it
   					$subtitle = norm($subtitle);
-  					
+
   					# Remove ending dot
-  					$subtitle =~ s/.$//; 
+  					$subtitle =~ s/.$//;
   			}
 			}
-			
+
 			#my $genre = norm($oWkS->{Cells}[$iR][6]); # Not used as of yet
 			my $desc = norm($oWkS->{Cells}[$iR][16]->Value);
-			
+
 			my $ce = {
           channel_id   => $chd->{id},
           title        => $title,
           start_time   => $time,
           description  => $desc,
         };
-		
+
 			$ce->{subtitle} = $subtitle if $subtitle;
 			$ce->{episode} = $episode if $episode;
-		
+
 			push( @ces , $ce );
 
     } else {
         # skip
     }
    } # next row
-	
+
   } # next worksheet
 
   # save last day if we have it in memory
   FlushDayData( $xmltvid, $dsh , @ces );
 
   $dsh->EndBatch( 1 );
-  
+
   return;
 }
 

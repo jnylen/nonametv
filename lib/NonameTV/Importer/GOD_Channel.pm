@@ -120,11 +120,11 @@ my $ref = ReadData ($file);
   # main loop
   for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
     my $oWkS = $oBook->{Worksheet}[$iSheet];
-    next if $oWkS->{Name} ne "GMT";
+    next if $oWkS->{Name} ne "GMT" and $oWkS->{Name} ne "CET";
 
     progress( "GOD_Channel: Processing worksheet: $oWkS->{Name}" );
 
-	my $foundcolumns = 0;
+	  my $foundcolumns = 0;
     # browse through rows
     my $i = 0;
     for(my $iR = 7 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
@@ -136,7 +136,7 @@ my $ref = ReadData ($file);
       $oWkC = $oWkS->{Cells}[$iR][$coldate];
       next if( ! $oWkC );
 
-	  $date = $oWkC->{Val} if( $oWkC->Value );
+	    $date = $oWkC->{Val} if( $oWkC->Value );
       $date = ParseDate( ExcelFmt('yyyy-mm-dd', $date) );
       next if( ! $date );
 
@@ -155,21 +155,17 @@ my $ref = ReadData ($file);
       }
 
       # time
-      $oWkC = $oWkS->{Cells}[$iR][$coltime];
-      next if( ! $oWkC );
-
-
-
-      my $time = 0;  # fix for  12:00AM
-      $time=$oWkC->{Val} if( $oWkC->Value );
-      print Dumper($time);
-      print Dumper(ExcelFmt('hh:mm', $time));
+      my $field2 = "B".$i;
+      my $time = $ref->[1]{$field2};
       $time =~ s/\./:/;
       print Dumper($time);
       my ( $hour, $min ) = ( $time =~ /^(\d+):(\d\d)/ );
+      $hour = $hour-24 if($hour >= 24);
+
 
       # Strpad
       $time = sprintf( "%02d:%02d", $hour, $min );
+
 
 
       # title
