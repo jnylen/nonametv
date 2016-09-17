@@ -175,3 +175,20 @@ a.get('http://info.sky.de/inhalt/de/programm_info_presseexport_start.jsp') do |h
     puts "Couldn't log out successfully. (#{e.message})"
   end
 end
+
+puts "Cleaning up the SKYDE folder.."
+Dir.foreach('/content/skyde') do |item|
+  next if item == '.' or item == '..'
+
+  cur_week = Time.now.strftime('%W').to_i
+  cur_year = Time.now.year.to_i
+
+  if result = item.match(/_(\d\d)_(\d\d\d\d)/)
+    week, year = result.captures
+
+    if (week.to_i < (cur_week-1)) or (year.to_i < cur_year-1)
+      FileUtils.rm('/content/skyde/' + item)
+      puts "Removed #{item}"
+    end
+  end
+end
