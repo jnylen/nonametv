@@ -672,11 +672,22 @@ sub WriteEntry
 
   if( defined( $data->{category} ) and ($data->{category} =~ /\S/) )
   {
-    push @{$d->{category}}, [$data->{category}, 'en'];
+    my @genres = split /\//, $data->{category};
+    foreach my $genre (sort @genres) {
+      push @{$d->{category}}, [$genre, 'en'];
+    }
+
+    #push @{$d->{category}}, [$data->{category}, 'en'];
+
   }
   elsif( defined( $chd->{def_cat} ) and ($chd->{def_cat} =~ /\S/) )
   {
-    push @{$d->{category}}, [$chd->{def_cat}, 'en'];
+    my @genres2 = split /\//, $chd->{def_cat};
+    foreach my $genre2 (sort @genres2) {
+      push @{$d->{category}}, [$genre2, 'en'];
+    }
+
+    #push @{$d->{category}}, [$chd->{def_cat}, 'en'];
   }
 
   if( defined( $data->{production_date} ) and

@@ -19,6 +19,13 @@ use Archive::Zip qw/:ERROR_CODES/;
 use XML::LibXML;
 use Spreadsheet::ParseExcel;
 
+use Spreadsheet::XLSX;
+use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel int2col);
+use Spreadsheet::Read;
+
+use Text::Iconv;
+my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
+
 use NonameTV qw/norm AddCategory AddCountry/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error d p w f/;
@@ -51,7 +58,7 @@ sub ImportContentFile {
 
   if( $file =~ /\.xml$/i ){
     $self->ImportXML( $file, $chd );
-  } elsif( $file =~ /\.xls$/i ) {
+  } elsif( $file =~ /\.(xls|xlsx)$/i ) {
     $self->ImportXLS( $file, $chd );
   } else {
     error( "FOXTV: Unknown file format: $file" );
@@ -244,7 +251,10 @@ sub ImportXLS {
   my $currdate = "x";
   my %columns = ();
 
-  my $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );
+  my $oBook;
+  if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
+  else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
+  my $ref = ReadData ($file);
 
   # main loop
   for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
@@ -331,36 +341,41 @@ sub ImportXLS {
       my $start = $oWkC->Value if( $oWkC->Value );
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
-      next if( ! $oWkC );
-      my $title = $oWkC->Value if( $oWkC->Value );
-      my $title_org = norm($oWkS->{Cells}[$iR][$columns{'ORGTitle'}]->Value );
+      my $title_field = int2col($columns{'Title'}).$i;
+      my $title = $ref->[1]{$title_field};
 
-      my $hd = norm($oWkS->{Cells}[$iR][$columns{'HD'}]->Value );
-      my $ws = norm($oWkS->{Cells}[$iR][$columns{'169'}]->Value );
-      my $yr = norm($oWkS->{Cells}[$iR][$columns{'Year'}]->Value);
-      my $ep_desc  = norm($oWkS->{Cells}[$iR][$columns{'Ep Synopsis'}]->Value );
-      my $se_desc  = norm($oWkS->{Cells}[$iR][$columns{'Ser Synopsis'}]->Value );
-      my $subtitle = norm($oWkS->{Cells}[$iR][$columns{'Ep Title'}]->Value );
-      my $ep_num   = norm($oWkS->{Cells}[$iR][$columns{'Ep No'}]->Value );
-      my $se_num   = norm($oWkS->{Cells}[$iR][$columns{'Ser No'}]->Value );
-      my $of_num   = norm($oWkS->{Cells}[$iR][$columns{'Eps'}]->Value );
-      my $genre    = norm($oWkS->{Cells}[$iR][$columns{'Genre'}]->Value );
-      my $prodcountry = norm($oWkS->{Cells}[$iR][$columns{'Country'}]->Value );
-      my $actors = $oWkS->{Cells}[$iR][$columns{'Actors'}]->Value;
+      my $title_org = norm($oWkS->{Cells}[$iR][$columns{'ORGTitle'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'ORGTitle'}]);
+
+      my $hd = norm($oWkS->{Cells}[$iR][$columns{'HD'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'HD'}]);
+      my $ws = norm($oWkS->{Cells}[$iR][$columns{'169'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'169'}]);
+      my $yr = norm($oWkS->{Cells}[$iR][$columns{'Year'}]->Value) if defined($oWkS->{Cells}[$iR][$columns{'Year'}]);
+
+      my $ep_field = int2col($columns{'Ep Synopsis'}).$i;
+      my $ep_desc = $ref->[1]{$ep_field};
+
+      my $se_field = int2col($columns{'Ser Synopsis'}).$i;
+      my $se_desc = $ref->[1]{$se_field};
+
+      my $subtitle = norm($oWkS->{Cells}[$iR][$columns{'Ep Title'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'Ep Title'}]);
+      my $ep_num   = norm($oWkS->{Cells}[$iR][$columns{'Ep No'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'Ep No'}]);
+      my $se_num   = norm($oWkS->{Cells}[$iR][$columns{'Ser No'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'Ser No'}]);
+      my $of_num   = norm($oWkS->{Cells}[$iR][$columns{'Eps'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'Eps'}]);
+      my $genre    = norm($oWkS->{Cells}[$iR][$columns{'Genre'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'Genre'}]);
+      my $prodcountry = norm($oWkS->{Cells}[$iR][$columns{'Country'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'Country'}]);
+      my $actors = $oWkS->{Cells}[$iR][$columns{'Actors'}]->Value if defined($oWkS->{Cells}[$iR][$columns{'Actors'}]);
       $actors =~ s/, /;/g;
       $actors =~ s/-$//g;
       $actors =~ s/;$//g;
       $actors =~ s/,$//g;
-      my $directors = $oWkS->{Cells}[$iR][$columns{'Directors'}]->Value;
+      my $directors = $oWkS->{Cells}[$iR][$columns{'Directors'}]->Value if defined($oWkS->{Cells}[$iR][$columns{'Directors'}]);
       $directors =~ s/, /;/g;
       $directors =~ s/-$//g;
       $directors =~ s/;$//g;
       $directors =~ s/,$//g;
 
       my $desc;
-      $desc = $ep_desc;
-      $desc = $se_desc if !defined($ep_desc) or norm($ep_desc) eq "" or norm($ep_desc) eq "-" or norm($ep_desc) eq "1";
+      $desc = $ep_desc if(defined($ep_desc));
+      $desc = $se_desc if !defined($ep_desc) and defined($se_desc) or norm($ep_desc) eq "" or norm($ep_desc) eq "-" or norm($ep_desc) eq "1";
       $desc = "" if $desc eq "" or $desc eq "-" or $desc eq "\x{2d}" or $desc eq "1";
 
       my $premiere = norm($oWkS->{Cells}[$iR][$columns{'Premiere'}]->Value );
@@ -378,7 +393,7 @@ sub ImportXLS {
       }
 
       # Aspect
-      if($ws eq "Yes")
+      if(defined($ws) and $ws eq "Yes")
       {
         $ce->{aspect} = "16:9";
       } else {
@@ -386,7 +401,7 @@ sub ImportXLS {
       }
 
       # HDTV & Actors
-      $ce->{quality} = 'HDTV' if ($hd eq 'Yes');
+      $ce->{quality} = 'HDTV' if (defined($hd) and $hd eq 'Yes');
       $ce->{actors} = norm($actors) if($actors ne "" and $actors ne "null");
       $ce->{directors} = norm($directors) if($directors ne "" and $directors ne "null");
       $ce->{subtitle} = norm($subtitle) if defined($subtitle) and $subtitle ne "" and $subtitle ne "null";
@@ -419,7 +434,7 @@ sub ImportXLS {
 
       # Original title
       $title_org =~ s/(Series |Y)(\d+)$//i;
-      $title_org =~ s/$se_num//i;
+      $title_org =~ s/$se_num//i if defined $se_num;
       if(defined($title_org) and norm($title_org) =~ /, The$/i)  {
           $title_org =~ s/, The//i;
           $title_org = "The ".norm($title_org);

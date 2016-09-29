@@ -101,15 +101,19 @@ sub ImportXLS
           if( $oWkS->{Cells}[$iR][$iC] ){
             $columns{$oWkS->{Cells}[$iR][$iC]->Value} = $iC;
 
-			$columns{'Start'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Start/ );
-			$columns{'End'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /End/ );
-			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Title/ );
-			$columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
+      			$columns{'Start'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Start/ );
+      			$columns{'End'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /End/ );
+      			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Title/ );
+      			$columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
             $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time/ );
 
 
           	$columns{'Description'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description/ );
           	$columns{'Description'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis/ );
+
+            $columns{'Season'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Season/ );
+            $columns{'Episode'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode/ );
+            $columns{'HD'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^HD/ );
 
 
             $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
@@ -206,7 +210,9 @@ sub ParseDate {
     ( $year, $month, $day ) = ( $text =~ /^(\d{4})\/(\d{2})\/(\d{2})$/i );
   } elsif( $text =~ /^\d{1,2}-\d{1,2}-\d{2}$/ ){ # format '10-18-11' or '1-9-11'
      ( $month, $day, $year ) = ( $text =~ /^(\d+)-(\d+)-(\d+)$/ );
-   }
+  } elsif( $text =~ /^\d{2}\/\d{2}\/\d{4}$/i ){
+     ( $day, $month, $year ) = ( $text =~ /^(\d{2})\/(\d{2})\/(\d{4})$/i );
+  }
 
   if(!defined($year)) {
     return;

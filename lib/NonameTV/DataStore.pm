@@ -4,6 +4,7 @@ use strict;
 use utf8;
 use warnings;
 use JSON -support_by_pp;
+use Lingua::Identify::CLD;
 use Data::Dumper;
 
 use NonameTV qw/FixProgrammeData/;
@@ -380,11 +381,24 @@ sub AddProgrammeRaw {
     delete( $data->{program_type} );
   }
 
+  my $channel = $self->sa->Lookup( 'channels', { id => $data->{channel_id} } );
+  my( $tld ) = ($channel->{xmltvid} =~ /\.([a-z]+)$/i );
+  my $cld = Lingua::Identify::CLD->new(tld => $tld);
+
   if ( exists( $data->{description} ) and defined( $data->{description} ) ) {
 
     # Strip leading and trailing whitespace from description.
     $data->{description} =~ s/^\s+//;
     $data->{description} =~ s/\s+$//;
+
+    # Get language
+    my @desc_lang = $cld->identify($data->{description});
+    my $delang = $desc_lang[1];
+    $delang =~ s/^nb$/no/i;
+    if(!$data->{description_lang} and $desc_lang[3] and $delang ne $channel->{sched_lang} and $delang ne "un") {
+      $data->{description_lang} = $delang;
+      #print Dumper($data) if $desc_lang[1] ne "sv" and $desc_lang[1] ne "en";
+    }
   }
 
   # Encode json

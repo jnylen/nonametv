@@ -180,7 +180,7 @@ sub ImportContent
     my $direcs = norm( $sc->findvalue( './Program/@Directors' ) );
 
     # ids
-    my $assetid  = $sc->findvalue( './Program/@PlayAssetId1' );
+    my $assetid  = $sc->findvalue( './@PlayAssetId1' );
     my $seriesid = $sc->findvalue( './Program/@SeriesId' );
     my $vod      = $sc->findvalue( './Program/@Vod' );
 

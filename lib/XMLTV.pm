@@ -1,5 +1,5 @@
 # -*- perl -*-
-# $Id: XMLTV.pm.in,v 1.156 2013/10/18 10:12:56 bilbo_uk Exp $
+# $Id: XMLTV.pm.in,v 1.173 2016/06/02 05:05:01 rmeden Exp $
 package XMLTV;
 
 use strict;
@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(read_data parse parsefile parsefiles write_data
 # the xmltv package as a whole.  This number should be checked by the
 # mkdist tool.
 #
-our $VERSION = '0.5.63';
+our $VERSION = '0.5.68';
 
 # Work around changing behaviour of XML::Twig.  On some systems (like
 # mine) it always returns UTF-8 data unless KeepEncoding is specified.
@@ -32,6 +32,11 @@ our $VERSION = '0.5.63';
 # everywhere.  So the library is distributed with this flag on.
 #
 my $KEEP_ENCODING = 1;
+
+# We need a way of telling parsefiles_callback() to optionally *not* die when presented with multiple encodings,
+# but without affecting any other packages which uses it (i.e. so a new sub param is out of the question)
+# - best I can think of for the minute is a global  (yuk)
+my $DIE_ON_MULTIPLE_ENCODINGS = 1;
 
 my %warned_unknown_key;
 sub warn_unknown_keys( $$ );
@@ -169,6 +174,7 @@ our @Programme_Handlers =
    [ 'credits',          'credits',            '?' ],
    [ 'date',             'scalar',             '?' ],
    [ 'category',         'with-lang',          '*' ],
+   [ 'keyword',          'with-lang',          '*' ],
    [ 'language',         'with-lang',          '?' ],
    [ 'orig-language',    'with-lang',          '?' ],
    [ 'length',           'length',             '?' ],
@@ -439,7 +445,7 @@ sub new_doc_callback( $$$$ ) {
 			    $ch_cb->($c);
 			}
 		    },
-		
+
 		    '/tv/programme' => sub {
 			my ($t, $node) = @_;
 			die if not defined $node;
@@ -498,7 +504,9 @@ sub parsefiles_callback( $$$$@ ) {
     my $all_credits;
     my %all_channels;
 
-    my $do_next_file; # to be defined below
+    my $do_next_file;    # sub to parse file ( defined below)
+    my $do_file_number;  # current file in @files array
+
     my $my_enc_cb = sub( $ ) {
 	my $e = shift;
 	t 'encoding callback';
@@ -509,7 +517,7 @@ sub parsefiles_callback( $$$$@ ) {
 		warn "two files both have unspecified character encodings, hope they're the same\n";
 	    }
 	    elsif (not $da and $de) {
-		warn "encoding $e not being returned to caller\n";
+		##warn "encoding $e not being returned to caller\n";
 		$all_encoding = $e;
 	    }
 	    elsif ($da and not $de) {
@@ -517,14 +525,20 @@ sub parsefiles_callback( $$$$@ ) {
 	    }
 	    elsif ($da and $de) {
 		if (uc($all_encoding) ne uc($e)) {
+		    if ( defined $DIE_ON_MULTIPLE_ENCODINGS && !$DIE_ON_MULTIPLE_ENCODINGS ) {
+			warn "this file's encoding $e differs from others' $all_encoding \n";
+		    } else {
 		    die "this file's encoding $e differs from others' $all_encoding - aborting\n";
 		}
 	    }
+	    }
 	    else { die }
+	    t 'have encoding, call user';
+	    $enc_cb->($e, $do_file_number) if $enc_cb;
 	}
 	else {
 	    t 'not seen encoding before, call user';
-	    $enc_cb->($e) if $enc_cb;
+	    $enc_cb->($e, $do_file_number) if $enc_cb;
 	    $all_encoding = $e;
 	    $have_encoding = 1;
 	}
@@ -532,6 +546,7 @@ sub parsefiles_callback( $$$$@ ) {
 
     my $my_cred_cb = sub( $ ) {
 	my $c = shift;
+	$Data::Dumper::Sortkeys = 1; # ensure consistent order of dumped hash
 	if (defined $all_credits) {
 	    if (Dumper($all_credits) ne Dumper($c)) {
 		warn "different files have different credits, picking one arbitrarily\n";
@@ -549,24 +564,31 @@ sub parsefiles_callback( $$$$@ ) {
     my $my_ch_cb = sub( $ ) {
 	my $c = shift;
 	my $id = $c->{id};
+	$Data::Dumper::Sortkeys = 1; # ensure consistent order of dumped hash
 	if (defined $all_channels{$id} and Dumper($all_channels{$id}) ne Dumper($c)) {
 	    warn "differing channels with id $id, picking one arbitrarily\n";
 	}
 	else {
 	    $all_channels{$id} = $c;
-	    $ch_cb->($c) if $ch_cb;
+	    $ch_cb->($c, $do_file_number) if $ch_cb;
 	}
     };
 
     my $my_p_cb = sub( $ ) {
+	my $doing_file = $do_file_number;
+
 	$do_next_file->(); # if any
-	$p_cb->(@_) if $p_cb;
+
+	$do_file_number = $doing_file;
+	$p_cb->(@_, $do_file_number) if $p_cb;
     };
 
     $do_next_file = sub() {
 	while (@files) {
 	    # Last first.
 	    my $f = pop @files;
+
+	    $do_file_number = scalar @files;
 
 	    # In older versions of perl there were segmentation faults
 	    # when calling die() inside the parsing callbacks, so we
@@ -737,7 +759,7 @@ sub get_subelements( $ ) {
 # Return the element name of a node.
 #
 sub get_name( $ ) { $_[0]->gi() }
-	
+
 # Private.
 #
 # dump_node()
@@ -928,25 +950,47 @@ differ.
 
 The first argument is a hash reference giving information to pass to
 C<XMLTV::Writer>E<39>s constructor.  But do not specify encoding, this
-will be taken from the input files.  Currently C<catfiles()> will fail
-work if the input files have different encodings.
+will be taken from the input files.  C<catfiles()> will abort if the
+input files have different encodings, unless the 'UTF8'=1 argument
+is passed in.
 
 =cut
 
 sub catfiles( $@ ) {
     my $w_args = shift;
     my $w;
+    my $enc;	# encoding of current file
+    my @encs;	# encoding of all files being catenated
     my %seen_ch;
+    my %seen_progs;
+
+    $DIE_ON_MULTIPLE_ENCODINGS = ( defined $w_args->{UTF8} ? 0 : 1 );
+    $Data::Dumper::Sortkeys = 1; # ensure consistent order of dumped hash
+
     XMLTV::parsefiles_callback
       (sub {
-	   die if defined $w;
-	   $w = new XMLTV::Writer(%$w_args, encoding => shift);
+	   $enc = shift;
+	   my $do_file = shift;
+	   $encs[$do_file] = (defined $enc ? $enc : 'unknown');
+	   t "file $do_file = $enc" if defined $enc;
+	   $w = new XMLTV::Writer(%$w_args, encoding => ( defined $w_args->{UTF8} ? 'UTF-8' : $enc ) )  if !defined $w;
        },
        sub { $w->start(shift) },
        sub {
 	   my $c = shift;
 	   my $id = $c->{id};
 	   if (not defined $seen_ch{$id}) {
+
+	       my $do_file = shift;
+	       if (defined $w_args->{UTF8}) {
+	          if (uc($encs[$do_file]) ne 'UTF-8' && $encs[$do_file] ne 'unknown') {
+	             # recode the incoming channel name
+		     t 'recoding channel from '.$encs[$do_file].' to UTF-8';
+		     require XMLTV::Data::Recursive::Encode;
+		     $c = XMLTV::Data::Recursive::Encode->from_to($c, $encs[$do_file], 'UTF-8');
+	          }
+	       }
+
 	       $w->write_channel($c);
 	       $seen_ch{$id} = $c;
 	   }
@@ -958,7 +1002,25 @@ sub catfiles( $@ ) {
 		 . "picking one arbitrarily\n";
 	   }
        },
-       sub { $w->write_programme(shift) },
+       sub {
+	   my $p = shift;
+	   my $do_file = shift;
+	   if (defined $w_args->{UTF8}) {
+	      if (uc($encs[$do_file]) ne 'UTF-8' && $encs[$do_file] ne 'unknown') {
+	         # recode the incoming programme
+		 t 'recoding prog from '.$encs[$do_file].' to UTF-8';
+		 require XMLTV::Data::Recursive::Encode;
+		 $p = XMLTV::Data::Recursive::Encode->from_to($p, $encs[$do_file], 'UTF-8');
+	      }
+	   }
+	   if (! $seen_progs{ $p->{start} . "|" . $p->{title}[0][0] . "|" . $p->{channel} }++) {
+	      $w->write_programme($p);
+	   }
+	   else {
+	      # warn "duplicate programme detected, skipping\n"
+	      # . "  " . $p->{start} . "|" . $p->{stop} . "|" . $p->{title}[0][0] . "|" . $p->{channel} . "\n";
+	   }
+       },
        @_);
     $w->end();
 }
@@ -1000,6 +1062,8 @@ sub cat_aux( @ ) {
     my @all_progs;
     my $do_progs = shift;
 
+    $Data::Dumper::Sortkeys = 1; # ensure consistent order of dumped hash
+
     foreach (@_) {
 	t 'doing arg: ' . d $_;
 	my ($encoding, $credits, $channels, $progs) = @$_;
@@ -1032,7 +1096,7 @@ sub cat_aux( @ ) {
  		}
  	    }
  	}
-	
+
  	# Now in uniqueness checks ignore the date.
 	if (not defined $all_credits_nodate) {
 	    $all_credits_nodate = \%credits_nodate;
@@ -1062,6 +1126,16 @@ sub cat_aux( @ ) {
       if defined $all_credits_date;
 
     if ($do_progs) {
+        @all_progs = reverse @all_progs;
+        my %seen_progs;
+        my @dupe_indexes = reverse(grep { $seen_progs{ $all_progs[$_]->{start} . "|" . $all_progs[$_]->{stop} . "|" . $all_progs[$_]->{title}[0][0] . "|" . $all_progs[$_]->{channel} }++ } 0..$#all_progs);
+        foreach my $item (@dupe_indexes) {
+            # warn "duplicate programme detected, skipping\n"
+            #      . "  " . $all_progs[$item]->{start} . "|" . $all_progs[$item]->{stop} . "|" . $all_progs[$item]->{title}[0][0] . "|" . $all_progs[$item]->{channel} . "\n";
+            splice (@all_progs,$item,1);
+        }
+        @all_progs = reverse @all_progs;
+
 	return [ $all_encoding, \%all_credits, \%all_channels, \@all_progs ];
     }
     else {
@@ -1157,7 +1231,7 @@ $Handlers{'credits'}->[1] = sub( $$$ ) {
     # convention of passing undef.
     #
     $w->startTag($e) if $w;
-    foreach ( qw[director actor writer adapter producer composer 
+    foreach ( qw[director actor writer adapter producer composer
                  editor presenter commentator guest] ) {
 	next unless defined $h{$_};
 	my @people = @{delete $h{$_}};
@@ -1171,7 +1245,7 @@ $Handlers{'credits'}->[1] = sub( $$$ ) {
 			}
 		} else {
 			$w->dataElement($_, $person) if $w;
-		} 
+		}
         }
     }
     warn_unknown_keys($e, \%h);
@@ -1538,7 +1612,7 @@ $Handlers{rating}->[0] = sub( $ ) {
 
     # Remaining children are icons.
     my @icons = map { read_icon($_) } @children;
-	
+
     return [ $rating, $system, \@icons ];
 };
 $Handlers{rating}->[1] = sub( $$$ ) {
@@ -1567,7 +1641,7 @@ $Handlers{rating}->[1] = sub( $$$ ) {
 In XML this is a string 'X/Y' plus a list of icons.  In Perl represented
 as a pair [ rating, icons ] similar to I<rating>.
 
-Multiple star ratings are now supported. For backward compatability,
+Multiple star ratings are now supported. For backward compatibility,
 you may specify a single [rating,icon] or the preferred double array
 [[rating,system,icon],[rating2,system2,icon2]] (like 'ratings')
 
@@ -1594,7 +1668,7 @@ $Handlers{'star-rating'}->[0] = sub( $ ) {
 
     # Remaining children are icons.
     my @icons = map { read_icon($_) } @children;
-	
+
     return [ $rating, $system, \@icons ];
 };
 $Handlers{'star-rating'}->[1] = sub ( $$$ ) {
@@ -1780,7 +1854,7 @@ sub write_with_lang( $$$$$ ) {
 #
     my $old_text = $text;
     $text =~ s/^\s+//;
-    $text =~ s/\s+$//;  
+    $text =~ s/\s+$//;
 
     if (not length $text) {
 	if (not $allow_empty) {
@@ -1801,6 +1875,7 @@ sub write_with_lang( $$$$$ ) {
     }
 
     if (defined $lang) {
+		#print($e . " - " . $text . "\n");
 	$w->dataElement($e, $text, lang => $lang) if $w;
     }
     else {
@@ -1842,69 +1917,11 @@ scalar, and B<1> (exactly one) will give a scalar which is not undef.
 
 =head2 Handlers for <channel>
 
-
-=over
-
-=item display-name, I<with-lang>, B<+>
-
-=item icon, I<icon>, B<*>
-
-=item url, I<scalar>, B<*>
-
-
-=back
+@CHANNEL_HANDLERS
 
 =head2 Handlers for <programme>
 
-
-=over
-
-=item title, I<with-lang>, B<+>
-
-=item sub-title, I<with-lang>, B<*>
-
-=item desc, I<with-lang/m>, B<*>
-
-=item credits, I<credits>, B<?>
-
-=item date, I<scalar>, B<?>
-
-=item category, I<with-lang>, B<*>
-
-=item language, I<with-lang>, B<?>
-
-=item orig-language, I<with-lang>, B<?>
-
-=item length, I<length>, B<?>
-
-=item icon, I<icon>, B<*>
-
-=item url, I<scalar>, B<*>
-
-=item country, I<with-lang>, B<*>
-
-=item episode-num, I<episode-num>, B<*>
-
-=item video, I<video>, B<?>
-
-=item audio, I<audio>, B<?>
-
-=item previously-shown, I<previously-shown>, B<?>
-
-=item premiere, I<with-lang/em>, B<?>
-
-=item last-chance, I<with-lang/em>, B<?>
-
-=item new, I<presence>, B<?>
-
-=item subtitles, I<subtitles>, B<*>
-
-=item rating, I<rating>, B<*>
-
-=item star-rating, I<star-rating>, B<*>
-
-
-=back
+@PROGRAMME_HANDLERS
 
 At present, no parsing or validation on dates is done because dates
 may be partially specified in XMLTV.  For example '2001' means that
@@ -1965,7 +1982,7 @@ sub node_to_channel( $ ) {
 	    delete $channel{$_};
 	}
     }
-		
+
     t '\@Channel_Handlers=' . d \@Channel_Handlers;
     call_handlers_read($node, \@Channel_Handlers, \%channel);
     return \%channel;
@@ -2124,7 +2141,11 @@ BEGIN {
 }
 
 BEGIN {
-  Date::Manip::Date_Init("TZ=UTC");
+    if (int(Date::Manip::DateManipVersion) >= 6) {
+	Date::Manip::Date_Init("SetDate=now,UTC");
+    } else {
+	Date::Manip::Date_Init("TZ=UTC");
+    }
 }
 
 # Override dataElement() to refuse writing empty or whitespace
@@ -2206,6 +2227,12 @@ sub new {
     my %args = @_;
     croak 'OUTPUT requires a filehandle, not a filename or anything else'
       if exists $args{OUTPUT} and not ref $args{OUTPUT};
+
+    # force OUTPUT explicitly to standard output to avoid warnings about
+    # undefined OUTPUT in XML::Writer where it tests against 'self'
+    if (!exists $args{OUTPUT}) {
+        $args{OUTPUT} = \*STDOUT;
+    }
     my $encoding = delete $args{encoding};
     my $days = delete $args{days};
     my $offset = delete $args{offset};
@@ -2226,18 +2253,18 @@ sub new {
     }
 
 #    $Log::TraceMessages::On = 1;
-    $self->{mintime} = "19700101000000"; 	 
-    $self->{maxtime} = "29991231235959"; 	 
-    
+    $self->{mintime} = "19700101000000";
+    $self->{maxtime} = "29991231235959";
+
 
     if (defined( $days ) and defined( $offset ) and defined( $cutoff )) {
-      $self->{mintime} = UnixDate( 
+      $self->{mintime} = UnixDate(
           DateCalc( "today", "+" . $offset . " days" ),
           "%Y%m%d") . $cutoff;
       t "using mintime $self->{mintime}";
 
-      $self->{maxtime} = UnixDate( 
-          DateCalc("today", "+" . $offset+$days . " days"), 	 
+      $self->{maxtime} = UnixDate(
+          DateCalc("today", "+" . ($offset+$days) . " days"),
           "%Y%m%d" ) . $cutoff;
       t "using maxtime $self->{maxtime}";
     }

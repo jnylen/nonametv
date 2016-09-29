@@ -838,7 +838,7 @@ sub ParseXmltv {
   }
 
   foreach my $pgm ($ns->get_nodelist) {
-    print($pgm->findvalue( 'title' ) . " - " . $pgm->findvalue( '@start') . "\n" );
+    #print($pgm->findvalue( 'title' ) . " - " . $pgm->findvalue( '@start') . "\n" );
     my $start = $pgm->findvalue( '@start' );
     my $start_dt = create_dt( $start );
 
@@ -849,6 +849,9 @@ sub ParseXmltv {
     my $subtitle = $pgm->findvalue( 'sub-title' );
 
     my $desc = $pgm->findvalue( 'desc' );
+    if(defined($pgm->findvalue( 'desc_short' )) and (!defined($desc) or $desc eq "")) { # MTV
+      $desc = $pgm->findvalue( 'desc_short' );
+    }
     my $cat1 = $pgm->findvalue( 'category[1]' );
     my $cat2 = $pgm->findvalue( 'category[2]' );
     my $episode = $pgm->findvalue( 'episode-num[@system="xmltv_ns"]' );

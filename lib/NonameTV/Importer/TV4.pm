@@ -170,7 +170,8 @@ sub ImportContent
     my $eps         = $pgm->findvalue( 'number_of_episodes' );
     my $prodyear    = $pgm->findvalue( 'production_year' );
     my $genre       = $pgm->findvalue( 'category' );
-    my $rerun       = $pgm->findvalue( 'premier' );
+    my $rerun       = $pgm->findvalue( 'rerun' );
+    my $subtitles   = $pgm->findvalue( 'subtitles' );
 
     my $prev_shown_date = $pgm->findvalue( 'previous_transmissiondate' );
 
@@ -198,21 +199,36 @@ sub ImportContent
 #     $ce->{prev_shown_date} = norm($prev_shown_date)
 #     if( $prev_shown_date =~ /\S/ );
 
+    # Extra
+    my $extra = {};
+    $extra->{descriptions} = [];
+    $extra->{qualifiers} = [];
+    $extra->{images} = [];
+
 	# Find live-info
 	  if( $live eq "true" )
 	  {
 	    $ce->{live} = "1";
+      push $extra->{qualifiers}, "live";
 	  }
 	  else
 	  {
 	    $ce->{live} = "0";
 	  }
 
+    if( $subtitles eq "textat" )
+	  {
+      push $extra->{qualifiers}, "cc";
+	  }
+
 	# HDTV
-	  if( $definition eq "HD" and $chd->{xmltvid} eq "hd.tv4.se" )
+	  if( $definition eq "HD" or $chd->{xmltvid} eq "hd.tv4.se" )
 	  {
 	    $ce->{quality} = "HDTV";
-	  }
+      push $extra->{qualifiers}, "HD";
+	  } elsif( $definition eq "SD" ) {
+      push $extra->{qualifiers}, "SD";
+    }
 
     my @actors;
     my @directors;
@@ -296,6 +312,7 @@ sub ImportContent
     foreach my $item ($imgs->get_nodelist)
     {
         $ce->{fanart} = $item->to_literal;
+        push $extra->{images}, { url => $item->to_literal, type => undef, title => undef, copyright => undef, source => "TV4" };
         #print "IMG:" .$item->to_literal;
     }
 
@@ -332,11 +349,15 @@ sub ImportContent
     }
 
     # replay
-    if(defined($rerun) and norm($rerun) eq "true") {
+    if(defined($rerun) and norm($rerun) eq "false") {
       $ce->{new} = "1";
+      push $extra->{qualifiers}, "new";
     } else {
       $ce->{new} = "0";
+      push $extra->{qualifiers}, "rerun";
     }
+
+    $ce->{extra} = $extra;
 
     progress($date." ".$starttime." - ".$ce->{title});
 

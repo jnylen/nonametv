@@ -62,27 +62,27 @@ sub ImportContentFile {
 
   if( $file =~ /\.xml$/i ) {
     if( $chd->{sched_lang} eq "sv") {
-        $self->ImportXML( $file, $chd ) if $file =~ /swe*.*xml$/i;
+    #    $self->ImportXML( $file, $chd ) if $file =~ /swe*.*xml$/i;
     } elsif($chd->{sched_lang} eq "da") {
-        $self->ImportXML( $file, $chd ) if $file =~ /dan*.*xml$/i;
+    #    $self->ImportXML( $file, $chd ) if $file =~ /dan*.*xml$/i;
     } elsif($chd->{sched_lang} eq "fi") {
-        $self->ImportXML( $file, $chd ) if $file =~ /fin*.*xml$/i;
+    #    $self->ImportXML( $file, $chd ) if $file =~ /fin*.*xml$/i;
     } elsif($chd->{sched_lang} eq "no") {
-        $self->ImportXML( $file, $chd ) if $file =~ /nor*.*xml$/i;
+    #    $self->ImportXML( $file, $chd ) if $file =~ /nor*.*xml$/i;
     } elsif($chd->{sched_lang} eq "en") {
-        $self->ImportXML( $file, $chd ) if $file =~ /eng*.*xml$/i and $file !~ /swe*.*xml$/i;
+    #    $self->ImportXML( $file, $chd ) if $file =~ /eng*.*xml$/i and $file !~ /swe*.*xml$/i;
     }
-  } elsif( $file =~ /\.xls$/i ){
+  } elsif( $file =~ /\.(xls|xlsx)$/i ){
     if( $chd->{sched_lang} eq "sv") {
-        $self->ImportExcel( $file, $chd ) if $file =~ /swe*.*xls$/i;
+        $self->ImportExcel( $file, $chd ) if $file =~ /swe/i and $file =~ /\.(xls|xlsx)$/i;
     } elsif($chd->{sched_lang} eq "da") {
-        $self->ImportExcel( $file, $chd ) if $file =~ /dan*.*xls$/i;
+        $self->ImportExcel( $file, $chd ) if $file =~ /dan/i and $file =~ /\.(xls|xlsx)$/i;
     } elsif($chd->{sched_lang} eq "fi") {
-        $self->ImportExcel( $file, $chd ) if $file =~ /fin*.*xls$/i;
+        $self->ImportExcel( $file, $chd ) if $file =~ /fin/i and $file =~ /\.(xls|xlsx)$/i;
     } elsif($chd->{sched_lang} eq "no") {
-        $self->ImportExcel( $file, $chd ) if $file =~ /nor*.*xls$/i;
+        $self->ImportExcel( $file, $chd ) if $file =~ /nor/i and $file =~ /\.(xls|xlsx)$/i;
     } elsif($chd->{sched_lang} eq "en") {
-        $self->ImportExcel( $file, $chd ) if $file =~ /eng*.*xls$/i and $file !~ /swe*.*xls$/i;
+        $self->ImportExcel( $file, $chd ) if $file =~ /eng/i and $file =~ /\.(xls|xlsx)$/i;
     }
   } elsif( $file =~ /\.zip$/i ) {
   	# When ParseExcel can load a XLS file
@@ -108,7 +108,7 @@ sub ImportContentFile {
       } elsif($chd->{sched_lang} eq "no") {
         push( @filess, $member->{fileName} ) if $member->{fileName} =~ /nor/i and $member->{fileName} =~ /\.(xls|xlsx|xml)$/i ;
       } elsif($chd->{sched_lang} eq "en") {
-        push( @filess, $member->{fileName} ) if $member->{fileName} =~ /eng*.*(xls|xml|xlsx)$/i and $member->{fileName} !~ /swe*.*(xls|xlsx|xml)$/i;
+        push( @filess, $member->{fileName} ) if $member->{fileName} =~ /eng/i and $member->{fileName} =~ /\.(xls|xlsx|xml)$/i ;
       }
     }
 
@@ -134,7 +134,7 @@ sub ImportContentFile {
   	close (MYFILE);
 
     $self->ImportExcel( $filename, $chd ) if($filename =~ /\.(xls|xlsx)$/i);
-    $self->ImportXML( $filename, $chd ) if($filename =~ /\.xml$/i);
+    #$self->ImportXML( $filename, $chd ) if($filename =~ /\.xml$/i);
     unlink $filename; # remove file
   } else {
     error( "Disney: Unknown file format: $file" );
@@ -261,7 +261,7 @@ sub ImportExcel
       $title = FixSubtitle(norm($title));
 
       $oWkC = $oWkS->{Cells}[$iR][$columns{'ORGTitle'}];
-      my $title_org = norm($oWkC->Value);
+      my $title_org = norm($oWkC->Value) if( $oWkC );
 
       # Desc
       my $field = int2col($columns{'Synopsis'}).$i;
