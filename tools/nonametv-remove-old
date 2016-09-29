@@ -6,6 +6,9 @@ use NonameTV;
 use NonameTV::DataStore;
 use NonameTV::Config qw/ReadConfig/;
 
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
 use Getopt::Long;
 
 # Read configuration
@@ -15,7 +18,7 @@ my $conf = ReadConfig();
 my $ds = NonameTV::DataStore->new( $conf->{DataStore} );
 
 print "Deleting old programs and batches from database\n";
-$ds->sa->DoSql( "delete from programs where TO_DAYS(now()) - TO_DAYS(start_time) > 7" ); 
+$ds->sa->DoSql( "delete from programs where TO_DAYS(now()) - TO_DAYS(start_time) > 7" );
 
 print "Deleting batches\n";
 
@@ -27,4 +30,3 @@ while( my $d = $sth->fetchrow_hashref() )
   #print $d->{name} . "\n";
   $ds->sa->Delete( 'batches', { id => $d->{id} } );
 }
-
