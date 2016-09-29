@@ -16,10 +16,14 @@ $V && echo "Local rsync"
 
 rsync -c --delete -r $NROOT/staging/json_extra/ $NROOT/full/json_extra/
 rsync -c --delete -r $NROOT/staging/json/ $NROOT/full/json/
+rsync -c --delete -r $NROOT/staging/honeybee/ $NROOT/full/honeybee/
+rsync -c --delete -r $NROOT/staging/xmltv/ $NROOT/full/xmltv/
+
+# datalist
+tools/se-tvzon/nonametv-xmltv-gendatalist
+tools/se-tvzon/nonametv-json-gendatalist
 
 # upload
-rsync -c --delete -r $NROOT/staging/xmltv/ $NROOT/full/xmltv/
-tools/se-tvzon/nonametv-xmltv-gendatalist
 rsync -c --delete -r $NROOT/full/xmltv/datalist.xml.gz $NROOT/full/datalist.xml.gz
 #rsync -c --delete -r /content/headers/HEADER_xmltv.txt $NROOT/full/xmltv/HEADER.txt
 rsync -c --delete -r /content/headers/displayfile.html $NROOT/full/xmltv/displayfile.html
@@ -34,23 +38,7 @@ $V && echo "honeybee"
 
 rsync -c --delete -r $NROOT/full/json_extra/ honeybee:/xmltv_files/json_extra/
 rsync -c --delete -r $NROOT/full/json/ honeybee:/xmltv_files/json/
+rsync -c --delete -r $NROOT/full/honeybee/ honeybee:/xmltv_files/honeybee/
 rsync -c --delete -r $NROOT/full/xmltv/ honeybee:/xmltv_files/xmltv/
 rsync -c --delete -r $NROOT/full/datalist.xml.gz honeybee:/xmltv_files/datalist.xml.gz
-
-$V && echo "compare"
-
-# Compare
-tools/se-tvzon/nonametv-xmltv-compare-run
-rsync --delete -r /content/xmltv_compare/ /var/www/html/compare/
-
-$V && echo "combined"
-tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/at.xmltv.conf --output $NROOT/full/combined/austria.xml
-tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/ch.xmltv.conf --output $NROOT/full/combined/switzerland.xml
-tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/de.xmltv.conf --output $NROOT/full/combined/germany.xml
-tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/dk.xmltv.conf --output $NROOT/full/combined/denmark.xml
-tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/fi.xmltv.conf --output $NROOT/full/combined/finland.xml
-tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/nl.xmltv.conf --output $NROOT/full/combined/netherlands.xml
-tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/no.xmltv.conf --output $NROOT/full/combined/norway.xml
-tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/pl.xmltv.conf --output $NROOT/full/combined/poland.xml
-tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/se.xmltv.conf --output $NROOT/full/combined/sweden.xml
-rsync --delete -r $NROOT/full/combined/ /var/www/combined/
+rsync -c --delete -r $NROOT/full/honeybee_datalist.js.gz honeybee:/xmltv_files/datalist.js.gz

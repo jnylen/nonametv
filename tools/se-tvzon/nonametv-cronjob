@@ -25,21 +25,9 @@ then
   # Remove old files after 70 days (safes space)
   tools/nonametv-filestore-removeold --all --leavedays 70
 
-  # remove Tvrage cache (they can't be updated automatic..
-  # .. as tvrage doesnt provide that sort of system)
-  rm /nonametv/contentcache/Tvrage/tvrage.db
-
-  # Make sure we have all xmltv updated. As some seem to go missing (Somehow)
-  # (for example if the time on the server is way off)
-  #tools/nonametv-export Xmltv --force-export
-  tools/nonametv-export Json --force-export
-
   # Remove old programmes and batches - dont use, fucks up the previouslyshown
   # augmenter
-  #perl -I lib tools/nonametv-remove-old
-
-  # Generate the docs for the importers etc
-  tools/nonametv-generate-doc /home/jnylen/content/docs/
+  perl -I lib tools/nonametv-remove-old
 
   exit
 fi
@@ -122,9 +110,22 @@ $d tools/se-tvzon/nonametv-updatesite $Q
 # Upload to www (daily)
 $d tools/se-tvzon/nonametv-upload $Q
 
-# Run after, everything
-#$d rsync --delete -r /content/html/00status.html /var/www/xmltv/
+# Compare - Only run daily
+$d tools/se-tvzon/nonametv-xmltv-compare-run
+$d rsync --delete -r /content/xmltv_compare/ /var/www/html/compare/
 
-# Combined files
-#$d ruby /home/jnylen/notice.rb
-#$d /home/jnylen/xmltv-grabber
+# Combined files - only run daily
+$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/at.xmltv.conf --output $NROOT/full/combined/austria.xml
+$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/ch.xmltv.conf --output $NROOT/full/combined/switzerland.xml
+$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/de.xmltv.conf --output $NROOT/full/combined/germany.xml
+$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/dk.xmltv.conf --output $NROOT/full/combined/denmark.xml
+$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/fi.xmltv.conf --output $NROOT/full/combined/finland.xml
+$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/nl.xmltv.conf --output $NROOT/full/combined/netherlands.xml
+$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/no.xmltv.conf --output $NROOT/full/combined/norway.xml
+$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/pl.xmltv.conf --output $NROOT/full/combined/poland.xml
+$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/se.xmltv.conf --output $NROOT/full/combined/sweden.xml
+$d rsync --delete -r $NROOT/full/combined/ /var/www/combined/
+
+$h tools/nonametv-export Honeybee --export-channels
+$h tools/nonametv-export Honeybee
+$h tools/se-tvzon/nonametv-upload

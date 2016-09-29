@@ -37,3 +37,7 @@ tools/nonametv-export Json --export-channels --channel-group Germany
 tools/nonametv-export Json --export-channels --channel-group Austria
 tools/nonametv-export Json --export-channels --channel-group Switzerland
 tools/nonametv-export Json --export-channels --channel-group Poland
+
+# Honeybee-specific json
+tools/nonametv-export Honeybee --export-channels $1 $2 $3
+tools/nonametv-export Honeybee $1 $2 $3

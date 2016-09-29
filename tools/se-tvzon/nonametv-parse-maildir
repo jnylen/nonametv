@@ -191,7 +191,7 @@ sub guess_channel
 {
   my( $dir, $from, $subject, $filename, $type, $size ) = @_;
 
-  if( $dir =~ /Disney/ ) {
+  if( $dir =~ /Disney/ and $filename =~ /\.(xls|zip|xlsx)$/i ) {
     # The Disney filenames are very unreliable.
     if( $filename eq "noname" ) {
       return undef;
@@ -205,31 +205,25 @@ sub guess_channel
     if( $filename =~ /\bdxd/i ) {
       return "xd.disneychannel.se";
     }
-    elsif( $filename =~ /playhouse/i ) {
+    elsif( $filename =~ /junior/i and $filename =~ /\(0500/i ) {
       return "junior.disney.se";
     }
-    elsif( $filename =~ /junior/i ) {
-      return "junior.disney.se";
-    }
-    elsif( $filename =~ /disney\s*channel/i ) {
+    elsif( $filename =~ /disney\s*channel/i and $filename !~ /\((\d\d\d\d)/i ) {
       return "disneychannel.se";
     }
-    elsif( $subject =~ /playhouse/i ) {
+    elsif( $subject =~ /junior/i and $filename =~ /\(0500/i ) {
       return "junior.disney.se";
     }
-    elsif( $subject =~ /junior/i ) {
+    elsif( $subject =~ /drj/i and $filename =~ /\(0500/i ) {
       return "junior.disney.se";
     }
-    elsif( $subject =~ /drj/i ) {
+    elsif( $subject =~ /djr/i and $filename =~ /\(0500/i ) {
       return "junior.disney.se";
     }
-    elsif( $subject =~ /djr/i ) {
-      return "junior.disney.se";
-    }
-    elsif( $subject =~ /disney\s*channel/i ) {
+    elsif( $subject =~ /disney\s*channel/i and $filename !~ /\((\d\d\d\d)/i ) {
       return "disneychannel.se";
     }
-    elsif( $filename =~ /^DC/i ) {
+    elsif( $filename =~ /^DC/i and $filename !~ /\((\d\d\d\d)/i ) {
       return "disneychannel.se";
     }
 
@@ -319,12 +313,10 @@ sub guess_channel
     return "de.eonline.com"  if $filename =~ /eger\d\d\d\d/i and $filename =~ /\.xml$/i;
 
     # FOX TV
-    return "foxtv.no"       if $filename =~ /^fox\s+norway/i and $filename =~ /\.xml$/i;
-    return "foxtv.no"       if $filename =~ /^fox\.cr\.nor/i and $filename =~ /\.doc$/i;
-    return "foxtv.no"       if $filename =~ /^nor\s+fox/i and $filename =~ /\.xml$/i;
-    #return "foxtv.no"       if $subject  =~ /^fox\s+norway/i and $filename =~ /\.xml$/i;
-    return "foxtv.se"       if $filename =~ /^fox\s+sweden/i and $filename =~ /\.xml$/i;
-    return "foxtv.se"       if $filename =~ /^fox\s+sweden/i and $filename =~ /\.xls$/i;
+    return "foxtv.no"       if $filename =~ /^fox\s*norway/i and $filename =~ /\.(xls|xlsx)$/i;
+    return "foxtv.se"       if $filename =~ /^fox\s*sweden/i and $filename =~ /\.(xls|xlsx)$/i;
+
+
 
     # H2
     if(($filename =~ /h2\s+europe/i or $filename =~ /h2.eur./i or $filename =~ /h2.eu./i) and $filename =~ /\.xml$/i) {

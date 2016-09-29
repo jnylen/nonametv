@@ -62,8 +62,6 @@ my @folders = qw(		 NonameTV-Data.MTV
                  		 NonameTV-Data.HighTV
                  		 NonameTV-Data.EBS
                  		 NonameTV-Data.Euronews
-                 		 NonameTV-Data.TV8Norge
-                 		 NonameTV-Data.PokerChannel
                  		 NonameTV-Data.Gospel
                 		 NonameTV-Data.RTL2
                 		 NonameTV-Data.DWDE
@@ -252,7 +250,7 @@ sub guess_channel
     	return "classic.vh1.se" if $filename =~ /vh1euroclassic/i;
 
     	if($filename =~ /^mtv.*live/i) {
-    	    return "hd.mtv.se" if $filename =~ /listings/i;
+    	    return "hd.mtv.se";
     	}
     }
 

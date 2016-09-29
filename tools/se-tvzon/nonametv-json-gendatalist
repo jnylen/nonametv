@@ -10,26 +10,29 @@ use lib "$FindBin::Bin/../../lib";
 use DateTime;
 use IO::Compress::Gzip qw(gzip $GzipError);
 use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
-use XML::LibXML;
+use JSON -support_by_pp;
+use JSON::XS;
 
 use NonameTV qw(ParseXml);
 
 # sources
-my $channelsxml = '/var/local/nonametv/xmltv/channels.xml.gz';
-my $xmltvdir    = '/var/local/nonametv/json';
+my $channelsxml = '/content/full/honeybee/channels.js.gz';
+my $xmltvdir    = '/content/full/honeybee';
 
 # target
-my $datalistxml = '/var/local/nonametv/datalist.xml.gz';
+my $datalistxml = '/content/full/honeybee_datalist.js.gz';
 
 my $xml;
 gunzip $channelsxml => \$xml
         or die "gunzip failed: $GunzipError\n";
 
-my $doc = ParseXml( \$xml );
+my $json = new JSON->allow_nonref;
+my $doc = $json->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->decode($xml);
 
-my @channels = $doc->findnodes( '/tv/channel' );
-foreach my $channel (@channels) {
-  my $xmltvid = $channel->findvalue( '@id' );
+my $channels = $doc->{"jsontv"}->{'channels'};
+my $chans = [];
+foreach my $channel (@{$channels}) {
+  my $xmltvid = $channel->{"xmltvid"};
 
   opendir(DIR, $xmltvdir)
         or die "could not read from $xmltvdir\n";
@@ -38,22 +41,23 @@ foreach my $channel (@channels) {
 
   @files = sort @files;
 
+  my $dates = [];
+
   foreach my $filename (@files) {
     my $modified = ( stat( "$xmltvdir/$filename" ) )[9];
     my( $date )=( $filename =~ m|^.*_(\d{4}-\d{2}-\d{2})\.js.gz$| );
     my $dt = DateTime->from_epoch( epoch => $modified );
 
-    my $element = XML::LibXML::Element->new( 'datafor' );
-    $element->setAttribute( 'lastmodified', $dt->ymd( '' ) . $dt->hms( '' ) . ' +0000' );
-    $element->appendText( $date );
-    $channel->appendText( '  ' );
-    $channel->appendChild( $element );
-    $channel->appendText( "\n  " );
+    my $date2 = {"lastmodified" => $dt->ymd( '' ) . $dt->hms( '' ) . ' +0000', "date" => $date};
+
+    push @{$dates}, $date2;
   }
+
+  push @{$chans}, {"days" => $dates, "channel" => $xmltvid};
 }
 
-$xml = $doc->toString( 1 );
-gzip \$xml => $datalistxml . '.new', Level => 9, Time => 0
+my $xml2 = JSON::XS->new->ascii( 1 )->pretty( 1 )->encode( { jsontv => { channels => $chans } } );
+gzip \$xml2 => $datalistxml . '.new', Level => 9, Time => 0
         or die "gzip failed: $GzipError\n";
 
 if( compare( $datalistxml, $datalistxml . '.new' )== 0 ){

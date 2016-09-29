@@ -70,3 +70,4 @@ tools/nonametv-import FightSports $1 $2 $3
 tools/nonametv-import YFE $1 $2 $3
 #tools/nonametv-import Uptown $1 $2 $3 # Issue with illegal utf8 chars
 tools/nonametv-import MTV_xmltv $1 $2 $3
+tools/nonametv-import ServusTV $1 $2 $3
