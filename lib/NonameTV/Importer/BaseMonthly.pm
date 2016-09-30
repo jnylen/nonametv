@@ -5,8 +5,8 @@ use warnings;
 
 =pod
 
-Abstract base-class for an Importer that downloads data in one 
-file per month and channel. 
+Abstract base-class for an Importer that downloads data in one
+file per month and channel.
 
 =cut
 
@@ -23,12 +23,12 @@ sub new {
     bless ($self, $class);
 
     $self->{MaxMonths} = 12 unless defined $self->{MaxMonths};
-    $self->{MaxMonthsShort} = 1 unless defined $self->{MaxMonthsShort};
+    $self->{MaxMonthsShort} = 0 unless defined $self->{MaxMonthsShort};
 
     return $self;
 }
 
-sub BatchPeriods { 
+sub BatchPeriods {
   my $self = shift;
   my( $shortgrab ) = @_;
 

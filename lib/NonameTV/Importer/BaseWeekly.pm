@@ -23,7 +23,7 @@ sub new {
     bless ($self, $class);
 
     $self->{MaxWeeks} = 4 unless defined $self->{MaxWeeks};
-    $self->{MaxWeeksShort} = 1 unless defined $self->{MaxWeeksShort};
+    $self->{MaxWeeksShort} = 0 unless defined $self->{MaxWeeksShort};
 
     return $self;
 }

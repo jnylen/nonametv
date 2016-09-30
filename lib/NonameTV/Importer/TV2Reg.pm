@@ -18,7 +18,7 @@ use Data::Dumper;
 use XML::LibXML;
 use Encode qw/encode decode/;
 
-use NonameTV qw/MyGet norm AddCategory/;
+use NonameTV qw/MyGet norm AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 
@@ -78,8 +78,7 @@ sub ImportContent
 
   foreach my $program ($rows->get_nodelist) {
     $xpc->setContextNode( $program );
-    my ($date)    = ($xpc->findvalue( 'link' ) =~ /(\d\d\d\d-\d\d-\d\d)$/);
-    my $starttime = $xpc->findvalue( 'tv2r:tidspunkt' );
+    my $dt    = $self->create_dt($xpc->findvalue( 'pubDate' ));
     my $duration  = $xpc->findvalue( 'tv2r:varighed' );
     my $title     = $xpc->findvalue( 'title' );
     my $desc      = $xpc->findvalue( 'description' );
@@ -87,21 +86,21 @@ sub ImportContent
     my $genre     = $xpc->findvalue( 'tv2r:kategori' );
     my $seriestit = $xpc->findvalue( 'tv2r:serienavn' );
 
-    #$title =~ s/Nat-tv://i; # It's a series
+    $title = "Nyheder" if(norm($title) =~ /Nyheder$/i); # It's a series
 
     # Start a new date
-    if($date ne $currdate ) {
+    if($dt->ymd("-") ne $currdate ) {
 
-      $dsh->StartDate( $date , "06:00" );
-      $currdate = $date;
-      progress("TV2Reg: $chd->{xmltvid}: Date is: $date");
+      $dsh->StartDate( $dt->ymd("-") , "06:00" );
+      $currdate = $dt->ymd("-");
+      progress("TV2Reg: $chd->{xmltvid}: Date is: $currdate");
     }
 
     my $ce = {
       channel_id   => $chd->{id},
-      title        => norm($title),
-      description  => norm($longdesc),
-      start_time   => $starttime,
+      title        => norm(($title || $seriestit)),
+      description  => norm(($longdesc || $desc)),
+      start_time   => $dt->hms,
     };
 
     # genre
@@ -123,11 +122,6 @@ sub ImportContent
         $ce->{title} =~ s/$epnum:$ofeps$//;
         $ce->{title} = norm($ce->{title});
         $ce->{episode} = sprintf( " . %d/%d . ", $epnum-1, $ofeps );
-    }elsif( ( $epnum ) = ( $ce->{title} =~ /(\d+)$/ ) )
-    {
-        $ce->{title} =~ s/$epnum$//;
-        $ce->{title} = norm($ce->{title});
-        $ce->{episode} = sprintf( " . %d . ", $epnum-1 );
     }elsif( ( $epnum, $ofeps ) = ($ce->{title} =~ /\((\d+):(\d+)\)$/) )
     {
         $ce->{title} =~ s/\($epnum:$ofeps\)$//;
@@ -194,7 +188,7 @@ sub ImportContent
     ParseCredits( $ce, 'presenters',     'V.rt',        $xpc, 'tv2r:cast/tv2r:person' );
     #ParseCredits( $ce, 'producers',      'Producer',    $xpc, 'tv2r:cast/tv2r:person' ); # their format is Jesper Jørgensen, Producent, Wasabi Film
 
-    progress("TV2Reg: $chd->{xmltvid}: $starttime - $ce->{title}");
+    progress("TV2Reg: $chd->{xmltvid}: $dt - $ce->{title}");
     $dsh->AddProgramme( $ce );
   }
 
@@ -235,6 +229,35 @@ sub AddCredits
     } else {
       $ce->{$field} = join( ';', @people );
     }
+  }
+}
+
+sub create_dt ( $ )
+{
+  my $self = shift;
+  my ($timestamp, $date) = @_;
+
+  if( $timestamp ){
+    # 2011-11-12T20:15:00+01:00
+    my ($day, $monthname, $year, $hour, $minute) = ($timestamp =~ m/, (\d+) (.*?) (\d\d\d\d) (\d\d):(\d\d)/);
+    my $month;
+
+    $month = MonthNumber( $monthname, "en" );
+
+    my $dt = DateTime->new (
+      year      => $year,
+      month     => $month,
+      day       => $day,
+      hour      => $hour,
+      minute    => $minute,
+      time_zone => 'Europe/Stockholm'
+    );
+    #$dt->set_time_zone( 'UTC' );
+
+    return( $dt );
+
+  } else {
+    return undef;
   }
 }
 

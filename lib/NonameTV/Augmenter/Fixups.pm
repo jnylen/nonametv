@@ -143,6 +143,9 @@ sub AugmentProgram( $$$ ){
     }
   }elsif( $ruleref->{matchby} eq 'replacetitle' ) {
     $resultref->{'title'} = $ruleref->{remoteref};
+  }elsif( $ruleref->{matchby} eq 'replacetitleundef' ) {
+    $resultref->{'title'} = $ruleref->{remoteref};
+    $resultref->{$ruleref->{otherfield}} = undef if defined($ruleref->{otherfield}) and $ruleref->{otherfield} ne "";
   }elsif( $ruleref->{matchby} eq 'subtitle_to_title_type' && $ceref->{'subtitle'} && $ceref->{'subtitle'} ne "") {
     # Sets subtitle as the title and sets program type = remoteref
     $resultref->{'title'} = $ceref->{'subtitle'};
