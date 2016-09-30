@@ -81,7 +81,7 @@ sub InitiateDownload {
 
   my $mech = $self->{cc}->UserAgent();
 
-  my $response = $mech->get('https://presseportal.zdf.de/start/index.php?eID=FrontendLoginRsaPublicKey');
+  my $response = $mech->get('https://presseportal.zdf.de/index.php?eID=RsaPublicKeyGenerationController');
 
   # split the result into modulus and exponent
   my ($modulus, $exponent) = ($mech->content() =~ m|([0-9A-F]+):([0-9A-F]+):| );
