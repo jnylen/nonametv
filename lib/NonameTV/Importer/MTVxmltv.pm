@@ -33,7 +33,7 @@ sub new {
 
   #defined( $self->{UrlRoot} ) or die "You must specify UrlRoot";
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "UTC" );
   $self->{datastorehelper} = $dsh;
 
   return $self;
