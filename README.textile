@@ -1,7 +1,6 @@
-README for NonameTV
--------------------
+h1. README for NonameTV
 
-LICENSE
+h2. LICENSE
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
@@ -14,15 +13,14 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public
-License along with this program.  If not, see
-<http://www.gnu.org/licenses/>.
+License along with this program.  If not, see "http://www.gnu.org/licenses/":this.
 
-INTRODUCTION
+h2. INTRODUCTION
 
 The system consists of three main parts: the Importers, the Database
 and the Exporters.
 
-IMPORTERS
+h2. IMPORTERS
 
 Importers are used to import data from different sources into the database.
 There is one importers for each data provider. All importers inherit
@@ -44,9 +42,9 @@ the importers. See tools/nonametv-import-download for instructions.
 
 The Importers are run via the command-line tool tools/nonametv-import:
 
-perl -I lib tools/nonametv-import Infomedia --verbose
+<pre>perl -I lib tools/nonametv-import Infomedia --verbose</pre>
 
-DATABASE
+h2. DATABASE
 
 All data is stored in a MySQL-database in a consistent format. All
 strings are encoded in utf-8 in the database and all times are stored
@@ -55,13 +53,13 @@ manually (using the mysql frontend of your choice.) The programs and
 batches tables are updated by the Importers and cannot be updated
 manually.
 
-EXPORTERS
+h2. EXPORTERS
 
 The Exporters take the data in the database and export it in another format.
 The only Exporter that exist today is the Xmltv exporter that exports data
 in a format that tv_grab_se_swedb can utilize.
 
-AVOIDING UNNECESSARY UPDATES
+h2. AVOIDING UNNECESSARY UPDATES
 
 tv_grab_se_swedb utilizes http-caching to avoid downloading data that
 hasn't changed since the last time tv_grab_se_swedb was run. This
@@ -76,7 +74,7 @@ processes data if it has actually changed since it was last downloaded.
 To force an update (for example if the Importer-code has been improved),
 use the parameter --force-update:
 
-perl -I lib tools/nonametv-import Infomedia --force-update
+<pre>perl -I lib tools/nonametv-import Infomedia --force-update</pre>
 
 The Exporter only exports data for batches that have actually changed.
 Furthermore, after exporting a file, the Exporter checks to see if the
@@ -87,7 +85,7 @@ After the export-step, rsync is used to copy the data from the
 xmltv_staging directory to the xmltv-directory. Once more, only files
 that have actually changed (detected by checking file contents) are
 copied. This can be useful during development, since you can do an
-export, see that something went wrong (for example by using 
+export, see that something went wrong (for example by using
 tools/nonametv-xmltv-compare-run and look at the changes). Then revert
 your changes and run export again. Since the newly exported files are
 then identical to the files in the xmltv/directory, the next run of
