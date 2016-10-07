@@ -237,12 +237,12 @@ sub ReadState {
 
   my $ds = $self->{datastore};
 
-  my $last_update = $ds->sa->Lookup( 'state', { name => "json_last_update" },
+  my $last_update = $ds->sa->Lookup( 'state', { name => "honeybee_last_update" },
                                  'value' );
 
   if( not defined( $last_update ) )
   {
-    $ds->sa->Add( 'state', { name => "json_last_update", value => 0 } );
+    $ds->sa->Add( 'state', { name => "honeybee_last_update", value => 0 } );
     $last_update = 0;
   }
 
@@ -255,7 +255,7 @@ sub WriteState {
 
   my $ds = $self->{datastore};
 
-  $ds->sa->Update( 'state', { name => "json_last_update" },
+  $ds->sa->Update( 'state', { name => "honeybee_last_update" },
                { value => $update_started } );
 }
 
