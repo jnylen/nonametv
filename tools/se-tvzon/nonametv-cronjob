@@ -3,8 +3,8 @@
 NROOT=/content
 PROOT=/home/jnylen/projects/nonametv/
 
-#Q="--quiet --quiet"
-Q="--verbose"
+Q="--quiet --quiet"
+#Q="--verbose"
 F="--force-update"
 
 h=true
@@ -113,18 +113,6 @@ $d tools/se-tvzon/nonametv-upload $Q
 # Compare - Only run daily
 $d tools/se-tvzon/nonametv-xmltv-compare-run
 $d rsync --delete -r /content/xmltv_compare/ /var/www/html/compare/
-
-# Combined files - only run daily
-$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/at.xmltv.conf --output $NROOT/full/combined/austria.xml
-$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/ch.xmltv.conf --output $NROOT/full/combined/switzerland.xml
-$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/de.xmltv.conf --output $NROOT/full/combined/germany.xml
-$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/dk.xmltv.conf --output $NROOT/full/combined/denmark.xml
-$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/fi.xmltv.conf --output $NROOT/full/combined/finland.xml
-$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/nl.xmltv.conf --output $NROOT/full/combined/netherlands.xml
-$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/no.xmltv.conf --output $NROOT/full/combined/norway.xml
-$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/pl.xmltv.conf --output $NROOT/full/combined/poland.xml
-$d tv_grab_se_tvzon --days 14 --config-file /home/jnylen/.xmltv/configs/se.xmltv.conf --output $NROOT/full/combined/sweden.xml
-$d rsync --delete -r $NROOT/full/combined/ /var/www/combined/
 
 $h tools/nonametv-export Honeybee --export-channels
 $h tools/nonametv-export Honeybee
