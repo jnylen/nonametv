@@ -115,6 +115,7 @@ sub ImportXLS
       my $time = 0;  # fix for  12:00AM
       $time=$oWkC->{Val} if( $oWkC->Value );
       $time = ExcelFmt('hh:mm', $time);
+      #$time =~ s/ (AM|PM)$//;
 
       # duration - column 3
 

@@ -95,164 +95,171 @@ sub ImportXML
   my $column;
 
     # the grabber_data should point exactly to one worksheet
-    my $rows = $doc->findnodes( ".//programmElement" );
+  my $days = $doc->findnodes( ".//Sendetag" );
 
-    if( $rows->size() == 0 ) {
-      error( "RTL2: $chd->{xmltvid}: No Rows found" ) ;
-      return;
-    }
+  if( $days->size() == 0 ) {
+    error( "RTL2: $chd->{xmltvid}: No Days found" ) ;
+    return;
+  }
 
-  foreach my $row ($rows->get_nodelist) {
-      my $title = norm($row->findvalue( './/header//stitel' ) );
+  foreach my $day ($days->get_nodelist) {
+    my $rows = $day->findnodes( "//programmElement" );
+    my $date = norm($day->findvalue( '@Datum' ) );
 
-      my $org_title = norm($row->findvalue( './/header//otitel' ) );
-      my $time = $row->findvalue( './/header//szeit' );
-      my $type = $row->findvalue( './@typ' );
-      my $rerun = $row->findvalue( './@rerun' );
-
-      my $date = $row->findvalue( './/header//kdatum' );
-      $date =~ s/\./-/g; # They fail sometimes
-	  my $start = $self->create_dt( $date."T".$time );
-	  $date = $start->ymd("-");
-
-	  if( $date ne $currdate ){
-      	progress("RTL2: Date is $date");
-
-        if( $currdate ne "x" ) {
-        	$dsh->EndBatch( 1 );
-        }
-
-        my $batch_id = $chd->{xmltvid} . "_" . $date;
-        $dsh->StartBatch( $batch_id , $chd->{id} );
-        #$dsh->StartDate( $date , "00:00" );
-        $currdate = $date;
+    if( $date ne $currdate ){
+      if( $currdate ne "x" ) {
+        $dsh->EndBatch( 1 );
       }
 
-	  # extra info
-	  my $desc = norm( $row->findvalue( './/langinhalt' ) );
-	  my $year = $row->findvalue( './/header//produktionsjahr' );
-	  my $hd = $row->findvalue( './/header//label//hd' );
-	  my $genre = $row->findvalue( './/header//pressegenre');
-	  my $prodco = $row->findvalue( './/header//produktionsland');
-	  my $aspect = $row->findvalue( './/header//bildformat');
+      progress("RTL2: Date is $date");
 
-	  my $subtitle = $row->findvalue( './/header//epistitel' );
-	  my $subtitle_org = $row->findvalue( './/header//oepistitel' );
+      my $batch_id = $chd->{xmltvid} . "_" . $date;
+      $dsh->StartBatch( $batch_id , $chd->{id} );
+      #$dsh->StartDate( $date , "00:00" );
+      $currdate = $date;
+    }
 
-      my $ce = {
-        channel_id => $chd->{id},
-        title => norm($title),
-        start_time => $start,
-      };
+    foreach my $row ($rows->get_nodelist) {
+        my $title = norm($row->findvalue( './/header//stitel' ) );
 
-      if(defined $prodco and $prodco ne "") {
-        my @conts = split(', ', norm($prodco));
-        my @countries;
+        my $org_title = norm($row->findvalue( './/header//otitel' ) );
+        my $time = $row->findvalue( './/header//szeit' );
+        my $type = $row->findvalue( './@typ' );
+        my $rerun = $row->findvalue( './@rerun' );
 
-        foreach my $c (@conts) {
-            my ( $c2 ) = $self->{datastore}->LookupCountry( "KFZ", $c );
-            push @countries, $c2 if defined $c2;
+        my $date = $row->findvalue( './/header//kdatum' );
+        $date =~ s/\./-/g; # They fail sometimes
+        my $start = $self->create_dt( $date."T".$time );
+
+        # extra info
+        my $desc = norm( $row->findvalue( './/langinhalt' ) );
+        my $year = $row->findvalue( './/header//produktionsjahr' );
+        my $hd = $row->findvalue( './/header//label//hd' );
+        my $genre = $row->findvalue( './/header//pressegenre');
+        my $prodco = $row->findvalue( './/header//produktionsland');
+        my $aspect = $row->findvalue( './/header//bildformat');
+
+        my $subtitle = $row->findvalue( './/header//epistitel' );
+        my $subtitle_org = $row->findvalue( './/header//oepistitel' );
+
+        my $ce = {
+          channel_id => $chd->{id},
+          title => norm($title),
+          start_time => $start,
+        };
+
+        if(defined $prodco and $prodco ne "") {
+          my @conts = split(', ', norm($prodco));
+          my @countries;
+
+          foreach my $c (@conts) {
+              my ( $c2 ) = $self->{datastore}->LookupCountry( "KFZ", $c );
+              push @countries, $c2 if defined $c2;
+          }
+
+          if( scalar( @countries ) > 0 )
+          {
+                $ce->{country} = join "/", @countries;
+          }
         }
 
-        if( scalar( @countries ) > 0 )
+        if( defined( $year ) and ($year =~ /(\d\d\d\d)/) )
         {
-              $ce->{country} = join "/", @countries;
+            $ce->{production_date} = "$1-01-01";
         }
+
+
+        if( defined( $subtitle ) and ($subtitle ne '') )
+        {
+              $ce->{subtitle} = norm($subtitle);
+        }
+
+       #print Dumper($ce);
+
+       # hd
+      if( $hd eq "true") {
+        $ce->{quality} = "HDTV";
       }
 
-      if( defined( $year ) and ($year =~ /(\d\d\d\d)/) )
-    	{
-      		$ce->{production_date} = "$1-01-01";
-    	}
+      my @actors;
+      my @directors;
+      my @writers;
 
-
-      if( defined( $subtitle ) and ($subtitle ne '') )
+      my $ns2 = $row->find( './/mitwirkende//Darsteller' );
+      foreach my $act ($ns2->get_nodelist)
       {
-            $ce->{subtitle} = norm($subtitle);
+      my $name = norm( $act->findvalue('./pname') );
+
+          # Role played - TODO: Add rolename to the actor
+          if( $act->findvalue('./rname') and norm($act->findvalue('./rname')) ne "" ) {
+            my $name .= " (".norm( $act->findvalue('./rname') ).")";
+          }
+
+          push @actors, $name;
       }
 
-     #print Dumper($ce);
+      my $ns3 = $row->find( './/mitwirkende//Stab' );
+      foreach my $stab ($ns3->get_nodelist)
+      {
+        my $name = norm( $stab->findvalue('./pname') );
 
-     # hd
-    if( $hd eq "true") {
-     	$ce->{quality} = "HDTV";
-    }
+          # Type
+          my $type = norm( $stab->findvalue('./@typ') );
 
-    my @actors;
-    my @directors;
-    my @writers;
+      # Directors
+      if($type eq "Regie") {
+        push @directors, $name;
+      }
 
-    my $ns2 = $row->find( './/mitwirkende//Darsteller' );
-    foreach my $act ($ns2->get_nodelist)
+      # Writers
+          if($type eq "Drehbuch") {
+        push @writers, $name;
+      }
+      }
+
+      # Actors
+    if( scalar( @actors ) > 0 )
     {
-		my $name = norm( $act->findvalue('./pname') );
+      $ce->{actors} = join ";", @actors;
+      }
 
-        # Role played - TODO: Add rolename to the actor
-        if( $act->findvalue('./rname') and norm($act->findvalue('./rname')) ne "" ) {
-        	my $name .= " (".norm( $act->findvalue('./rname') ).")";
-        }
+      if( scalar( @directors ) > 0 )
+      {
+          $ce->{directors} = join ";", @directors;
+      }
 
-        push @actors, $name;
-    }
+      if( scalar( @writers ) > 0 )
+      {
+          $ce->{writers} = join ";", @writers;
+      }
 
-    my $ns3 = $row->find( './/mitwirkende//Stab' );
-    foreach my $stab ($ns3->get_nodelist)
-    {
-    	my $name = norm( $stab->findvalue('./pname') );
+      # Genre
+      my ( $program_type, $categ ) = $self->{datastore}->LookupCat( "RTL2", $genre );
+      # movie
+      if( $type eq "Film") {
+         AddCategory( $ce, 'movie', $categ );
+      } elsif($type eq "Serie") {
+          AddCategory( $ce, 'series', $categ );
+      } elsif($type eq "Sonderablauf") {
+          AddCategory( $ce, 'tvshow', $categ );
+      } else {
+          AddCategory( $ce, 'series', $categ );
+      }
 
-        # Type
-        my $type = norm( $stab->findvalue('./@typ') );
+      $ce->{title} = norm($title);
+      $ce->{original_title} = norm($org_title) if $org_title and $org_title ne $title;
+      $ce->{original_subtitle} = norm($subtitle_org) if $subtitle_org and $subtitle ne $subtitle_org;
 
-		# Directors
-		if($type eq "Regie") {
-			push @directors, $name;
-		}
+      $ce->{aspect} = norm($aspect) if $aspect;
 
-		# Writers
-        if($type eq "Drehbuch") {
-			push @writers, $name;
-		}
-    }
+       progress( "RTL2: $chd->{xmltvid}: $start - $title" );
+       $dsh->AddCE( $ce );
 
-    # Actors
-	if( scalar( @actors ) > 0 )
-	{
-		$ce->{actors} = join ";", @actors;
-    }
+      } # next row
 
-    if( scalar( @directors ) > 0 )
-    {
-        $ce->{directors} = join ";", @directors;
-    }
+  }
 
-    if( scalar( @writers ) > 0 )
-    {
-        $ce->{writers} = join ";", @writers;
-    }
 
-    # Genre
-    my ( $program_type, $categ ) = $self->{datastore}->LookupCat( "RTL2", $genre );
-    # movie
-    if( $type eq "Film") {
-       AddCategory( $ce, 'movie', $categ );
-    } elsif($type eq "Serie") {
-        AddCategory( $ce, 'series', $categ );
-    } elsif($type eq "Sonderablauf") {
-        AddCategory( $ce, 'tvshow', $categ );
-    } else {
-        AddCategory( $ce, 'series', $categ );
-    }
-
-    $ce->{title} = norm($title);
-    $ce->{original_title} = norm($org_title) if $org_title and $org_title ne $title;
-    $ce->{original_subtitle} = norm($subtitle_org) if $subtitle_org and $subtitle ne $subtitle_org;
-
-    $ce->{aspect} = norm($aspect) if $aspect;
-
-     progress( "RTL2: $chd->{xmltvid}: $start - $title" );
-     $dsh->AddCE( $ce );
-
-    } # next row
 
   #  $column = undef;
 
