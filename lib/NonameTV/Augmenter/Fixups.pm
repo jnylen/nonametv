@@ -231,6 +231,12 @@ sub AugmentProgram( $$$ ){
     #
     # FIXME what about programmes that have been augmented in between? (rewrite of episode number / typo fixes in episode title)
     #
+
+    my $channel_id = $ceref->{channel_id};
+    if(defined($ruleref->{remoteref})) {
+      $channel_id = $ruleref->{remoteref};
+    }
+
     my $matchdone = 0;
     if( !$matchdone && $ceref->{'title'} && $ceref->{subtitle} && $ceref->{subtitle} ne "" && $ceref->{episode} && !$ceref->{description} ){
       # try matching by title/subtitle/episode number first
@@ -240,7 +246,7 @@ sub AugmentProgram( $$$ ){
           WHERE channel_id = ? and title = ? and subtitle = ? and episode = ? and description is not null
           ORDER BY timediff( ? , start_time ) asc, start_time asc, end_time desc
           LIMIT 1",
-        [$ceref->{channel_id}, $ceref->{title}, $ceref->{subtitle}, $ceref->{episode}, $ceref->{start_time}] );
+        [$channel_id, $ceref->{title}, $ceref->{subtitle}, $ceref->{episode}, $ceref->{start_time}] );
       my $ce;
       while( defined( my $ce = $sth->fetchrow_hashref() ) ) {
         CopyProgramWithoutTransmission( $resultref, $ce );
@@ -255,7 +261,7 @@ sub AugmentProgram( $$$ ){
           WHERE channel_id = ? and title = ? and episode = ? and description is not null
           ORDER BY timediff( ? , start_time ) asc, start_time asc, end_time desc
           LIMIT 1",
-        [$ceref->{channel_id}, $ceref->{title}, $ceref->{episode}, $ceref->{start_time}] );
+        [$channel_id, $ceref->{title}, $ceref->{episode}, $ceref->{start_time}] );
       my $ce;
       while( defined( my $ce = $sth->fetchrow_hashref() ) ) {
         CopyProgramWithoutTransmission( $resultref, $ce );
@@ -271,7 +277,7 @@ sub AugmentProgram( $$$ ){
           WHERE channel_id = ? and title = ? and subtitle = ? and description is not null
           ORDER BY timediff( ? , start_time ) asc, start_time asc, end_time desc
           LIMIT 1",
-        [$ceref->{channel_id}, $ceref->{title}, $ceref->{subtitle}, $ceref->{start_time}] );
+        [$channel_id, $ceref->{title}, $ceref->{subtitle}, $ceref->{start_time}] );
       my $ce;
       while( defined( my $ce = $sth->fetchrow_hashref() ) ) {
         d( 'copying from ' . $ce->{start_time} . ' to ' . $ceref->{start_time} );
@@ -287,7 +293,7 @@ sub AugmentProgram( $$$ ){
           WHERE channel_id = ? and title = ? and description is not null
           ORDER BY abs( timediff( start_time, ? ) ) asc, start_time asc, end_time desc
           LIMIT 1",
-        [$ceref->{channel_id}, $ceref->{title}, $ceref->{start_time}] );
+        [$channel_id, $ceref->{title}, $ceref->{start_time}] );
       my $ce;
       if( defined( my $ce = $sth->fetchrow_hashref() ) ) {
         CopyProgramWithoutTransmission( $resultref, $ce );

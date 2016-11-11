@@ -40,6 +40,7 @@ BEGIN {
                       MonthNumber DayNumber
                       CompareArrays
                       RemoveSpecialChars CleanSubtitle FixSubtitle
+                      AMPMtoTwentyFour
                      /;
 }
 our @EXPORT_OK;
@@ -88,6 +89,22 @@ sub MyPost
   {
     return (undef, $res->status_line );
   }
+}
+
+## Turns AM and PM time to 24 hour
+sub AMPMtoTwentyFour
+{
+  my( $str ) = @_;
+
+  my($hh, $mm, $ampm) = split(/:| /, $str);
+  $hh -= 12 if ($ampm eq 'AM' && $hh == 12);
+  $hh += 12 if ($ampm eq 'PM' && $hh != 12);
+  $hh = sprintf "%02d", $hh;
+  # for date times that don't use leading zeroes, use this regex instead:
+  # (\d{1,2}/\d{1,2}/\d{4} )(\d{1,2})(:\d\d:\d\d) (?:AM|PM)
+  $str = $hh.":".$mm.":00";
+
+  return $str;
 }
 
 # Make it easier to match the episode titles to each other
