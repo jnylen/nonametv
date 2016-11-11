@@ -34,7 +34,8 @@ def copy_to_channels(file_name)
     { :xmltvid => "classica.de", :info => "CLASSICA" },
 
     { :xmltvid => "3d.sky.de", :info => "SKY HD-3D" }, { :xmltvid => "action.sky.de", :info => "Sky Action" },
-    { :xmltvid => "actionhd.sky.de", :info => "Sky Action HD" }, { :xmltvid => "atlantic.sky.de", :info => "SKY ATLANTIC" },
+    { :xmltvid => "actionhd.sky.de", :info => "Sky Action HD" }, { :xmltvid => "action.sky.de", :info => "Sky Cinema Action" },
+    { :xmltvid => "actionhd.sky.de", :info => "Sky Cinema Action HD" }, { :xmltvid => "atlantic.sky.de", :info => "SKY ATLANTIC" },
     { :xmltvid => "atlanticp1.sky.de", :info => "SKY ATLANTIC +1 HD" }, { :xmltvid => "arts.sky.de", :info => "SKY ARTS HD" },
     { :xmltvid => "atlantichd.sky.de", :info => "SKY ATLANTIC HD" }, { :xmltvid => "cinema.sky.de", :info => "SKY CINEMA" },
     { :xmltvid => "cinemahd.sky.de", :info => "SKY CINEMA HD" }, { :xmltvid => "p1.cinema.sky.de", :info => "Sky Cinema +1" },
@@ -48,17 +49,17 @@ def copy_to_channels(file_name)
     { :xmltvid => "sporthd2.sky.de", :info => "Sky Sport HD 2" }, { :xmltvid => "sportaustria.sky.de", :info => "SKY SPORT AUSTRIA" },
     { :xmltvid => "sportnews.sky.de", :info => "SKY SPORT NEWS" }, { :xmltvid => "sportnewshd.sky.de", :info => "SKY SPORT NEWS HD" },
 
-    { :xmltvid => "bundesliga1.sky.de", :info => "Sky Bundesliga 1" }, { :xmltvid => "bundesliga2.sky.de", :info => "Sky Bundesliga 2" },
-    { :xmltvid => "bundesliga3.sky.de", :info => "Sky Bundesliga 3" }, { :xmltvid => "bundesliga4.sky.de", :info => "Sky Bundesliga 4" },
-    { :xmltvid => "bundesliga5.sky.de", :info => "Sky Bundesliga 5" }, { :xmltvid => "bundesliga6.sky.de", :info => "Sky Bundesliga 6" },
-    { :xmltvid => "bundesliga7.sky.de", :info => "Sky Bundesliga 7" }, { :xmltvid => "bundesliga8.sky.de", :info => "Sky Bundesliga 8" },
-    { :xmltvid => "bundesliga9.sky.de", :info => "Sky Bundesliga 9" }, { :xmltvid => "bundesliga10.sky.de", :info => "Sky Bundesliga 10" },
+    { :xmltvid => "bundesliga1.sky.de", :info => "Sky Sport Bundesliga 1" }, { :xmltvid => "bundesliga2.sky.de", :info => "Sky Sport Bundesliga 2" },
+    { :xmltvid => "bundesliga3.sky.de", :info => "Sky Sport Bundesliga 3" }, { :xmltvid => "bundesliga4.sky.de", :info => "Sky Sport Bundesliga 4" },
+    { :xmltvid => "bundesliga5.sky.de", :info => "Sky Sport Bundesliga 5" }, { :xmltvid => "bundesliga6.sky.de", :info => "Sky Sport Bundesliga 6" },
+    { :xmltvid => "bundesliga7.sky.de", :info => "Sky Sport Bundesliga 7" }, { :xmltvid => "bundesliga8.sky.de", :info => "Sky Sport Bundesliga 8" },
+    { :xmltvid => "bundesliga9.sky.de", :info => "Sky Sport Bundesliga 9" },
 
-    { :xmltvid => "bundesligahd1.sky.de", :info => "Sky Bundesliga HD 1" }, { :xmltvid => "bundesligahd2.sky.de", :info => "Sky Bundesliga HD 2" },
-    { :xmltvid => "bundesligahd3.sky.de", :info => "Sky Bundesliga HD 3" }, { :xmltvid => "bundesligahd4.sky.de", :info => "Sky Bundesliga HD 4" },
-    { :xmltvid => "bundesligahd5.sky.de", :info => "Sky Bundesliga HD 5" }, { :xmltvid => "bundesligahd6.sky.de", :info => "Sky Bundesliga HD 6" },
-    { :xmltvid => "bundesligahd7.sky.de", :info => "Sky Bundesliga HD 7" }, { :xmltvid => "bundesligahd8.sky.de", :info => "Sky Bundesliga HD 8" },
-    { :xmltvid => "bundesligahd9.sky.de", :info => "Sky Bundesliga HD 9" }, { :xmltvid => "bundesligahd10.sky.de", :info => "Sky Bundesliga HD 10" },
+    { :xmltvid => "bundesligahd1.sky.de", :info => "Sky Sport Bundesliga 1 HD" }, { :xmltvid => "bundesligahd2.sky.de", :info => "Sky Sport Bundesliga 2 HD" },
+    { :xmltvid => "bundesligahd3.sky.de", :info => "Sky Sport Bundesliga 3 HD" }, { :xmltvid => "bundesligahd4.sky.de", :info => "Sky Sport Bundesliga 4 HD" },
+    { :xmltvid => "bundesligahd5.sky.de", :info => "Sky Sport Bundesliga 5 HD" }, { :xmltvid => "bundesligahd6.sky.de", :info => "Sky Sport Bundesliga 6 HD" },
+    { :xmltvid => "bundesligahd7.sky.de", :info => "Sky Sport Bundesliga 7 HD" }, { :xmltvid => "bundesligahd8.sky.de", :info => "Sky Sport Bundesliga 8 HD" },
+    { :xmltvid => "bundesligahd9.sky.de", :info => "Sky Sport Bundesliga 9 HD" }, { :xmltvid => "bundesligahd10.sky.de", :info => "Sky Sport Bundesliga UHD" },
 
     { :xmltvid => "sport1.sky.de", :info => "Sky Sport 1" }, { :xmltvid => "sport2.sky.de", :info => "Sky Sport 2" },
     { :xmltvid => "sport3.sky.de", :info => "Sky Sport 3" }, { :xmltvid => "sport4.sky.de", :info => "Sky Sport 4" },
@@ -67,12 +68,14 @@ def copy_to_channels(file_name)
     { :xmltvid => "sport9.sky.de", :info => "Sky Sport 9" }, { :xmltvid => "sport10.sky.de", :info => "Sky Sport 10" },
     { :xmltvid => "sport11.sky.de", :info => "Sky Sport 11" },
 
-    { :xmltvid => "sporthd1.sky.de", :info => "Sky Sport HD 1" }, { :xmltvid => "sporthd2.sky.de", :info => "Sky Sport HD 2" },
-    { :xmltvid => "sporthd3.sky.de", :info => "Sky Sport HD 3" }, { :xmltvid => "sporthd4.sky.de", :info => "Sky Sport HD 4" },
-    { :xmltvid => "sporthd5.sky.de", :info => "Sky Sport HD 5" }, { :xmltvid => "sporthd6.sky.de", :info => "Sky Sport HD 6" },
-    { :xmltvid => "sporthd7.sky.de", :info => "Sky Sport HD 7" }, { :xmltvid => "sporthd8.sky.de", :info => "Sky Sport HD 8" },
-    { :xmltvid => "sporthd9.sky.de", :info => "Sky Sport HD 9" }, { :xmltvid => "sporthd10.sky.de", :info => "Sky Sport HD 10" },
-    { :xmltvid => "sporthd11.sky.de", :info => "Sky Sport HD 11" },
+    { :xmltvid => "sporthd1.sky.de", :info => "Sky Sport 1 HD" }, { :xmltvid => "sporthd2.sky.de", :info => "Sky Sport 2 HD" },
+    { :xmltvid => "sporthd3.sky.de", :info => "Sky Sport 3 HD" }, { :xmltvid => "sporthd4.sky.de", :info => "Sky Sport 4 HD" },
+    { :xmltvid => "sporthd5.sky.de", :info => "Sky Sport 5 HD" }, { :xmltvid => "sporthd6.sky.de", :info => "Sky Sport 6 HD" },
+    { :xmltvid => "sporthd7.sky.de", :info => "Sky Sport 7 HD" }, { :xmltvid => "sporthd8.sky.de", :info => "Sky Sport 8 HD" },
+    { :xmltvid => "sporthd9.sky.de", :info => "Sky Sport 9 HD" }, { :xmltvid => "sporthd10.sky.de", :info => "Sky Sport 10 HD" },
+    { :xmltvid => "sporthd11.sky.de", :info => "Sky Sport 11 HD" },
+
+    { :xmltvid => "eins.sky.de", :info => "SKY 1" }, { :xmltvid => "einshd.sky.de", :info => "SKY 1 HD" },
 
     { :xmltvid => "spiegel-geschichte.tv", :info => "SPIEGEL GESCHICHTE" }, { :xmltvid => "hd.spiegel-geschichte.tv", :info => "SPIEGEL GESCHICHTE HD" },
     { :xmltvid => "sportdigital.tv", :info => "SPORTDIGITAL.TV" }, { :xmltvid => "syfy.de", :info => "SCI FI" },
@@ -102,7 +105,7 @@ def copy_to_channels(file_name)
         io.close
 
         doc.xpath('//programmElement').each do |node|
-            if node.xpath('./@service').to_s != c[:info]
+            if node.xpath('./@service').to_s.strip.downcase != c[:info].downcase.strip
                 node.remove
             end
         end
