@@ -59,6 +59,9 @@ then
   h=
 fi
 
+# Lockfile
+$h lockfile -r 0 /tmp/nonametv.lock || exit 1
+
 # Update tvdb
 $d perl -I lib tools/nonametv-update-tvdb sv
 $d perl -I lib tools/nonametv-update-tvdb en
@@ -117,3 +120,5 @@ $d rsync --delete -r /content/xmltv_compare/ /var/www/html/compare/
 $h tools/nonametv-export Honeybee --export-channels
 $h tools/nonametv-export Honeybee
 $h tools/se-tvzon/nonametv-upload
+
+$h rm -f /tmp/nonametv.lock

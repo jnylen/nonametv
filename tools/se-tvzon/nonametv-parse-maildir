@@ -287,6 +287,8 @@ sub guess_channel
     # FOX TV
     return "foxtv.no"       if $filename =~ /^fox\s*norway/i and $filename =~ /\.(xls|xlsx)$/i;
     return "foxtv.se"       if $filename =~ /^fox\s*sweden/i and $filename =~ /\.(xls|xlsx)$/i;
+    return "foxtv.no"       if $filename =~ /^fox_norway/i and $filename =~ /\.(xls|xlsx)$/i;
+    return "foxtv.se"       if $filename =~ /^fox_sweden/i and $filename =~ /\.(xls|xlsx)$/i;
 
 
 
