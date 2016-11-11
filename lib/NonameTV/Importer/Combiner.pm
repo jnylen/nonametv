@@ -19,7 +19,7 @@ Todo:
 Bugs:
   - a 12 hour nonstop program with a channel switch every hour doesn't work
 
-=cut 
+=cut
 
 use strict;
 use warnings;
@@ -36,9 +36,9 @@ inkluderar alla program p� b�da kanalerna.
 =cut
 
 $channel_data{ "svtb-svt24.svt.se" } =
-  { 
-    "svtb.svt.se" => 
-      [ 
+  {
+    "svtb.svt.se" =>
+      [
         {
           day => 'all',
         },
@@ -58,9 +58,9 @@ Viasat Nature/Crime och Nickelodeon sams�nder hos SPA.
 =cut
 
 $channel_data{ "viasat-nature-nick.spa.se" } =
-  { 
-    "nature.viasat.se" => 
-      [ 
+  {
+    "nature.viasat.se" =>
+      [
         {
           day => 'all',
 	  time => '1800-0000',
@@ -82,9 +82,9 @@ ZDFneo / KI.KA switch on ZDFmobil
 =cut
 
 $channel_data{ "neokika.zdfmobil.de" } =
-  { 
-    "kika.de" => 
-      [ 
+  {
+    "kika.de" =>
+      [
         {
           day => 'all',
 	  time => '0600-2100',
@@ -197,9 +197,9 @@ ARTE / EinsExtra on ARD national mux from HR
 =cut
 
 $channel_data{ "arteeinsextra.ard.de" } =
-  { 
-    "arte.de" => 
-      [ 
+  {
+    "arte.de" =>
+      [
         {
           day => 1,
 	  time => '0000-0300',
@@ -268,9 +268,9 @@ Nickelodeon Germany / Comedy Central. The share the same channel and do not over
 =cut
 
 $channel_data{ "nickcc.mtvnetworks.de" } =
-  { 
-    "nick.de" => 
-      [ 
+  {
+    "nick.de" =>
+      [
         {
           day => 'all',
         },
@@ -284,9 +284,9 @@ $channel_data{ "nickcc.mtvnetworks.de" } =
   };
 
 $channel_data{ "ch.nickcc.mtvnetworks.de" } =
-  { 
-    "nick.ch" => 
-      [ 
+  {
+    "nick.ch" =>
+      [
         {
           day => 'all',
         },
@@ -329,9 +329,9 @@ RBB Berlin
 =cut
 
 $channel_data{ "berl.rbb-online.de" } =
-  { 
-    "rbb.rbb-online.de" => 
-      [ 
+  {
+    "rbb.rbb-online.de" =>
+      [
         {
           day => 'all',
         },
@@ -351,9 +351,9 @@ Nickelodeon DK 05:00-21:00, MTV Hits 21:00-05:00
 =cut
 
 $channel_data{ "nickdk-mtvhits.sat.viasat.dk" } =
-  { 
+  {
     "nickelodeon.dk" =>
-      [ 
+      [
         {
           day => 'all',
           time => '0500-2100',
@@ -516,6 +516,90 @@ $channel_data{ "cartoonnetwork.boxer.se" } =
       ]
   };
 
+  $channel_data{ "livehdhitshd.cmore.boxer.se" } =
+    {
+      "livehd.cmore.se" =>
+        [
+          {
+            day => 'mo',
+            time => '0000-0700',
+          },
+          {
+            day => 'mo',
+            time => '1630-0000',
+          },
+
+          {
+            day => 'tu',
+            time => '0000-0030',
+          },
+          {
+            day => 'tu',
+            time => '1630-0000',
+          },
+
+          {
+            day => 'we',
+            time => '0000-0030',
+          },
+          {
+            day => 'we',
+            time => '1630-0000',
+          },
+
+          {
+            day => 'th',
+            time => '0000-0030',
+          },
+          {
+            day => 'th',
+            time => '1630-0000',
+          },
+
+          {
+            day => 'fr',
+            time => '0000-0030',
+          },
+
+          {
+            day => 'sa',
+            time => '0700-0000',
+          },
+
+          {
+            day => 'su',
+            time => '0000-0000',
+          },
+        ],
+        "hitshd.cmore.se" =>
+          [
+            {
+              day => 'mo',
+              time => '0700-1630',
+            },
+            {
+              day => 'tu',
+              time => '0030-1630',
+            },
+            {
+              day => 'we',
+              time => '0030-1630',
+            },
+            {
+              day => 'th',
+              time => '0030-1630',
+            },
+            {
+              day => 'fr',
+              time => '0030-0000',
+            },
+            {
+              day => 'sa',
+              time => '0000-0700',
+            },
+
+          ]
+    };
 
 use DateTime;
 use DateTime::Event::Recurrence;
@@ -542,7 +626,7 @@ sub new {
     }
 
     $self->{OptionSpec} = [ qw/force-update verbose+ quiet+ short-grab/ ];
-    $self->{OptionDefaults} = { 
+    $self->{OptionDefaults} = {
       'force-update' => 0,
       'verbose'      => 0,
       'quiet'        => 0,
@@ -557,7 +641,7 @@ sub Import
 {
   my $self = shift;
   my( $p ) = @_;
-  
+
   NonameTV::Log::SetVerbosity( $p->{verbose}, $p->{quiet} );
 
   my $maxdays = $p->{'short-grab'} ? $self->{MaxDaysShort} : $self->{MaxDays};
@@ -585,7 +669,7 @@ sub Import
         push (@source_channels, '\'' . $chan . '\'');
     }
     my $source_xmltvids = join (', ', @source_channels);
-      
+
     for( my $days = 0; $days <= $maxdays; $days++ )
     {
       my $dt = $start_dt->clone;
@@ -646,7 +730,7 @@ sub Import
       {
         p( "$batch_id: Processing data" );
 
-        my $progs = $self->BuildDay( $batch_id, \%prog, 
+        my $progs = $self->BuildDay( $batch_id, \%prog,
                                      $channel_data{$data->{xmltvid}}, $data );
       }
       else
@@ -700,13 +784,13 @@ sub BuildDay
 
         if( defined( $span->{time} ) ) {
           my( $sstart, $sstop ) = split( /-/, $span->{time} );
-	
+
 	  $sstart_dt = changetime( $date_dt, $sstart );
 	  $sstop_dt = changetime( $date_dt, $sstop );
 	  if( $sstop_dt lt $sstart_dt ) {
 	    $sstop_dt->add( days => 1 );
           }
-        } else { 
+        } else {
 	  $sstart_dt = changetime( $date_dt, '0000' );
 	  $sstop_dt = $sstart_dt->clone->add ( days=> 1);
         }
@@ -771,12 +855,12 @@ sub FetchDataFromSite
 {
   return( '', undef );
 }
-    
+
 sub date2dt {
   my( $date ) = @_;
 
   my( $year, $month, $day ) = split( '-', $date );
-  
+
   my $dt = DateTime->new( year   => $year,
                           month  => $month,
                           day    => $day,

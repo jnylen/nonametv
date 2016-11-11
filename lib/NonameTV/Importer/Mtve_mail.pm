@@ -17,6 +17,7 @@ use utf8;
 use POSIX;
 use DateTime;
 use XML::LibXML;
+use Data::Dumper;
 use Spreadsheet::ParseExcel;
 use Spreadsheet::XLSX;
 use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
@@ -41,10 +42,10 @@ sub new {
 
   my $conf = ReadConfig();
 
-  $self->{FileStore} = $conf->{FileStore};
-
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "UTC" );
   $self->{datastorehelper} = $dsh;
+
+  $self->{FileStore} = $conf->{FileStore};
 
   return $self;
 }
@@ -69,8 +70,8 @@ sub ImportXLS
   my $self = shift;
   my( $file, $chd ) = @_;
 
-  my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
+  my $dsh = $self->{datastorehelper};
 
   my %columns = ();
   my $date;
@@ -87,11 +88,10 @@ sub ImportXLS
   foreach my $oWkS (@{$oBook->{Worksheet}}) {
 
 		my $foundcolumns = 0;
+    my $timezone = undef;
 
     # browse through rows
     for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
-
-
       if( not %columns ){
         # the column names are stored in the first row
         # so read them and store their column positions
@@ -108,12 +108,19 @@ sub ImportXLS
             $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time/ );
 
 
+
           	$columns{'Description'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description/ );
           	$columns{'Description'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis/ );
 
             $columns{'Season'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Season/ );
             $columns{'Episode'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode/ );
             $columns{'HD'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^HD/ );
+
+            # Timezone
+            if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time/ ) {
+              my ($tt) = ($oWkS->{Cells}[$iR][$iC]->Value =~ /\((.*)\)/);
+              $timezone = $tt;
+            }
 
 
             $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
@@ -127,7 +134,14 @@ sub ImportXLS
         next;
       }
 
-	  my $oWkDate = $oWkS->{Cells}[$iR][$columns{'Date'}];
+      if($timezone =~ /\+(\d+) Hour/i) {
+        $timezone = "Europe/Stockholm";
+      } elsif($timezone ne "Europe/Stockholm") {
+        $timezone = "UTC";
+      }
+
+      # date
+	    my $oWkDate = $oWkS->{Cells}[$iR][$columns{'Date'}];
       next if( ! $oWkDate );
       $date = ParseDate( $oWkDate->Value );
       next if( ! $date );
@@ -138,19 +152,19 @@ sub ImportXLS
       my $time = ExcelFmt('hh:mm', $oWkTime->Value);
       next if( ! $date );
 
-
+      my $start = $self->create_dt($date . "T" . $time, $timezone);
 
 	  # Startdate
-      if( $date ne $currdate ) {
+      if( $start->ymd("-") ne $currdate ) {
       	if( $currdate ne "x" ) {
-		    $dsh->EndBatch( 1 );
+		        $dsh->EndBatch( 1 );
         }
 
-      	my $batchid = $chd->{xmltvid} . "_" . $date;
+      	my $batchid = $chd->{xmltvid} . "_" . $start->ymd("-");
         $dsh->StartBatch( $batchid , $chd->{id} );
-        progress("Mtve_mail: $chd->{xmltvid}: Date is $date");
-        $dsh->StartDate( $date , "00:00" );
-        $currdate = $date;
+        progress("Mtve_mail: $chd->{xmltvid}: Date is " . $start->ymd("-"));
+        $dsh->StartDate( $start->ymd("-") , "00:00" );
+        $currdate = $start->ymd("-");
       }
 
       # title
@@ -172,7 +186,7 @@ sub ImportXLS
       my $ce = {
         channel_id => $chd->{channel_id},
         title => norm( $title ),
-        start_time => $time,
+        start_time => $start->hms(":"),
         description => norm( $desc ),
       };
 
@@ -194,6 +208,29 @@ sub ImportXLS
   $dsh->EndBatch( 1 );
 
   return 1;
+}
+
+sub create_dt
+{
+  my $self = shift;
+  my( $str, $timezone ) = @_;
+
+  my( $year, $month, $day, $hour, $minute ) =
+  ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+)/ );
+
+
+
+  my $dt = DateTime->new( year      => $year,
+    month     => $month,
+    day       => $day,
+    hour      => $hour,
+    minute    => $minute,
+    time_zone => $timezone
+  );
+
+
+  $dt->set_time_zone( "UTC" );
+  return $dt;
 }
 
 sub ParseDate {

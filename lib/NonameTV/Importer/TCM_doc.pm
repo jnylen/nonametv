@@ -129,6 +129,14 @@ sub ImportContentFile
 
       $ce->{program_type} = "movie" if defined $director and norm($director) ne "";
 
+      # Series!
+      if($ce->{title} =~ /^TCM Presents Under the Influence/i) {
+        my( $t, $st ) = ($ce->{title} =~ /(.*)\: (.*)/);
+        $ce->{title} = norm($t);
+        $ce->{subtitle} = norm($st);
+        $ce->{program_type} = "series";
+      }
+
       # add the programme to the array
       # as we have to add description later
       push( @ces , $ce );
@@ -154,8 +162,14 @@ sub ImportContentFile
 
             # Dont add this
         }else {
-
+          #if(!defined($element->{description}) and defined($element->{subtitle}) and norm($text) eq norm($element->{subtitle})) {
             $element->{description} .= $text;
+          #}
+
+          # Don't make it be the subtitle
+          if(defined($element->{subtitle}) and norm($element->{subtitle}) eq norm($element->{description})) {
+            $element->{description} = undef;
+          }
         }
     }
   }

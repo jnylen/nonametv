@@ -236,8 +236,9 @@ sub ImportContent {
       my $prodyear = $emission->findvalue( 'productionYear' );
       my $widescreen = $emission->findvalue( 'wideScreen' );
       my $bline = $emission->findvalue( 'bline' );
+      my $lead  = $emission->findvalue( 'lead' );
       my $rerun = $emission->findvalue( 'rerun' );
-      my $live = $emission->findvalue( 'live' );
+      my $live  = $emission->findvalue( 'live' );
 
       # Actors and directors
       my @actors;
@@ -332,7 +333,7 @@ sub ImportContent {
 	  }
 
 	  # Find live-info
-	  if( $live eq "true" )
+	  if( $live eq "true" or $lead eq "LIVE" or $lead eq "LIVE:" )
 	  {
 	    $ce->{live} = "1";
       push $extra->{qualifiers}, "live";
@@ -387,6 +388,11 @@ sub ImportContent {
   	      ( $pty, $cat ) = $ds->LookupCat( 'Viasat2_category', $category );
   	  	  AddCategory( $ce, $pty, $cat );
   	  }
+
+      # Sometimes they fuck up
+      if($bline eq "National Football League") {
+        $ce->{program_type} = "sports";
+      }
 
   	  $ce->{external_ids} = 'viasat_' . $emission->findvalue( 'uniqueId' );
       $ce->{extra} = $extra;
