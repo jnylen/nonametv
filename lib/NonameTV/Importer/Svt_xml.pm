@@ -153,6 +153,7 @@ sub ImportXML
 	  my $genrenum  = $row->findvalue( './/sch:Classification/@content' );
 	  my $genrenum2 = $row->findvalue( './/sch:Classification/@format' );
 	  my $genrenum3 = $row->findvalue( './/sch:Classification/@subject' );
+    my $extra = {};
 
       my $ce = {
         channel_id => $chd->{id},
@@ -376,6 +377,21 @@ sub ImportXML
         ( $pty, $cat ) = $ds->LookupCat( 'Svt_genre2', $genrenum3 );
         AddCategory( $ce, $pty, $cat );
     }
+
+    # Guess rerun
+    my $postcomment = $row->findvalue( './/sch:LongDescription/@postcomment' );
+    if($postcomment =~ /Fr.n/i) {
+      #if($postcomment =~ /Fr.n \d\d\d\d/i) {
+        # Production year
+      #} else {
+        $ce->{new} = "0";
+      #}
+
+    } elsif($postcomment ne "") {
+      $ce->{new} = "1";
+    }
+
+    #$ce->{extra} = $extra;
 
     progress( "SvtXML: $chd->{xmltvid}: $time - $title" );
     $dsh->AddCE( $ce );
