@@ -255,17 +255,14 @@ sub ImportExcel
       # program_title
       $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
       next if( ! $oWkC );
-      my $title = norm($oWkC->Value);
+      my $field2 = int2col($columns{'Title'}).$i;
+      my $title = $ref->[1]{$field2};
       next if( ! $title );
       $title =~ s/S(\d+)$//;
       $title = FixSubtitle(norm($title));
 
       $oWkC = $oWkS->{Cells}[$iR][$columns{'ORGTitle'}];
       my $title_org = norm($oWkC->Value) if( $oWkC );
-
-      # Desc
-      my $field = int2col($columns{'Synopsis'}).$i;
-      my $desc = $ref->[1]{$field};
 
       my $ce = {
         channel_id => $channel_id,
@@ -300,6 +297,8 @@ sub ImportExcel
       ## END
 
       # Desc
+      my $field = int2col($columns{'Synopsis'}).$i;
+      my $desc = $ref->[1]{$field};
       $ce->{description} = normUtf8($desc) if defined($desc);
       $desc = '';
 
