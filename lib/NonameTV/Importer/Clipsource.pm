@@ -62,7 +62,7 @@ sub ImportContent
   }
 
   # events includes rerun, live, start, end and catchup, prev aired
-  my $eis = $doc->findnodes( ".//event" );
+  my $eis = $doc->findnodes( ".//eventList/event" );
   my %events;
 
   if( $eis->size() == 0 ) {
@@ -179,6 +179,7 @@ sub ImportContent
         channel_id   => $chd->{id},
         title        => norm($title),
         start_time   => $start->hms(":"),
+        end_time     => $end->hms(":"),
         description  => norm($desc),
     };
 
@@ -360,7 +361,7 @@ sub Object2Url {
 }
 
 sub ContentExtension {
-  return 'zip';
+  return 'xml';
 }
 
 sub FilterContent {
