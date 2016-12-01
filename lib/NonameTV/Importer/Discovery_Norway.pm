@@ -42,7 +42,7 @@ sub InitiateDownload {
 
   my $mech = $self->{cc}->UserAgent();
 
-  $mech->get("http://presse.sbsdiscovery.no/brukere/logginn");
+  $mech->get("http://presse.discovery.no/brukere/logginn");
 
   $mech->submit_form(
       with_fields => {
@@ -79,7 +79,7 @@ sub Object2Url {
 
   my $datefirst = first_day_of_week( $year, $week ); # monday
 
-  my $url = "http://presse.sbsdiscovery.no/tablaa.xml?channel=" . $chd->{grabber_info} . "&show_type=all&utf8=%E2%9C%93&week=" . $datefirst->ymd("-");
+  my $url = "http://presse.discovery.no/tablaa.xml?channel=" . $chd->{grabber_info} . "&show_type=all&utf8=%E2%9C%93&week=" . $datefirst->ymd("-");
 
   return( $url, undef );
 }
@@ -205,8 +205,9 @@ sub ImportContent
 
     	# TVNorge seems to have the season in the originaltitle, weird.
     	# �r 2
-      my ( $dummy, $season ) = ($title_original =~ /(.r|sesong)\s*(\d+)$/ );
-
+      my ( $dummy, $dseason ) = ($title_original =~ /(.r|sesong)\s*(\d+)$/ );
+      my $sseason = $sc->findvalue( './season' );
+      my $season = ($sseason || $dseason);
 
     	progress("TVNorge: $chd->{xmltvid}: $start2 - $title");
 
@@ -299,7 +300,7 @@ sub ImportContent
       if($subtitle ne "") {
           if($subtitle =~ /(.r|sesong)\s*(\d+), (\d+)\. del/i) {
               $ce->{episode} = sprintf( "%d . %d . ", $2-1, $3-1 );
-          } else {
+          } elsif(lc($subtitle) ne lc($title)) {
               $ce->{subtitle} = norm(ucfirst(lc($subtitle)));
           }
       }
