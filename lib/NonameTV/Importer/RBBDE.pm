@@ -52,7 +52,9 @@ sub Object2Url {
 
   my( $year, $week ) = ( $objectname =~ /(\d+)-(\d+)$/ );
 
-  my $url = sprintf( "http://presseservice.rbb-online.de/programmwochen/rbb_fernsehen/%04d/rbb-%02d.xml", $year, $week);
+  # changes url in 2017 to https://www.rbb-online.de/unternehmen/presse/programmwochen/rbb-fernsehen/2017/01--programmwoche/xml-rbb.file.html/rbb-01.xml
+  ## add --programmwochen
+  my $url = sprintf( "https://www.rbb-online.de/unternehmen/presse/programmwochen/rbb-fernsehen/%04d/%02d/xml-rbb.file.html/rbb-%02d.xml", $year, $week, $week);
 
   return( $url, undef );
 }
@@ -92,7 +94,7 @@ sub ImportContent( $$$ ) {
   my ($batch_id, $cref, $chd) = @_;
 
   my $doc = ParseXml ($cref);
-  
+
   if (not defined ($doc)) {
     f ("$batch_id: Failed to parse.");
     return 0;
@@ -169,12 +171,12 @@ sub parseTimestamp( $$ ){
     if( !defined( $year )|| !defined( $hour ) ){
       w( "could not parse timestamp: $timestamp" );
     }
-    my $dt = DateTime->new ( 
+    my $dt = DateTime->new (
       year      => $year,
       month     => $month,
       day       => $day,
       hour      => $hour,
-      minute    => $minute, 
+      minute    => $minute,
       second    => $second,
       time_zone => 'Europe/Berlin',
     );
