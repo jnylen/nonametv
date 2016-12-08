@@ -49,7 +49,7 @@ sub Object2Url {
   my $self = shift;
   my( $objectname, $chd ) = @_;
 
-  my $url = $self->{UrlRoot} . "/md/v0/".$chd->{grabber_info}."/getepg/week";
+  my $url = "http://api.mtg-r.net/md/v0/".$chd->{grabber_info}."/getepg/week";
 
   return( $url, undef );
 }
