@@ -35,8 +35,8 @@ sub new {
 sub Object2Url {
   my $self = shift;
   my( $objectname, $chd ) = @_;
- 
-  my $url = $self->{UrlRoot};
+
+  my $url = "http://www.radioseven.se/rss/xmltabla.asp";
 
   return( $url, undef );
 }
@@ -61,7 +61,7 @@ sub ImportContent
   my( $batch_id, $cref, $chd ) = @_;
 
   my $ds = $self->{datastore};
-  
+
   my $xml = XML::LibXML->new;
   my $doc;
   eval { $doc = $xml->parse_string($$cref); };
@@ -70,7 +70,7 @@ sub ImportContent
     f "Failed to parse $@";
     return 0;
   }
- 
+
  	 # Find all "z:row"-entries.
  	 my $ns = $doc->find( "//program" );
 
@@ -79,19 +79,19 @@ sub ImportContent
  	   f "No data found";
  	   return 0;
  	 }
-  
-  	 
+
+
  	 foreach my $sc ($ns->get_nodelist)
   	{
-		
+
 		# Date
 		my $start = $self->create_dt( $sc->findvalue( './start' ) );
 		my $start_time = $start->ymd("-").' '.$start->hms(":");
-		
+
 		my $end = $self->create_dt( $sc->findvalue( './end' ) );
 		my $end_time = $end->ymd("-").' '.$end->hms(":");
-		
-	
+
+
 		my $title = $sc->findvalue( './title' );
 		my $desc = $sc->findvalue( './description' );
 		my $url = $sc->findvalue( './link' );
@@ -106,12 +106,12 @@ sub ImportContent
  	  	description	=> norm($desc),
  	  	url => $url,
    	};
-   	
+
    	if( my( $presenters ) = ($desc =~ /med\s*(.*)/ ) )
     {
       $ce->{presenters} = parse_person_list( $presenters );
     }
-	
+
   	  $ds->AddProgramme( $ce );
  	 }
 
@@ -123,8 +123,8 @@ sub create_dt
 {
   my $self = shift;
   my( $str ) = @_;
-  
-  my( $year, $month, $day, $hour, $minute ) = 
+
+  my( $year, $month, $day, $hour, $minute ) =
       ($str =~ /(\d+)-(\d+)-(\d+) (\d+):(\d+)$/ );
 
   my $dt = DateTime->new( year   => $year,
@@ -134,9 +134,9 @@ sub create_dt
                           minute => $minute,
                           time_zone => 'Europe/Stockholm',
                           );
-  
+
   $dt->set_time_zone( "UTC" );
-  
+
   return $dt;
 }
 
@@ -147,7 +147,7 @@ sub parse_person_list
 
   # Remove all variants of m.fl.
   $str =~ s/\s*m[\. ]*fl\.*\b//;
-  
+
   # Remove trailing '.'
   $str =~ s/\.$//;
 
@@ -163,5 +163,5 @@ sub parse_person_list
 
   return join( ";", grep( /\S/, @persons ) );
 }
-    
+
 1;
