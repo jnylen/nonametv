@@ -257,7 +257,7 @@ sub ImportContent
 
       # Actors
       my @actors;
-      my $acts = $sc->find( './/actors' );
+      my $acts = $sc->find( './/actors/actor' );
       foreach my $act ($acts->get_nodelist)
       {
           my $name = $act->to_literal;
