@@ -16,6 +16,10 @@ use utf8;
 
 use DateTime;
 use Spreadsheet::ParseExcel;
+use Spreadsheet::XLSX;
+use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel int2col);
+use Spreadsheet::Read;
+use Data::Dumper;
 
 use Text::Iconv;
 my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
@@ -47,7 +51,7 @@ sub ImportContentFile {
 
   $self->{fileerror} = 0;
 
-  if( $file =~ /\.xls$/i ){
+  if( $file =~ /\.(xlsx|xls)$/i ){
     $self->ImportFlatXLS( $file, $chd );
   } else {
     error( "YaS: Unknown file format: $file" );
@@ -75,18 +79,22 @@ sub ImportFlatXLS
   my $oBook;
   if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
   else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }   #  staro, za .xls
+  my $ref = ReadData ($file);
 
-    my($iR, $oWkS, $oWkC);
+  my($iR, $oWkS, $oWkC);
 
-	  my( $time, $episode );
+	my( $time );
   my( $program_title , $program_description );
-    my @ces;
+  my @ces;
 
   # main loop
   foreach my $oWkS (@{$oBook->{Worksheet}}) {
+    my $i = 5;
 
-    for(my $iR = 2 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+    for(my $iR = 5 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+      $i++;
 
+    next if(!defined($oWkS->{Cells}[$iR][0]));
 		$oWkC = $oWkS->{Cells}[$iR][0]->Value;
 
 		if( isDate( $oWkC ) ) { # the line with the date in format '01/10/2011'
@@ -94,16 +102,14 @@ sub ImportFlatXLS
       $date = ParseDate( $oWkC );
 
       if( $date ) {
-
-        progress("MusicBoxIT: $xmltvid: Date is $date");
-
         if( $date ne $currdate ) {
 
           if( $currdate ne "x" ){
           	# save last day if we have it in memory
-  					FlushDayData( $xmltvid, $dsh , @ces );
             $dsh->EndBatch( 1 );
           }
+
+          progress("MusicBoxIT: $xmltvid: Date is $date");
 
           my $batch_id = "${xmltvid}_" . $date;
           $dsh->StartBatch( $batch_id, $channel_id );
@@ -117,25 +123,45 @@ sub ImportFlatXLS
 
     } elsif( isTime( $oWkC ) ) {
     	my $time = ParseTime( $oWkC );
-			my $title = norm($oWkS->{Cells}[$iR][1]->Value);
-			my $subtitle = norm($oWkS->{Cells}[$iR][15]->Value);
+
+      # title
+      my $title_field = int2col(1).$i;
+      my $title = $ref->[1]{$title_field};
+
+      # subtitle
+      my $subtitle_field = int2col(5).$i;
+      my $subtitle = $ref->[1]{$subtitle_field} if defined($oWkS->{Cells}[$iR][5]);
+      my $episode;
+
 			if((defined $subtitle) and ($subtitle ne "")) {
-				if( $subtitle =~ /Ep.\s*\d+$/i ) {
-  					my ( $epi ) = ( $subtitle =~ /Ep.\s*(\d+)$/ );
-  					$episode = sprintf( " . %d . ", $epi-1 ) if defined $epi;
+				if( $subtitle =~ /Ep.\s*\d+/i ) {
+  					my ( $epi ) = ( $subtitle =~ /Ep.\s*(\d+)/ );
+            my ( $season ) = ( $subtitle =~ /Season.\s*(\d+)/ );
+
+            if(defined($season) and defined($epi)) {
+              $episode = sprintf( "%d . %d . ", $season-1, $epi-1 );
+            } elsif(defined($epi)) {
+              $episode = sprintf( " . %d . ", $epi-1 );
+            }
+
   					# Remove it from title
-  					$subtitle =~ s/Ep.\s*(\d+)$//;
+            $subtitle =~ s/Season.\s*(\d+)//;
+  					$subtitle =~ s/Ep.\s*(\d+)//;
 
   					# norm it
   					$subtitle = norm($subtitle);
 
   					# Remove ending dot
   					$subtitle =~ s/.$//;
+            $subtitle =~ s/^- //;
   			}
 			}
 
-			#my $genre = norm($oWkS->{Cells}[$iR][6]); # Not used as of yet
-			my $desc = norm($oWkS->{Cells}[$iR][16]->Value);
+			#my $genre = norm($oWkS->{Cells}[$iR][5]); # Not used as of yet
+
+      # desc
+      my $desc_field = int2col(6).$i;
+      my $desc = $ref->[1]{$desc_field} if defined($oWkS->{Cells}[$iR][6]);
 
 			my $ce = {
           channel_id   => $chd->{id},
@@ -147,17 +173,17 @@ sub ImportFlatXLS
 			$ce->{subtitle} = $subtitle if $subtitle;
 			$ce->{episode} = $episode if $episode;
 
-			push( @ces , $ce );
+      progress("$time - $title");
+      $dsh->AddProgramme( $ce );
 
     } else {
-        # skip
+    #    next;
     }
    } # next row
 
   } # next worksheet
 
   # save last day if we have it in memory
-  FlushDayData( $xmltvid, $dsh , @ces );
 
   $dsh->EndBatch( 1 );
 
@@ -202,7 +228,7 @@ sub ParseDate {
     time_zone => "Europe/Stockholm"
       );
 
-  $dt->set_time_zone( "UTC" );
+  #$dt->set_time_zone( "UTC" );
 
 
 	return $dt->ymd("-");
