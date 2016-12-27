@@ -196,7 +196,7 @@ sub guess_channel
     if( $filename eq "noname" ) {
       return undef;
     }
-    elsif( $filename eq /\.(jpg|png|jpeg|gif|bmp)$/ ) {
+    elsif( $filename =~ /\.(jpg|png|jpeg|gif|bmp)$/ ) {
       return undef;
     }
     elsif( $filename =~ /\bxd/i ) {
@@ -211,13 +211,16 @@ sub guess_channel
     elsif( $filename =~ /disney\s*channel/i and $filename !~ /\((\d\d\d\d)/i ) {
       return "disneychannel.se";
     }
-    elsif( $subject =~ /junior/i and $filename =~ /\(0500/i ) {
+    elsif( $filename =~ /disney\s*channel/i and $filename =~ /\((0500|0600)/i ) {
+      return "disneychannel.se";
+    }
+    elsif( $subject =~ /junior/i and $filename =~ /\((0500|0600)/i ) {
       return "junior.disney.se";
     }
-    elsif( $subject =~ /drj/i and $filename =~ /\(0500/i ) {
+    elsif( $subject =~ /drj/i and $filename =~ /\((0500|0600)/i ) {
       return "junior.disney.se";
     }
-    elsif( $subject =~ /djr/i and $filename =~ /\(0500/i ) {
+    elsif( $subject =~ /djr/i and $filename =~ /\((0500|0600)/i ) {
       return "junior.disney.se";
     }
     elsif( $subject =~ /disney\s*channel/i and $filename !~ /\((\d\d\d\d)/i ) {
