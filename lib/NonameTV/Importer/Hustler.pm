@@ -44,7 +44,7 @@ sub new {
   bless ($self, $class);
 
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "UTC" );
   $self->{datastorehelper} = $dsh;
 
   return $self;
@@ -182,7 +182,7 @@ if( $file =~ /\.pdf$/i ) {return $self->ImportPDF( $file, $channel_id, $xmltvid 
       # time - column $coltime
       $oWkC = $oWkS->{Cells}[$iR][$coltime];
       next if( ! $oWkC );
-      
+
       if($oWkC->Value eq "") { next; }
 
       my $time;
@@ -191,7 +191,7 @@ if( $file =~ /\.pdf$/i ) {return $self->ImportPDF( $file, $channel_id, $xmltvid 
       } else {
         $time = ParseTime( $oWkC->Value ) if( $oWkC->Value );
       }
-      
+
 
       next if( ! $time );
 
@@ -274,14 +274,14 @@ sub ImportPDF{
 
   foreach my $p ($doc->rangeToArray(1,$doc->numPages(),'1-end'))
       {
-      $str = $str . $doc->getPageText($p); 
-      }   
+      $str = $str . $doc->getPageText($p);
+      }
 
  CAM::PDF->asciify(\$str);  #print "stra: $str";
 
   # filtering
   $str =~ s/\n+/\n/g;
-  $str =~ s/PREMIER.{0,3}\n/PREMIERE-/g; 
+  $str =~ s/PREMIER.{0,3}\n/PREMIERE-/g;
   $str =~ s/\nDaring.TV\nListing.*\n.Times shown are in CET.\n/\n/g;
 
   my @lines = split("\n", $str);

@@ -15,6 +15,7 @@ Features:
 
 use DateTime;
 use XML::LibXML;
+use Data::Dumper;
 use Encode qw/encode decode/;
 
 use NonameTV qw/ParseXml MyGet norm AddCountry AddCategory/;
@@ -198,7 +199,7 @@ sub ImportContent
     }
 
     # original title
-    if(defined($org_title) and $ce->{title} !~ /^$org_title$/i) {
+    if($chd->{xmltvid} ne "sport.tv2.no" and defined($org_title) and $ce->{title} !~ /^$org_title$/i) {
         $org_title =~ s/^Film\://gi;
         $ce->{original_title} = norm($org_title);
 

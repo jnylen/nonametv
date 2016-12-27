@@ -26,31 +26,31 @@ sub new {
     my $class = ref($proto) || $proto;
     my $self  = $class->SUPER::new( @_ );
     bless ($self, $class);
-    
-    
+
+
     defined( $self->{UrlRoot} ) or die "You must specify UrlRoot";
-    
+
     my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
     $self->{datastorehelper} = $dsh;
-    
+
     return $self;
 }
 
 sub ImportContent
 {
     my $self = shift;
-    
+
     my( $batch_id, $cref, $chd ) = @_;
-    
+
     my $ds = $self->{datastore};
     my $dsh = $self->{datastorehelper};
-    
+
     $ds->{SILENCE_END_START_OVERLAP}=1;
-    
+
     my( $date ) = ($batch_id =~ /_(.*)$/);
 
     $dsh->StartDate( $date, "00:00" );
-        
+
     my $str = decode( "iso-8859-1", $$cref );
 
     my @rows = split("\n", $str );
@@ -73,7 +73,7 @@ sub ImportContent
       my $inrow = $self->row_to_hash($batch_id, $rows[$i], $columns );
       #print "<<<<$rows[$i]>>>>\n";
       $start = $inrow->{'Time'};
-      #next if undef $start; 
+      next if(!defined($start));
       #next if $start eq "";
       $title = $inrow->{'Programme'};
       $subtitle = $inrow->{'Episode'};
@@ -93,13 +93,13 @@ sub ImportContent
         description => norm($desc),
         start_time => $start,
       };
-    
-    
+
+
       $dsh->AddProgramme( $ce );
-    
-    
+
+
     }
-    
+
     return 1;
 }
 
@@ -152,14 +152,13 @@ sub createDate
 {
     my $self = shift;
     my( $str ) = @_;
-    
+
     my $date = substr( $str, 0, 2 );
     my $month = substr( $str, 2, 2 );
     my $year = substr( $str, 4, 4 );
-    
+
     return "$year-$month-$date";
 
 }
 
 1;
-

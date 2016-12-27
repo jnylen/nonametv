@@ -291,7 +291,7 @@ sub ImportExcel
         AddCategory( $ce, $program_type2, $category2 );
       }
 
-      if(defined($ce->{episode}) and $season > 0) {
+      if(defined($ce->{episode}) and defined($season) and norm($season) ne "" and $season > 0) {
         $ce->{episode} = $season-1 . $ce->{episode};
       }
       ## END
