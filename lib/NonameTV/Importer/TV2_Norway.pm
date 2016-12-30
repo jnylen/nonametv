@@ -112,7 +112,9 @@ sub ImportContent
     #
     # description
     #
-    my $desc  = $sc->getElementsByTagName('desc');
+    my $desc_series = $sc->findvalue( 'review[@source="series_long_synopsis"]' );
+    my $desc_prog   = $sc->findvalue( 'review[@source="program_long_synopsis"]' );
+    my $desc        = (norm($desc_prog) || norm($desc_series));
 
     #
     # genre
