@@ -119,7 +119,7 @@ sub ImportContent( $$$ ) {
     $xpc->setContextNode( $program );
     my $ce = ();
     $ce->{channel_id} = $chd->{id};
-    $ce->{start_time} = $self->parseTimestamp( $xpc->findvalue( 's:termin/@start' ) );
+    $ce->{start_time} = $self->parseTimestamp( $xpc->findvalue( 's:termin/@exakt' ) );
     $ce->{end_time} = $self->parseTimestamp( $xpc->findvalue( 's:termin/@ende' ) );
 
     $ce->{title} = norm($xpc->findvalue( 's:titel/@termintitel' ));
@@ -231,7 +231,6 @@ sub parseTimestamp( $ ){
       day       => $day,
       hour      => $hour,
       minute    => $minute,
-      second    => $second,
       time_zone => $offset
     );
     $dt->set_time_zone( 'UTC' );
