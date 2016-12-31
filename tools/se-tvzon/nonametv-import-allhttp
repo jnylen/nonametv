@@ -10,7 +10,6 @@ $NONAMETV CMore $1 $2 $3
 $NONAMETV CMoreDK $1 $2 $3
 $NONAMETV CMoreNO $1 $2 $3
 $NONAMETV CMoreFI $1 $2 $3
-$NONAMETV Discovery_xmltv $1 $2 $3
 $NONAMETV DR $1 $2 $3
 $NONAMETV DK4 $1 $2 $3
 $NONAMETV DigiTV $1 $2 $3
@@ -26,7 +25,6 @@ $NONAMETV Frikanalen $1 $2 $3
 $NONAMETV Infomedia $1 $2 $3
 $NONAMETV HBOHR $1 $2 $3
 $NONAMETV HBOSI $1 $2 $3
-$NONAMETV KanalGlobal $1 $2 $3
 $NONAMETV MTVde $1 $2 $3 # vg media license/foreign channels
 $NONAMETV MTV_novg $1 $2 $3 # no vg media license
 $NONAMETV NRK $1 $2 $3
@@ -57,10 +55,8 @@ $NONAMETV HRT $1 $2 $3
 $NONAMETV ViasatPL $1 $2 $3
 $NONAMETV EurosportPL $1 $2 $3
 $NONAMETV KBSWorld $1 $2 $3
-$NONAMETV Horse1 $1 $2 $3
 $NONAMETV RTLDE $1 $2 $3
 $NONAMETV RTLDE_HTML $1 $2 $3
-$NONAMETV KiKA $1 $2 $3
 $NONAMETV Anixe $1 $2 $3
 $NONAMETV RTS $1 $2 $3
 $NONAMETV Arirang $1 $2 $3
