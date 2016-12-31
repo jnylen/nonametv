@@ -125,7 +125,7 @@ sub ImportXLSX
 
        # date (column 1)
        $oWkC = $oWkS->{Cells}[$iR][$columns{'Date'}];
-       my $date = ExcelFmt('yyyy:mm:dd', $oWkC->Value);
+       my $date = ExcelFmt('yyyy-mm-dd', $oWkC->Value);
 
        # time (column 1)
        $oWkC       = $oWkS->{Cells}[$iR][$columns{'Start'}];
