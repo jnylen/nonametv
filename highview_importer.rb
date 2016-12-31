@@ -4,7 +4,6 @@ require 'pathname'
 require 'fileutils'
 require 'nokogiri'
 require 'dotenv'
-require 'httparty'
 
 # Load dotenv
 Dotenv.load
