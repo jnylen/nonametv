@@ -74,3 +74,4 @@ tools/nonametv-import ServusTV $1 $2 $3
 tools/nonametv-import Bloomberg $1 $2 $3
 tools/nonametv-import Matkanalen $1 $2 $3
 tools/nonametv-import PlanetTV $1 $2 $3
+tools/nonametv-import Highview $1 $2 $3
