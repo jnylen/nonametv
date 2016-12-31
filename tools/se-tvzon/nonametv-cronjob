@@ -16,7 +16,6 @@ cd $PROOT
 if [ $1x = --weeklyx ]
 then
   # Run weekly commands.
-  perl -I lib tools/nonametv-remove-old
   tools/se-tvzon/nonametv-import-allhttp --remove-old
 
   # Move away old files  after 6 weeks
@@ -83,6 +82,7 @@ $d tools/se-tvzon/nonametv-filestore-carusmedia $Q
 
 # Ruby importers for files
 $d ruby ftv_importer.rb
+$d ruby highview_importer.rb
 #$d ruby tv5_importer.rb
 
 # Import everything
