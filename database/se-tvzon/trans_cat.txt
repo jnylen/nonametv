@@ -1174,6 +1174,7 @@ OUTTV,"tysk komediserie",Comedy,series
 OUTTV,"utnämnd till världens första reseprogram för",Travel,
 OUTTV,"utnämnt till världens första reseprogram för",Travel,
 OUTTV,"utnämt till världens första reseprogram för ",Travel,
+PlanetTV_main,serie,\N,series
 ProSieben_genre,abenteuer,Adventure,
 ProSieben_genre,action,Action,
 ProSieben_genre,actionkomödie,Action/Comedy,
@@ -1838,6 +1839,12 @@ Tmdb_genre,878,Sci-Fi,
 Tmdb_genre,9648,Mystery,
 Tmdb_genre,9805,Sports,
 Tmdb_genre,99,Documentary,
+Trace,documentary,Documentary,series
+Trace,magazine,Magazine,series
+Trace,music,Music,tvshow
+Trace,"music magazine",Magazine,series
+Trace,profile,Biography,series
+Trace,"reality tv",Reality,series
 Turner_xml,action,Action,
 Turner_xml,adventure,Adventure,
 Turner_xml,animated,Animation,
@@ -2691,6 +2698,10 @@ Viasat_genre,underholdning,Entertainment,
 Viasat_genre,verklighets,"True Story",
 Viasat_genre,verklighets/underhållning,"True Story/Entertain",
 Viasat_genre,western,Western,
+VisatWorld_category,miniseries,\N,series
+VisatWorld_category,movie,\N,movie
+VisatWorld_category,news,News,tvshow
+VisatWorld_category,series,\N,series
 YFE_genre,action,Action,
 YFE_genre,"action comedy",Action/Comedy,
 YFE_genre,adventure,Adventure,

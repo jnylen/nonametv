@@ -681,7 +681,7 @@
 233,Tvdb,"Gränsbevakarna Kanada",program_type,series,261999,episodeseason
 868,Tvdb,^.*$,program_type,series,\N,episodeseason
 867,Tvdb,^.*$,program_type,series,\N,episodeseason
-870,TvdbEN,^.*$,program_type,series,\N,episodeseason
+870,Tvdb,^.*$,program_type,series,\N,episodeseason
 871,TvdbEN,^.*$,program_type,series,\N,episodeseason
 872,TvdbEN,^.*$,program_type,series,\N,episodeseason
 873,TvdbEN,^.*$,program_type,series,\N,episodeseason
@@ -697,7 +697,7 @@
 883,TvdbEN,^.*$,program_type,series,\N,episodeseason
 884,TvdbEN,^.*$,program_type,series,\N,episodeseason
 885,TvdbEN,^.*$,program_type,series,\N,episodeseason
-870,TvdbEN,Futurama,program_type,series,\N,episodetitle
+\N,TvdbEN,Futurama,program_type,series,\N,episodetitle
 \N,TvdbEN,"Plain Jane - International",program_type,series,179881,episodeseason
 876,TvdbEN,Jackass,program_type,series,\N,episodetitle
 882,TvdbEN,Jackass,program_type,series,\N,episodetitle
@@ -1667,3 +1667,42 @@
 295,Fixups,^.*(Poirot):\s+(.*)$,\N,\N,\N,splittitle
 295,TvdbNO,Poirot,program_type,series,76133,episodeseason
 472,Fixups,"^(Huset på Christianshavn):\s+(.*)$",\N,\N,\N,splittitle
+1624,Fixups,"^Hello World (\d+)$",\N,\N,"Hello World",replacetitle
+1624,Fixups,"Bloomberg Markets",subtitle,"Middle East","Bloomberg Markets: Middle East",replacetitleundef
+1624,Fixups,"Bloomberg Markets",subtitle,"European Close","Bloomberg Markets: European Close",replacetitleundef
+1624,Fixups,"Countdown On The Move",\N,\N,"On The Move",replacetitleundef
+1624,Fixups,"Best of Bloomberg Markets",subtitle,"Middle East","Best of Bloomberg Markets: Middle East",replacetitleundef
+1628,TvdbDK,^.*$,program_type,series,\N,guess
+953,Fixups,\N,\N,\N,956,copylastdetails
+954,Fixups,\N,\N,\N,956,copylastdetails
+955,Fixups,\N,\N,\N,956,copylastdetails
+1631,TvdbFI,^.*$,program_type,series,\N,guess
+1638,TvdbNO,^.*$,program_type,series,\N,guess
+1640,TvdbNL,^.*$,program_type,series,\N,guess
+1641,TvdbNL,^.*$,program_type,series,\N,guess
+1642,TvdbDE,^.*$,program_type,series,\N,guess
+1643,TvdbDE,^.*$,program_type,series,\N,guess
+1644,TvdbDE,^.*$,program_type,series,\N,guess
+1639,TvdbDE,^.*$,program_type,series,\N,guess
+1629,TvdbDE,^.*$,program_type,series,\N,guess
+1630,TvdbDE,^.*$,program_type,series,\N,guess
+\N,TvdbEN,"American Dad",program_type,series,\N,episodetitle
+\N,TvdbEN,"American Dad!",program_type,series,\N,episodetitle
+877,TvdbNO,"Teenage Mutant Ninja Turtles",program_type,series,261451,guess
+878,Tvdb,"Teenage Mutant Ninja Turtles",program_type,series,261451,guess
+883,TvdbDK,"Teenage Mutant Ninja Turtles",program_type,series,261451,guess
+938,TvdbNL,"Teenage Mutant Ninja Turtles",program_type,series,261451,guess
+990,TvdbDE,"Teenage Mutant Ninja Turtles",program_type,series,261451,guess
+991,TvdbDE,"Teenage Mutant Ninja Turtles",program_type,series,261451,guess
+1644,TvdbDE,"Teenage Mutant Ninja Turtles",program_type,series,261451,guess
+1286,TvdbPL,"Teenage Mutant Ninja Turtles",program_type,series,261451,guess
+1405,TvdbEN,^.*$,program_type,series,\N,episodetitle
+936,TvdbEN,^.*$,program_type,series,\N,episodetitle
+932,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1282,TvdbEN,^.*$,program_type,series,\N,episodetitle
+870,TvdbEN,^.*$,program_type,series,\N,episodetitle
+939,TvdbEN,^.*$,program_type,series,\N,episodetitle
+940,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1283,TvdbEN,^.*$,program_type,series,\N,episodetitle
+1654,TvdbDK,^.*$,program_type,series,\N,guess
+1654,TvdbEN,^.*$,program_type,series,\N,guess
