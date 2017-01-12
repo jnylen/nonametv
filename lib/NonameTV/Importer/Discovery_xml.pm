@@ -84,11 +84,14 @@ sub ImportContent {
     my $episode = $b->findvalue( "PROGRAMME[1]/EPISODE_NUMBER" );
     my $desc = $b->findvalue( "PROGRAMME[1]/TEXT[1]/TEXT_TEXT" );
     my $year = $b->findvalue( "PROGRAMME[1]/PROGRAMME_YEAR" );
+    my $rerun = $b->findvalue( 'BROADCAST_INFO/@RERUN' );
+    my $is_hd = $b->findvalue( 'BROADCAST_INFO/@HD' );
+    my $live = $b->findvalue( 'BROADCAST_INFO/@LIVE' );
 
     my $ce = {
       channel_id => $chd->{id},
-      start_time => ParseDateTime( $start ),
-      end_time => ParseDateTime( $end ),
+      start_time => ParseDateTime( $start, $chd->{grabber_info} ),
+      end_time => ParseDateTime( $end, $chd->{grabber_info} ),
       title => norm($title),
       description => norm($desc),
     };
@@ -113,7 +116,41 @@ sub ImportContent {
       $ce->{production_date} = "$1-01-01";
     }
 
+    my $extra = {};
+    $extra->{qualifiers} = [];
+
+    # HD?
+    if( defined($is_hd) and $is_hd eq "Yes" )
+	  {
+	    $ce->{quality} = "HDTV";
+      push $extra->{qualifiers}, "HD";
+	  } elsif( defined($is_hd) and $is_hd eq "No" ) {
+      push $extra->{qualifiers}, "SD";
+    }
+
+    # replay
+    if(defined($rerun) and norm($rerun) eq "No") {
+      $ce->{new} = "1";
+      push $extra->{qualifiers}, "new";
+    } elsif(defined($rerun) and norm($rerun) eq "Yes") {
+      $ce->{new} = "0";
+      push $extra->{qualifiers}, "rerun";
+    }
+
+    # Find live-info
+  	if( $live eq "Yes" )
+  	{
+  	  $ce->{live} = "1";
+      push $extra->{qualifiers}, "live";
+  	}
+    else
+    {
+      $ce->{live} = "0";
+    }
+
     p($start." $ce->{title}");
+
+    $ce->{extra} = $extra;
 
     $ds->AddProgramme( $ce );
   }
@@ -124,20 +161,27 @@ sub ImportContent {
 # The start and end-times are in the format 2007-12-31T01:00
 # and are expressed in the local timezone.
 sub ParseDateTime {
-  my( $str ) = @_;
+  my( $str, $grabber_info ) = @_;
 
   my( $year, $month, $day, $hour, $minute ) =
       ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+)$/ );
+
+  # Select grabber info
+  my $timezone = "Europe/Stockholm";
+  if($grabber_info =~ /UTC/i) {
+    $timezone = "UTC";
+  }
 
   my $dt = DateTime->new(
     year => $year,
     month => $month,
     day => $day,
     hour => $hour,
-    minute => $minute
+    minute => $minute,
+    time_zone => $timezone
   );
 
-  #$dt->set_time_zone( "UTC" );
+  $dt->set_time_zone( "UTC" );
 
   return $dt->ymd("-") . " " . $dt->hms(":");
 }
@@ -146,7 +190,7 @@ sub Object2Url {
   my $self = shift;
   my( $objectname, $chd ) = @_;
 
-  my $url = sprintf( "%s%s-UTC.xml", $self->{UrlRoot}, $chd->{grabber_info} );
+  my $url = sprintf( "%s%s", $self->{UrlRoot}, $chd->{grabber_info} );
 
   return( $url, undef );
 }
