@@ -35,8 +35,9 @@ sub new {
 
 
     $self->{MaxMonths} = 2;
+    $self->{Timezone} = "CET" unless defined $self->{Timezone};
 
-    my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "UTC" );
+    my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, $self->{Timezone} );
 
     # use augment
     $self->{datastore}->{augment} = 1;
@@ -53,9 +54,9 @@ sub Object2Url {
   my( $year, $month ) = ( $objectname =~ /(\d+)-(\d+)$/ );
   my $pad_len = 2;
   $month = sprintf("%0${pad_len}d", $month);
-  my( $directory, $name, $timezone ) = split( /:/, $chd->{grabber_info} );
+  my( $directory, $name ) = split( /:/, $chd->{grabber_info} );
 
-  my $url = $self->{UrlRoot} . $directory . $year . '-' . $month.'-'. $name .'-' . $timezone . '.xml';
+  my $url = $self->{UrlRoot} . $directory . $year . '-' . $month.'-'. $name .'-' . $self->{Timezone} . '.xml';
 
   return( $url, undef );
 }
