@@ -62,8 +62,11 @@ CREATE TABLE `programs` (
   `schedule_id` varchar(100) NOT NULL,
   `title_id` varchar(100) NOT NULL,
   `title` varchar(100) NOT NULL DEFAULT '',
+  `title_lang` varchar(5) DEFAULT NULL,
   `subtitle` mediumtext,
+  `subtitle_lang` varchar(5) DEFAULT NULL,
   `description` text,
+  `description_lang` varchar(5) DEFAULT NULL,
   `batch_id` int(11) NOT NULL DEFAULT '0',
   `program_type` varchar(20) DEFAULT '',
   `episode` varchar(20) DEFAULT NULL,
@@ -97,6 +100,7 @@ CREATE TABLE `programs` (
   `external_ids` varchar(255) DEFAULT NULL,
   `extra` text,
   PRIMARY KEY (`channel_id`,`start_time`),
+  UNIQUE KEY `languages` (`description_lang`,`title_lang`,`subtitle_lang`),
   KEY `batch` (`batch_id`,`start_time`),
   KEY `title` (`title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
