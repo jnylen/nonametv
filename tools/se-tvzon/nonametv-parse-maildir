@@ -78,6 +78,7 @@ my @folders = qw(NonameTV-Data.GlobalListings
      NonameTV-Data.Disney
      NonameTV-Data.Uptown
      NonameTV-Data.KinoPolska
+     NonameTV-Data.Trace
 		 );
 # Flag messages AFTER they have been processed. Then I normally
 # only have to move the message to the correct folder.
@@ -469,6 +470,15 @@ sub guess_channel
     return "filmboxpremium.spi.pl" if $filename =~ /^FilmBox_Premium/i and $filename =~ /HU/i;
 
     return "arthouse.spi.pl" if $filename =~ /^Arthouse/i and $filename =~ /EN/i;
+ }
+
+ if( $dir =~ /Trace/ and $filename =~ /\.(xls|xlsx)$/i ) {
+     return "urbanint.trace.tv" if $filename =~ /Urban_INTL/i;
+     return "gospel.trace.tv" if $filename =~ /Gospel/i;
+     return "sportstars.trace.tv" if $filename =~ /Sport Stars/i;
+     return "toca.trace.tv" if $filename =~ /Toca/i;
+     return "tropical.trace.tv" if $filename =~ /Tropical/i;
+     return "urbanfr.trace.tv" if $filename =~ /Urban_France/i;
  }
 
  return undef;

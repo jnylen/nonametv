@@ -387,7 +387,7 @@ sub guess_channel
 
  if( $dir =~ /ETVMedia/ ) {
     # Channel 1 Russia
-    if( $filename =~ /\d{8}_\d{8}/i and $filename =~ /\.rtf$/i ) {
+    if( $filename =~ /\.rtf$/i ) {
        return "1tvrus.com";
     }
 
