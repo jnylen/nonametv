@@ -43,7 +43,8 @@ $NONAMETV Viasat $1 $2 $3
 $NONAMETV ViasatDK $1 $2 $3
 $NONAMETV ViasatNO $1 $2 $3
 $NONAMETV ViasatFI $1 $2 $3
-$NONAMETV ViasatWorld $1 $2 $3
+$NONAMETV ViasatWorld $1 $2 $3 # CET
+$NONAMETV ViasatWorld_Finland $1 $2 $3 # EET
 $NONAMETV TV2 $1 $2 $3
 $NONAMETV TV2NO $1 $2 $3
 $NONAMETV TV2Reg $1 $2 $3
@@ -61,6 +62,7 @@ $NONAMETV Anixe $1 $2 $3
 $NONAMETV RTS $1 $2 $3
 $NONAMETV Arirang $1 $2 $3
 $NONAMETV NatGeo_xml $1 $2 $3
+$NONAMETV MTGRadio $1 $2 $3
 
 # Download files
 wget -O /content/channels/tv_grab/ok54.xml http://epg.ok-rlp.de/xmltv/trier.xml
