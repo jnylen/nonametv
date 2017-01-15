@@ -34,7 +34,7 @@ sub new {
     bless ($self, $class);
 
 
-    $self->{MaxMonths} = 2;
+    $self->{MaxMonths} = 2 unless defined $self->{MaxMonths};
     $self->{Timezone} = "CET" unless defined $self->{Timezone};
 
     my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, $self->{Timezone} );
