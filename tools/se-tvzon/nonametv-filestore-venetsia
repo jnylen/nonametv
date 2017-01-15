@@ -34,8 +34,6 @@ my $filestore = $conf->{FileStore};
 my %channel_data;
 $channel_data{ "r01" } = "1.radio.yle.fi";
 $channel_data{ "ava" } = "ava.mtv.fi";
-$channel_data{ "mtf" } = "fakta.mtv.fi";
-$channel_data{ "mtd" } = "faktaxl.mtv.fi";
 $channel_data{ "fsd" } = "fem.yle.fi";
 $channel_data{ "stv" } = "fox.fi";
 $channel_data{ "her" } = "herotv.fi";
