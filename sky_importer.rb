@@ -73,7 +73,7 @@ def copy_to_channels(file_name)
     { :xmltvid => "sporthd5.sky.de", :info => "Sky Sport 5 HD" }, { :xmltvid => "sporthd6.sky.de", :info => "Sky Sport 6 HD" },
     { :xmltvid => "sporthd7.sky.de", :info => "Sky Sport 7 HD" }, { :xmltvid => "sporthd8.sky.de", :info => "Sky Sport 8 HD" },
     { :xmltvid => "sporthd9.sky.de", :info => "Sky Sport 9 HD" }, { :xmltvid => "sporthd10.sky.de", :info => "Sky Sport 10 HD" },
-    { :xmltvid => "sporthd11.sky.de", :info => "Sky Sport 11 HD" },
+    { :xmltvid => "sporthd11.sky.de", :info => "Sky Sport 11 HD" }, { :xmltvid => "sportuhd.sky.de", :info => "Sky Sport UHD" },
 
     { :xmltvid => "eins.sky.de", :info => "SKY 1" }, { :xmltvid => "einshd.sky.de", :info => "SKY 1 HD" },
 
