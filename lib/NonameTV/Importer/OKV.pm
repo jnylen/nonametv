@@ -157,6 +157,7 @@ sub ImportContent
     $title       =~ s/&amp;/&/g; # Wrong encoded char
     my $desc     = norm($sc->findvalue( './desc'    ));
     my $duration = norm($sc->findvalue( './duration'    ));
+    my $url = norm($sc->findvalue( './url'    ));
 
 	  my $ce = {
         channel_id 		=> $chd->{id},
@@ -213,6 +214,7 @@ sub ImportContent
 
     # norm it and replace it
     $ce->{title} = norm($title);
+    $ce->{url} = $url if defined $url;
 
     progress( "OKV: $chd->{xmltvid}: $start - $title" );
 
