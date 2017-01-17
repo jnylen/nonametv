@@ -135,20 +135,20 @@ sub ImportContent
     #
     # start time
     #
-    my $start = $self->create_dt( $sc->findvalue( './@start' ) );
+    my $start = $self->create_dt( $sc->findvalue( './start' ) );
     if( not defined $start )
     {
-      error( "$batch_id: Invalid starttime '" . $sc->findvalue( './@start' ) . "'. Skipping." );
+      error( "$batch_id: Invalid starttime '" . $sc->findvalue( './start' ) . "'. Skipping." );
       next;
     }
 
     #
     # end time
     #
-    my $end = $self->create_dt( $sc->findvalue( './@stop' ) );
+    my $end = $self->create_dt( $sc->findvalue( './stop' ) );
     if( not defined $end )
     {
-      error( "$batch_id: Invalid endtime '" . $sc->findvalue( './@stop' ) . "'. Skipping." );
+      error( "$batch_id: Invalid endtime '" . $sc->findvalue( './stop' ) . "'. Skipping." );
       next;
     }
 
