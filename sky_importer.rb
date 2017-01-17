@@ -53,13 +53,14 @@ def copy_to_channels(file_name)
     { :xmltvid => "bundesliga3.sky.de", :info => "Sky Sport Bundesliga 3" }, { :xmltvid => "bundesliga4.sky.de", :info => "Sky Sport Bundesliga 4" },
     { :xmltvid => "bundesliga5.sky.de", :info => "Sky Sport Bundesliga 5" }, { :xmltvid => "bundesliga6.sky.de", :info => "Sky Sport Bundesliga 6" },
     { :xmltvid => "bundesliga7.sky.de", :info => "Sky Sport Bundesliga 7" }, { :xmltvid => "bundesliga8.sky.de", :info => "Sky Sport Bundesliga 8" },
-    { :xmltvid => "bundesliga9.sky.de", :info => "Sky Sport Bundesliga 9" },
+    { :xmltvid => "bundesliga9.sky.de", :info => "Sky Sport Bundesliga 9" }, { :xmltvid => "bundesliga10.sky.de", :info => "Sky Sport Bundesliga 10" },
 
     { :xmltvid => "bundesligahd1.sky.de", :info => "Sky Sport Bundesliga 1 HD" }, { :xmltvid => "bundesligahd2.sky.de", :info => "Sky Sport Bundesliga 2 HD" },
     { :xmltvid => "bundesligahd3.sky.de", :info => "Sky Sport Bundesliga 3 HD" }, { :xmltvid => "bundesligahd4.sky.de", :info => "Sky Sport Bundesliga 4 HD" },
     { :xmltvid => "bundesligahd5.sky.de", :info => "Sky Sport Bundesliga 5 HD" }, { :xmltvid => "bundesligahd6.sky.de", :info => "Sky Sport Bundesliga 6 HD" },
     { :xmltvid => "bundesligahd7.sky.de", :info => "Sky Sport Bundesliga 7 HD" }, { :xmltvid => "bundesligahd8.sky.de", :info => "Sky Sport Bundesliga 8 HD" },
-    { :xmltvid => "bundesligahd9.sky.de", :info => "Sky Sport Bundesliga 9 HD" }, { :xmltvid => "bundesligahd10.sky.de", :info => "Sky Sport Bundesliga UHD" },
+    { :xmltvid => "bundesligahd9.sky.de", :info => "Sky Sport Bundesliga 9 HD" }, { :xmltvid => "bundesligahd10.sky.de", :info => "Sky Sport Bundesliga 10 HD" },
+    { :xmltvid => "bundesligauhd.sky.de", :info => "Sky Bundesliga UHD" },
 
     { :xmltvid => "sport1.sky.de", :info => "Sky Sport 1" }, { :xmltvid => "sport2.sky.de", :info => "Sky Sport 2" },
     { :xmltvid => "sport3.sky.de", :info => "Sky Sport 3" }, { :xmltvid => "sport4.sky.de", :info => "Sky Sport 4" },
