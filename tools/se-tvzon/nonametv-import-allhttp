@@ -63,6 +63,7 @@ $NONAMETV RTS $1 $2 $3
 $NONAMETV Arirang $1 $2 $3
 $NONAMETV NatGeo_xml $1 $2 $3
 $NONAMETV MTGRadio $1 $2 $3
+$NONAMETV Fjorton $1 $2 $3
 
 # Download files
 wget -O /content/channels/tv_grab/ok54.xml http://epg.ok-rlp.de/xmltv/trier.xml
