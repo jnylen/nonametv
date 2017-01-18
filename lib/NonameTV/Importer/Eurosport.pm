@@ -101,12 +101,14 @@ sub ImportContent {
         $end_dt->add( days => 1 );
       }
 
-      my $title = norm( $emission->findvalue( 'Title' ) );
+      my $title2 = norm( $emission->findvalue( 'Title' ) );
       my $desc = norm( $emission->findvalue( 'Feature' ) );
       my $hd = norm( $emission->findvalue( 'HD' ) );
       my $image = norm( $emission->findvalue( 'ImageHD' ) );
       my $bc_type = norm( $emission->findvalue( 'BroadcastType' ) );
       my $sport = norm( $emission->findvalue( 'Sport' ) );
+
+      my $title = ($title2 || ucfirst(lc($sport)));
 
       my $ce = {
         channel_id => $channel_id,
