@@ -327,7 +327,7 @@ sub ImportContent
     }
 
     # Some sports programs needs to be tagged sports correctly
-    if($ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|Segling|(.*)\-VM)\:/i or $ce->{title} =~ /^FIFA (.*)-(VM|EM) (\d\d\d\d)\:/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Segling|Simning|(.*)\-EM)\:/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|UFC|Segling|(.*)\-EM)$/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Segling|Simning|UFC)\:/i)
+    if($ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|Alpina v.rldscupen|Segling|(.*)\-VM)\:/i or $ce->{title} =~ /^FIFA (.*)-(VM|EM) (\d\d\d\d)\:/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Segling|Simning|(.*)\-EM)\:/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Simning|UFC|Segling|(.*)\-EM)$/i or $ce->{title} =~ /^(Handboll|Fotboll|Hockey|Ishockey|Innebandy|Segling|Simning|UFC)\:/i)
     {
       # Different types needs different Genres
       if($ce->{title} =~ /^Handboll/i) {
@@ -342,6 +342,8 @@ sub ImportContent
         $ce->{category} = "Swimming";
       } elsif($ce->{title} =~ /^Segling/i) {
         $ce->{category} = "Sailing";
+      } elsif($ce->{title} =~ /^Alpina v.rldscupen/i) {
+        $ce->{category} = "Skiing";
       }
 
       $ce->{program_type} = "sports";
@@ -448,7 +450,27 @@ sub extract_episode
         $ce->{title_org} = norm("A ".$ce->{title_org});
     }
 
-  	my ( $original_title, $romanseason ) = ( $ce->{title_org} =~ /^(.*)\s+(.*)$/ );
+    my ( $original_title, $romanseason, $prodyear, $orgepisode, $orgsubtitle, $poo );
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL-]+)\s+(\d+)\s+"(.*)"$/ );
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+),\s+The\s+(\d+)\s+"(.*)"\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)"(.*)"\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)\s+"(.*)"\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)\s+"(.*)"$/ ) if !defined($original_title);
+    ( $original_title, $orgepisode, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*)\s+(\d+)\s+"(.*)"$/ ) if !defined($original_title);
+    ( $original_title, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*?)\s+"(.*)"$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL-]+)\s+(\d+)\s+'(.*)'$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+),\s+The\s+(\d+)\s+'(.*)'\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)'(.*)'\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)\s+'(.*)'\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)\s+'(.*)'$/ ) if !defined($original_title);
+    ( $original_title, $orgepisode, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*)\s+(\d+)\s+'(.*)'$/ ) if !defined($original_title);
+    ( $original_title, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*?)\s+'(.*)'$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)\s+\(([#0-9A-Z]+)\) $/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)$/ ) if !defined($original_title);
+    ( $original_title, $prodyear, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+(\d\d\d\d)\s+(\d+)\s+"(.*)"\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $prodyear, $orgepisode, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+(\d\d\d\d)\s+(\d+)\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $prodyear, $orgepisode ) = ( $ce->{title_org} =~ /^(.*)\s+(\d\d\d\d)\s+(\d+)$/ ) if !defined($original_title);
+    ( $original_title, $romanseason ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)$/ ) if !defined($original_title);
 
   	# Roman season found
   	if(defined($romanseason) and isroman(norm($romanseason))) {
@@ -462,10 +484,22 @@ sub extract_episode
   		( $episode2 )=( $ce->{episode} =~ m|\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
 
   		# Put it into episode field
-  		if(defined($romanseason_arabic) and not defined($season2) and defined($episode2)) {
+      if(defined($romanseason_arabic) and defined($orgepisode)) {
+        $ce->{episode} = sprintf( "%d . %d .", $romanseason_arabic-1, $orgepisode-1 );
+      } elsif(defined($romanseason_arabic) and not defined($season2) and defined($episode2)) {
   			$ce->{episode} = sprintf( "%d . %d .", $romanseason_arabic-1, $episode2 );
   		}
   	}
+
+    # Set original subtitle
+    if(defined($orgsubtitle)) {
+      $ce->{original_subtitle} = norm($orgsubtitle);
+    }
+
+    # Set original title
+    if(defined($original_title)) {
+      $ce->{title_org} = norm($original_title);
+    }
   }
 
   if( defined( $ce->{episode} ) )
@@ -508,6 +542,11 @@ sub extract_episode
     $ce->{original_title} = norm($ce->{original_title});
 
     $ce->{original_title} = undef if $ce->{original_title} eq $ce->{title};
+
+    # remove in case this is the org title
+    if(defined($ce->{original_title}) and $ce->{original_title} =~ /^Epi#/) {
+      delete $ce->{original_title};
+    }
   }
 
   # remove original title
