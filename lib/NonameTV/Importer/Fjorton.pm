@@ -13,6 +13,7 @@ use utf8;
 
 use DateTime;
 use XML::LibXML;
+use Data::Dumper;
 
 use NonameTV qw/ParseXml norm AddCategory/;
 use NonameTV::DataStore::Helper;
@@ -88,6 +89,7 @@ sub ImportContent {
     my $start_date = $emission->findvalue( './block/item[1]/@date' );
     my $start_time = $emission->findvalue( './block/item[1]/@start' );
     my $start_dt = create_dt($start_date, $start_time);
+    next if(!defined $start_dt);
 
     my $title = norm( $emission->findvalue( './@name' ) );
     my $desc = norm( $emission->findvalue( './description' ) );
@@ -110,6 +112,10 @@ sub ImportContent {
 
 sub create_dt {
   my( $date, $time ) = @_;
+
+  if($date eq "" or $time eq "") {
+    return undef;
+  }
 
   my($day, $month, $year ) = ($date =~ /^(\d+)\.(\d+)\.(\d\d\d\d)$/ );
   my( $hour, $minute ) = split(':', $time );
