@@ -183,6 +183,12 @@ sub ImportContent
     my $assetid  = $sc->findvalue( './@PlayAssetId1' );
     my $seriesid = $sc->findvalue( './Program/@SeriesId' );
     my $vod      = $sc->findvalue( './Program/@Vod' );
+    my $vodstart = $sc->findvalue( './Program/@VodStart' );
+    my $vodend   = $sc->findvalue( './Program/@VodEnd' );
+
+    # Ratings
+    # GREEN = Barntillåten, Turqoise = Från 7 år, Blue = Från 11 år, Orange = Från 15 år
+    my $age_rating = $sc->findvalue( './Program/@Rating' );
 
     my $ce = {
       channel_id  => $chd->{id},
