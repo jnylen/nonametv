@@ -16,8 +16,6 @@ use utf8;
 
 use DateTime;
 use Spreadsheet::ParseExcel;
-use Spreadsheet::Read;
-
 use Spreadsheet::XLSX;
 use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
 use Spreadsheet::Read;
