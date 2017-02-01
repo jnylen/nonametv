@@ -102,11 +102,11 @@ sub ImportXLS {
 	my %columns = ();
   my $date;
   my $currdate = "x";
-  my $coldate = 1;
-  my $coltime = 2;
-  my $coltitle = 5;
-  my $colepisode = 6;
-  my $coldesc = 7;
+  my $coldate = 0;
+  my $coltime = 1;
+  my $coltitle = 4;
+  my $colepisode = 5;
+  my $coldesc = 6;
 
 my $oBook;
 
