@@ -33,7 +33,7 @@ foreach my $channel (@channels) {
 
   opendir(DIR, $xmltvdir)
         or die "could not read from $xmltvdir\n";
-  my @files = grep(/^$xmltvid.*gz/, readdir(DIR));
+  my @files = grep(/^$xmltvid\_.*gz/, readdir(DIR));
   closedir(DIR);
 
   @files = sort @files;
