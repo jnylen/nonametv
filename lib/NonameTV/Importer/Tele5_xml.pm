@@ -45,7 +45,6 @@ sub ImportContentFile {
 
   if( $file =~ /\.xml$/i ) {
     if($file =~ /Startzeiten/) {
-      print("amendment.\n");
     } else {
       $self->ImportFullXML( $file, $chd );
     }
@@ -99,22 +98,6 @@ sub ImportFullXML
 
   my $currdate = "x";
 
-  ## Fix for data falling off when on a new week (same date, removing old programmes for that date)
-  my ($week, $year) = ($file =~ /PW_(\d+)_(\d\d)/);
-
-  if(!defined $year) {
-      error( "$file: $chd->{xmltvid}: Failure to get year from filename" ) ;
-      return;
-  }
-
-  $year += 2000;
-
-  my $batchid = $chd->{xmltvid} . "_" . $year . "-".$week;
-
-  $dsh->StartBatch( $batchid , $chd->{id} );
-
-  ## END
-
   foreach my $program (sort by_start $programs->get_nodelist) {
         $xpc->setContextNode( $program );
         my $start = $self->parseTimestamp( $xpc->findvalue( 's:termin/@start' ) );
@@ -125,10 +108,18 @@ sub ImportFullXML
         $ce->{start_time} = $start->ymd("-") . " " . $start->hms(":");
         $ce->{end_time} = $end->ymd("-") . " " . $end->hms(":");
 
-        if($start->ymd("-") ne $currdate ) {
-          #$dsh->StartDate( $start->ymd("-") , "06:00" );
+        if( $start->ymd("-") ne $currdate ){
+
+          progress("Tele5_xml: Date is " . $start->ymd("-"));
+
+          if( $currdate ne "x" ) {
+            $dsh->EndBatch( 1 );
+          }
+
+          my $batch_id = $chd->{xmltvid} . "_" . $start->ymd("-");
+          $dsh->StartBatch( $batch_id , $chd->{id} );
+          $dsh->StartDate( $start->ymd("-") , "00:00" );
           $currdate = $start->ymd("-");
-          progress("Tele5_xml: $chd->{xmltvid}: Date is: ".$start->ymd("-"));
         }
 
         $ce->{title} = norm($xpc->findvalue( 's:titel/@termintitel' ));
