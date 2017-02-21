@@ -35,6 +35,9 @@ sub new {
   defined( $self->{FtpRoot} ) or die "You must specify FtpRoot";
   defined( $self->{Filename} ) or die "You must specify Filename";
 
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Stockholm" );
+  $self->{datastorehelper} = $dsh;
+
   my $conf = ReadConfig();
 
   return $self;
@@ -69,6 +72,7 @@ sub ImportContent {
 
   my $channel_id = $chd->{id};
   my $ds = $self->{datastore};
+  my $dsh = $self->{datastorehelper};
 
   my $doc = ParseXml( $cref );
 
@@ -85,51 +89,70 @@ sub ImportContent {
     return 0;
   }
 
+  my $currdate = "x";
+
   foreach my $emission ($ns->get_nodelist) {
-    my $start_date = $emission->findvalue( './block/item[1]/@date' );
-    my $start_time = $emission->findvalue( './block/item[1]/@start' );
-    my $start_dt = create_dt($start_date, $start_time);
-    next if(!defined $start_dt);
+    my $start_date = create_date($emission->findvalue( './block/item[1]/@date' ));
+    my $start_time = create_time($emission->findvalue( './block/item[1]/@start' ));
+
+    if( defined($start_date) and $start_date ne $currdate ) {
+      if( $currdate ne "x" ) {
+      #  $dsh->EndBatch( 1 );
+      }
+
+      my $batch_id = $chd->{xmltvid} . "_" . $start_date;
+      #$dsh->StartBatch( $batch_id , $chd->{id} );
+      $dsh->StartDate( $start_date , "00:00" );
+      $currdate = $start_date;
+
+      p("Fjorton: $chd->{xmltvid}: Date is: $start_date");
+    }
+
+    next if(!defined $start_time);
 
     my $title = norm( $emission->findvalue( './@name' ) );
     my $desc = norm( $emission->findvalue( './description' ) );
 
     my $ce = {
       channel_id => $channel_id,
-      start_time => $start_dt->ymd('-') . ' ' . $start_dt->hms(':'),
+      start_time => $start_time,
       title => $title,
       description => $desc,
     };
 
-    p($start_dt." $ce->{title}");
+    p($start_time." $ce->{title}");
 
-    $ds->AddProgramme( $ce );
+    $dsh->AddProgramme( $ce );
 
   }
+
+  #$dsh->EndBatch( 1 );
 
   return 1;
 }
 
-sub create_dt {
-  my( $date, $time ) = @_;
+sub create_date {
+  my( $date ) = @_;
 
-  if($date eq "" or $time eq "") {
+  if($date eq "") {
     return undef;
   }
 
   my($day, $month, $year ) = ($date =~ /^(\d+)\.(\d+)\.(\d\d\d\d)$/ );
+
+  return sprintf("%04d-%02d-%02d", $year, $month, $day);
+}
+
+sub create_time {
+  my( $time ) = @_;
+
+  if($time eq "") {
+    return undef;
+  }
+
   my( $hour, $minute ) = split(':', $time );
 
-  my $dt = DateTime->new( year => $year,
-                        month => $month,
-                        day => $day,
-                        hour => $hour,
-                        minute => $minute,
-                        time_zone => "Europe/Stockholm" );
-
-  $dt->set_time_zone( "UTC" );
-
-  return $dt;
+  return sprintf("%02d:%02d", $hour, $minute);
 }
 
 1;
