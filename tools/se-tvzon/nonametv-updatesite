@@ -17,6 +17,8 @@ tools/nonametv-export Xmltv --export-channels --channel-group Germany
 tools/nonametv-export Xmltv --export-channels --channel-group Austria
 tools/nonametv-export Xmltv --export-channels --channel-group Switzerland
 tools/nonametv-export Xmltv --export-channels --channel-group Poland
+tools/nonametv-export Xmltv --export-channels --channel-group Croatia
+tools/nonametv-export Xmltv --export-channels --channel-group Hungary
 
 
 # JSON
@@ -37,6 +39,8 @@ tools/nonametv-export Json --export-channels --channel-group Germany
 tools/nonametv-export Json --export-channels --channel-group Austria
 tools/nonametv-export Json --export-channels --channel-group Switzerland
 tools/nonametv-export Json --export-channels --channel-group Poland
+tools/nonametv-export Json --export-channels --channel-group Croatia
+tools/nonametv-export Json --export-channels --channel-group Hungary
 
 # Honeybee-specific json
 tools/nonametv-export Honeybee --export-channels $1 $2 $3
