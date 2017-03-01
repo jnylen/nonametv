@@ -190,19 +190,17 @@ sub ParseDate
 {
   my ( $text ) = @_;
 
-  my( $dayname, $day, $month );
+  my( $dayname, $day, $month, $year );
 
   # format 'Ètvrtak, 23.10.'
 
   if( $text =~ /^(ponedjeljak|utorak|srijeda|ČETVRTAK|petak|subota|nedjelja),\s*\d+\.\s*\d+\.*$/i ){
-    ( $dayname, $day, $month ) = ( $text =~ /^(\S+),\s*(\d+)\.\s*(\d+)\.*$/ );
+    ( $dayname, $day, $month, $year ) = ( $text =~ /^(\S+),\s*(\d+)\.\s*(\d+)\.\s*(\d+)\.*$/ );
   } else {
     return undef;
   }
 
   return undef if( ! $day );
-
-  my $year = DateTime->today->year();
 
   my $date = sprintf( "%04d-%02d-%02d", $year, $month, $day );
   return $date;
