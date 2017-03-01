@@ -38,6 +38,9 @@ sub new {
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
   $self->{datastorehelper} = $dsh;
 
+  # use augment
+  #$self->{datastore}->{augment} = 1;
+
   return $self;
 }
 
@@ -59,7 +62,7 @@ sub ImportContentFile
   }
 
   progress( "NovaTV: $xmltvid: Processing $file" );
-  
+
   my $doc;
   $doc = Wordfile2Xml( $file );
 
@@ -73,10 +76,10 @@ sub ImportContentFile
     my $str = $node->getData();
     $node->setData( uc( $str ) );
   }
-  
+
   # Find all paragraphs.
   my $ns = $doc->find( "//div" );
-  
+
   if( $ns->size() == 0 ) {
     error( "NovaTV $file: No divs found." ) ;
     return;
@@ -91,6 +94,7 @@ sub ImportContentFile
   my $subtitle;
   my $directors;
   my $actors;
+  my ( $originaltitle, $country, $productionyear, $genre );
 
   foreach my $div ($ns->get_nodelist) {
 
@@ -104,7 +108,7 @@ sub ImportContentFile
     elsif( $text =~ /^PROGRAM NOVE TV za/i ) {
       #progress("NovaTV: $xmltvid: OK, this is the file with the schedules: $file");
     }
-    elsif( isDate( $text ) ) { # the line with the date in format 'MONDAY 12.4.'
+    elsif( isDate( $text ) ) { # the line with the date in format 'MONDAY 12.4.2017'
 
       $date = ParseDate( $text , $nowyear );
 
@@ -118,10 +122,10 @@ sub ImportContentFile
 
         my $batch_id = "${xmltvid}_" . $date->ymd();
         $dsh->StartBatch( $batch_id, $channel_id );
-        $dsh->StartDate( $date->ymd("-") , "06:00" ); 
+        $dsh->StartDate( $date->ymd("-") , "05:55" );
         $currdate = $date;
 
-        progress("NovaTV: $xmltvid: Date is $date");
+        progress("NovaTV: $xmltvid: Date is " . $date->ymd());
       }
 
       # empty last day array
@@ -131,18 +135,48 @@ sub ImportContentFile
       undef $subtitle;
       undef $directors;
       undef $actors;
+      undef $originaltitle;
+      undef $country;
+      undef $productionyear;
+      undef $genre;
     }
     elsif( isShow( $text ) ) { # the line with the show in format '19.30 Show title, genre'
 
       my( $starttime, $title, $genre ) = ParseShow( $text , $date );
 
+      $title =~ s/\((\d+)\)//;
+      $title =~ s/(\d+)\-(\d+)\/(\d+)//;
+      $title =~ s/(\d+)\-//;
+      $title =~ s/(\d+)\/(\d+)//;
+      $title =~ s/(\d+)\/ (\d+)//;
+
       my $ce = {
         channel_id   => $chd->{id},
-	start_time => $starttime->hms(":"),
-	title => norm($title),
+      	start_time => $starttime->hms(":"),
+      	title => norm($title),
       };
 
+      # Subtitle is sometimes in title
+      if( my ( $subtitle2 ) = (norm($title) =~ /(\(.*?)\)$/ ) )
+      {
+        $ce->{subtitle} = norm($subtitle2);
+        $ce->{title} =~ s/(\(.*?)\)$//;
+        $ce->{title} = norm($ce->{title});
+      }
+
+      # Genre is sometimes in title
+      if($ce->{title} =~ / serija$/i) {
+        $ce->{program_type} = "series";
+        $ce->{title} =~ s/ serija$//;
+      }
+
+      # Genre
       if( $genre ){
+        $genre =~ s/\((\d+)\)//;
+        $genre =~ s/(\d+)\-//;
+        $genre =~ s/(\d+)\/(\d+)//;
+        $genre =~ s/(\d+)\/ (\d+)//;
+
         my($program_type, $category ) = $ds->LookupCat( 'NovaTV', $genre );
         AddCategory( $ce, $program_type, $category );
       }
@@ -157,14 +191,47 @@ sub ImportContentFile
       # if we have something in the description buffer
       # then this is for the last targetshow
       if( $targetshow and $description ){
-        $targetshow->{description} = $description if defined $description;
+        my ($episode, $season);
+        my @sentences = (split_text( $description ), "");
+
+        for( my $i2=0; $i2<scalar(@sentences); $i2++ )
+        {
+          if( ( $season, $episode ) = ($sentences[$i2] =~ /^(\d+)\. sez\., (\d+)\. ep\./ ) )
+          {
+            $targetshow->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 );
+            $sentences[$i2] = "";
+          } elsif( ( $episode ) = ($sentences[$i2] =~ /^(\d+)\. ep\./ ) )
+          {
+            $targetshow->{episode} = sprintf( ". %d .", $episode-1 );
+            $sentences[$i2] = "";
+          }
+
+        }
+
+        $targetshow->{description} = norm(join_text( @sentences ));
+
         $targetshow->{subtitle} = $subtitle if defined $subtitle;
         $targetshow->{directors} = $directors if defined $directors;
         $targetshow->{actors} = $actors if defined $actors;
+
+        if(defined($originaltitle)) {
+          $targetshow->{original_title} = norm($originaltitle) if $originaltitle !~ /,/;
+          $targetshow->{production_date} = $productionyear."-01-01";
+          #$targetshow->{program_type} = "movie";
+
+          if(defined($directors)) {
+            $targetshow->{program_type} = "movie";
+          }
+        }
+
         undef $description;
         undef $subtitle;
         undef $directors;
         undef $actors;
+        undef $originaltitle;
+        undef $country;
+        undef $productionyear;
+        undef $genre;
       }
 
       my $utext = utf8ucase( $text );
@@ -185,21 +252,29 @@ sub ImportContentFile
       # if we know the target show then this is the description
       if( $targetshow ){
 
-        $description .= $text;
-
         # subtitle if present in the first description line
         if( $text =~ /^\(.*\)/ ){
-          $subtitle = $text;
+          if( ( $originaltitle, $country, $productionyear, $genre ) = ($text =~ /^\((.*?)\), (.*?), (\d\d\d\d)., (.*?)/ ) )
+          {
+
+          } else {
+            $subtitle = $text;
+          }
         }
 
         # subtitle if present in one text line
-        if( $text =~ s/^Redatelj: // ){
+        elsif( $text =~ s/^Redatelj: // ){
           $directors = $text;
+          print("DIRECTORS: $text\n");
         }
 
         # actor if present in the one text line
-        if( $text =~ s/^Glume: // ){
+        elsif( $text =~ s/^Glume: // ){
           $actors = $text;
+        }
+
+        else {
+          $description .= $text;
         }
 
       } else {
@@ -211,7 +286,7 @@ sub ImportContentFile
   FlushDayData( $chd, $dsh , @ces );
 
   $dsh->EndBatch( 1 );
-    
+
   return;
 }
 
@@ -229,7 +304,7 @@ sub FlushDayData {
 sub isDate {
   my ( $text ) = @_;
 
-  if( 
+  if(
     ( $text =~ /^(ponedjeljak|utorak|srijeda|ČETVRTAK|petak|subota|nedjelja|nejelja)\,*\s*\d+\s*\.\s*\d+\s*\.\s*\d+\s*\.\s*$/i )
     or
     ( $text =~ /^(ponedjeljak|utorak|srijeda|ČETVRTAK|petak|subota|nedjelja|nejelja)\,*\s*\d+\s*\.\s*\d+\s*\.\s*$/i )
@@ -256,7 +331,7 @@ sub ParseDate {
 
   $year = $yr if $yr;
   $year+= 2000 if $year< 100;
-  
+
   my $dt = DateTime->new( year   => $year,
                           month  => $month,
                           day    => $day,
@@ -334,6 +409,64 @@ sub isCroUcase {
   }
 
   return 1;
+}
+
+sub split_text
+{
+  my( $t ) = @_;
+
+  return () if not defined( $t );
+
+  # Remove any trailing whitespace
+  $t =~ s/\s*$//;
+
+  # Replace strange dots.
+  $t =~ tr/\x2e/./;
+
+  # We might have introduced some errors above. Fix them.
+  $t =~ s/([\?\!])\./$1/g;
+
+  # Replace ... with ::.
+  $t =~ s/\.{3,}/::./g;
+
+  # Lines ending with a comma is not the end of a sentence
+  #  $t =~ s/,\s*\n+\s*/, /g;
+
+  # newlines have already been removed by norm()
+  # Replace newlines followed by a capital with space and make sure that there
+  # is a dot to mark the end of the sentence.
+  #  $t =~ s/([\!\?])\s*\n+\s*([A-Z���])/$1 $2/g;
+  #  $t =~ s/\.*\s*\n+\s*([A-Z���])/. $1/g;
+
+  # Turn all whitespace into pure spaces and compress multiple whitespace
+  # to a single.
+  $t =~ tr/\n\r\t \xa0/     /s;
+
+  # Mark sentences ending with '.', '!', or '?' for split, but preserve the
+  # ".!?".
+  $t =~ s/([\.\!\?])\s+([\(A-Z���])/$1;;$2/g;
+
+  my @sent = grep( /\S\S/, split( ";;", $t ) );
+
+  if( scalar( @sent ) > 0 )
+  {
+    # Make sure that the last sentence ends in a proper way.
+    $sent[-1] =~ s/\s+$//;
+    $sent[-1] .= "."
+    unless $sent[-1] =~ /[\.\!\?]$/;
+  }
+
+  return @sent;
+}
+
+# Join a number of sentences into a single paragraph.
+# Performs the inverse of split_text
+sub join_text
+{
+  my $t = join( " ", grep( /\S/, @_ ) );
+  $t =~ s/::/../g;
+
+  return $t;
 }
 
 1;
