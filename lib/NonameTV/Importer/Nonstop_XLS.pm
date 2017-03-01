@@ -167,6 +167,8 @@ sub ImportXLS
     $ce->{title}           =~ s/&amp;/&/g;
 	  $ce->{subtitle}        = norm($oWkS->{Cells}[$iR][$num_subtitle]->Value) if $oWkS->{Cells}[$iR][$num_subtitle];
     $ce->{subtitle}        =~ s/&amp;/&/g if defined($ce->{subtitle});
+    $ce->{subtitle}        =~ s/Finale\: //i if defined($ce->{subtitle});
+    $ce->{subtitle}        =~ s/Pilot\: //i if defined($ce->{subtitle});
 	  $ce->{actors}          = parse_person_list(norm($oWkS->{Cells}[$iR][$num_actors]->Value))          if defined($num_actors) and $oWkS->{Cells}[$iR][$num_actors];
 	  $ce->{directors}       = parse_person_list(norm($oWkS->{Cells}[$iR][$num_directors]->Value))       if defined($num_directors) and $oWkS->{Cells}[$iR][$num_directors];
       $ce->{production_date} = $year."-01-01" if defined($year) and $year ne "" and $year ne "0000";
@@ -213,6 +215,11 @@ sub ImportXLS
             $ce->{program_type} = 'movie';
         }
       }
+
+      $ce->{subtitle} =~ s|\s*-\s+part\s+(\d+)$| ($1)|i if defined $ce->{subtitle};
+      $ce->{subtitle} =~ s|(.*), The$|The $1| if defined $ce->{subtitle};
+      $ce->{subtitle} =~ s|(.*), A$|A $1| if defined $ce->{subtitle};
+      $ce->{subtitle} =~ s|(.*), An$|An $1| if defined $ce->{subtitle};
 
       # Series
       $ce->{program_type} = "series" if defined($ce->{subtitle}) and $ce->{subtitle} ne "";
