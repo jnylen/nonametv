@@ -163,9 +163,10 @@ sub ImportContent {
       # Description
       my $desc_episode = $emission->findvalue( 'synopsisThisEpisode' );
       my $desc_series = $emission->findvalue( 'synopsis' );
+      my $logline = $emission->findvalue( 'logline' );
 
 
-      my $desc = $desc_episode || $desc_series;
+      my $desc = $desc_episode || $desc_series || $logline;
 
       # Season and episode
       my $episode = $emission->findvalue( 'episode' );
@@ -271,12 +272,17 @@ sub ImportContent {
         my $dirs = norm($emission->findvalue( 'director' ));
         $dirs =~ s/ & /, /g;
         $ce->{directors} = parse_person_list($dirs);
+
+        # Movie?
+        if($season eq "0" and $episode eq "0") {
+          $ce->{program_type} = "movie";
+        }
       }
 
 
       # Episodes
-      if($episode) {
-        if($season) {
+      if($episode and $episode ne "0") {
+        if($season and $season ne "0") {
           $ce->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 );
         } else {
           $ce->{episode} = sprintf( " . %d . ", $episode-1 );
@@ -286,12 +292,18 @@ sub ImportContent {
       # Genres and category
       my( $pty, $cat );
       if(defined($genre) and $genre and $genre ne "") {
-          ( $pty, $cat ) = $ds->LookupCat( 'VisatWorld_genre', $genre );
-          AddCategory( $ce, $pty, $cat );
+        my @genres = split("/", $genre);
+        my @cats;
+        foreach my $node ( @genres ) {
+          my ( $type, $categ ) = $self->{datastore}->LookupCat( "ViasatWorld_genre", $node );
+          push @cats, $categ if defined $categ;
+        }
+        my $cat = join "/", @cats;
+        AddCategory( $ce, $pty, $cat );
       }
 
       if(defined($category) and $category and $category ne "") {
-          ( $pty, $cat ) = $ds->LookupCat( 'VisatWorld_category', $category );
+          ( $pty, $cat ) = $ds->LookupCat( 'ViasatWorld_category', $category );
           AddCategory( $ce, $pty, $cat );
       }
 
