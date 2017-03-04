@@ -13,6 +13,8 @@ use File::Slurp;
 use File::Temp qw/tempfile tempdir/;
 use LWP::UserAgent;
 
+use Archive::Zip qw/:ERROR_CODES/; # DOCX
+
 use NonameTV::StringMatcher;
 use NonameTV::Log qw/w/;
 use XML::LibXML;
@@ -31,7 +33,7 @@ BEGIN {
                       Html2Xml Htmlfile2Xml
                       Word2Xml Wordfile2Xml
     		              File2Xml Content2Xml
-    		              FindParagraphs DOCXfile2Array
+    		              FindParagraphs Docxfile2Xml
                       norm normLatin1 normUtf8 normUndef
                       AddCategory AddCountry
                       ParseDescCatDan
@@ -353,24 +355,34 @@ sub Wordfile2Xml
   return Html2Xml( $html );
 }
 
-sub DOCXfile2Array
+sub Docxfile2Xml
 {
   my( $filename ) = @_;
 
-  my $lines = qx/docx2txt < "$filename" -/;
-  if( $? )
-  {
-    w "docx2txt < $filename - failed: $?";
+  my $zip = Archive::Zip->new();
+  if( $zip->read( $filename ) != AZ_OK ) {
+    #f "Failed to read zip.";
     return undef;
   }
 
-  # Remove character that makes LibXML choke.
-  $lines =~ s/\&hellip;/.../g;
-  $lines =~ s/\&amp;/\&/g;
+  my @files;
 
-  my @linesarray = split("\n", $lines);
+  my @members = $zip->members();
+  foreach my $member (@members) {
+    push( @files, $member->{fileName} ) if $member->{fileName} eq "word/document.xml";
+  }
 
-  return @linesarray;
+  my $numfiles = scalar( @files );
+  if( $numfiles != 1 ) {
+    #f "Found $numfiles matching files, expected 1.";
+    return undef;
+  }
+
+  #d "Using file $files[0]";
+  my $content = $zip->contents( $files[0] );
+
+
+  return $content;
 }
 
 sub File2Xml {
