@@ -164,19 +164,8 @@ sub ImportContent {
       $name =~ s/(HD)//g; # remove category_
 
       # # End of airtime
-      if( ($name eq "END") )
-      {
-      	$name = "end-of-transmission";
-        $lastitem = 1;
-      }
-
-      if( ($name eq "GODNAT") )
-      {
-      	$name = "end-of-transmission";
-        $lastitem = 1;
-      }
-
-      if( $name =~ /^P.\s+GENSYN/)
+      if( ($name =~ /^HEAD\s+..D/) or ($name =~ /^Programmas beigas/) or ($name =~ /^P.\s+GENSYN/)
+          or ($name eq "GODNAT") or ($name eq "END") or ($name =~ /^Programos pabaiga/) or ($name =~ /^S.ndningsuppeh.ll/) )
       {
       	$name = "end-of-transmission";
         $lastitem = 1;
@@ -380,13 +369,19 @@ sub ImportContent {
       # Genres and category
       my( $pty, $cat );
   	  if(defined($genre) and $genre and $genre ne "") {
-  	      ( $pty, $cat ) = $ds->LookupCat( 'Viasat2_genre', $genre );
-  	  	  AddCategory( $ce, $pty, $cat );
+        my @genres = split("/", $genre);
+        my @cats;
+        foreach my $node ( @genres ) {
+          my ( $type, $categ ) = $self->{datastore}->LookupCat( "Viasat_genre", $node );
+          push @cats, $categ if defined $categ;
+        }
+        my $cat = join "/", @cats;
+        AddCategory( $ce, $pty, $cat );
   	  }
 
   	  if(defined($category) and $category and $category ne "") {
-  	      ( $pty, $cat ) = $ds->LookupCat( 'Viasat2_category', $category );
-  	  	  AddCategory( $ce, $pty, $cat );
+  	    ( $pty, $cat ) = $ds->LookupCat( 'Viasat_category', $category );
+  	  	AddCategory( $ce, $pty, $cat );
   	  }
 
       # Sometimes they fuck up
@@ -394,7 +389,7 @@ sub ImportContent {
         $ce->{program_type} = "sports";
       }
 
-  	  $ce->{external_ids} = 'viasat_' . $emission->findvalue( 'uniqueId' );
+  	  #$ce->{external_ids} = 'viasat_' . $emission->findvalue( 'uniqueId' ); # only for non-commercial
       $ce->{extra} = $extra;
 
       progress( "Viasat: $chd->{xmltvid}: $start_time - $name" );
@@ -409,11 +404,12 @@ sub parse_person_list
 {
   my( $str ) = @_;
 
+  $str =~ s/ ja /, /g;
   my @persons = split( /\s*,\s*/, $str );
   foreach (@persons)
   {
-    # The character name is sometimes given . Remove it.
-    s/^.*\s+-\s+//;
+    s|.*\s+\((.*?)\)$|$1|; # "Stīvens R. Monro (Steven R. Monroe)"
+    s/^.*\s+-\s+//; # The character name is sometimes given . Remove it.
   }
 
   return join( ";", grep( /\S/, @persons ) );
