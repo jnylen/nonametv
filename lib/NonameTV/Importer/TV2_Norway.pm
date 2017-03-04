@@ -201,7 +201,7 @@ sub ImportContent
     }
 
     # original title
-    if($chd->{xmltvid} ne "sport.tv2.no" and defined($org_title) and $ce->{title} !~ /^$org_title$/i) {
+    if($chd->{xmltvid} ne "sport.tv2.no" and defined($org_title) and lc($ce->{title}) ne lc(norm($org_title))) {
         $org_title =~ s/^Film\://gi;
         $ce->{original_title} = norm($org_title);
 
