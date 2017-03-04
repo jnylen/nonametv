@@ -1706,3 +1706,31 @@
 1283,TvdbEN,^.*$,program_type,series,\N,episodetitle
 1654,TvdbDK,^.*$,program_type,series,\N,guess
 1654,TvdbEN,^.*$,program_type,series,\N,guess
+747,TvdbFI,^.*$,program_type,series,\N,episodeseason
+732,Tvdb,"Welcome to Sweden",program_type,series,274123,guess
+1663,TvdbEN,^.*$,program_type,series,\N,guess
+1663,TvdbDE,^.*$,program_type,series,\N,guess
+994,TvdbDE,^.*$,program_type,series,\N,guess
+981,TvdbEN,^.*$,program_type,series,\N,guess
+980,TvdbEN,^.*$,program_type,series,\N,guess
+978,TvdbEN,^.*$,program_type,series,\N,guess
+977,TvdbEN,^.*$,program_type,series,\N,guess
+976,TvdbEN,^.*$,program_type,series,\N,guess
+975,TvdbEN,^.*$,program_type,series,\N,guess
+974,TvdbEN,^.*$,program_type,series,\N,guess
+973,TvdbEN,^.*$,program_type,series,\N,guess
+972,TvdbEN,^.*$,program_type,series,\N,guess
+1605,TvdbEN,^.*$,program_type,series,\N,guess
+489,Tvdb,"Halv åtta hos mig: England",program_type,series,81580,episodetitle
+489,Tvdb,"Rush hour",program_type,series,298368,guess
+262,TvdbEN,"Brottskod: Försvunnen",program_type,series,77963,guess
+262,Fixups,"Brottskod: Försvunnen",\N,\N,series,setprogram_type
+1665,TvdbDE,^.*$,program_type,series,\N,guess
+1076,TmdbTVDK,Skadestuen,program_type,series,4588,guess
+1676,Tvdb,^.*$,program_type,series,\N,guess
+1675,TvdbNO,^.*$,program_type,series,\N,guess
+1674,TvdbFI,^.*$,program_type,series,\N,guess
+1673,TvdbDK,^.*$,program_type,series,\N,guess
+1672,TvdbFI,^.*$,program_type,series,\N,guess
+1667,TvdbHR,^.*$,program_type,series,\N,guess
+1668,TvdbHR,^.*$,program_type,series,\N,guess
