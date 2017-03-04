@@ -57,29 +57,31 @@ EOHELP
 my $ds = CreateDataStore();
 
 my $root = "/content/maildir/.Projects/";
-my @folders = qw(		 NonameTV-Data.MTV
-                 		 NonameTV-Data.Mezzo
-                 		 NonameTV-Data.HighTV
-                 		 NonameTV-Data.EBS
-                 		 NonameTV-Data.Euronews
-                 		 NonameTV-Data.Gospel
-                		 NonameTV-Data.RTL2
+my @folders = qw(
                 		 NonameTV-Data.DWDE
-                		 NonameTV-Data.HaC
-                		 NonameTV-Data.ETVMedia
-                		 NonameTV-Data.VisjonNorge
-                		 NonameTV-Data.Turner
-                		 NonameTV-Data.DMB
-                		 NonameTV-Data.PPS
+                     NonameTV-Data.HaC
+                     NonameTV-Data.ETVMedia
+                     NonameTV-Data.VisjonNorge
+                     NonameTV-Data.Turner
+                     NonameTV-Data.DMB
+                     NonameTV-Data.PPS
                      NonameTV-Data.ServusTV
-                		 NonameTV-Data.DreiPlus
-                		 NonameTV-Data.Classica
-                		 NonameTV-Data.HopeChannel
-                		 NonameTV-Data.Discovery
+                     NonameTV-Data.DreiPlus
+                     NonameTV-Data.Classica
+                     NonameTV-Data.HopeChannel
+                     NonameTV-Data.Discovery
                      NonameTV-Data.FightSports
                      NonameTV-Data.YFE
                      NonameTV-Data.Tele5
                      NonameTV-Data.Matkanalen
+                     NonameTV-Data.Highview
+                     NonameTV-Data.MTV
+                     NonameTV-Data.Mezzo
+                     NonameTV-Data.HighTV
+                     NonameTV-Data.EBS
+                     NonameTV-Data.Euronews
+                     NonameTV-Data.Gospel
+                     NonameTV-Data.RTL2
         );
 #
 # Flag messages AFTER they have been processed. Then I normally
@@ -193,6 +195,7 @@ sub process_parts
 sub guess_channel
 {
   my( $dir, $from, $subject, $filename, $type, $size ) = @_;
+  #print Dumper($dir, $from, $subject, $filename, $type, $size);
 
  if( $dir =~ /Turner/ ) {
     # Word files
@@ -370,14 +373,15 @@ sub guess_channel
     return "visjonnorge.com";
  }
 
- if( $dir =~ /DWDE/ and $filename =~ /\.(xls|.xlsx)$/i ) {
-    return "dw.de" if $filename =~ /Europa/i;
-    return "asien.dw.de" if $filename =~ /Asien/i and $filename !~ /Afrika/i;
-    return "english.dw.de" if $filename =~ /English/i;
-    return "la.dw.de" if $filename =~ /Latino/i;
-    return "amerika.dw.de" if $filename =~ /Amerika/i;
-    return "asien.dw.de" if $filename =~ /Deutsch/i;
-    return "dw.de" if $filename =~ /^DW\s+/i;
+ if( $dir =~ /DWDE/ and $filename =~ /\.(xls|xlsx)/i ) {
+   return "dw.de" if $filename =~ /English/i; #otherwise english.dw.de
+   return "la.dw.de" if $filename =~ /Espanol/i;
+   return "dw.de" if $filename =~ /Europa/i;
+   return "dw.de" if $filename =~ /^DW\s+/i;
+
+   return "asien.dw.de" if $filename =~ /Deutsch/i and $filename !~ /Deutsch\+/o;
+   return "deutschplus.dw.de" if $filename =~ /Deutsch\+/i;
+
  }
 
  if( $dir =~ /HaC/ and $filename =~ /\.xml$/i ) {
@@ -471,6 +475,10 @@ sub guess_channel
 
  if( $dir =~ /Matkanalen/ and $filename =~ /\.xls$/i ) {
     return "matkanalen.tv";
+ }
+
+ if( $dir =~ /Highview/ ) {
+    return "planet-tv.de" if $filename =~ /planet/i and $filename =~ /\.xml$/i;
  }
 
   return undef;
