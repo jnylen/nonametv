@@ -396,7 +396,7 @@ sub guess_channel
  }
 
  if( $dir =~ /Motors/ and $filename =~ /\.xls$/i ) {
-     return "motorstv.com" if $filename =~ /pgms/i and $filename !~ /french/i;
+     return "motorstv.com" if $filename !~ /french/i;
  }
 
  if( $dir =~ /TravelChannel/ and $filename =~ /\.xls$/i ) {
