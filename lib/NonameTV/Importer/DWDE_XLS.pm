@@ -130,7 +130,7 @@ sub ImportXLS {
 
   my $date;
   my $currdate = "x";
-  if($xmltvid eq "amerika.dw.de") {
+  if($xmltvid eq "deutschplus.dw.de") {
     $coldate  = 0;
     $coltime  = 1;
     $coltitle = 2;
@@ -138,16 +138,16 @@ sub ImportXLS {
     $coldesc  = 4;
   } elsif($xmltvid eq "la.dw.de") {
     $coldate  = 1;
-    $coltime  = 3;
+    $coltime  = 2;
+    $coltitle = 3;
+    $colsubtitle = 4;
+    $coldesc  = 5;
+  }elsif($xmltvid eq "asien.dw.de") {
+    $coldate  = 1;
+    $coltime  = 2;
     $coltitle = 4;
     $colsubtitle = 5;
     $coldesc  = 6;
-  }elsif($xmltvid eq "asien.dw.de") {
-    $coldate  = 2;
-    $coltime  = 4;
-    $coltitle = 9;
-    $colsubtitle = 10;
-    $coldesc  = 11;
   }else {
     $coldate  = 0;
     $coltime  = 1;
