@@ -27,10 +27,7 @@ foreach my $msg ($infolder->messages) {
   next if $msg->isDeleted();
   my @from = $msg->from;
   my $fromaddr = $from[0]->format;
-  if( $fromaddr =~ /\@mtvne.com/i ) {
-    MoveMessage( $msg, "MTV" );
-  }
-  elsif( $fromaddr =~ /\@vimn.com/i ) {
+  if( $fromaddr =~ /\@vimn.com/i ) {
     MoveMessage( $msg, "MTV" );
   }
   elsif( $fromaddr =~ /\@disney.com/i ) {
@@ -79,7 +76,7 @@ foreach my $msg ($infolder->messages) {
     MoveMessage( $msg, "GlobalListings" );
   }
   elsif( $fromaddr =~ /\@jnylen.nu/i ) {
-    MoveMessage( $msg, "GlobalListings" );
+    MoveMessage( $msg, "DWDE" );
   }
   elsif( $fromaddr =~ /\@kanal10.se/i ) {
     MoveMessage( $msg, "Kanal10" );
@@ -105,12 +102,6 @@ foreach my $msg ($infolder->messages) {
   elsif( $fromaddr =~ /\@ebs.tv/i ) {
     MoveMessage( $msg, "EBS" );
   }
-  elsif( $fromaddr =~ /\@sbstv.se/i ) {
-    MoveMessage( $msg, "SBSTV" );
-  }
-  elsif( $fromaddr =~ /\@sbsdiscovery.se/i ) {
-    MoveMessage( $msg, "SBSTV" );
-  }
   elsif( $fromaddr =~ /\@fox.com/i ) {
     MoveMessage( $msg, "GlobalListings" );
   }
@@ -134,9 +125,6 @@ foreach my $msg ($infolder->messages) {
   }
   elsif( $fromaddr =~ /\@fatstone.com/i ) {
     MoveMessage( $msg, "Fatstone" );
-  }
-  elsif( $fromaddr =~ /\@pokerchanneleurope.com/i ) {
-    MoveMessage( $msg, "PokerChannel" );
   }
   elsif( $fromaddr =~ /\@ginx.tv/i ) {
     MoveMessage( $msg, "PokerChannel" );
@@ -167,12 +155,6 @@ foreach my $msg ($infolder->messages) {
   }
   elsif( $fromaddr =~ /\@wildtv.ca/i ) {
   	MoveMessage( $msg, "WildTV" );
-  }
-  elsif( $fromaddr =~ /\@tv8norge.no/i ) {
-    MoveMessage( $msg, "TV8Norge" );
-  }
-  elsif( $fromaddr =~ /\@pangroup.com/i ) {
-    MoveMessage( $msg, "TV8Norge" );
   }
   elsif( $fromaddr =~ /\@euronews.com/i ) {
     MoveMessage( $msg, "Euronews" );
@@ -275,6 +257,9 @@ foreach my $msg ($infolder->messages) {
   }
   elsif( $fromaddr =~ /\@trace.tv/i ) {
     MoveMessage( $msg, "Trace" );
+  }
+  elsif( $fromaddr =~ /\@highview.com/i ) {
+    MoveMessage( $msg, "Highview" );
   }
 }
 
