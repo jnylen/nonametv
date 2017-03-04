@@ -39,7 +39,7 @@ The typical calling-sequence is
 =item new
 
 The constructor for the object. Called with a NonameTV::DataStore object
-and a timezone-string as parameters. If the timezone is omitted, 
+and a timezone-string as parameters. If the timezone is omitted,
 "Europe/Stockholm" is used.
 
 After creating the object, you can set DETECT_SEGMENTS:
@@ -58,10 +58,10 @@ of the episode number as 0/2 and 1/2.
 sub new
 {
   my $class = ref( $_[0] ) || $_[0];
-  
-  my $self = { }; 
+
+  my $self = { };
   bless $self, $class;
-  
+
   $self->{ds} = $_[1];
   $self->{timezone} = $_[2] || "Europe/Stockholm";
 
@@ -73,11 +73,11 @@ sub new
 sub DESTROY
 {
   my $self = shift;
-  
+
 }
 
 =item StartBatch
-  
+
 Called by an importer to signal the start of a batch of updates.
 Takes two parameters: one containing a string that uniquely identifies
 a set of programmes (a batch_id) and the channel_id for the channel
@@ -90,7 +90,7 @@ sub StartBatch
 {
   my $self = shift;
   my( $batch_id, $channel_id ) = @_;
-  
+
   $self->{batch_id} = $batch_id;
   $self->{channel_id} = $channel_id;
 
@@ -105,7 +105,7 @@ sub StartBatch
 =item EndBatch
 
 Called by an importer to signal the end of a batch of updates.
-Takes two parameters: 
+Takes two parameters:
 
 An integer containing 1 if the batch was processed
 successfully, 0 if the batch failed and the database should
@@ -142,8 +142,8 @@ in StartDate, then it is assumed that the programme actually starts a
 day later. E.g.:
 
     $dsh->StartDate( "2008-01-01", "06:00" );
-    $dsh->AddProgramme( {  
-      start_time => "01:45", 
+    $dsh->AddProgramme( {
+      start_time => "01:45",
       ...
     } );
 
@@ -156,13 +156,13 @@ sub StartDate
   my $self = shift;
   my( $date, $time ) = @_;
 
-  if( scalar( @{$self->{programs}} ) > 0 ) {
+  if( defined($self->{programs}) and scalar( @{$self->{programs}} ) > 0 ) {
     $self->CommitPrograms();
   }
 
   d "StartDate: $date";
   my( $year, $month, $day ) = split( '-', $date );
-  $self->{curr_date} = DateTime->new( 
+  $self->{curr_date} = DateTime->new(
                                       year   => $year,
                                       month  => $month,
                                       day    => $day,
@@ -218,7 +218,7 @@ sub AddProgramme
     confess "Helper $self->{batch_id}: You must call StartDate before AddProgramme";
   }
 
-  my $start_time = $self->create_dt( $self->{curr_date}, 
+  my $start_time = $self->create_dt( $self->{curr_date},
                                      $ce->{start_time} );
   if( defined( $self->{lasttime} ) and ($start_time < $self->{lasttime}) )
   {
@@ -246,16 +246,16 @@ sub AddProgramme
       $self->{curr_date}->add( days => 1 );
       $start_time = $new_start_time;
     }
-    else 
+    else
     {
       # By adding one day to the start_time, we ended up with a time
       # that is more than 20 hours after the lasttime. This probably means
-      # that the start_time hasn't wrapped into a new day, but that 
+      # that the start_time hasn't wrapped into a new day, but that
       # there is something wrong with the source-data and the time actually
       # moves backwards in the schedule.
-      if( not $self->{ds}->{SILENCE_END_START_OVERLAP} ) 
+      if( not $self->{ds}->{SILENCE_END_START_OVERLAP} )
       {
-        w "Improbable program start " . 
+        w "Improbable program start " .
                $start_time->ymd . " " . $start_time->hms . " skipped";
         return;
       }
@@ -267,7 +267,7 @@ sub AddProgramme
 
   if( defined( $ce->{end_time} ) )
   {
-    my $stop_time = $self->create_dt( $self->{curr_date}, 
+    my $stop_time = $self->create_dt( $self->{curr_date},
                                       $ce->{end_time} );
     if( $stop_time < $self->{lasttime} )
     {
@@ -275,7 +275,7 @@ sub AddProgramme
       $self->{curr_date}->add( days => 1 );
     }
     $ce->{end_time} = $stop_time->clone();
-    $self->{lasttime} = $stop_time->clone(); 
+    $self->{lasttime} = $stop_time->clone();
   }
 
   $self->AddCE( $ce );
@@ -287,13 +287,13 @@ sub AddCE
   my( $ce ) = @_;
 
   $ce->{start_time}->set_time_zone( "UTC" );
-  $ce->{start_time} = $ce->{start_time}->ymd('-') . " " . 
+  $ce->{start_time} = $ce->{start_time}->ymd('-') . " " .
     $ce->{start_time}->hms(':');
 
   if( defined( $ce->{end_time} ) )
   {
     $ce->{end_time}->set_time_zone( "UTC" );
-    $ce->{end_time} = $ce->{end_time}->ymd('-') . " " . 
+    $ce->{end_time} = $ce->{end_time}->ymd('-') . " " .
 	$ce->{end_time}->hms(':');
   }
 
@@ -326,7 +326,7 @@ sub CommitPrograms {
   foreach my $ce (@{$self->{programs}}) {
     $self->{ds}->AddProgramme( $ce );
   }
-  
+
   $self->{programs} = [];
 }
 
@@ -334,11 +334,11 @@ sub create_dt
 {
   my $self = shift;
   my( $date, $time ) = @_;
-  
+
 #  print $date->ymd('-') . " $time\n";
 
   my $dt = $date->clone();
-  
+
   my( $hour, $minute, $second ) = split( ":", $time );
 
   # Don't die for invalid times during shift to DST.
@@ -356,8 +356,8 @@ sub create_dt
     $dt->set( hour   => $hour,
               minute => $minute,
               );
-  }    
-  
+  }
+
   return $dt;
 }
 
