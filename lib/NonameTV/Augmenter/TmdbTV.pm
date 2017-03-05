@@ -117,8 +117,13 @@ sub FillHash( $$$$ ) {
 
   ########## SERIES INFO
 
+  # Fix when name is not using the original name correctly.
+  if(lc($ceref->{title}) eq lc($series->info->{name})) {
+    $resultref->{title} = $series->info->{name};
+  }
+
   # Org title
-  if( defined( $series->info->{original_name} ) and ($ceref->{title} ne $series->info->{original_name}) ){
+  if( defined( $series->info->{original_name} ) and (lc($ceref->{title}) ne lc($series->info->{original_name})) ){
     $resultref->{original_title} = norm( $series->info->{original_name} );
   }
 
@@ -254,13 +259,24 @@ sub AugmentProgram( $$$ ){
 
     $matchby = 'episodeabs';
   } elsif( $ruleref->{matchby} eq 'absorepsea' ) {
+    if(!defined($ceref->{episode}) and defined($ceref->{subtitle})) {
+      $matchby = 'episodetitle';
+    }
     # Season?
-    if($ceref->{episode} =~ /^\s*(\d+)\s*\.\s*(\d+)\s*/) {
+    elsif(defined($ceref->{episode}) and $ceref->{episode} =~ /^\s*(\d+)\s*\.\s*(\d+)\s*/) {
       my( $seasonss, $episodess )=( $ceref->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
 
       # Check if the episode number is above the count of eps on that season
-      my $serie = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
+      my $serie;
+      if( defined( $ruleref->{remoteref} ) ) {
+        $serie = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
+      } else {
+        $serie = $self->find_series($ceref, $ruleref);
+      }
+
       my $epcount = 0;
+
+      return( undef, 'couldn\'t guess the right matchby, sorry.' ) if !defined $serie;
 
       # check seasons
       foreach my $seasons ( @{ $serie->info->{seasons} } ){
@@ -301,12 +317,14 @@ sub AugmentProgram( $$$ ){
 
     } else {
       # Right now it just defaults to episode abs if it doesn't have a season number
-      ( $episodeabs )=( $ceref->{episode} =~ m|\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
-      $matchby = 'episodeabs';
+      #( $episodeabs )=( $ceref->{episode} =~ m|\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
+      $matchby = 'nothing';
     }
   } else {
     $matchby = $ruleref->{matchby};
   }
+
+  return( undef, 'matchby was undefined?' ) if !defined($matchby);
 
   # Match bys
   if( $ceref->{url} && $ceref->{url} =~ m|^https://www\.themoviedb\.org/tv/\d+| ) {
@@ -597,6 +615,83 @@ sub find_series($$$ ) {
       return undef;
     }
 
+    # Check actors
+    if( scalar(@candidates) >= 1 and ( $ceref->{actors} ) ){
+      my @actors = split( /;/, $ceref->{actors} );
+      my $match = 0;
+
+      # loop over all remaining movies
+      while( @candidates ) {
+        my $candidate = shift( @candidates );
+
+        if( defined( $candidate->{id} ) ) {
+          # we have to fetch the remaining candidates to peek at the directors
+          my $tvid = $candidate->{id};
+          my $movie = $self->{themoviedb}->tv( id => $tvid );
+
+          my @names = ( );
+          foreach my $cast ( $movie->cast ) {
+            my $person = $self->{themoviedb}->person( id => $cast->{id} );
+
+            if( defined( $person ) ){
+              if( defined( $person->aka() ) ){
+                if( defined( $person->aka()->[0] ) ){
+                  # FIXME actually aka() should simply return an array
+                  my $aliases = $person->aka()->[0];
+                  if( defined( $aliases ) ){
+                    @names =  ( @names, @{ $aliases } );
+                  }else{
+                    my $url = 'http://www.themoviedb.org/person/' . $cast->{id};
+                    w( "something is fishy with this persons aliases, see $url." );
+                  }
+                  push( @names, $person->name );
+                }else{
+                  my $url = 'http://www.themoviedb.org/person/' . $cast->{id};
+                w( "got a person but could not get the aliases (with [0]), see $url." );
+                }
+              }else{
+                my $url = 'http://www.themoviedb.org/person/' . $cast->{id};
+                w( "got a person but could not get the aliases, see $url." );
+              }
+            }else{
+              my $url = 'http://www.themoviedb.org/person/' . $cast->{id};
+              w( "got a reference to a person but could not get the person, see $url." );
+            }
+          }
+
+          my $matches = 0;
+          if( @names == 0 ){
+            my $url = 'http://www.themoviedb.org/tv/' . $candidate->{ id };
+            w( "actors not on record, removing candidate. Add it at $url." );
+          } else {
+            foreach my $a ( @actors ) {
+              foreach my $b ( @names ) {
+                $a =~ s/(\.|\,)//;
+                $b =~ s/(\.|\,)//;
+                $a =~ s/ \(.*?\)//;
+                $b =~ s/ \(.*?\)//;
+
+                if( lc norm( $a ) eq lc norm( $b ) ) {
+                  $matches += 1;
+                }
+              }
+            }
+          }
+
+          if( $matches == 0 ){
+            d( "actors '" . $ceref->{actors} ."' not found, removing candidate" );
+          } else {
+            push( @keep, $candidate );
+          }
+        }else{
+          w( "got a tv result without id as candidate! " . Dumper( $candidate ) );
+        }
+      }
+
+      @candidates = @keep;
+      @keep = ();
+    }
+
     # need to be the correct country if available
     if( $ceref->{country} and $ceref->{country} ne "" ) {
       my( @countries ) = split("/", $ceref->{country});
@@ -619,7 +714,7 @@ sub find_series($$$ ) {
     }
 
     # need to be the correct year if available
-    if( $ceref->{production_date} and $ceref->{production_date} ne "" ) {
+    if( scalar(@candidates) > 1 and $ceref->{production_date} and $ceref->{production_date} ne "" ) {
       my( $produced )=( $ceref->{production_date} =~ m|^(\d{4})\-\d+\-\d+$| );
       while( @candidates ) {
         $candidate = shift( @candidates );
@@ -651,27 +746,27 @@ sub find_series($$$ ) {
         $candidate = shift( @candidates );
 
         # So shit doesn't get added TWICE
-        my $match = 0;
+        my $match2 = 0;
 
         # Title matched?
         if(distance( lc(RemoveSpecialChars($ceref->{title})), lc(RemoveSpecialChars($candidate->{name})) ) <= 2) {
           push( @keep, $candidate );
-          $match = 1;
+          $match2 = 1;
         }
 
-        if(!$match and distance( lc(RemoveSpecialChars($ceref->{title})), lc(RemoveSpecialChars($candidate->{original_name})) ) <= 2) {
+        if(!$match2 and distance( lc(RemoveSpecialChars($ceref->{title})), lc(RemoveSpecialChars($candidate->{original_name})) ) <= 2) {
           push( @keep, $candidate );
-          $match = 1;
+          $match2 = 1;
         }
 
-        if(!$match and defined($ceref->{original_title}) and distance( lc(RemoveSpecialChars($ceref->{original_title})), lc(RemoveSpecialChars($candidate->{name})) ) <= 2) {
+        if(!$match2 and defined($ceref->{original_title}) and distance( lc(RemoveSpecialChars($ceref->{original_title})), lc(RemoveSpecialChars($candidate->{name})) ) <= 2) {
           push( @keep, $candidate );
-          $match = 1;
+          $match2 = 1;
         }
 
-        if(!$match and defined($ceref->{original_title}) and distance( lc(RemoveSpecialChars($ceref->{original_title})), lc(RemoveSpecialChars($candidate->{original_name})) ) <= 2) {
+        if(!$match2 and defined($ceref->{original_title}) and distance( lc(RemoveSpecialChars($ceref->{original_title})), lc(RemoveSpecialChars($candidate->{original_name})) ) <= 2) {
           push( @keep, $candidate );
-          $match = 1;
+          $match2 = 1;
         }
       }
 
