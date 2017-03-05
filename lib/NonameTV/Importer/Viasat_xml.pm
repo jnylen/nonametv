@@ -40,8 +40,9 @@ sub new {
 
     $self->{MinWeeks} = 0 unless defined $self->{MinWeeks};
     $self->{MaxWeeks} = 4 unless defined $self->{MaxWeeks};
+    $self->{Timezone} = "Europe/Stockholm" unless defined $self->{Timezone};
 
-    my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
+    my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, $self->{Timezone} );
 
     # use augment
     $self->{datastore}->{augment} = 1;
@@ -161,10 +162,11 @@ sub ImportContent {
       my $original_name = $emission->findvalue( 'orgName' );
       my $name = $other_name || $original_name;
       $name =~ s/#//g; # crashes the whole importer
-      $name =~ s/(HD)//g; # remove category_
+      $name =~ s/\(HD\)//g; # remove category_
+      $name =~ s/\(m\)//g; # remove (m)
 
       # # End of airtime
-      if( ($name =~ /^HEAD\s+..D/) or ($name =~ /^Programmas beigas/) or ($name =~ /^P.\s+GENSYN/)
+      if( ($name =~ /^HEAD\s+..D/) or ($name =~ /^Programmas beigas/) or ($name =~ /^P.\s+GENSYN/) or ($name =~ /^OPHOLD I SENDEFLADE/)
           or ($name eq "GODNAT") or ($name eq "END") or ($name =~ /^Programos pabaiga/) or ($name =~ /^S.ndningsuppeh.ll/) )
       {
       	$name = "end-of-transmission";
@@ -209,6 +211,8 @@ sub ImportContent {
 
 
       my $desc = $desc_episode || $desc_series || $desc_logline;
+      $desc =~ s/\s+\.$//;
+      $desc =~ s/\?\./\?/g;
 
       # Season and episode
       my $episode = $emission->findvalue( 'episode' );
@@ -217,8 +221,18 @@ sub ImportContent {
       # Remove from title
       if(defined($season) and $season ne "" and $category eq "series") {
         $name =~ s/- s(.*)son $season$//;
+        $name =~ s/ \(s(.*?)son $season\)$//;
         $name =~ s/$season$//;
         $name = norm($name);
+
+        # Depotjægerne has seasonnumepisodenum
+        if($name =~ /^Depotj.*gerne$/i or $name =~ /^Depotj.*gerne fra Texas$/i or $name =~ /^Depotj.*gerne: New York$/i) {
+          if(defined($episode) and $episode ne "" and $episode =~ /^(\d\d\d)$/) {
+            $episode =~ s/^$season//;
+          } elsif(defined($episode2) and $episode2 ne "" and $episode2 =~ /^(\d\d\d)$/) {
+            $episode2 =~ s/^$season//;
+          }
+        }
       }
 
       # Extra stuff
@@ -235,19 +249,21 @@ sub ImportContent {
 
       my $ns3 = $emission->find( './/castMember' );
       foreach my $act ($ns3->get_nodelist)
-	  {
-	  	push @actors, $act->to_literal;
-	  }
+  	  {
+        my $acts = $act->to_literal;
+        $acts =~ s|^(.*?) - (.*?)$|$1 ($2)|;
+  	  	push @actors, $acts;
+  	  }
 
-	  my @countries;
+	    my @countries;
       my $ns4 = $emission->find( './/country' );
       foreach my $con ($ns4->get_nodelist)
-	  {
-	    my ( $c ) = $self->{datastore}->LookupCountry( "Viasat", $con->to_literal );
-	  	push @countries, $c if defined $c;
-	  }
+  	  {
+  	    my ( $c ) = $self->{datastore}->LookupCountry( "Viasat", $con->to_literal );
+  	  	push @countries, $c if defined $c;
+  	  }
 
-	  my $ce = {
+	    my $ce = {
 	      title       => norm($name),
 	      description => norm($desc),
 	      start_time  => $start_time,
@@ -280,64 +296,63 @@ sub ImportContent {
 
       # Actors
       if( scalar( @actors ) > 0 )
-	  {
-	      $ce->{actors} = join ";", @actors;
-	  }
+  	  {
+  	      $ce->{actors} = join ";", @actors;
+  	  }
 
       if( scalar( @countries ) > 0 )
-	  {
-	      $ce->{country} = join "/", @countries;
-	  }
+  	  {
+  	      $ce->{country} = join "/", @countries;
+  	  }
 
-	  # prod year
-	  if(defined($prodyear) and $prodyear ne "" and $prodyear =~ /(\d\d\d\d)/)
-	  {
-	  	$ce->{production_date} = "$1-01-01";
-	  } elsif(defined($bline) and $bline ne "" and $bline =~ /(\d\d\d\d)/) {
+  	  # prod year
+  	  if(defined($prodyear) and $prodyear ne "" and $prodyear =~ /(\d\d\d\d)/)
+  	  {
+  	  	$ce->{production_date} = "$1-01-01";
+  	  } elsif(defined($bline) and $bline ne "" and $bline =~ /(\d\d\d\d)/) {
         $ce->{production_date} = "$1-01-01";
       }
 
-	  # Find aspect-info ( they dont appear to actually use this correctly )
-	  if( $widescreen eq "true" )
-	  {
-	    $ce->{aspect} = "16:9";
-      #push $extra->{qualifiers}, "widescreen";
-	  }
-	  else
-	  {
-	    $ce->{aspect} = "4:3";
-      #push $extra->{qualifiers}, "smallscreen";
-	  }
+  	  # Find aspect-info ( they dont appear to actually use this correctly )
+  	  if( $widescreen eq "true" )
+  	  {
+  	    $ce->{aspect} = "16:9";
+        #push $extra->{qualifiers}, "widescreen";
+  	  }
+  	  else
+  	  {
+  	    $ce->{aspect} = "4:3";
+        #push $extra->{qualifiers}, "smallscreen";
+  	  }
 
-	  # Find rerun-info
-	  if( $rerun eq "true" )
-	  {
-	    $ce->{new} = "0";
-      push $extra->{qualifiers}, "repeat";
-	  }
-	  else
-	  {
-	    $ce->{new} = "1";
-      push $extra->{qualifiers}, "new";
-	  }
+  	  # Find rerun-info
+  	  if( $rerun eq "true" )
+  	  {
+  	    $ce->{new} = "0";
+        push $extra->{qualifiers}, "repeat";
+  	  }
+  	  else
+  	  {
+  	    $ce->{new} = "1";
+        push $extra->{qualifiers}, "new";
+  	  }
 
-	  # Find live-info
-	  if( $live eq "true" or $lead eq "LIVE" or $lead eq "LIVE:" )
-	  {
-	    $ce->{live} = "1";
-      push $extra->{qualifiers}, "live";
-	  }
-	  else
-	  {
-	    $ce->{live} = "0";
-	  }
+  	  # Find live-info
+  	  if( $live eq "true" or $lead eq "LIVE" or $lead eq "LIVE:" )
+  	  {
+  	    $ce->{live} = "1";
+        push $extra->{qualifiers}, "live";
+  	  }
+  	  else
+  	  {
+  	    $ce->{live} = "0";
+  	  }
 
-	  if( $emission->findvalue( 'director' ) ) {
-	    my $dirs = norm($emission->findvalue( 'director' ));
-	    $dirs =~ s/ & /, /g;
-	    $ce->{directors} = parse_person_list($dirs);
-	  }
-
+  	  if( $emission->findvalue( 'director' ) ) {
+  	    my $dirs = norm($emission->findvalue( 'director' ));
+  	    $dirs =~ s/ & /, /g;
+  	    $ce->{directors} = parse_person_list($dirs);
+  	  }
 
       # Episodes
       if($episode2 and $episode2 ne "") {
