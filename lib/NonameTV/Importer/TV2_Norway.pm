@@ -253,6 +253,7 @@ sub parse_person_list
 
   return undef if not defined $str;
   my @persons;
+  my @persons2;
 
   # Each person
   foreach my $p ($str->get_nodelist)
@@ -260,7 +261,11 @@ sub parse_person_list
     push ( @persons, split(/, | og /, $p->to_literal));
   }
 
-  return join( ";", grep( /\S/, @persons ) );
+  foreach my $pp (@persons) {
+    push @persons2, norm($pp);
+  }
+
+  return join( ";", grep( /\S/, @persons2 ) );
 }
 
 sub create_dt ( $ ){
