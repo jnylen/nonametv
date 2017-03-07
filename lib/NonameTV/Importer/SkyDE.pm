@@ -211,11 +211,11 @@ sub ImportContentFile {
 
       	# Actor
       	if ( $type eq "DA" ) {
-      	    push @actors, $person;
+      	    push @actors, norm($person);
       	} elsif( $type eq "RE" ) {
-      	    push @directors, $person;
+      	    push @directors, norm($person);
       	} elsif( $type eq "PR" ) {
-      	    push @producers, $person;
+      	    push @producers, norm($person);
       	}
     }
 
