@@ -5,6 +5,19 @@ require 'fileutils'
 require 'nokogiri'
 require 'dotenv'
 
+class String
+  def squish
+    dup.squish!
+  end
+  def squish!
+    gsub!(/\A[[:space:]]+/, '')
+    gsub!(/[[:space:]]+\z/, '')
+    gsub!(/[[:space:]]+/, ' ')
+    self
+  end
+end
+
+
 # Load dotenv
 Dotenv.load
 
@@ -17,37 +30,31 @@ a = Mechanize.new { |agent|
 def copy_to_channels(file_name)
     # Channels
     channels = [
-    { :xmltvid => "13thstreet.de", :info => "13TH STREET" }, { :xmltvid => "hd.13thstreet.de", :info => "13TH STREET HD" },
+    { :xmltvid => "13thstreet.de", :info => "13TH STREET" },
     { :xmltvid => "ae-tv.de", :info => "A&E" }, { :xmltvid => "beate-uhse.tv", :info => "BEATE-UHSE.TV" },
     { :xmltvid => "1.bluemovie.de", :info => "BLUE MOVIE 1" }, { :xmltvid => "2.bluemovie.de", :info => "BLUE MOVIE 2" },
     { :xmltvid => "3.bluemovie.de", :info => "BLUE MOVIE 3" }, { :xmltvid => "hd.bluemovie.de", :info => "BLUE MOVIE HD" },
-    { :xmltvid => "foxchannel.de", :info => "FOX" }, { :xmltvid => "hd.foxchannel.de", :info => "FOX HD" },
+    { :xmltvid => "foxchannel.de", :info => "FOX" },
     { :xmltvid => "goldstar-tv.de", :info => "GOLDSTAR TV" }, { :xmltvid => "heimatkanal.de", :info => "HEIMATKANAL" },
     { :xmltvid => "hd.historytv.de", :info => "HISTORY HD" }, { :xmltvid => "junior.tv", :info => "JUNIOR" },
     { :xmltvid => "jukebox-tv.de", :info => "JUKEBOX" }, { :xmltvid => "kinowelt.tv", :info => "KINOWELT TV" },
     { :xmltvid => "motorvision.de", :info => "MOTORVISION" }, { :xmltvid => "wild.natgeo.de", :info => "NATIONAL GEOGRAPHIC WILD" },
-    { :xmltvid => "wildhd.natgeo.de", :info => "NATIONAL GEOGRAPHIC WILD HD" }, { :xmltvid => "natgeo.de", :info => "NATIONAL GEOGRAPHIC" },
-    { :xmltvid => "hd.natgeo.de", :info => "NATIONAL GEOGRAPHIC HD" }, { :xmltvid => "passion.de", :info => "PASSION" },
-    { :xmltvid => "romance-tv.de", :info => "ROMANCE TV" }, { :xmltvid => "crime.rtl.de", :info => "RTL Crime" },
-    { :xmltvid => "crimehd.rtl.de", :info => "RTL Crime HD" }, { :xmltvid => "living.rtl.de", :info => "RTL LIVING" },
-    { :xmltvid => "discovery.de", :info => "Discovery Channel" }, { :xmltvid => "hd.discovery.de", :info => "Discovery Channel HD" },
-    { :xmltvid => "classica.de", :info => "CLASSICA" },
+    { :xmltvid => "natgeo.de", :info => "NATIONAL GEOGRAPHIC" }, { :xmltvid => "passion.de", :info => "PASSION" },
+    { :xmltvid => "romance-tv.de", :info => "ROMANCE TV" }, { :xmltvid => "crime.rtl.de", :info => "RTL Crime" }, { :xmltvid => "living.rtl.de", :info => "RTL LIVING" },
+    { :xmltvid => "discovery.de", :info => "Discovery Channel" }, { :xmltvid => "classica.de", :info => "CLASSICA" },
 
     { :xmltvid => "3d.sky.de", :info => "SKY HD-3D" }, { :xmltvid => "action.sky.de", :info => "Sky Action" },
-    { :xmltvid => "actionhd.sky.de", :info => "Sky Action HD" }, { :xmltvid => "action.sky.de", :info => "Sky Cinema Action" },
-    { :xmltvid => "actionhd.sky.de", :info => "Sky Cinema Action HD" }, { :xmltvid => "atlantic.sky.de", :info => "SKY ATLANTIC" },
+    { :xmltvid => "action.sky.de", :info => "Sky Cinema Action" },
+    { :xmltvid => "atlantic.sky.de", :info => "SKY ATLANTIC" },
     { :xmltvid => "atlanticp1.sky.de", :info => "SKY ATLANTIC +1 HD" }, { :xmltvid => "arts.sky.de", :info => "SKY ARTS HD" },
-    { :xmltvid => "atlantichd.sky.de", :info => "SKY ATLANTIC HD" }, { :xmltvid => "cinema.sky.de", :info => "SKY CINEMA" },
-    { :xmltvid => "cinemahd.sky.de", :info => "SKY CINEMA HD" }, { :xmltvid => "p1.cinema.sky.de", :info => "Sky Cinema +1" },
-    { :xmltvid => "p1hd.cinema.sky.de", :info => "Sky Cinema +1 HD" }, { :xmltvid => "p24.cinema.sky.de", :info => "Sky Cinema +24" },
-    { :xmltvid => "p24hd.cinema.sky.de", :info => "Sky Cinema +24 HD" }, { :xmltvid => "family.cinema.sky.de", :info => "SKY CINEMA FAMILY" },
-    { :xmltvid => "familyhd.cinema.sky.de", :info => "SKY CINEMA FAMILY HD" },{ :xmltvid => "comedy.sky.de", :info => "SKY Cinema COMEDY" },
+    { :xmltvid => "cinema.sky.de", :info => "SKY CINEMA" },
+    { :xmltvid => "p1.cinema.sky.de", :info => "Sky Cinema +1" }, { :xmltvid => "p24.cinema.sky.de", :info => "Sky Cinema +24" },
+    { :xmltvid => "family.cinema.sky.de", :info => "SKY CINEMA FAMILY" },{ :xmltvid => "comedy.sky.de", :info => "SKY Cinema COMEDY" },
     { :xmltvid => "emotion.sky.de", :info => "SKY Cinema EMOTION" }, { :xmltvid => "hits.sky.de", :info => "Sky Cinema Hits" },
-    { :xmltvid => "hitshd.sky.de", :info => "Sky Cinema Hits HD" }, { :xmltvid => "krimi.sky.de", :info => "SKY KRIMI" },
+    { :xmltvid => "krimi.sky.de", :info => "SKY KRIMI" },
     { :xmltvid => "nostalgie.sky.de", :info => "SKY Cinema NOSTALGIE" }, { :xmltvid => "select.sky.de", :info => "Sky Select" },
-    { :xmltvid => "selecthd.sky.de", :info => "SKY SELECT HD" }, { :xmltvid => "hd.sportaustria.sky.de", :info => "SKY SPORT AUSTRIA HD" },
-    { :xmltvid => "sporthd2.sky.de", :info => "Sky Sport HD 2" }, { :xmltvid => "sportaustria.sky.de", :info => "SKY SPORT AUSTRIA" },
-    { :xmltvid => "sportnews.sky.de", :info => "SKY SPORT NEWS" }, { :xmltvid => "sportnewshd.sky.de", :info => "SKY SPORT NEWS HD" },
+    { :xmltvid => "sportaustria.sky.de", :info => "SKY SPORT AUSTRIA" },
+    { :xmltvid => "sportnews.sky.de", :info => "SKY SPORT NEWS" },
 
     { :xmltvid => "bundesliga1.sky.de", :info => "Sky Sport Bundesliga 1" }, { :xmltvid => "bundesliga2.sky.de", :info => "Sky Sport Bundesliga 2" },
     { :xmltvid => "bundesliga3.sky.de", :info => "Sky Sport Bundesliga 3" }, { :xmltvid => "bundesliga4.sky.de", :info => "Sky Sport Bundesliga 4" },
@@ -55,11 +62,6 @@ def copy_to_channels(file_name)
     { :xmltvid => "bundesliga7.sky.de", :info => "Sky Sport Bundesliga 7" }, { :xmltvid => "bundesliga8.sky.de", :info => "Sky Sport Bundesliga 8" },
     { :xmltvid => "bundesliga9.sky.de", :info => "Sky Sport Bundesliga 9" }, { :xmltvid => "bundesliga10.sky.de", :info => "Sky Sport Bundesliga 10" },
 
-    { :xmltvid => "bundesligahd1.sky.de", :info => "Sky Sport Bundesliga 1 HD" }, { :xmltvid => "bundesligahd2.sky.de", :info => "Sky Sport Bundesliga 2 HD" },
-    { :xmltvid => "bundesligahd3.sky.de", :info => "Sky Sport Bundesliga 3 HD" }, { :xmltvid => "bundesligahd4.sky.de", :info => "Sky Sport Bundesliga 4 HD" },
-    { :xmltvid => "bundesligahd5.sky.de", :info => "Sky Sport Bundesliga 5 HD" }, { :xmltvid => "bundesligahd6.sky.de", :info => "Sky Sport Bundesliga 6 HD" },
-    { :xmltvid => "bundesligahd7.sky.de", :info => "Sky Sport Bundesliga 7 HD" }, { :xmltvid => "bundesligahd8.sky.de", :info => "Sky Sport Bundesliga 8 HD" },
-    { :xmltvid => "bundesligahd9.sky.de", :info => "Sky Sport Bundesliga 9 HD" }, { :xmltvid => "bundesligahd10.sky.de", :info => "Sky Sport Bundesliga 10 HD" },
     { :xmltvid => "bundesligauhd.sky.de", :info => "Sky Bundesliga UHD" },
 
     { :xmltvid => "sport1.sky.de", :info => "Sky Sport 1" }, { :xmltvid => "sport2.sky.de", :info => "Sky Sport 2" },
@@ -69,20 +71,15 @@ def copy_to_channels(file_name)
     { :xmltvid => "sport9.sky.de", :info => "Sky Sport 9" }, { :xmltvid => "sport10.sky.de", :info => "Sky Sport 10" },
     { :xmltvid => "sport11.sky.de", :info => "Sky Sport 11" },
 
-    { :xmltvid => "sporthd1.sky.de", :info => "Sky Sport 1 HD" }, { :xmltvid => "sporthd2.sky.de", :info => "Sky Sport 2 HD" },
-    { :xmltvid => "sporthd3.sky.de", :info => "Sky Sport 3 HD" }, { :xmltvid => "sporthd4.sky.de", :info => "Sky Sport 4 HD" },
-    { :xmltvid => "sporthd5.sky.de", :info => "Sky Sport 5 HD" }, { :xmltvid => "sporthd6.sky.de", :info => "Sky Sport 6 HD" },
-    { :xmltvid => "sporthd7.sky.de", :info => "Sky Sport 7 HD" }, { :xmltvid => "sporthd8.sky.de", :info => "Sky Sport 8 HD" },
-    { :xmltvid => "sporthd9.sky.de", :info => "Sky Sport 9 HD" }, { :xmltvid => "sporthd10.sky.de", :info => "Sky Sport 10 HD" },
-    { :xmltvid => "sporthd11.sky.de", :info => "Sky Sport 11 HD" }, { :xmltvid => "sportuhd.sky.de", :info => "Sky Sport UHD" },
+    { :xmltvid => "sportuhd.sky.de", :info => "Sky Sport UHD" },
 
-    { :xmltvid => "eins.sky.de", :info => "SKY 1" }, { :xmltvid => "einshd.sky.de", :info => "SKY 1 HD" },
+    { :xmltvid => "eins.sky.de", :info => "SKY 1" },
 
-    { :xmltvid => "spiegel-geschichte.tv", :info => "SPIEGEL GESCHICHTE" }, { :xmltvid => "hd.spiegel-geschichte.tv", :info => "SPIEGEL GESCHICHTE HD" },
+    { :xmltvid => "spiegel-geschichte.tv", :info => "SPIEGEL GESCHICHTE" },
     { :xmltvid => "sportdigital.tv", :info => "SPORTDIGITAL.TV" }, { :xmltvid => "syfy.de", :info => "SCI FI" },
-    { :xmltvid => "hd.syfy.de", :info => "SCI FI HD" }, { :xmltvid => "tnt-film.de", :info => "TNT FILM" },
+    { :xmltvid => "tnt-film.de", :info => "TNT FILM" },
     { :xmltvid => "hd.tnt-glitz.tv", :info => "TNT COMEDY HD" },
-    { :xmltvid => "tnt-serie.de", :info => "TNT SERIE" }, { :xmltvid => "hd.tnt-serie.de", :info => "TNT SERIE HD" },
+    { :xmltvid => "tnt-serie.de", :info => "TNT SERIE" },
     { :xmltvid => "universalchannel.de", :info => "UNIVERSAL CHANNEL HD" },
 
     { :xmltvid => "boomerangtv.de", :info => "BOOMERANG" },
@@ -112,7 +109,7 @@ def copy_to_channels(file_name)
         end
 
         # File content
-        content = doc.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::AS_XML)
+        content = doc.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::AS_XML).squish!
         #content = content.gsub(/^\s+\s+\n$/, "")
 
         File.open('/content/channels/' + c[:xmltvid] + '/' + file_basename, 'w') { |f| f.print(content) }
