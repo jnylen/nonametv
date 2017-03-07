@@ -418,48 +418,24 @@ $channel_data{ "disneyjuniorse-viasatfilmdramase.tvtogo.viasat.se" } =
 
 =pod
 
-Nat Geo Wild 04:00-18:00, Viasat Film Action 18:00-00:00, Penthouse 1 00:00-04:00
+  Viasat Nature 06:00-00:00 - Playboy 00:00-05:00
 
 =cut
 
-$channel_data{ "ngwildse-viasatfilmactionse-penthouse1.sat.viasat.se" } =
+$channel_data{ "nature-playboy.sat.viasat.se" } =
   {
-    "wild.natgeo.se" =>
+    "nature.disney.se" =>
       [
         {
           day => 'all',
-          time => '0400-1800',
+          time => '0600-0000',
         },
       ],
-    "action.film.viasat.se" =>
+    "europe.playboytv.com" =>
       [
         {
           day => 'all',
-          time => '1800-0000',
-        },
-      ],
-  };
-
-=pod
-
-Viasat Film Classic 04:00-00:00, Blue Hustler 00:00-04:00
-
-=cut
-
-$channel_data{ "viasatfilmclassicse-bluehustler.sat.viasat.se" } =
-  {
-    "classic.film.viasat.se" =>
-      [
-        {
-          day => 'all',
-          time => '0400-0000',
-        },
-      ],
-    "europe.bluehustler.com" =>
-      [
-        {
-          day => 'all',
-          time => '0000-0400',
+          time => '0000-0500',
         },
       ],
   };
@@ -476,14 +452,14 @@ $channel_data{ "nickjrse-vh1se.sat.viasat.se" } =
       [
         {
           day => 'all',
-          time => '0600-1800',
+          time => '0600-2000',
         },
       ],
     "vh1.se" =>
       [
         {
           day => 'all',
-          time => '1800-0600',
+          time => '2000-0600',
         },
       ],
   };
@@ -494,9 +470,9 @@ CN 06:00-21:00, Disney XD 06:00-18:00.﻿
 
 =cut
 
-$channel_data{ "cartoonnetwork.boxer.se" } =
+$channel_data{ "boomerang.boxer.se" } =
   {
-    "cartoonnetwork.se" =>
+    "boomerangtv.se" =>
       [
         {
           day => 'all',
