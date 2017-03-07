@@ -9,7 +9,7 @@ Arte_genre,fernsehfilm,,movie
 Arte_genre,fernsehserie,,series
 Arte_genre,film,\N,movie
 Arte_genre,gala,Musical,
-Arte_genre,kindersendung,Children's,
+Arte_genre,kindersendung,Kids,
 Arte_genre,kurzfilm,,movie
 Arte_genre,magazin,Magazine,
 Arte_genre,magazin/ratgeber,Magazine,
@@ -88,279 +88,6 @@ C1R,"muzykal'noj komedii",Musical/Comedy,
 C1R,"muzykal'nom fil'me",Musical,movie
 C1R,"ostrosjuzhetnom fil'me",\N,movie
 C1R,"prikljuchencheskom fil'me glorii""",\N,movie
-CanalPlus,action,Action,
-CanalPlus,"action comedy",Action/Comedy,
-CanalPlus,"action drama",Action/Drama,
-CanalPlus,"action thriller",Action/Thriller,
-CanalPlus,"action, crime, drama",Action/Crime/Drama,
-CanalPlus,"action, drama, krig",Action/Drama/War,
-CanalPlus,"action, krim, drama",Action/Crime/Drama,
-CanalPlus,"action, thriller",Action/Thriller,
-CanalPlus,action.,Action,
-CanalPlus,actionäventyr,Action/Adventure,
-CanalPlus,actiondrama,Action/Drama,
-CanalPlus,actioneventyr,Action/Adventure,
-CanalPlus,actionfilm,Action,movie
-CanalPlus,actionkomedi,Action,
-CanalPlus,actionkomedie,Action/Comedy,
-CanalPlus,actionrysare,Action/Thriller,
-CanalPlus,actionserie,Action,series
-CanalPlus,actionthriller,Action,
-CanalPlus,actionthrillerserie,Action/Thriller,series
-CanalPlus,allsvenskan,Football,sports
-CanalPlus,anal,Adult,
-CanalPlus,animasjon,Animation,
-CanalPlus,animasjonseventyr,Animation/Adventure,
-CanalPlus,animasjonsfilm,Animation,movie
-CanalPlus,animasjonskomedie,Animation/Comedy,
-CanalPlus,animasjonsserie,Animation,series
-CanalPlus,animation,Animation,
-CanalPlus,animeäventyr,Anime/Adventure,
-CanalPlus,"animerad äventyrsfilm",Adventure,movie
-CanalPlus,"animerad äventyrskomedi",Animated/Adventure/Comedy,
-CanalPlus,"animerad barnfilm",Children's,movie
-CanalPlus,"animerad familjekomedi",Animated/Family/Comedy,
-CanalPlus,"animerad film",Animated,movie
-CanalPlus,"animerad julsaga",Christmas,movie
-CanalPlus,"animerad komedi",Animation/Comedy,
-CanalPlus,"animerad science fiction",Animation/Sci-fi,
-CanalPlus,"animerat action-äventyr",Action/Adventure,movie
-CanalPlus,"animerat äventyr",Animation/Adventure,
-CanalPlus,"animerat barnprogram",Animated/Children's,
-CanalPlus,"animerat familjeäventyr",Family/Adventure,movie
-CanalPlus,äventyr,Adventure,
-CanalPlus,"äventyr, familj, fantasy",Adventure/Family/Fantasy,
-CanalPlus,"äventyr, fantasy",Adventure/Fantasy,
-CanalPlus,äventyrsdrama,Adventure/Drama,movie
-CanalPlus,äventyrsfilm,Adventure,movie
-CanalPlus,"äventyrsfilm för barn",Adventure,movie
-CanalPlus,äventyrskomedi,Adventure/Comedy,
-CanalPlus,äventyrsserie,Adventure,Series
-CanalPlus,bådsport,Boats,sports
-CanalPlus,barn,Children's,
-CanalPlus,"barn, animasjon, julefilm",Children's/Animation,movie
-CanalPlus,"barn, tecknat, jul",Children's/Animated,
-CanalPlus,barnäventyr,Children's/Adventure,
-CanalPlus,barnefilm,Children's,movie
-CanalPlus,barneprogram,Children's,
-CanalPlus,barneprogram.,Children's,
-CanalPlus,barneserie,Children's,series
-CanalPlus,barnfilm,Children's,movie
-CanalPlus,barnprogram,Kids,tvshow
-CanalPlus,barnserie,Children's,series
-CanalPlus,basket,Sports,
-CanalPlus,basketmagasin,Magazine,sports
-CanalPlus,båtsport,Boats,sports
-CanalPlus,"biografisk drama",Drama/Biography,
-CanalPlus,"biografiskt drama",Biography/Drama,
-CanalPlus,boksing,Boxing,sports
-CanalPlus,boxning,Boxing,sports
-CanalPlus,busty,Adult,
-CanalPlus,comedy,Comedy,
-CanalPlus,deckarserie,Crime,
-CanalPlus,docu-drama,Documentary/Drama,
-CanalPlus,dokumentär,Documentary,
-CanalPlus,"dokumentär, musik",Documentary/Music,
-CanalPlus,"dokumentar, musikk",Documentary/Music,
-CanalPlus,dokumentarer,Documentary,
-CanalPlus,dokumentarfilm,Documentary,movie
-CanalPlus,dokumentärserie,Documentary,series
-CanalPlus,drama,Drama,
-CanalPlus,"drama, historisk",Drama/History,
-CanalPlus,"drama, historiskt",Drama/History,
-CanalPlus,"drama, komedi",Drama/Comedy,
-CanalPlus,"drama, komedi, romantik",Drama/Comedy/Romance,
-CanalPlus,"drama, komedie",Drama/Comedy,
-CanalPlus,"drama, komedie, romantikk",Drama/Comedy/Romance,
-CanalPlus,"drama, romantik",Drama/Romance,
-CanalPlus,"drama, thriller",Drama/Thriller,
-CanalPlus,drama/komiserie,Drama/Comedy,series
-CanalPlus,dramaäventyr,Drama/Adventure,
-CanalPlus,dramaeventyr,Drama/Adventure,
-CanalPlus,dramakomedi,Drama,
-CanalPlus,dramakomedie,Drama/Comedy,
-CanalPlus,dramakomediserie,Drama/Comedy,series
-CanalPlus,dramaserie,Drama,
-CanalPlus,dramathriller,Drama,
-CanalPlus,elitserien,Soccer,sports
-CanalPlus,"endast tjejer",Adult,
-CanalPlus,"endats tjejer",Adult,
-CanalPlus,"engelsk ligafotboll",Sports,
-CanalPlus,eroti/soft,Adult,
-CanalPlus,"erotic feature",Adult,
-CanalPlus,eroticgay,Adult,
-CanalPlus,erotik,Adult,
-CanalPlus,"erotik - hard",Adult,
-CanalPlus,"erotik - par",Adult,
-CanalPlus,"erotik - soft",Adult,
-CanalPlus,"erotik feature",Adult,
-CanalPlus,"erotik gonzo",Adult,
-CanalPlus,"erotik hård",Adult,
-CanalPlus,"erotik soft",Adult,
-CanalPlus,erotik.,Adult,
-CanalPlus,"erotik/all girl",Adult,
-CanalPlus,erotik/artcore,Adult,
-CanalPlus,erotik/busty,Adult,
-CanalPlus,erotik/hard,Adult,
-CanalPlus,erotik/soft,Adult,
-CanalPlus,erotikk,Adult,
-CanalPlus,erotikk/hard,Adult,
-CanalPlus,erotikk/soft,Adult,
-CanalPlus,erotik\hard,Adult,
-CanalPlus,"erotiskt drama",Adult,
-CanalPlus,europeiskt,Adult,
-CanalPlus,eventyr,Adventure,
-CanalPlus,"eventyr, familie, fantasy",Adventure/Family/Fantasy,
-CanalPlus,eventyrdrama,Adventure/Drama,
-CanalPlus,eventyrfilm,Adventure,movie
-CanalPlus,eventyrserie,Adventure,series
-CanalPlus,exotiskt,Exotic,
-CanalPlus,"explosiv action",Action,
-CanalPlus,famijefilm,Family,movie
-CanalPlus,"familie, animasjon",Family/Animation,
-CanalPlus,familiedrama,Family/Drama,
-CanalPlus,familieeventyr,Family/Adventure,
-CanalPlus,familiefilm,Family,movie
-CanalPlus,familiekomedie,Family/Comedy,
-CanalPlus,familj,Family,
-CanalPlus,"familj, animerad",Family/Animated,
-CanalPlus,familjeaction,Action,
-CanalPlus,familjeäventyr,Family/Adventure,
-CanalPlus,familjedrama,Family/Drama,
-CanalPlus,familjefilm,Family,movie
-CanalPlus,familjekomedi,Family/Comedy,
-CanalPlus,fantasidrama,Fantasy/Drama,
-CanalPlus,fantasy,Fantasy,
-CanalPlus,fantasyäventyr,Fantasy/Adventure,
-CanalPlus,fantasykomedi,Fantasy/Comedy,
-CanalPlus,"fiktiv dokumentärfilm",Documentary,movie
-CanalPlus,filmintervju,Talk,
-CanalPlus,"filmmagasin med hans wiklund",Magazine,
-CanalPlus,fodbold,Soccer,sports
-CanalPlus,fotball,Soccer,sports
-CanalPlus,fotboll,Soccer,sports
-CanalPlus,fotbollsmagasin,Magazine,sports
-CanalPlus,gangsterthriller,Gangster/Thriller,
-CanalPlus,gonzo,Adult,
-CanalPlus,grøsser,Horror,
-CanalPlus,hard,Adult,
-CanalPlus,"hard erotik",Adult,
-CanalPlus,"hard feature",Adult,
-CanalPlus,hästsport,Horse,sports
-CanalPlus,hestesport,Horse,sports
-CanalPlus,"historiskt drama",History/Drama,
-CanalPlus,hockey,Hockey,sports
-CanalPlus,hockeymagasin,Hockey,tvshow
-CanalPlus,intervju,Talk,
-CanalPlus,ishockey,Hockey,sports
-CanalPlus,"italiensk ligafotboll",Sports,
-CanalPlus,kampsort,"Martial Arts",sports
-CanalPlus,kampsport,"Martial Arts",sports
-CanalPlus,katastroffilm,,movie
-CanalPlus,komedi,Comedy,
-CanalPlus,komediserie,Comedy,series
-CanalPlus,konsertfilm,Musical,movie
-CanalPlus,kortfilm,Short,movie
-CanalPlus,krigsdrama,War/Drama,
-CanalPlus,krigsfilm,War,movie
-CanalPlus,krigsthriller,War/Thriller,
-CanalPlus,kriminaldrama,Crime/Drama,
-CanalPlus,kriminalfilm,Crime,movie
-CanalPlus,kriminalkomedi,Crime/Comedy,
-CanalPlus,kriminalserie,Crime,series
-CanalPlus,kriminalthriller,Crime/Thriller,
-CanalPlus,"la liga",Football,Sports
-CanalPlus,magasin,Magazine,
-CanalPlus,milf,Adult,movie
-CanalPlus,mockumentär,Parody/Documentary,
-CanalPlus,motor,Motors,Sports
-CanalPlus,motormagasin,Motormagazine,
-CanalPlus,motorsport,Motors,sports
-CanalPlus,musikal,Music,
-CanalPlus,"musikalisk dramakomedi",Musical/Drama/Comedy,
-CanalPlus,"musikaliskt drama",Musical/Drama,
-CanalPlus,musikalkomedi,Musical/Comedy,
-CanalPlus,musikdokumentär,Music/Documentary,
-CanalPlus,musikdrama,Music/Drama,
-CanalPlus,musikkomedi,Music/Comedy,
-CanalPlus,nba,Basketball,sports
-CanalPlus,nöjesnyheter,News,
-CanalPlus,nordiskt,Nordic,
-CanalPlus,"övernaturlig skräckfilm.",Horror,movie
-CanalPlus,"politisk komedi",Comedy,
-CanalPlus,"politiskt drama",Drama,
-CanalPlus,"politiskt dramathriller",Drama/Thriller,
-CanalPlus,program,\N,tvshow
-CanalPlus,"psykologisk thriller",Thriller,
-CanalPlus,relationsdrama,Romantic/Drama,
-CanalPlus,reportageserie,\N,series
-CanalPlus,ridsport,Horse,sports
-CanalPlus,"rock'n'roll komedi",Comedy,
-CanalPlus,"romantisk dramakomedi",Romance/Drama/Comedy,
-CanalPlus,"romantisk komedi",Romance/Comedy,
-CanalPlus,"romantisk komedi för barn",Romantic/Comedy/Children's,
-CanalPlus,"romantisk komedi för barn.",Romance/Comedy,\N
-CanalPlus,"romantisk komedi.",Romantic/Comedy,
-CanalPlus,"romantiskt drama",Romance/Drama,
-CanalPlus,rysare,Thriller,
-CanalPlus,"sci fi-thriller",Sci-Fi/Thriller,
-CanalPlus,sci-fi,Sci-Fi,
-CanalPlus,"sci-fi action",Sci-Fi/Action,
-CanalPlus,"sci-fi drama",Sci-Fi/Drama,
-CanalPlus,"sci-fi komedi",Sci-Fi/Comedy,\N
-CanalPlus,sci-fi-action,Sci-Fi/Action,\N
-CanalPlus,sci-fi-thriller,Sci-Fi/Thriller,
-CanalPlus,"science fiction",Sci-Fi,
-CanalPlus,"science fiction-action",Sci-Fi/Action,
-CanalPlus,"science fiction-drama",Sci-Fi/Drama,
-CanalPlus,"science fiction-komedi",Sci-Fi/Comedy,
-CanalPlus,"science fiction-serie",Sci-Fi,serieis
-CanalPlus,"science fiction-skräck",Sci-Fi/Horror,
-CanalPlus,"science fiction-thriller",Sci-Fi/Thriller,
-CanalPlus,sckräk,Horror,
-CanalPlus,"serie a",Soccer,sports
-CanalPlus,serier,series,Series
-CanalPlus,skräck,Horror,
-CanalPlus,skräckdrama,Horror/Drama,
-CanalPlus,skräckfilm,Horror,movie
-CanalPlus,skräckkomedi,Horror/Comedy,
-CanalPlus,skräckthriller,Horror/Thriller,
-CanalPlus,skräckthriller.,Horror/Thriller,
-CanalPlus,"soft erotik",Adult,
-CanalPlus,speedway,Motors,Sports
-CanalPlus,spionparodi,Action/Comedy,
-CanalPlus,spionthriller,Thriller,
-CanalPlus,sport,sports,Sports
-CanalPlus,sportdokumentär,Sports/Documentary,
-CanalPlus,sportdrama,Sports/Drama,
-CanalPlus,ståuppkomedi,"Stand Up/Comedy",
-CanalPlus,"stora bröst",Adult,movie
-CanalPlus,studio,\N,sports
-CanalPlus,studioprogram,Studios,
-CanalPlus,studiosändning,\N,sports
-CanalPlus,studiosändning.,Sports,sports
-CanalPlus,"svart komedi",Comedy,
-CanalPlus,"tecknad familjefilm",Family,
-CanalPlus,"tecknad saga",Children's,
-CanalPlus,tecknat,Animated,
-CanalPlus,"tecknat äventyr",Children's/Adventure,
-CanalPlus,"tecknat barnäventyr",Animated/Children's,
-CanalPlus,"tecknat familjeäventyr",Children's/Family/Ad,
-CanalPlus,tennis,Tennis,sports
-CanalPlus,tennismagasin,Tennis,
-CanalPlus,tennisturnering,Tennis,sports
-CanalPlus,thriller,Thriller,
-CanalPlus,thrillerdrama,Thriller/Drama,
-CanalPlus,thrillerkomedi,Thriller/Comedy,
-CanalPlus,thrillerserie,Thriller,series
-CanalPlus,"tragikomiskt drama",Drama,
-CanalPlus,"unga tjejer",Adult,movie
-CanalPlus,ungdomsdrama,Drama,
-CanalPlus,ungdomsfilm,movies,movie
-CanalPlus,vampyrthriller,Thriller,
-CanalPlus,västern,Western,
-CanalPlus,"verklighetsbaserat drama",Drama,
-CanalPlus,western,Western,
 CarusMedia,auto,Automotor,sports
 CarusMedia,handwerk,\N,series
 CarusMedia,kochen,Food,series
@@ -403,6 +130,7 @@ CMore_genre,action/sci-fi,Action/Sci-Fi,
 CMore_genre,action/sci-fi/horror,Action/Sci-Fi/Horror,
 CMore_genre,action/sci-fi/thriller,Action/Sci-Fi/Thriller,
 CMore_genre,action/thriller,Action/Thriller,
+CMore_genre,children,Kids,
 CMore_genre,children/comedy,Children's/Comedy,
 CMore_genre,comedy,Comedy,
 CMore_genre,comedy/action,Comedy/Action,
@@ -495,7 +223,7 @@ DisneyChannel,comedy,Comedy,
 DisneyChannel,"live action",,series
 DisneyChannel,"live action dubbed",,series
 DisneyChannel,movie,Movies,movie
-DisneyChannel,"pre school",Children's,series
+DisneyChannel,"pre school",Kids,series
 DisneyChannel,series,\N,series
 DisneyChannel,sitcom,Sitcom,series
 DisneyChannel_xls,"animated series",Animated,\N
@@ -515,7 +243,7 @@ DMAX,sonstiges,\N,series
 DR,actionfilm,Action,movie
 DR,"ãkonomi",News,
 DR,"bã¸rn & ungdom",Children's/Youth,
-DR,"børn & ungdom",Children's,
+DR,"børn & ungdom",Kids,
 DR,dokumentar,Documentary,tvshow
 DR,film,Movies,movie
 DR,"for de mindste",Kids,
@@ -959,13 +687,13 @@ Kanal5,series,,series
 Kanal5,sport,,sports
 Kanal5,talkshows,Talk,tvshow
 Kanal5_fallback,adventure/nature,Adventure,
-Kanal5_fallback,children,Children's,
+Kanal5_fallback,children,Kids,
 Kanal5_fallback,film,Movies,
 Kanal5_fallback,magazine,Magazine,
 Kanal5_fallback,specials,Specials,
 Kanal5_fallback,sport,Sports,
 Kanal5_fallback,talkshows,"Talk show",
-Kanal5_xml,children,Children's,series
+Kanal5_xml,children,Kids,series
 Kanal5_xml,film,\N,movie
 Kanal5_xml,program,\N,series
 Kanal5_xml,series,\N,series
@@ -974,11 +702,11 @@ KBSWorld,"drama series",Drama,series
 KBSWorld,entertainment,Entertainment,series
 KBSWorld,news/finance,News/Finance,tvshow
 MTVde,"action series",Action,series
-MTVde,barneserie,Children's,series
-MTVde,barnprogram,Children's,series
-MTVde,børneserie,Children's,series
-MTVde,"children film",Children's,movie
-MTVde,"children series",Children's,series
+MTVde,barneserie,Kids,series
+MTVde,barnprogram,Kids,series
+MTVde,børneserie,Kids,series
+MTVde,"children film",Kids,movie
+MTVde,"children series",Kids,series
 MTVde,comedy,Comedy,series
 MTVde,film,Movies,movie
 MTVde,kinderfilm,\N,movie
@@ -994,11 +722,11 @@ MTVde,series,\N,series
 MTVde,show,\N,tvshow
 MTVde,show/unterhaltung,Entertainment,series
 MTVNN,actionserie,Action,series
-MTVNN,barnfilm,Children's,movie
+MTVNN,barnfilm,Kids,movie
 MTVNN,barnprogram,Children´s,series
 MTVNN,dokusåpa,Soap,series
 MTVNN,film,\N,movie
-MTVNN,kinderserie,Children's,movie
+MTVNN,kinderserie,Kids,movie
 MTVNN,komedi,Comedy,series
 MTVNN,konsert,Concert,\N
 MTVNN,livsstilsprogram,Lifestyle,series
@@ -1051,8 +779,8 @@ NonstopDOC,"science fiction",Sci-Fi,
 NonstopDOC,thriller,Thriller,
 NonstopDOC,war,War,
 NonstopDOC,western,Western,
-OKV,barn,Children's,
-OKV,children,Children's,
+OKV,barn,Kids,
+OKV,children,Kids,
 OKV,community,Community,
 OKV,documentary,Documentary,
 OKV,educational,Education,
@@ -1476,7 +1204,7 @@ SBSTV,ungdomsserie,\N,series
 SBSTV,videnskabsshow,\N,series
 SBSTV,western,Western,
 SBSTV,westernkomedie,Western/Comedy,
-SBS_Discovery,children,Children's,series
+SBS_Discovery,children,Kids,series
 SBS_Discovery,film,\N,movie
 SBS_Discovery,program,\N,series
 SBS_Discovery,series,\N,series
@@ -1547,8 +1275,8 @@ SkyDE,jugenddrama,Drama,
 SkyDE,jugendfilm,\N,movie
 SkyDE,katastrophendrama,Drama/Catastrophe,
 SkyDE,katastrophenfilm,\N,movie
-SkyDE,kinderprogramm,Children's,
-SkyDE,kinderserie,Children's,
+SkyDE,kinderprogramm,Kids,
+SkyDE,kinderserie,Kids,
 SkyDE,koch-doku,Documentary,
 SkyDE,komödie,Comedy,
 SkyDE,konzert,Concert,
@@ -1661,7 +1389,7 @@ SRF,"spielfilm (romanze)",Romance,movie
 SRF,"spielfilm (sciencefiction / fantasy)",Sci-Fi/Fantasy,movie
 SRF,"spielfilm (western)",Western,movie
 SRF,sport,\N,sports
-Svt,barn,Children's,
+Svt,barn,Kids,
 Svt,film,,movie
 Svt,musik/dans,Music,
 Svt,nöje,Svt-Nöje,
@@ -1880,6 +1608,12 @@ Tmdb_genre,10752,War,
 Tmdb_genre,10755,Short,
 Tmdb_genre,10756,Indie,
 Tmdb_genre,10757,Sports,
+Tmdb_genre,10762,Kids,
+Tmdb_genre,10763,News,
+Tmdb_genre,10764,Reality,
+Tmdb_genre,10765,Sci-Fi/Fantasy,
+Tmdb_genre,10766,Soap,
+Tmdb_genre,10767,Talkshow,
 Tmdb_genre,10770,"TV Movie",
 Tmdb_genre,12,Adventure,
 Tmdb_genre,14,Fantasy,
@@ -1917,7 +1651,7 @@ Turner_xml,political,Politics,
 Turner_xml,sit-com,Sitcom,
 Turner_xml,thriller,Thriller,
 Turner_xml,western,Western,
-TV2Denmark,børn,Children's,series
+TV2Denmark,børn,Kids,series
 TV2Denmark,dokumentar/aktualitet,Documentary,series
 TV2Denmark,film,Movies,movie
 TV2Denmark,nyheder,News,tvshow
@@ -1934,8 +1668,8 @@ TV2NO,animasjonserie,Animation,series
 TV2NO,animasjonsfilm,Animation,movie
 TV2NO,animasjonssatire,Animation,
 TV2NO,animasjonsserie,Animation,series
-TV2NO,"ba00 barn",Children's,
-TV2NO,barnefilm,Children's,movie
+TV2NO,"ba00 barn",Kids,
+TV2NO,barnefilm,Kids,movie
 TV2NO,bilmagasin,Cars,
 TV2NO,bilprogram,Cars,
 TV2NO,boligprogram,Boats,
@@ -2079,7 +1813,7 @@ TV2NO,westerndrama,Western/Drama,
 TV2NO,westernkomedie,Western/Comedy,
 TV4,aktuellt,\N,series
 TV4,animation,Animation,
-TV4,barnprogram,Children's,series
+TV4,barnprogram,Kids,series
 TV4,dokumentär,Documentary,series
 TV4,drama,Drama,series
 TV4,film,Movies,movie
@@ -2134,7 +1868,7 @@ TVChile,telenovela,Opera,tvshow
 TVChile,teleserie,\N,series
 Tvdb,"action and adventure",Action/Adventure,
 Tvdb,animation,Animation,
-Tvdb,children,Children's,
+Tvdb,children,Kids,
 Tvdb,comedy,Comedy,
 Tvdb,documentary,Documentary,
 Tvdb,drama,Drama,
@@ -2231,7 +1965,7 @@ TVP,talk-show,Talk,tvshow
 Tvrage,action,Action,
 Tvrage,adventure,Adventure,
 Tvrage,"animation general",Animation,
-Tvrage,children,Children's,
+Tvrage,children,Kids,
 Tvrage,comedy,Comedy,\N
 Tvrage,cooking/food,Food,
 Tvrage,crime,Crime,
@@ -2256,7 +1990,7 @@ Venetsia,03,\N,series
 Venetsia,04,\N,sports
 Venetsia,06,\N,series
 Venetsia,07,Movies,movie
-Venetsia,08,Children's,series
+Venetsia,08,Kids,series
 Venetsia,09,\N,series
 Venetsia,1,News,tvshow
 Venetsia,1.1,News,tvshow
@@ -2283,7 +2017,7 @@ Venetsia,6,\N,series
 Venetsia,7,Movies,movie
 Venetsia,7.1,Movies,movie
 Venetsia,7.2,Movies,movie
-Venetsia,8,Children's,series
+Venetsia,8,Kids,series
 Venetsia,9,\N,series
 ViasatWorld_genre,action,Action,
 ViasatWorld_genre,adventure,Adventure,
@@ -2304,7 +2038,7 @@ ViasatWorld_genre,gameshow,Gameshow,
 ViasatWorld_genre,historical,History,
 ViasatWorld_genre,history,History,
 ViasatWorld_genre,horror,Horror,
-ViasatWorld_genre,kids,Children's,
+ViasatWorld_genre,kids,Kids,
 ViasatWorld_genre,komedija,Comedy,
 ViasatWorld_genre,musical,Musical,
 ViasatWorld_genre,mystery,Mystery,
@@ -2331,8 +2065,8 @@ Viasat_genre,akció,Action,
 Viasat_genre,"animacinis filmas",Animation,
 Viasat_genre,animerat,Animation,
 Viasat_genre,äventyr,Adventure,
-Viasat_genre,barn,Children's,
-Viasat_genre,børn,Children's,
+Viasat_genre,barn,Kids,
+Viasat_genre,børn,Kids,
 Viasat_genre,deckare,Crime,
 Viasat_genre,dokumentär,Documentary,
 Viasat_genre,draama,Drama,

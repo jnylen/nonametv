@@ -88,10 +88,10 @@
 \N,Tvdb,"McLeod's döttrar",program_type,series,76532,episodeseason
 \N,Tvdb,"Masterchef USA",program_type,series,167751,episodeseason
 257,Tvdb,^.*$,program_type,series,\N,guess
-259,Tvdb,^.*$,program_type,series,\N,guess
-260,Tvdb,^.*$,program_type,series,\N,guess
+259,TmdbTV,^.*$,program_type,series,\N,guess
+260,TmdbTV,^.*$,program_type,series,\N,guess
 261,Tvdb,^.*$,program_type,series,\N,guess
-262,Tvdb,^.*$,program_type,series,\N,guess
+262,TmdbTV,^.*$,program_type,series,\N,guess
 263,Tvdb,^.*$,program_type,series,\N,guess
 264,Tvdb,^.*$,program_type,series,\N,episodeseason
 265,Tvdb,^.*$,program_type,series,\N,episodeseason
@@ -446,7 +446,7 @@
 478,Tvdb,^.*$,program_type,series,\N,episodetitle
 260,Tvdb,Wilfred,program_type,series,239761,guess
 482,Tvdb,^.*$,program_type,series,\N,episodeseason
-489,Tvdb,^.*$,program_type,series,\N,guess
+489,TmdbTV,^.*$,program_type,series,\N,guess
 491,Tvdb,^.*$,program_type,series,\N,episodeseason
 492,Tvdb,^.*$,program_type,series,\N,episodeseason
 308,Tvdb,^.*$,program_type,series,\N,episodeseason
@@ -551,7 +551,7 @@
 730,Tvdb,^.*$,program_type,series,\N,episodeseason
 734,Tvdb,^.*$,program_type,series,\N,episodeseason
 735,Tvdb,^.*$,program_type,series,\N,episodeseason
-732,Tvdb,^.*$,program_type,series,\N,guess
+732,TmdbTV,^.*$,program_type,series,\N,guess
 736,TvdbNO,^.*$,program_type,series,\N,episodeseason
 659,TvdbNO,^.*$,program_type,series,\N,guess
 661,TvdbNO,^.*$,program_type,series,\N,guess
@@ -562,8 +562,8 @@
 663,TvdbNO,^.*$,program_type,series,\N,guess
 664,TvdbNO,^.*$,program_type,series,\N,episodetitle
 711,TvdbNO,^.*$,program_type,series,\N,episodetitle
-506,TvdbNO,^.*$,program_type,series,\N,episodeseason
-509,TvdbNO,^.*$,program_type,series,\N,episodeseason
+506,TmdbTV,^.*$,program_type,series,\N,guess
+509,TmdbTV,^.*$,program_type,series,\N,guess
 751,TvdbEN,^.*$,program_type,series,\N,episodeseason
 752,TvdbEN,^.*$,program_type,series,\N,episodeseason
 741,TvdbFI,^.*$,program_type,series,\N,episodeseason
@@ -791,7 +791,7 @@
 1001,TvdbDE,^.*$,program_type,series,\N,guess
 1002,TvdbDE,^.*$,program_type,series,\N,guess
 1003,TvdbDE,^.*$,program_type,series,\N,guess
-1015,TvdbEN,^.*$,program_type,series,\N,guess
+1015,TmdbTV,^.*$,program_type,series,\N,guess
 1021,TvdbDE,^.*$,program_type,series,\N,guess
 972,TvdbDE,Castle,program_type,series,83462,guess
 973,TvdbDE,Castle,program_type,series,83462,guess
@@ -809,8 +809,8 @@
 1022,TvdbDE,^.*$,program_type,series,\N,guess
 1024,TvdbDE,^.*$,program_type,series,\N,guess
 1023,TvdbDE,^.*$,program_type,series,\N,guess
-1025,TvdbDE,^.*$,program_type,series,\N,guess
-1026,TvdbDE,^.*$,program_type,series,\N,guess
+1025,TmdbTV,^.*$,program_type,series,\N,guess
+1026,TmdbTV,^.*$,program_type,series,\N,guess
 1027,TvdbEN,^.*$,\N,\N,\N,guess
 812,TvdbDK,^.*$,program_type,series,\N,guess
 813,TvdbFI,^.*$,program_type,series,\N,guess
@@ -831,7 +831,7 @@
 1039,TvdbNL,^.*$,program_type,series,\N,guess
 1043,TvdbDE,^.*$,program_type,series,\N,guess
 1044,TvdbDE,^.*$,program_type,series,\N,episodetitle
-1052,Tvdb,^.*$,program_type,series,\N,guess
+1052,TmdbTV,^.*$,program_type,series,\N,guess
 1052,Tvdb,Gränsen,program_type,series,134381,guess
 1052,Tvdb,"The Border",program_type,series,134381,guess
 1052,Tvdb,"Star Trek Enterprise",program_type,series,73893,guess
@@ -910,49 +910,49 @@
 1092,TvdbDE,^.*$,program_type,series,\N,guess
 1093,TvdbDE,^.*$,program_type,series,\N,guess
 1094,TvdbDE,^.*$,program_type,series,\N,guess
-1116,TvdbDE,^.*$,program_type,series,\N,guess
-1120,TvdbDE,^.*$,program_type,series,\N,guess
-1121,TvdbDE,^.*$,program_type,series,\N,guess
-1122,TvdbDE,^.*$,program_type,series,\N,guess
-1123,TvdbDE,^.*$,program_type,series,\N,guess
-1124,TvdbDE,^.*$,program_type,series,\N,guess
-1125,TvdbDE,^.*$,program_type,series,\N,guess
-1147,TvdbDE,^.*$,program_type,series,\N,guess
-1148,TvdbDE,^.*$,program_type,series,\N,guess
-1149,TvdbDE,^.*$,program_type,series,\N,guess
-1150,TvdbDE,^.*$,program_type,series,\N,guess
-1151,TvdbDE,^.*$,program_type,series,\N,guess
-1152,TvdbDE,^.*$,program_type,series,\N,guess
-1153,TvdbDE,^.*$,program_type,series,\N,guess
-1155,TvdbDE,^.*$,program_type,series,\N,guess
-1157,TvdbDE,^.*$,program_type,series,\N,guess
-1158,TvdbDE,^.*$,program_type,series,\N,guess
-1159,TvdbDE,^.*$,program_type,series,\N,guess
-1161,TvdbDE,^.*$,program_type,series,\N,guess
-1163,TvdbDE,^.*$,program_type,series,\N,guess
-1164,TvdbDE,^.*$,program_type,series,\N,guess
-1165,TvdbDE,^.*$,program_type,series,\N,guess
-1166,TvdbDE,^.*$,program_type,series,\N,guess
-1167,TvdbDE,^.*$,program_type,series,\N,guess
-1169,TvdbDE,^.*$,program_type,series,\N,guess
-1170,TvdbDE,^.*$,program_type,series,\N,guess
-1172,TvdbDE,^.*$,program_type,series,\N,guess
-1173,TvdbDE,^.*$,program_type,series,\N,guess
-1174,TvdbDE,^.*$,program_type,series,\N,guess
-1175,TvdbDE,^.*$,program_type,series,\N,guess
-1176,TvdbDE,^.*$,program_type,series,\N,guess
-1177,TvdbDE,^.*$,program_type,series,\N,guess
-1178,TvdbDE,^.*$,program_type,series,\N,guess
-1179,TvdbDE,^.*$,program_type,series,\N,guess
-1180,TvdbDE,^.*$,program_type,series,\N,guess
-1181,TvdbDE,^.*$,program_type,series,\N,guess
-1209,TvdbDE,^.*$,program_type,series,\N,guess
+1116,TmdbTV,^.*$,program_type,series,\N,guess
+1120,TmdbTV,^.*$,program_type,series,\N,guess
+1121,TmdbTV,^.*$,program_type,series,\N,guess
+1122,TmdbTV,^.*$,program_type,series,\N,guess
+1123,TmdbTV,^.*$,program_type,series,\N,guess
+1124,TmdbTV,^.*$,program_type,series,\N,guess
+1125,TmdbTV,^.*$,program_type,series,\N,guess
+1147,TmdbTV,^.*$,program_type,series,\N,guess
+1148,TmdbTV,^.*$,program_type,series,\N,guess
+1149,TmdbTV,^.*$,program_type,series,\N,guess
+1150,TmdbTV,^.*$,program_type,series,\N,guess
+1151,TmdbTV,^.*$,program_type,series,\N,guess
+1152,TmdbTV,^.*$,program_type,series,\N,guess
+1153,TmdbTV,^.*$,program_type,series,\N,guess
+1155,TmdbTV,^.*$,program_type,series,\N,guess
+1157,TmdbTV,^.*$,program_type,series,\N,guess
+1158,TmdbTV,^.*$,program_type,series,\N,guess
+1159,TmdbTV,^.*$,program_type,series,\N,guess
+1161,TmdbTV,^.*$,program_type,series,\N,guess
+1163,TmdbTV,^.*$,program_type,series,\N,guess
+1164,TmdbTV,^.*$,program_type,series,\N,guess
+1165,TmdbTV,^.*$,program_type,series,\N,guess
+1166,TmdbTV,^.*$,program_type,series,\N,guess
+1167,TmdbTV,^.*$,program_type,series,\N,guess
+1169,TmdbTV,^.*$,program_type,series,\N,guess
+1170,TmdbTV,^.*$,program_type,series,\N,guess
+1172,TmdbTV,^.*$,program_type,series,\N,guess
+1173,TmdbTV,^.*$,program_type,series,\N,guess
+1174,TmdbTV,^.*$,program_type,series,\N,guess
+1175,TmdbTV,^.*$,program_type,series,\N,guess
+1176,TmdbTV,^.*$,program_type,series,\N,guess
+1177,TmdbTV,^.*$,program_type,series,\N,guess
+1178,TmdbTV,^.*$,program_type,series,\N,guess
+1179,TmdbTV,^.*$,program_type,series,\N,guess
+1180,TmdbTV,^.*$,program_type,series,\N,guess
+1181,TmdbTV,^.*$,program_type,series,\N,guess
+1209,TmdbTV,^.*$,program_type,series,\N,guess
 1211,TvdbDE,^.*$,program_type,series,\N,guess
-1213,TvdbDE,^.*$,program_type,series,\N,guess
-1212,TvdbDE,^.*$,program_type,series,\N,guess
-1214,TvdbDE,^.*$,program_type,series,\N,guess
-1215,TvdbDE,^.*$,program_type,series,\N,guess
-1217,TvdbDE,^.*$,program_type,series,\N,guess
+1213,TmdbTV,^.*$,program_type,series,\N,guess
+1212,TmdbTV,^.*$,program_type,series,\N,guess
+1214,TmdbTV,^.*$,program_type,series,\N,guess
+1215,TmdbTV,^.*$,program_type,series,\N,guess
+1217,TmdbTV,^.*$,program_type,series,\N,guess
 1218,TvdbDE,^.*$,program_type,series,\N,guess
 1222,TmdbTV,^.*$,program_type,series,\N,guess
 1223,TvdbFI,^.*$,program_type,series,\N,guess
@@ -1034,7 +1034,7 @@
 1355,Tvdb,Stallkompisar,program_type,series,81993,guess
 1355,Tvdb,Heartland,program_type,series,82701,guess
 1355,Tvdb,Wendy,program_type,series,270812,guess
-1356,TvdbNO,^.*$,program_type,series,\N,guess
+1356,TmdbTV,^.*$,program_type,series,\N,guess
 1357,TvdbDE,^.*$,program_type,series,\N,episodetitle
 1040,TvdbDE,"Sailor Moon S",program_type,series,78500,guess
 1040,TvdbDE,"Sailor Moon R",program_type,series,78500,guess
@@ -1415,7 +1415,7 @@
 689,Tmdb,"Balto 2 - Balto og ulveflokken",\N,\N,25913,movieid
 913,Tmdb,Balto,\N,\N,21032,movieid
 913,Tmdb,"Balto II: Wolf Quest",\N,\N,25913,movieid
-398,TvdbEN,^.*$,program_type,series,\N,episodeseason
+398,TmdbTV,^.*$,program_type,series,\N,guess
 1222,TvdbNO,Louie,program_type,series,155201,guess
 843,TvdbFI,Louie,program_type,series,155201,guess
 1222,TvdbNO,"Fresh Prince Of Bel Air",program_type,series,76738,guess
@@ -1464,7 +1464,7 @@
 1479,TvdbEN,^.*$,program_type,series,\N,guess
 1480,TvdbPL,^.*$,program_type,series,\N,guess
 489,Tvdb,"Brottskod: Försvunnen",program_type,series,77963,guess
-489,Fixups,"Brottskod: Försvunnen",program_type,movie,series,setprogram_type
+489,Fixups,"Brottskod: Försvunnen",\N,\N,series,setprogram_type
 1482,TmdbTV,Antikkrejlerne,program_type,series,\N,episodeabs
 1482,TmdbTV,"Rap fyr i L.A.",program_type,series,\N,episodetitle
 288,TmdbTV,Antikkrejlerne,program_type,series,58581,episodeabs
@@ -1678,8 +1678,8 @@
 1643,TvdbDE,^.*$,program_type,series,\N,guess
 1644,TvdbDE,^.*$,program_type,series,\N,guess
 1639,TvdbDE,^.*$,program_type,series,\N,guess
-1629,TvdbDE,^.*$,program_type,series,\N,guess
-1630,TvdbDE,^.*$,program_type,series,\N,guess
+1629,TmdbTV,^.*$,program_type,series,\N,guess
+1630,TmdbTV,^.*$,program_type,series,\N,guess
 \N,TvdbEN,"American Dad",program_type,series,\N,episodetitle
 \N,TvdbEN,"American Dad!",program_type,series,\N,episodetitle
 877,TvdbNO,"Teenage Mutant Ninja Turtles",program_type,series,261451,guess
@@ -1800,3 +1800,46 @@
 484,TmdbTV,"'Til Death",program_type,series,1568,guess
 484,TvdbNO,"Storage Hunters UK",program_type,series,287534,guess
 484,TmdbTV,Simpsons,program_type,series,456,absorepsea
+506,TmdbTV,"Beauty and the Beast",program_type,series,44606,guess
+506,TvdbNO,"Project Runway med Tim Gunn",program_type,series,277297,guess
+506,TmdbTV,Husfikserne,program_type,series,60911,guess
+506,TvdbNO,"Kjolen som sier ja",program_type,series,183491,guess
+506,TvdbNO,"Hot Bench",program_type,series,286153,guess
+506,TvdbNO,"Tid for hjem",program_type,series,256029,guess
+506,TmdbTV,"Mitt bittelille hjem",program_type,series,62415,guess
+506,TvdbNO,"Mitt lille luksushjem",program_type,series,314102,guess
+506,TvdbNO,"Lucky Dog",program_type,series,274341,guess
+1222,TmdbTV,"The Office",program_type,series,2316,guess
+398,TvdbNO,"Åsted Norge",program_type,series,306945,guess
+398,TvdbNO,"Tid for hjem",program_type,series,256029,episodeseason
+398,TmdbTV,Undeniable,program_type,series,64072,guess
+398,TmdbTV,"The White Queen",program_type,series,57092,guess
+398,TvdbNO,"Alarm 112 - På liv og død",program_type,series,164861,episodeseason
+398,TvdbNO,"60 Minutes",program_type,series,73290,episodeseason
+398,TmdbTV,Chosen,program_type,series,26777,guess
+398,TmdbTV,"Teen Wolf",program_type,series,34524,guess
+509,TmdbTV,"Besatt av bil",program_type,series,45669,guess
+509,TmdbTV,Fraktekrigen,program_type,series,45669,episodetitle
+509,TvdbNO,"Alarm 112 - På liv og død",program_type,series,164861,episodeseason
+509,TmdbTV,"Ødemarkens menn",program_type,series,60381,guess
+509,TvdbNO,"Las Vegas Jailhouse",program_type,series,173191,episodeseason
+509,TvdbNO,Alligatorjegerne,program_type,series,183231,episodeseason
+509,TmdbTV,"American Ninja Warrior",program_type,series,37913,guess
+509,TmdbTV,"60 Days In",program_type,series,65854,guess
+259,Fixups,"Brottskod: Försvunnen",program_type,movie,series,setprogram_type
+260,TmdbTV,Batman,program_type,series,2098,guess
+260,Tvdb,Benidorm,program_type,series,79912,guess
+732,Tvdb,"Det stora fyndkriget - Kanada",program_type,series,272737,guess
+1356,TmdbTV,"American Dad",program_type,series,1433,episodetitle
+1356,TmdbTV,Futurama,program_type,series,615,episodetitle
+1052,TmdbTV,Bull,program_type,series,66840,guess
+1052,Tvdb,Outcast,program_type,series,298085,guess
+1052,Tvdb,Skattgrävare,program_type,series,256740,guess
+1524,TmdbTV,^.*$,program_type,series,\N,guess
+1610,TmdbTV,^.*$,program_type,series,\N,guess
+1162,TmdbTV,^.*$,program_type,series,\N,guess
+1210,TmdbTV,^.*$,program_type,series,\N,guess
+1116,TmdbTV,"Law & Order: Los Angeles",program_type,series,32632,guess
+1155,TmdbTV,"Law & Order: Los Angeles",program_type,series,32632,guess
+1116,TmdbTV,"Law & Order: Trial by Jury",program_type,series,3357,guess
+1155,TmdbTV,"Law & Order: Trial by Jury",program_type,series,3357,guess
