@@ -267,13 +267,7 @@ sub AugmentProgram( $$$ ){
       my( $seasonss, $episodess )=( $ceref->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
 
       # Check if the episode number is above the count of eps on that season
-      my $serie;
-      if( defined( $ruleref->{remoteref} ) ) {
-        $serie = $self->{themoviedb}->tv( id => $ruleref->{remoteref} );
-      } else {
-        $serie = $self->find_series($ceref, $ruleref);
-      }
-
+      my $serie = $self->find_series($ceref, $ruleref);
       my $epcount = 0;
 
       return( undef, 'couldn\'t guess the right matchby, sorry.' ) if !defined $serie;
