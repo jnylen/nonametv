@@ -165,7 +165,7 @@ sub FillHash( $$$$ ) {
   # Find total number of episodes in a season
   my $total_eps = undef;
   foreach my $seasons ( @{ $series->info->{seasons} } ){
-    next if ($seasons->{season_number} != $episode->{season_number});
+    next if ((!defined($seasons->{season_number}) or !defined($episode->{season_number})) or ($seasons->{season_number} != $episode->{season_number}));
 
     $total_eps = $seasons->{episode_count};
   }
