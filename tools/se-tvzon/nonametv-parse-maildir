@@ -380,8 +380,8 @@ sub guess_channel
  if( $dir =~ /Playboy/ ) {
      return "europe.playboytv.com" if $filename =~ /^playboy/i and $filename =~ /\.doc$/i;
      return "adultchannel.co.uk" if $filename =~ /^the\s*adult/i and $filename =~ /\.doc$/i;
-     return "brazzerstveurope.com" if $filename =~ /^brazzers/i and $filename =~ /\.docx$/i;
-     return "europe.realitykings.com" if $filename =~ /^rktv/i and $filename =~ /\.docx$/i;
+     return "brazzerstveurope.com" if $filename =~ /^brazzers/i and $filename =~ /\.doc$/i;
+     return "europe.realitykings.com" if $filename =~ /^rktv/i and $filename =~ /\.doc$/i;
  }
 
  if( $dir =~ /Hustler/ and $filename =~ /\.(xls|xlsx)$/i ) {
