@@ -77,7 +77,7 @@ sub ImportContentFile {
 
   # XPC
   my $xpc = XML::LibXML::XPathContext->new( );
-  my $ns = $xpc->findnodes( '//programmElement', $doc ); #[@service="'.$service_id.'"]
+  my $ns = $xpc->findnodes( '//programmElement[@service="'.$service_id.'"]', $doc ); #[@service="'.$service_id.'"]
   if( $ns->size() == 0 ) {
     f ("$filename: No data found");
     return 0;
