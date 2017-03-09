@@ -199,6 +199,11 @@ sub ImportContent( $$$ ) {
     # Skip show for Paramount
     if($chd->{xmltvid} eq "paramountchannel.se" and $ce->{title} =~ /^Coming Up$/i) { next; }
 
+    # remove unused subtitle
+    if($ce->{subtitle} =~ /^(Seizoen|S..son|Sesong|Sezon) (\d+) (Aflevering|Episode|Odcinek) (\d+)$/i) {
+      $ce->{subtitle} = undef;
+    }
+
     $self->{datastore}->AddProgramme( $ce );
 
     progress("MTVde: $chd->{xmltvid}: ".$ce->{start_time}." - ".$ce->{title});
