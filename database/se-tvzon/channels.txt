@@ -121,7 +121,7 @@
 500,"TV3 SPORT 2",two.tv3sport.dk,"TV,Denmark",ViasatDK,1,tv3_sport_2_dk_,1,series,Series,da,0,http://www.tv3sport.dk/,0
 502,"C More Sport / SF-Kanalen (SE)",sport-sf.cmore.se,"TV,Sweden",CMore,1,33,1,,,sv,0,http://www.cmore.se,0
 506,"TV2 Livsstil",bliss.tv2.no,"TV,Norway",TV2NO,1,9937,1,series,Series,no,0,\N,0
-508,"TV2 Sport",sport.tv2.no,"TV,Norway",TV2NO,1,9939,1,sports,Sports,no,0,\N,0
+508,"TV2 Sportskanalen",sport.tv2.no,"TV,Norway",TV2NO,1,9939,1,sports,Sports,no,0,\N,0
 509,"TV2 Zebra",zebra.tv2.no,"TV,Norway,Denmark",TV2NO,1,9953,1,series,Series,no,0,\N,0
 510,DR3,dr3.dr.dk,"TV,Norway,Sweden,Denmark",DR,1,DR3,1,series,Series,da,0,http://www.dr.dk/,0
 515,"France24 (English)",france24.com,"TV,Norway,Denmark,Finland,Sweden,Switzerland,Germany,Austria",France24,1,,1,,,en,0,http://www.france24.com,0
@@ -388,11 +388,11 @@
 1010,ZDFinfokanal,infokanal.zdf.de,"TV,Germany,Austria",ZDF,1,zdf_info,1,,,de,0,http://infokanal.zdf.de/,0
 1012,ZDFneo,neo.zdf.de,"TV,Germany,Austria",ZDF,1,zdf_neo,1,,,de,0,http://neo.zdf.de/,0
 1013,neo/KiKa,neokika.zdfmobil.de,"TV,Germany",Combiner,1,,0,,,de,0,\N,0
-1015,"E! Entertainment HD (DE)",de.eonline.com,"TV,Germany,Austria",SkyDE,1,,1,series,Series,de,0,\N,0
+1015,"E! Entertainment HD (DE)",de.eonline.com,"TV,Germany,Austria",SkyDE,1,"E! ENTERTAINMENT HD",1,series,Series,de,0,\N,0
 1019,"VIVA (AT)",at.viva.tv,"TV,Austria",MTV_novg,1,2:de:DE,1,,,de,0,\N,0
 1022,RTL2,rtl2.de,"TV,Germany,Austria,Switzerland,Sweden,Denmark,Finland,Norway",RTL2,1,,1,series,Series,de,0,\N,0
-1025,"Boomerang (DE)",boomerangtv.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1026,"Cartoon Network (DE)",cartoonnetwork.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
+1025,"Boomerang (DE)",boomerangtv.de,"TV,Germany,Austria",SkyDE,1,BOOMERANG,1,,,de,0,\N,0
+1026,"Cartoon Network (DE)",cartoonnetwork.de,"TV,Germany,Austria",SkyDE,1,"CARTOON NETWORK",1,,,de,0,\N,0
 1027,"Crime & Investigation Europe",crimeandinvestigation.eu,"TV,Netherlands",History_xml,1,,1,series,Series,en,0,\N,0
 1028,"ProTV International",protv.ro,"TV,Sweden,Norway,Denmark,Netherlands,Germany,Finland,Austria",ProTV,1,,1,series,Series,ro,0,\N,0
 1034,"DW (Deutsch)",asien.dw.de,"TV,Austria,Finland,Poland,Russia",DWDE,1,,1,series,News,de,0,http://www.dw.de,0
@@ -429,64 +429,64 @@
 1082,"Sky News International",international.skynews.com,"TV,Germany,Austria,Sweden,Norway,Denmark,Finland",SkyNews,1,,1,,,en,0,\N,0
 1083,"Marco Polo",marcopolo.de,"TV,Germany",CarusMedia,1,,1,series,Series,de,0,http://marcopolo.de/tv/,0
 1084,"Nat. Geo. People (DK)",people.natgeo.dk,"TV,Denmark",NGScan,1,,1,,,da,0,\N,0
-1085,"TV2 Sport",sport.tv2.dk,"TV,Denmark",TV2,1,TV%202%20SPORT,1,sports,Sports,da,0,\N,0
+1085,"TV2 Sport (DK)",sport.tv2.dk,"TV,Denmark",TV2,1,TV%202%20SPORT,1,sports,Sports,da,0,\N,0
 1088,"3+ (CH)",3plus.tv,"TV,Switzerland",DreiPlus,1,,1,,,de,0,http://www.3plus.tv,0
 1089,"4+ (CH)",4plus.tv,"TV,Switzerland",DreiPlus,1,,1,,,de,0,http://www.3plus.tv,0
 1090,"5+ (CH)",5plus.tv,"TV,Switzerland",DreiPlus,1,,1,,,de,0,http://www.3plus.tv,0
-1091,"Animal Planet (DE)",animalplanet.discovery.de,"TV,Germany,Austria",DMAX,1,AP,1,,,de,0,http://www.atv.at/,0
-1093,"DMAX (DE)",dmax.discovery.de,"TV,Germany,Austria",DMAX,1,DMAX,1,,,de,0,http://www.atv2.at/,0
-1094,"TLC (DE)",tlc.discovery.de,"TV,Germany,Austria",DMAX,1,TLC,1,,,de,0,http://www.atv2.at/,0
+1091,"Animal Planet (DE)",animalplanet.discovery.de,"TV,Germany,Austria",DMAX,1,AP,1,,,de,0,http://www.discovery.de/,0
+1093,"DMAX (DE)",dmax.discovery.de,"TV,Germany,Austria",DMAX,1,DMAX,1,,,de,0,http://www.discovery.de/,0
+1094,"TLC (DE)",tlc.discovery.de,"TV,Germany,Austria",DMAX,1,TLC,1,,,de,0,http://www.discovery.de/,0
 1095,"Kanal 10 (NO)",kanal10.no,"TV,Norway",Kanal10NO,1,,1,series,Series,no,0,\N,0
 1097,"Hope Channel Germany",hope-channel.de,"TV,Germany",HopeChannel,1,,1,series,Series,de,0,\N,0
 1099,"Rix FM",rixfm.se,"RADIO,Sweden",MTGRadio,1,FM01,0,,,sv,0,http://www.rixfm.se/,0
 1100,"Bandit Rock (SE)",bandit.se,"RADIO,Sweden",MTGRadio,1,FM02,1,,,sv,0,http://www.bandit.se/,0
 1101,"Lugna Favoriter",lugnafavoriter.se,"RADIO,Sweden",MTGRadio,1,FM03,0,,,sv,0,http://www.lugnafavoriter.se/,0
-1116,"13th Street (DE)",13thstreet.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1117,"Blue Movie 1",1.bluemovie.de,"TV,Germany,Austria",SkyDE,1,,1,movie,Adult,de,0,\N,0
-1118,"Blue Movie 2",2.bluemovie.de,"TV,Germany,Austria",SkyDE,1,,1,movie,Adult,de,0,\N,0
-1119,"Blue Movie 3",3.bluemovie.de,"TV,Germany,Austria",SkyDE,1,,1,movie,Adult,de,0,\N,0
-1120,"Sky 3D",3d.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1121,"Sky Cinema Action",action.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1123,"A&E (DE)",ae-tv.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1124,"Sky Atlantic",atlantic.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1126,Beate-Uhse.TV,beate-uhse.tv,"TV,Germany,Austria",SkyDE,1,,1,movie,Adult,de,0,\N,0
-1127,"Sky Sport Bundesliga 1",bundesliga1.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1147,"Sky Cinema",cinema.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1149,"Sky Cinema Comedy",comedy.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1150,"RTL Crime",crime.rtl.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1152,"Sky Cinema Emotion",emotion.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1153,"FOX (DE)",foxchannel.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1154,"GOLDSTAR TV",goldstar-tv.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1158,"History HD (DE)",hd.historytv.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1162,"TNT Comedy HD",hd.tnt-glitz.tv,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1164,Heimatkanal,heimatkanal.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1165,"Sky Cinema Hits",hits.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1167,"Junior (DE)",junior.tv,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1168,KinoweltTV,kinowelt.tv,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1169,"Sky Krimi",krimi.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1170,"RTL Living",living.rtl.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1171,"Motorvision TV",motorvision.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1172,"National Geographic (DE)",natgeo.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1173,"Sky Cinema Nostalgie",nostalgie.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1174,"Sky Cinema +1",p1.cinema.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1176,"Sky Cinema +24",p24.cinema.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1178,"RTL Passion",passion.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1179,"Romance TV",romance-tv.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1180,"Sky Select",select.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1182,"SPIEGEL Geschichte",spiegel-geschichte.tv,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1183,"Sky Sport 1",sport1.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1186,"Sky Sport 2",sport2.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1194,"Sky Sport Austria",sportaustria.sky.de,"TV,Germany,Austria,Switzerland",SkyDE,1,,1,,,de,0,\N,0
-1195,"sportdigital TV",sportdigital.tv,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1207,"Sky Sport News",sportnews.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1209,"Syfy (DE)",syfy.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1210,"TNT Film",tnt-film.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1212,"TNT Serie",tnt-serie.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1213,"Universal Channel HD (DE)",universalchannel.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1214,"Nat. Geo. Wild (DE)",wild.natgeo.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1216,"Jukebox (DE)",jukebox-tv.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1217,"Discovery Channel (DE)",discovery.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1219,Classica,classica.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
+1116,"13th Street (DE)",13thstreet.de,"TV,Germany,Austria",SkyDE,1,"13TH STREET",1,,,de,0,\N,0
+1117,"Blue Movie 1",1.bluemovie.de,"TV,Germany,Austria",SkyDE,1,"BLUE MOVIE 1",1,movie,Adult,de,0,\N,0
+1118,"Blue Movie 2",2.bluemovie.de,"TV,Germany,Austria",SkyDE,1,"BLUE MOVIE 2",1,movie,Adult,de,0,\N,0
+1119,"Blue Movie 3",3.bluemovie.de,"TV,Germany,Austria",SkyDE,1,"BLUE MOVIE 3",1,movie,Adult,de,0,\N,0
+1120,"Sky 3D",3d.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY HD-3D",1,,,de,0,\N,0
+1121,"Sky Cinema Action",action.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Cinema Action",1,,,de,0,\N,0
+1123,"A&E (DE)",ae-tv.de,"TV,Germany,Austria",SkyDE,1,A&amp;E,1,,,de,0,\N,0
+1124,"Sky Atlantic",atlantic.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY ATLANTIC",1,,,de,0,\N,0
+1126,Beate-Uhse.TV,beate-uhse.tv,"TV,Germany,Austria",SkyDE,1,BEATE-UHSE.TV,1,movie,Adult,de,0,\N,0
+1127,"Sky Sport Bundesliga 1",bundesliga1.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport Bundesliga 1",1,,,de,0,\N,0
+1147,"Sky Cinema",cinema.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY CINEMA",1,,,de,0,\N,0
+1149,"Sky Cinema Comedy",comedy.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Cinema Comedy",1,,,de,0,\N,0
+1150,"RTL Crime",crime.rtl.de,"TV,Germany,Austria",SkyDE,1,"RTL Crime",1,,,de,0,\N,0
+1152,"Sky Cinema Emotion",emotion.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Cinema Emotion",1,,,de,0,\N,0
+1153,"FOX (DE)",foxchannel.de,"TV,Germany,Austria",SkyDE,1,FOX,1,,,de,0,\N,0
+1154,"GOLDSTAR TV",goldstar-tv.de,"TV,Germany,Austria",SkyDE,1,"GOLDSTAR TV",1,,,de,0,\N,0
+1158,"History HD (DE)",hd.historytv.de,"TV,Germany,Austria",SkyDE,1,"HISTORY HD",1,,,de,0,\N,0
+1162,"TNT Comedy HD",hd.tnt-glitz.tv,"TV,Germany,Austria",SkyDE,1,"TNT COMEDY HD",1,,,de,0,\N,0
+1164,Heimatkanal,heimatkanal.de,"TV,Germany,Austria",SkyDE,1,HEIMATKANAL,1,,,de,0,\N,0
+1165,"Sky Cinema Hits",hits.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Cinema Hits",1,,,de,0,\N,0
+1167,"Junior (DE)",junior.tv,"TV,Germany,Austria",SkyDE,1,JUNIOR,1,,,de,0,\N,0
+1168,"Kinowelt TV",kinowelt.tv,"TV,Germany,Austria",SkyDE,1,"KINOWELT TV",1,,,de,0,\N,0
+1169,"Sky Krimi",krimi.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY KRIMI",1,,,de,0,\N,0
+1170,"RTL Living",living.rtl.de,"TV,Germany,Austria",SkyDE,1,"RTL LIVING",1,,,de,0,\N,0
+1171,"Motorvision TV",motorvision.de,"TV,Germany,Austria",SkyDE,1,MOTORVISION,1,,,de,0,\N,0
+1172,"National Geographic (DE)",natgeo.de,"TV,Germany,Austria",SkyDE,1,"NATIONAL GEOGRAPHIC",1,,,de,0,\N,0
+1173,"Sky Cinema Nostalgie",nostalgie.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Cinema Nostalgie",1,,,de,0,\N,0
+1174,"Sky Cinema +1",p1.cinema.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Cinema +1",1,,,de,0,\N,0
+1176,"Sky Cinema +24",p24.cinema.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Cinema +24",1,,,de,0,\N,0
+1178,"RTL Passion",passion.de,"TV,Germany,Austria",SkyDE,1,PASSION,1,,,de,0,\N,0
+1179,"Romance TV",romance-tv.de,"TV,Germany,Austria",SkyDE,1,"ROMANCE TV",1,,,de,0,\N,0
+1180,"Sky Select",select.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Select",1,,,de,0,\N,0
+1182,"SPIEGEL Geschichte",spiegel-geschichte.tv,"TV,Germany,Austria",SkyDE,1,"SPIEGEL GESCHICHTE",1,,,de,0,\N,0
+1183,"Sky Sport 1",sport1.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport 1",1,,,de,0,\N,0
+1186,"Sky Sport 2",sport2.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport 2",1,,,de,0,\N,0
+1194,"Sky Sport Austria",sportaustria.sky.de,"TV,Germany,Austria,Switzerland",SkyDE,1,"SKY SPORT AUSTRIA",1,,,de,0,\N,0
+1195,"sportdigital TV",sportdigital.tv,"TV,Germany,Austria",SkyDE,1,SPORTDIGITAL.TV,1,,,de,0,\N,0
+1207,"Sky Sport News",sportnews.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY SPORT NEWS",1,,,de,0,\N,0
+1209,"Syfy (DE)",syfy.de,"TV,Germany,Austria",SkyDE,1,"SCI FI",1,,,de,0,\N,0
+1210,"TNT Film",tnt-film.de,"TV,Germany,Austria",SkyDE,1,"TNT FILM",1,,,de,0,\N,0
+1212,"TNT Serie",tnt-serie.de,"TV,Germany,Austria",SkyDE,1,"TNT SERIE",1,,,de,0,\N,0
+1213,"Universal Channel HD (DE)",universalchannel.de,"TV,Germany,Austria",SkyDE,1,"UNIVERSAL CHANNEL HD",1,,,de,0,\N,0
+1214,"Nat. Geo. Wild (DE)",wild.natgeo.de,"TV,Germany,Austria",SkyDE,1,"NATIONAL GEOGRAPHIC WILD",1,,,de,0,\N,0
+1216,"Jukebox (DE)",jukebox-tv.de,"TV,Germany,Austria",SkyDE,1,JUKEBOX,1,,,de,0,\N,0
+1217,"Discovery Channel (DE)",discovery.de,"TV,Germany,Austria",SkyDE,1,"Discovery Channel",1,,,de,0,\N,0
+1219,Classica,classica.de,"TV,Germany,Austria",SkyDE,1,CLASSICA,1,,,de,0,\N,0
 1220,"TNT Comedy",tnt-glitz.tv,"TV,Germany,Austria",Downconverter,1,"hd.tnt-glitz.tv, quality",1,,,de,0,http://www.3sat.de/,0
 1221,Frikanalen,frikanalen.tv,"TV,Norway",Frikanalen,1,,1,series,Series,no,0,http://www.frikanalen.tv,0
 1222,"TV2 Humor",humor.tv2.no,"TV,Norway,Denmark",TV2NO,1,9954,1,series,Series,no,0,\N,0
@@ -536,11 +536,9 @@
 1309,"MTV Sport 2 HD",hd.sport2.mtv.fi,"TV,Finland",Downconverter,1,"sport2.mtv.fi, quality=HDTV",1,,,fi,0,http://www.3sat.de/,0
 1310,"MTV Sport 1",sport1.mtv.fi,"TV,Finland",Venetsia,1,,1,sports,Sports,fi,0,http://mtv.fi/,0
 1311,"MTV Sport 2",sport2.mtv.fi,"TV,Finland",Venetsia,1,,1,sports,Sports,fi,0,http://mtv.fi/,0
-1321,"Nat. Geo. Wild Sweden / Viasat Film Action Sweden / Penthouse 1 (Satellite)",ngwildse-viasatfilmactionse-penthouse1.sat.viasat.se,"TV,Sweden",Combiner,1,,0,,,sv,0,\N,0
 1322,"Nick. Denmark / MTV Hits (Satellite)",nickdk-mtvhits.sat.viasat.dk,"TV,Sweden,Denmark,Finland,Norway",Combiner,1,,0,,,da,0,\N,0
 1323,"Nick. Jr. Sweden / VH1 Sweden (Satellite)",nickjrse-vh1se.sat.viasat.se,"TV,Sweden",Combiner,1,,0,,,sv,0,\N,0
 1324,"Nick. Norway / VH1 Classic (Satellite)",nickno-vh1classic.sat.viasat.no,"TV,Sweden,Denmark,Finland,Norway",Combiner,1,,0,,,no,0,\N,0
-1325,"Viasat Film Classic Sweden / Blue Hustler (Satellite)",viasatfilmclassicse-bluehustler.sat.viasat.se,"TV,Sweden",Combiner,1,,0,,,sv,0,\N,0
 1326,KinoPolska,kinopolska.pl,"TV,Poland",KinoPolska,1,,1,movie,Movies,pl,0,http://www.spi.pl,0
 1330,DocuBox,docubox.spi.pl,"TV,Poland,Germany,Austria,Sweden,Denmark,Norway,Finland",KinoPolska,1,,1,series,Series,pl,0,http://www.spi.pl,0
 1331,"360 TuneBox",360tunebox.spi.pl,"TV,Poland,Germany,Sweden,Denmark,Norway,Finland,Austria",KinoPolska,1,,1,tvshow,Music,pl,0,http://www.spi.pl,0
@@ -559,7 +557,6 @@
 1344,"KinoPolska Muzyka International",int.kinopolskamuzyka.pl,"TV,Poland,Sweden,Denmark,Norway,Finland,Germany,Austria,Switzerland",KinoPolska,1,,1,tvshow,Music,pl,0,http://www.spi.pl,0
 1345,"KinoPolska Muzyka",kinopolskamuzyka.pl,"TV,Poland",KinoPolska,1,,1,tvshow,Music,pl,0,http://www.spi.pl,0
 1346,"H2 (English)",h2.historytv.eu,"TV,Finland",History_xml,1,,1,series,Series,en,0,\N,0
-1347,"Cartoon Network Sweden (Boxer)",cartoonnetwork.boxer.se,"TV,Sweden",Combiner,1,,1,,,sv,0,\N,0
 1348,"Disney XD Sweden (Boxer)",disneyxd.boxer.se,"TV,Sweden",Combiner,1,,1,,,sv,0,\N,0
 1350,"VH1 (FI)",vh1.fi,"TV,Finland",Downconverter,1,vh1.eu,1,tvshow,Music,en,0,\N,0
 1351,"VH1 (NO)",vh1.no,"TV,Norway",Downconverter,1,vh1.eu,1,tvshow,Music,en,0,\N,0
@@ -622,23 +619,23 @@
 1435,"OKTV Sudwestpfalz",oktv-suedwestpfalz.de,"TV,Germany",TVGrabXX,1,oksp;oktv-swp.de,1,,,de,0,\N,0
 1436,FIX&FOXI,fixundfoxi.tv,"TV,Germany,Austria,Switzerland",YFE,1,,1,,,de,0,\N,0
 1437,"RIC TV",rictv.de,"TV,Germany,Austria,Switzerland",YFE,1,,1,,,de,0,\N,0
-1439,"Sky Sport Bundesliga 2",bundesliga2.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1440,"Sky Sport Bundesliga 3",bundesliga3.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1441,"Sky Sport Bundesliga 4",bundesliga4.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1442,"Sky Sport Bundesliga 5",bundesliga5.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1443,"Sky Sport Bundesliga 6",bundesliga6.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1444,"Sky Sport Bundesliga 7",bundesliga7.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1445,"Sky Sport Bundesliga 8",bundesliga8.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1446,"Sky Sport Bundesliga 9",bundesliga9.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1456,"Sky Sport 10",sport10.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1457,"Sky Sport 11",sport11.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1458,"Sky Sport 3",sport3.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1459,"Sky Sport 4",sport4.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1460,"Sky Sport 5",sport5.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1461,"Sky Sport 6",sport6.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1462,"Sky Sport 7",sport7.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1463,"Sky Sport 8",sport8.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1464,"Sky Sport 9",sport9.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
+1439,"Sky Sport Bundesliga 2",bundesliga2.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport Bundesliga 2",1,,,de,0,\N,0
+1440,"Sky Sport Bundesliga 3",bundesliga3.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport Bundesliga 3",0,,,de,0,\N,0
+1441,"Sky Sport Bundesliga 4",bundesliga4.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport Bundesliga 4",0,,,de,0,\N,0
+1442,"Sky Sport Bundesliga 5",bundesliga5.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport Bundesliga 5",0,,,de,0,\N,0
+1443,"Sky Sport Bundesliga 6",bundesliga6.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport Bundesliga 6",0,,,de,0,\N,0
+1444,"Sky Sport Bundesliga 7",bundesliga7.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport Bundesliga 7",0,,,de,0,\N,0
+1445,"Sky Sport Bundesliga 8",bundesliga8.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport Bundesliga 8",0,,,de,0,\N,0
+1446,"Sky Sport Bundesliga 9",bundesliga9.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport Bundesliga 9",0,,,de,0,\N,0
+1456,"Sky Sport 10",sport10.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport 10",0,,,de,0,\N,0
+1457,"Sky Sport 11",sport11.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport 11",0,,,de,0,\N,0
+1458,"Sky Sport 3",sport3.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport 3",0,,,de,0,\N,0
+1459,"Sky Sport 4",sport4.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport 4",0,,,de,0,\N,0
+1460,"Sky Sport 5",sport5.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport 5",0,,,de,0,\N,0
+1461,"Sky Sport 6",sport6.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport 6",0,,,de,0,\N,0
+1462,"Sky Sport 7",sport7.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport 7",0,,,de,0,\N,0
+1463,"Sky Sport 8",sport8.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport 8",0,,,de,0,\N,0
+1464,"Sky Sport 9",sport9.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport 9",0,,,de,0,\N,0
 1477,"Reality Kings Europe",europe.realitykings.com,"TV,Norway,Sweden,Denmark,Finland,Germany,Austria,Switzerland",EBS_DOC,1,CET,1,movie,Adult,en,0,\N,0
 1478,"Travel Channel (DE)",travelchanneltv.de,"TV,Germany,Austria,Switzerland",Discovery,1,,1,series,Food/Travel,de,0,http://www.travelchanneltv.de/,0
 1479,"Travel Channel (English)",travelchanneltv.eu,"TV,Norway,Sweden,Denmark,Finland,Netherlands,Poland,Germany,Austria,Switzerland",Discovery,1,,1,series,Food/Travel,en,0,http://www.travelchanneltv.eu/,0
@@ -718,9 +715,9 @@
 1606,TV2/Fyn,tv2fyn.dk,"TV,Denmark",TV2Reg,1,fyn,1,series,Series,da,0,\N,0
 1607,"Uptown Classic",classic.uptown.dk,"TV,Denmark",Uptown,1,,1,,,en,0,\N,0
 1608,"VH1 Europe",vh1.eu,"TV,Sweden,Germany,Norway,Denmark,Finland,Austria,Switzerland,Poland",MTV_xmltv,1,"VH1 Euro IMM",1,,,en,0,\N,0
-1609,"Sky Arts HD",arts.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1610,"Sky Atlantic +1 HD",atlanticp1.sky.de,"TV,Germany,Austria",SkyDE,1,,1,,,de,0,\N,0
-1611,"Sky Cinema Family",family.cinema.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
+1609,"Sky Arts HD",arts.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY ARTS HD",1,,,de,0,\N,0
+1610,"Sky Atlantic +1 HD",atlanticp1.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY ATLANTIC +1 HD",1,,,de,0,\N,0
+1611,"Sky Cinema Family",family.cinema.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY CINEMA FAMILY",0,,,de,0,\N,0
 1614,"VH1 Classic Europe",classic.vh1.se,"TV,Norway,Sweden,Denmark,Finland,Germany",Mtve_mail,1,Classic,1,series,Music,en,0,\N,0
 1615,"C More Fotboll HD (SE)",hd.fotboll.cmore.se,"TV,Sweden",Downconverter,1,"fotboll.cmore.se, quality=HDTV",1,,,sv,0,http://www.cmore.se,0
 1616,"H2 HD (SE)",hd.h2.historytv.se,"TV,Sweden",Downconverter,1,"h2.historytv.se, quality=HDTV",1,series,Documentary,sv,0,http://www.historytv.se/,0
@@ -735,7 +732,7 @@
 1625,"TOGGO plus",plus.toggo.de,"TV,Germany,Austria,Switzerland",RTLDE,1,toggoplus,1,series,Series,de,0,\N,0
 1627,TV2/Lorry,tv2lorry.dk,"TV,Denmark",TV2Reg,1,lorry,1,series,Series,da,0,\N,0
 1628,"Discovery HD Showcase (DK)",hdshowcase.discovery.dk,"TV,Denmark",Discovery_xml,1,HDEUDAN-UTC.xml,1,series,Documentary,da,0,http://www.discoverychannel.se/,0
-1629,"Sky 1",eins.sky.de,"TV,Germany,Austria,Switzerland",SkyDE,1,,1,,,de,0,\N,0
+1629,"Sky 1",eins.sky.de,"TV,Germany,Austria,Switzerland",SkyDE,1,"SKY 1",1,,,de,0,\N,0
 1631,"TLC (FI)",tlc.discoverynetworks.fi,"TV,Finland",Venetsia,1,,1,series,Series,fi,0,http://discoverynetworks.fi/,0
 1632,"C More Live HD / Hits HD (Boxer)",livehdhitshd.cmore.boxer.se,"TV,Sweden",Combiner,1,,0,,,sv,0,\N,0
 1633,"Kanal Hovedstaden",kanalhovedstaden.dk,"TV,Denmark",DigiTV,1,417,1,series,Series,da,0,\N,0
@@ -761,9 +758,9 @@
 1656,"TV3 Sport HD (SE)",sporthd.tv3.se,"TV,Sweden",Downconverter,1,"sport.tv3.se, quality=HDTV",0,,,sv,0,\N,0
 1657,"C More Live 5 (SE)",live5.cmore.se,"TV,Sweden",CMore,1,94,0,sports,Sports,sv,0,http://www.cmore.se,0
 1658,"C More Live 5 HD (SE)",live5hd.cmore.se,"TV,Sweden",CMore,1,95,0,sports,Sports,sv,0,http://www.cmore.se,0
-1660,"Sky Sport UHD",sportuhd.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1661,"Sky Sport Bundesliga 10",bundesliga10.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
-1662,"Sky Sport Bundesliga UHD",bundesligauhd.sky.de,"TV,Germany,Austria",SkyDE,1,,0,,,de,0,\N,0
+1660,"Sky Sport UHD",sportuhd.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport UHD",0,,,de,0,\N,0
+1661,"Sky Sport Bundesliga 10",bundesliga10.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport Bundesliga 10",0,,,de,0,\N,0
+1662,"Sky Sport Bundesliga UHD",bundesligauhd.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Sport Bundesliga UHD",0,,,de,0,\N,0
 1663,"PULS 8",puls8.ch,"TV,Switzerland",ProSieben,1,,0,series,Series,de,0,\N,0
 1664,Fjorton,fjorton.tv,"TV,Sweden",Fjorton,1,,0,tvshow,Music,sv,0,http://www.fjorton.tv,0
 1665,S1,s1tv.ch,"TV,Switzerland",S1CH,1,,0,series,Series,de,0,\N,0
@@ -839,11 +836,11 @@
 1738,"TV1000 Kino (EE)",tv1000kino.ee.viasatworld.com,"TV,Estonia",ViasatWorld_Finland,1,TV1000%20Kino/Estonian/:TV1000Kino,0,movie,Movies,ee,0,http://www.viasatworld.com/,0
 1739,"TV1000 Kino (LT)",tv1000kino.lt.viasatworld.com,"TV,Lithuania",ViasatWorld_Finland,1,TV1000%20Kino/Lithuanian/:TV1000Kino,0,movie,Movies,lt,0,http://www.viasatworld.com/,0
 1740,"TV1000 Kino (LV)",tv1000kino.lv.viasatworld.com,"TV,Latvia",ViasatWorld_Finland,1,TV1000%20Kino/Latvian/:TV1000Kino,0,movie,Movies,lv,0,http://www.viasatworld.com/,0
-1742,"Sky Cinema Action HD",actionhd.sky.de,"TV,Germany,Austria",Downconverter,1,"action.sky.de, quality=HDTV",0,,,de,0,\N,0
-1743,"Sky Atlantic HD",atlantichd.sky.de,"TV,Germany,Austria",Downconverter,1,"atlantic.sky.de, quality=HDTV",0,,,de,0,\N,0
-1744,"Sky Sport Bundesliga HD 1",bundesligahd1.sky.de,"TV,Germany,Austria",Downconverter,1,"bundesliga1.sky.de, quality=HDTV",0,,,de,0,\N,0
+1742,"Sky Cinema Action HD",actionhd.sky.de,"TV,Germany,Austria",Downconverter,1,"action.sky.de, quality=HDTV",1,,,de,0,\N,0
+1743,"Sky Atlantic HD",atlantichd.sky.de,"TV,Germany,Austria",Downconverter,1,"atlantic.sky.de, quality=HDTV",1,,,de,0,\N,0
+1744,"Sky Sport Bundesliga HD 1",bundesligahd1.sky.de,"TV,Germany,Austria",Downconverter,1,"bundesliga1.sky.de, quality=HDTV",1,,,de,0,\N,0
 1745,"Sky Sport Bundesliga HD 10",bundesligahd10.sky.de,"TV,Germany,Austria",Downconverter,1,"bundesliga10.sky.de, quality=HDTV",0,,,de,0,\N,0
-1746,"Sky Sport Bundesliga HD 2",bundesligahd2.sky.de,"TV,Germany,Austria",Downconverter,1,"bundesliga2.sky.de, quality=HDTV",0,,,de,0,\N,0
+1746,"Sky Sport Bundesliga HD 2",bundesligahd2.sky.de,"TV,Germany,Austria",Downconverter,1,"bundesliga2.sky.de, quality=HDTV",1,,,de,0,\N,0
 1747,"Sky Sport Bundesliga HD 3",bundesligahd3.sky.de,"TV,Germany,Austria",Downconverter,1,"bundesliga3.sky.de, quality=HDTV",0,,,de,0,\N,0
 1748,"Sky Sport Bundesliga HD 4",bundesligahd4.sky.de,"TV,Germany,Austria",Downconverter,1,"bundesliga4.sky.de, quality=HDTV",0,,,de,0,\N,0
 1749,"Sky Sport Bundesliga HD 5",bundesligahd5.sky.de,"TV,Germany,Austria",Downconverter,1,"bundesliga5.sky.de, quality=HDTV",0,,,de,0,\N,0
@@ -851,30 +848,30 @@
 1751,"Sky Sport Bundesliga HD 7",bundesligahd7.sky.de,"TV,Germany,Austria",Downconverter,1,"bundesliga7.sky.de, quality=HDTV",0,,,de,0,\N,0
 1752,"Sky Sport Bundesliga HD 8",bundesligahd8.sky.de,"TV,Germany,Austria",Downconverter,1,"bundesliga8.sky.de, quality=HDTV",0,,,de,0,\N,0
 1753,"Sky Sport Bundesliga HD 9",bundesligahd9.sky.de,"TV,Germany,Austria",Downconverter,1,"bundesliga9.sky.de, quality=HDTV",0,,,de,0,\N,0
-1754,"Sky Cinema HD",cinemahd.sky.de,"TV,Germany,Austria",Downconverter,1,"cinema.sky.de, quality=HDTV",0,,,de,0,\N,0
-1755,"RTL Crime HD",crimehd.rtl.de,"TV,Germany,Austria",Downconverter,1,"crime.rtl.de, quality=HDTV",0,,,de,0,\N,0
+1754,"Sky Cinema HD",cinemahd.sky.de,"TV,Germany,Austria",Downconverter,1,"cinema.sky.de, quality=HDTV",1,,,de,0,\N,0
+1755,"RTL Crime HD",crimehd.rtl.de,"TV,Germany,Austria",Downconverter,1,"crime.rtl.de, quality=HDTV",1,,,de,0,\N,0
 1756,"DR1 HD",dr1hd.dr.dk,"TV,Norway,Sweden,Denmark,Germany,Austria",Downconverter,1,"dr1.dr.dk, quality=HDTV",0,series,Series,da,0,http://www.dr.dk/,0
 1757,"DR3 HD",dr3hd.dr.dk,"TV,Norway,Sweden,Denmark",Downconverter,1,"dr3.dr.dk, quality=HDTV",0,series,Series,da,0,http://www.dr.dk/,0
 1758,"Sky 1 HD",einshd.sky.de,"TV,Germany,Austria,Switzerland",Downconverter,1,"eins.sky.de, quality=HDTV",0,,,de,0,\N,0
 1759,"Sky Cinema Family HD",familyhd.cinema.sky.de,"TV,Germany,Austria",Downconverter,1,"family.cinema.sky.de, quality=HDTV",0,,,de,0,\N,0
-1760,"13th Street HD (DE)",hd.13thstreet.de,"TV,Germany,Austria",Downconverter,1,"13thstreet.de, quality=HDTV",0,,,de,0,\N,0
-1761,"Discovery Channel HD (DE)",hd.discovery.de,"TV,Germany,Austria",Downconverter,1,"discovery.de, quality=HDTV",0,,,de,0,\N,0
-1762,"FOX HD (DE)",hd.foxchannel.de,"TV,Germany,Austria",Downconverter,1,"foxchannel.de, quality=HDTV",0,,,de,0,\N,0
-1763,"National Geographic HD (DE)",hd.natgeo.de,"TV,Germany,Austria",Downconverter,1,"natgeo.de, quality=HDTV",0,,,de,0,\N,0
-1764,"SPIEGEL Geschichte HD",hd.spiegel-geschichte.tv,"TV,Germany,Austria",Downconverter,1,"spiegel-geschichte.tv, quality=HDTV",0,,,de,0,\N,0
-1765,"Syfy HD (DE)",hd.syfy.de,"TV,Germany,Austria",Downconverter,1,"syfy.de, quality=HDTV",0,,,de,0,\N,0
-1766,"TNT Serie HD",hd.tnt-serie.de,"TV,Germany,Austria",Downconverter,1,"tnt-serie.de, quality=HDTV",0,,,de,0,\N,0
+1760,"13th Street HD (DE)",hd.13thstreet.de,"TV,Germany,Austria",Downconverter,1,"13thstreet.de, quality=HDTV",1,,,de,0,\N,0
+1761,"Discovery Channel HD (DE)",hd.discovery.de,"TV,Germany,Austria",Downconverter,1,"discovery.de, quality=HDTV",1,,,de,0,\N,0
+1762,"FOX HD (DE)",hd.foxchannel.de,"TV,Germany,Austria",Downconverter,1,"foxchannel.de, quality=HDTV",1,,,de,0,\N,0
+1763,"National Geographic HD (DE)",hd.natgeo.de,"TV,Germany,Austria",Downconverter,1,"natgeo.de, quality=HDTV",1,,,de,0,\N,0
+1764,"SPIEGEL Geschichte HD",hd.spiegel-geschichte.tv,"TV,Germany,Austria",Downconverter,1,"spiegel-geschichte.tv, quality=HDTV",1,,,de,0,\N,0
+1765,"Syfy HD (DE)",hd.syfy.de,"TV,Germany,Austria",Downconverter,1,"syfy.de, quality=HDTV",1,,,de,0,\N,0
+1766,"TNT Serie HD",hd.tnt-serie.de,"TV,Germany,Austria",Downconverter,1,"tnt-serie.de, quality=HDTV",1,,,de,0,\N,0
 1767,"TV2 HD (DK)",hd.tv2.dk,"TV,Denmark,Norway,Sweden,Austria,Germany",Downconverter,1,"tv2.dk, quality=HDTV",0,series,Series,da,0,\N,0
-1768,"Sky Cinema Hits HD",hitshd.sky.de,"TV,Germany,Austria",Downconverter,1,"hits.sky.de, quality=HDTV",0,,,de,0,\N,0
+1768,"Sky Cinema Hits HD",hitshd.sky.de,"TV,Germany,Austria",Downconverter,1,"hits.sky.de, quality=HDTV",1,,,de,0,\N,0
 1769,"TV3 SPORT 1 HD",onehd.tv3sport.dk,"TV,Denmark",Downconverter,1,"one.tv3sport.dk, quality=HDTV",0,series,Series,da,0,http://www.tv3sport.dk/,0
-1770,"Sky Cinema +1 HD",p1hd.cinema.sky.de,"TV,Germany,Austria",Downconverter,1,"p1.cinema.sky.de, quality=HDTV",0,,,de,0,\N,0
-1771,"Sky Cinema +24 HD",p24hd.cinema.sky.de,"TV,Germany,Austria",Downconverter,1,"p24.cinema.sky.de, quality=HDTV",0,,,de,0,\N,0
-1772,"Sky Select HD",selecthd.sky.de,"TV,Germany,Austria",Downconverter,1,"select.sky.de, quality=HDTV",0,,,de,0,\N,0
+1770,"Sky Cinema +1 HD",p1hd.cinema.sky.de,"TV,Germany,Austria",Downconverter,1,"p1.cinema.sky.de, quality=HDTV",1,,,de,0,\N,0
+1771,"Sky Cinema +24 HD",p24hd.cinema.sky.de,"TV,Germany,Austria",Downconverter,1,"p24.cinema.sky.de, quality=HDTV",1,,,de,0,\N,0
+1772,"Sky Select HD",selecthd.sky.de,"TV,Germany,Austria",Downconverter,1,"select.sky.de, quality=HDTV",1,,,de,0,\N,0
 1773,"TV2 Sport HD (DK)",sporthd.tv2.dk,"TV,Denmark",Downconverter,1,"sport.tv2.dk, quality=HDTV",0,sports,Sports,da,0,\N,0
-1774,"Sky Sport HD 1",sporthd1.sky.de,"TV,Germany,Austria",Downconverter,1,"sport1.sky.de, quality=HDTV",0,,,de,0,\N,0
+1774,"Sky Sport HD 1",sporthd1.sky.de,"TV,Germany,Austria",Downconverter,1,"sport1.sky.de, quality=HDTV",1,,,de,0,\N,0
 1775,"Sky Sport HD 10",sporthd10.sky.de,"TV,Germany,Austria",Downconverter,1,"sport10.sky.de, quality=HDTV",0,,,de,0,\N,0
 1776,"Sky Sport HD 11",sporthd11.sky.de,"TV,Germany,Austria",Downconverter,1,"sport11.sky.de, quality=HDTV",0,,,de,0,\N,0
-1777,"Sky Sport HD 2",sporthd2.sky.de,"TV,Germany,Austria",Downconverter,1,"sport2.sky.de, quality=HDTV",0,,,de,0,\N,0
+1777,"Sky Sport HD 2",sporthd2.sky.de,"TV,Germany,Austria",Downconverter,1,"sport2.sky.de, quality=HDTV",1,,,de,0,\N,0
 1778,"Sky Sport HD 3",sporthd3.sky.de,"TV,Germany,Austria",Downconverter,1,"sport3.sky.de, quality=HDTV",0,,,de,0,\N,0
 1779,"Sky Sport HD 4",sporthd4.sky.de,"TV,Germany,Austria",Downconverter,1,"sport4.sky.de, quality=HDTV",0,,,de,0,\N,0
 1780,"Sky Sport HD 5",sporthd5.sky.de,"TV,Germany,Austria",Downconverter,1,"sport5.sky.de, quality=HDTV",0,,,de,0,\N,0
@@ -882,9 +879,9 @@
 1782,"Sky Sport HD 7",sporthd7.sky.de,"TV,Germany,Austria",Downconverter,1,"sport7.sky.de, quality=HDTV",0,,,de,0,\N,0
 1783,"Sky Sport HD 8",sporthd8.sky.de,"TV,Germany,Austria",Downconverter,1,"sport8.sky.de, quality=HDTV",0,,,de,0,\N,0
 1784,"Sky Sport HD 9",sporthd9.sky.de,"TV,Germany,Austria",Downconverter,1,"sport9.sky.de, quality=HDTV",0,,,de,0,\N,0
-1785,"Sky Sport News HD",sportnewshd.sky.de,"TV,Germany,Austria",Downconverter,1,"sportnews.sky.de, quality=HDTV",0,,,de,0,\N,0
+1785,"Sky Sport News HD",sportnewshd.sky.de,"TV,Germany,Austria",Downconverter,1,"sportnews.sky.de, quality=HDTV",1,,,de,0,\N,0
 1786,"TV3 SPORT 2 HD",twohd.tv3sport.dk,"TV,Denmark",Downconverter,1,"two.tv3sport.dk, quality=HDTV",0,series,Series,da,0,http://www.tv3sport.dk/,0
-1787,"Nat. Geo. Wild HD (DE)",wildhd.natgeo.de,"TV,Germany,Austria",Downconverter,1,"wild.natgeo.de, quality=HDTV",0,,,de,0,\N,0
+1787,"Nat. Geo. Wild HD (DE)",wildhd.natgeo.de,"TV,Germany,Austria",Downconverter,1,"wild.natgeo.de, quality=HDTV",1,,,de,0,\N,0
 1788,"Eurosport Norge HD",eurosporthd.sbsdiscovery.no,"TV,Norway,Sweden",Downconverter,1,"eurosport.sbsdiscovery.no, quality=HDTV",0,,,no,0,\N,0
 1789,"Viasat Explore HD (DK)",explorehd.viasat.dk,"TV,Denmark",Downconverter,1,"explorer.viasat.dk, quality=HDTV",0,series,Documentary,da,0,http://www.viasatworld.com/,0
 1790,"Viasat Explore HD (FI)",explorehd.viasat.fi,"TV,Finland",Downconverter,1,"explorer.viasat.fi, quality=HDTV",0,series,Documentary,fi,0,http://www.viasatworld.com/,0
@@ -931,8 +928,8 @@
 1831,"NRK2 HD",nrk2hd.nrk.no,"TV,Norway,Sweden,Denmark,Finland",Downconverter,1,"nrk2.nrk.no, quality=HDTV",0,series,Series,no,0,\N,0
 1832,"NRK3/NRK Super TV HD",nrk3superhd.nrk.no,"TV,Norway",Downconverter,1,"nrk3super.nrk.no, quality=HDTV",0,,,no,0,\N,0
 1833,"TV2 Sportskanalen HD",sporthd.tv2.no,"TV,Norway",Downconverter,1,"sport.tv2.no, quality=HDTV",0,sports,Sports,no,0,\N,0
-1834,"SVT24 HD",svt24hd.svt.se,"TV,Sweden,Finland,Denmark,Norway",Downconverter,1,"svt24.svt.se, quality=HDTV",0,,,sv,0,\N,0
-1835,"Barnkanalen HD",svtbhd.svt.se,"TV,Sweden,Finland,Denmark,Norway",Downconverter,1,"svtb.svt.se, quality=HDTV",0,,,sv,0,\N,0
+1834,"SVT24 HD",svt24hd.svt.se,"TV,Sweden,Finland,Denmark,Norway",Downconverter,1,"svt24.svt.se, quality=HDTV",1,,,sv,0,\N,0
+1835,"Barnkanalen HD",svtbhd.svt.se,"TV,Sweden,Finland,Denmark,Norway",Downconverter,1,"svtb.svt.se, quality=HDTV",1,,,sv,0,\N,0
 1836,"TLC HD (NO)",tlchd.discovery.no,"TV,Norway",Downconverter,1,"tlc.discovery.no, quality=HDTV",0,,,sv,0,\N,0
 1837,"Kanal 11 HD",tv11hd.sbstv.se,"TV,Sweden",Downconverter,1,"tv11.sbstv.se, quality=HDTV",0,,,sv,0,http://www.elva.tv,0
 1838,"TV2 Zebra HD",zebrahd.tv2.no,"TV,Norway",Downconverter,1,"zebra.tv2.no, quality=HDTV",0,series,Series,no,0,\N,0
@@ -972,3 +969,5 @@
 1872,"WDR HD",wdrhd.daserste.de,"TV,Germany,Austria,Denmark",Downconverter,1,"wdr.daserste.de, quality=HDTV",0,,,de,0,\N,0
 1873,"kabel eins classics HD",classicshd.kabel1.de,"TV,Germany,Austria",Downconverter,1,"classics.kabel1.de, quality=HDTV",0,series,Series,de,0,\N,0
 1874,"KinoweltTV HD",hd.kinowelt.tv,"TV,Germany,Austria",Downconverter,1,"kinowelt.tv, quality=HDTV",0,,,de,0,\N,0
+1875,"Boomerang Sweden (Boxer)",boomerang.boxer.se,"TV,Sweden",Combiner,1,,0,,,sv,0,\N,0
+1876,"Viasat Nature / Playboy TV (SE)",nature-playboy.sat.viasat.se,"TV,Sweden",Combiner,1,,0,,,sv,0,\N,0
