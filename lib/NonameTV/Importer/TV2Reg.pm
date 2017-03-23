@@ -17,6 +17,7 @@ use DateTime;
 use Data::Dumper;
 use XML::LibXML;
 use Encode qw/encode decode/;
+use TryCatch;
 
 use NonameTV qw/MyGet norm AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
@@ -78,7 +79,13 @@ sub ImportContent
 
   foreach my $program ($rows->get_nodelist) {
     $xpc->setContextNode( $program );
-    my $dt    = $self->create_dt($xpc->findvalue( 'pubDate' ));
+
+    my $dt;
+    try {
+      $dt    = $self->create_dt($xpc->findvalue( 'pubDate' ));
+    }
+    catch ($err) { print("error: $err"); next; }
+
     my $duration  = $xpc->findvalue( 'tv2r:varighed' );
     my $title     = $xpc->findvalue( 'title' );
     my $desc      = $xpc->findvalue( 'description' );

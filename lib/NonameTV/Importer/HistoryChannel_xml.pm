@@ -15,6 +15,7 @@ use utf8;
 use DateTime;
 use XML::LibXML;
 use IO::Scalar;
+use TryCatch;
 
 use NonameTV qw/norm ParseXml AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
@@ -100,14 +101,21 @@ sub ImportXML
       my $time = $row->findvalue( './/BROADCAST_START_DATETIME' );
       my $title = $row->findvalue( './/BROADCAST_TITLE' );
       my $title_org = $row->findvalue( './/PROGRAMME//PROGRAMME_TITLE_ORIGINAL' );
-      my $start = $self->create_dt( $row->findvalue( './/BROADCAST_START_DATETIME' ) );
-      my $end = $self->create_dt( $row->findvalue( './/BROADCAST_END_TIME' ) );
+
+      my ($start, $end);
+      try {
+        $start = $self->create_dt( $row->findvalue( './/BROADCAST_START_DATETIME' ) );
+        $end = $self->create_dt( $row->findvalue( './/BROADCAST_END_TIME' ) );
+      }
+      catch ($err) { print("error: $err"); next; }
+      
+
 
       my $date = $start->ymd("-");
 
-	  if($date ne $currdate ) {
+  	  if($date ne $currdate ) {
         if( $currdate ne "x" ) {
-			$dsh->EndBatch( 1 );
+  			     $dsh->EndBatch( 1 );
         }
 
         my $batchid = $chd->{xmltvid} . "_" . $date;

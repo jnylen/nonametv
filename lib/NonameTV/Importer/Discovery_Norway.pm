@@ -12,6 +12,7 @@ use DateTime;
 use XML::LibXML;
 use HTTP::Date;
 use Data::Dumper;
+use TryCatch;
 
 use NonameTV qw/ParseXml norm AddCategory AddCountry/;
 use NonameTV::Log qw/w progress error f/;
@@ -175,8 +176,12 @@ sub ImportContent
       my $start = $sc->findvalue( './starttime' );
       my $end   = $sc->findvalue( './endtime' );
 
-      my $start2 = $self->create_dt( $start );
-      my $stop2 = $self->create_dt( $end );
+      my ($start2, $stop2);
+      try {
+        $start2 = $self->create_dt( $start );
+        $stop2 = $self->create_dt( $end );
+      }
+      catch ($err) { print("error: $err"); next; }
 
 
       my $title_original = $sc->findvalue( './originaltitle' );

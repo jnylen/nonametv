@@ -14,6 +14,7 @@ The downloaded file is in xml-format.
 use DateTime;
 use XML::LibXML;
 use HTTP::Date;
+use TryCatch;
 
 use Compress::Zlib;
 
@@ -139,7 +140,13 @@ sub ImportContent
 
     my $title = $sc->findvalue( './Program/@Title' );
 
-    my $start = $self->create_dt( $sc->findvalue( './@CalendarDate' ) );
+    my $start;
+
+    try {
+      $start = $self->create_dt( $sc->findvalue( './@CalendarDate' ) );
+    }
+    catch ($err) { print("error: $err"); next; }
+
     if( not defined $start )
     {
       w "Invalid starttime '" . $sc->findvalue( './@CalendarDate' ) . "'. Skipping.";
@@ -208,7 +215,7 @@ sub ImportContent
     }
     if($epi_desc and defined($epi_desc) and norm($epi_desc) ne "") {
       my $seriesdesc = $epi_desc;
-      $seriesdesc =~ s/$med_desc//i;
+      #$seriesdesc =~ s/$med_desc//i;
 
       # Season / series
       if($seriesdesc =~ /(säsong|sæson|kausi|sesong)/i) {

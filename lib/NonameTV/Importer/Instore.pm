@@ -18,6 +18,7 @@ use XML::LibXML;
 use HTTP::Date;
 use Data::Dumper;
 use Math::Round 'nearest';
+use TryCatch;
 
 use NonameTV qw/ParseXml norm AddCategory/;
 use NonameTV::DataStore::Helper;
@@ -137,7 +138,12 @@ sub ImportContent
 
   foreach my $sc ($ns->get_nodelist)
   {
-    my $start = $self->create_dt( $sc->findvalue( './date' ) . " " . $sc->findvalue( './time' ) );
+    my $start;
+    try {
+      $start = $self->create_dt( $sc->findvalue( './date' ) . " " . $sc->findvalue( './time' ) );
+    }
+    catch ($err) { print("error: $err"); next; }
+
     if( not defined $start )
     {
       w "Invalid starttime '"

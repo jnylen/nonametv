@@ -2,6 +2,7 @@ package NonameTV::Importer::TV2_Denmark;
 
 use strict;
 use warnings;
+use TryCatch;
 
 =pod
 
@@ -9,9 +10,6 @@ Importer for data from TV2 Denmark,
 (You should change the filestore at the bottom)
 
 =cut
-
-use strict;
-use warnings;
 
 use DateTime;
 use XML::LibXML;
@@ -109,8 +107,13 @@ sub ImportContent
 
   foreach my $pgm (sort by_start $ns->get_nodelist) {
     $xpc->setContextNode( $pgm );
+    my $start;
 
-    my $start  = ParseDateTime($pgm->findvalue( 'time' ));
+    try {
+      $start  = ParseDateTime($pgm->findvalue( 'time' ));
+    }
+    catch ($err) { print("error: $err"); next; }
+
   	my $date  = $start->ymd("-");
     my $title = $pgm->findvalue( 'title' );
     $title =~ s/\((\d+):(\d+)\)//g if $title;
