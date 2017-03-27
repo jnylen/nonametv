@@ -187,6 +187,7 @@ if( $file =~ /\.pdf$/i ) {return $self->ImportPDF( $file, $channel_id, $xmltvid 
 
       my $time;
       if($file =~ /\.xlsx$/i) {
+        $oWkC = $oWkS->{Cells}[$iR][0];
         $time = ExcelFmt('hh:mm', $oWkC->{Val} ) if( $oWkC->Value );
       } else {
         $time = ParseTime( $oWkC->Value ) if( $oWkC->Value );

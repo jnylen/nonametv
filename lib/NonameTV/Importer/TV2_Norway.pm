@@ -17,6 +17,7 @@ use DateTime;
 use XML::LibXML;
 use Data::Dumper;
 use Encode qw/encode decode/;
+use TryCatch;
 
 use NonameTV qw/ParseXml MyGet norm AddCountry AddCategory/;
 use NonameTV::Log qw/progress error/;
@@ -86,7 +87,12 @@ sub ImportContent
     #
     # start time
     #
-    my $start = $self->create_dt( $sc->findvalue( './@start' ) );
+    my $start;
+    try {
+      $start = $self->create_dt( $sc->findvalue( './@start' ) );
+    }
+    catch ($err) { print("error: $err"); next; }
+
     if( not defined $start )
     {
       error( "$batch_id: Invalid starttime '" . $sc->findvalue( './@start' ) . "'. Skipping." );

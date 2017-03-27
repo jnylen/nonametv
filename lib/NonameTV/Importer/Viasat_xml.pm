@@ -23,6 +23,7 @@ use DateTime;
 use XML::LibXML;
 use HTTP::Date;
 use Data::Dumper;
+use TryCatch;
 
 use NonameTV qw/ParseXml norm AddCategory AddCountry/;
 use NonameTV::Log qw/w progress error f/;

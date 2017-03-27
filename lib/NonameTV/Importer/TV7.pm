@@ -65,6 +65,7 @@ sub ImportContent
   my $prog = ParseXmltv (\$$cref);
   my @shows = SortShows( @{$prog} );
   foreach my $e (@shows) {
+    next if !defined($e->{start_dt}) or !defined($e->{stop_dt});
     $e->{channel_id} = $chd->{id};
 
     # translate start end from DateTime to string
@@ -105,6 +106,8 @@ sub ImportContent
 }
 
 sub bytime {
+
+  return undef if !defined($$a{start_dt}) or !defined($$b{start_dt});
 
   my( $Y1, $M1, $D1, $h1, $m1, $s1 ) = ( $$a{start_dt} =~ /^(\d+)\-(\d+)\-(\d+)T(\d+)\:(\d+)\:(\d+)$/ );
   my $t1 = int( sprintf( "%04d%02d%02d%02d%02d%02d", $Y1, $M1, $D1, $h1, $m1, $s1 ) );

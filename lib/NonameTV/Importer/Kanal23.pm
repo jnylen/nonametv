@@ -33,6 +33,14 @@ sub new {
     return $self;
 }
 
+sub ContentExtension {
+  return 'xml';
+}
+
+sub FilteredExtension {
+  return 'xml';
+}
+
 sub ImportContent
 {
   my $self = shift;

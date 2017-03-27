@@ -21,7 +21,7 @@ use utf8;
 use DateTime;
 use XML::LibXML;
 
-use NonameTV qw/MyGet File2Xml norm MonthNumber/;
+use NonameTV qw/MyGet File2Xml norm MonthNumber Docxfile2Xml ParseXml/;
 use NonameTV::DataStore::Helper;
 use NonameTV::DataStore::Updater;
 use NonameTV::Log qw/progress error/;
@@ -64,6 +64,53 @@ sub ImportContentFile
     error("unknown file: $file");
   }
 
+}
+
+sub ImportDOCX
+{
+  my $self = shift;
+  my( $file, $chd ) = @_;
+
+  my $content = Docxfile2Xml($file);
+
+  my $ds = $self->{datastore};
+  $ds->{SILENCE_END_START_OVERLAP}=1;
+  $ds->{SILENCE_DUPLICATE_SKIP}=1;
+
+  my $doc;
+  my $xml = XML::LibXML->new;
+  eval { $doc = $xml->parse_string($content); };
+
+  if( not defined( $doc ) ) {
+    error( "EBS_DOC: $file: Failed to parse xml" );
+    return;
+  }
+
+  my $currdate = "x";
+  my $column;
+
+  # the grabber_data should point exactly to one worksheet
+  my $rows = $doc->findnodes( "//w:p" );
+
+  if( $rows->size() == 0 ) {
+    error( "EBS_DOC: $chd->{xmltvid}: No Rows found" ) ;
+    return;
+  }
+
+  foreach my $row ($rows->get_nodelist) {
+    # Date Check
+    if(norm($row->findvalue( 'w:r[1]/w:t' )) =~ /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/i) {
+      my $day = $row->findvalue( 'w:r[2]/w:t' );
+      my $month = $row->findvalue( 'w:r[4]/w:t' );
+      my $year = $row->findvalue( 'w:r[5]/w:t' );
+      print ("test: $day - $month - $year\n");
+    }
+
+    # Programme Check
+  }
+
+  #$dsh->EndBatch( 1 );
+  return 1;
 }
 
 sub ImportDOC

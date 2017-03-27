@@ -18,6 +18,7 @@ VG Media EPG License: http://www.vgmedia.de/de/lizenzen/epg.html
 use Data::Dumper;
 use DateTime;
 use XML::LibXML::XPathContext;
+use TryCatch;
 
 use NonameTV qw/AddCategory norm ParseXml/;
 use NonameTV::Importer::BaseWeekly;
@@ -119,8 +120,12 @@ sub ImportContent( $$$ ) {
     $xpc->setContextNode( $program );
     my $ce = ();
     $ce->{channel_id} = $chd->{id};
-    $ce->{start_time} = $self->parseTimestamp( $xpc->findvalue( 's:termin/@exakt' ) );
-    $ce->{end_time} = $self->parseTimestamp( $xpc->findvalue( 's:termin/@ende' ) );
+    try {
+      $ce->{start_time} = $self->parseTimestamp( $xpc->findvalue( 's:termin/@exakt' ) );
+      $ce->{end_time} = $self->parseTimestamp( $xpc->findvalue( 's:termin/@ende' ) );
+    }
+    catch ($err) { print("error: $err"); next; }
+
 
     $ce->{title} = norm($xpc->findvalue( 's:titel/@termintitel' ));
 

@@ -7,6 +7,7 @@ use warnings;
 use utf8;
 use Env;
 use Data::Dumper;
+use TryCatch;
 
 use Encode;
 use File::Slurp;
@@ -1063,17 +1064,21 @@ sub create_dt
     $tz = "Europe/Stockholm";
   }
 
-  my $dt = DateTime->new(
-                          year => $year,
-                          month => $month,
-                          day => $day,
-                          hour => $hour,
-                          minute => $minute,
-                          second => $second,
-                          time_zone => $tz
-                          );
+  try {
+    my $dt = DateTime->new(
+                            year => $year,
+                            month => $month,
+                            day => $day,
+                            hour => $hour,
+                            minute => $minute,
+                            second => $second,
+                            time_zone => $tz
+                            );
 
-  return $dt;
+    return $dt;
+  } catch ($err) {
+    return undef;
+  }
 }
 
 =pod
