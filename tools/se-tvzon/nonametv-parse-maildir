@@ -227,8 +227,8 @@ sub guess_channel
     elsif( $subject =~ /disney\s*channel/i and $filename !~ /\((\d\d\d\d)/i ) {
       return "disneychannel.se";
     }
-    elsif( $filename =~ /^DC/i and $filename !~ /\((\d\d\d\d)/i ) {
-      return "disneychannel.se";
+    elsif( $filename =~ /^DC/i ) {
+      return "disneychannel.se"; #  and $filename !~ /\((\d\d\d\d)/i
     }
 
     return undef;
