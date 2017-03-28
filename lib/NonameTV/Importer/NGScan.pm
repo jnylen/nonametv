@@ -46,8 +46,9 @@ sub new {
   my $conf = ReadConfig();
 
   $self->{FileStore} = $conf->{FileStore};
+  $self->{Timezone} = "CET" unless defined $self->{Timezone};
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "CET" );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, $self->{Timezone} );
   $self->{datastorehelper} = $dsh;
 
   $self->{datastore}->{augment} = 1;
@@ -118,8 +119,8 @@ sub ImportXLS
 
             $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description \(English\)/ );
 
-            $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ and $oWkS->{Cells}[$iR][$iC]->Value !~ /EET/ );
-            $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time/ and $oWkS->{Cells}[$iR][$iC]->Value !~ /EET/ ); # Dont set the time to EET
+            $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
+            $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time/ ); # Dont set the time to EET
 
             $columns{'Premiere'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Premiere$/ );
 
