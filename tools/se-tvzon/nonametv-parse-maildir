@@ -263,8 +263,8 @@ sub guess_channel
 
     return "natgeo.dk" if $filename =~ /^ngden/i and $filename =~ /\.xls$/i;
     return "natgeo.no" if $filename =~ /^ngnor/i and $filename =~ /\.xls$/i;
-    return "natgeotv.com" if $filename =~ /^ngscan/i and $filename =~ /\.xls$/i and $filename !~ /^ngden/i;
-    return "natgeotv.com" if $filename =~ /^ngswe_fin/i and $filename =~ /\.xls$/i and $filename !~ /^ngden/i;
+    return "natgeo.se" if $filename =~ /^ngswe/i and $filename =~ /\.xls$/i and $filename !~ /^ngden/i;
+    return "natgeo.fi" if $filename =~ /^ngfin/i and $filename =~ /\.xls$/i and $filename !~ /^ngden/i;
     return "people.natgeo.dk" if $filename =~ /^ngppl\.den/i and $filename =~ /\.xls$/i;
 
 	  # Travel Channel
