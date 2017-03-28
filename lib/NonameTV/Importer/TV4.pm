@@ -452,23 +452,24 @@ sub extract_episode
 
     my ( $original_title, $romanseason, $prodyear, $orgepisode, $orgsubtitle, $poo );
     ( $original_title, $romanseason, $orgepisode, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL-]+)\s+(\d+)\s+"(.*)"$/ );
-    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+),\s+The\s+(\d+)\s+"(.*)"\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
-    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)"(.*)"\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
-    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)\s+"(.*)"\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL-]+)\s+(\d+)"(.*)"$/ );
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+),\s+The\s+(\d+)\s+"(.*)"\s+\(([#0-9A-Z ]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)"(.*)"\s+\(([#0-9A-Z ]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)\s+"(.*)"\s+\(([#0-9A-Z ]+)\)$/ ) if !defined($original_title);
     ( $original_title, $romanseason, $orgepisode, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)\s+"(.*)"$/ ) if !defined($original_title);
     ( $original_title, $orgepisode, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*)\s+(\d+)\s+"(.*)"$/ ) if !defined($original_title);
     ( $original_title, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*?)\s+"(.*)"$/ ) if !defined($original_title);
     ( $original_title, $romanseason, $orgepisode, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL-]+)\s+(\d+)\s+'(.*)'$/ ) if !defined($original_title);
-    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+),\s+The\s+(\d+)\s+'(.*)'\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
-    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)'(.*)'\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
-    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)\s+'(.*)'\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+),\s+The\s+(\d+)\s+'(.*)'\s+\(([#0-9A-Z ]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)'(.*)'\s+\(([#0-9A-Z ]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)\s+'(.*)'\s+\(([#0-9A-Z ]+)\)$/ ) if !defined($original_title);
     ( $original_title, $romanseason, $orgepisode, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)\s+'(.*)'$/ ) if !defined($original_title);
     ( $original_title, $orgepisode, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*)\s+(\d+)\s+'(.*)'$/ ) if !defined($original_title);
     ( $original_title, $orgsubtitle ) = ( $ce->{title_org} =~ /^(.*?)\s+'(.*)'$/ ) if !defined($original_title);
-    ( $original_title, $romanseason, $orgepisode, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)\s+\(([#0-9A-Z]+)\) $/ ) if !defined($original_title);
+    ( $original_title, $romanseason, $orgepisode, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)\s+\(([#0-9A-Z ]+)\)$/ ) if !defined($original_title);
     ( $original_title, $romanseason, $orgepisode ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)\s+(\d+)$/ ) if !defined($original_title);
-    ( $original_title, $prodyear, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+(\d\d\d\d)\s+(\d+)\s+"(.*)"\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
-    ( $original_title, $prodyear, $orgepisode, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+(\d\d\d\d)\s+(\d+)\s+\(([#0-9A-Z]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $prodyear, $orgepisode, $orgsubtitle, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+(\d\d\d\d)\s+(\d+)\s+"(.*)"\s+\(([#0-9A-Z ]+)\)$/ ) if !defined($original_title);
+    ( $original_title, $prodyear, $orgepisode, $poo ) = ( $ce->{title_org} =~ /^(.*)\s+(\d\d\d\d)\s+(\d+)\s+\(([#0-9A-Z ]+)\)$/ ) if !defined($original_title);
     ( $original_title, $prodyear, $orgepisode ) = ( $ce->{title_org} =~ /^(.*)\s+(\d\d\d\d)\s+(\d+)$/ ) if !defined($original_title);
     ( $original_title, $romanseason ) = ( $ce->{title_org} =~ /^(.*)\s+([IXVL]+)$/ ) if !defined($original_title);
 
