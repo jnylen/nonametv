@@ -168,7 +168,7 @@ sub ImportContent {
 
       # # End of airtime
       if( ($name =~ /^HEAD\s+..D/) or ($name =~ /^Programmas beigas/) or ($name =~ /^P.\s+GENSYN/) or ($name =~ /^OPHOLD I SENDEFLADE/)
-          or ($name eq "GODNAT") or ($name eq "END") or ($name =~ /^Programos pabaiga/) or ($name =~ /^S.ndningsuppeh.ll/) )
+          or ($name eq "GODNAT") or ($name eq "END") or ($name =~ /^Programos pabaiga/) or ($name =~ /^S.ndningsuppeh.ll/ or ($name =~ /^L.hetystauko$/i)) )
       {
       	$name = "end-of-transmission";
         $lastitem = 1;
