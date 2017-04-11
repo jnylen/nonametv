@@ -70,6 +70,7 @@ $channel_data{ "r04" } = "vega.radio.yle.fi";
 $channel_data{ "r02" } = "x.radio.yle.fi";
 $channel_data{ "r44" } = "x3m.radio.yle.fi";
 $channel_data{ "tlc" } = "tlc.discoverynetworks.fi";
+$channel_data{ "alf" } = "alfatv.fi";
 
   opendir(DIR, "/content/ftp/venetsia/");
 
