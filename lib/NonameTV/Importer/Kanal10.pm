@@ -111,13 +111,34 @@ sub ImportXLS {
     # browse through rows
     my $i = 1;
 
-    for(my $iR = 1 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+    for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
       $i++;
+
+      if( not %columns ){
+        # the column names are stored in the first row
+        # so read them and store their column positions
+        # for further findvalue() calls
+
+        for(my $iC = $oWkS->{MinCol} ; defined $oWkS->{MaxCol} && $iC <= $oWkS->{MaxCol} ; $iC++) {
+          if( $oWkS->{Cells}[$iR][$iC] ){
+            $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Program/ );
+            $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Datum/ );
+            $columns{'Start'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Från$/ );
+            $columns{'End'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Till/ );
+            $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Beskrivning/ );
+
+            $foundcolumns = 1 if( $columns{'Title'} ); # Only import if season number is found
+          }
+        }
+        %columns = () if( $foundcolumns eq 0 );
+
+        next;
+      }
 
       my $oWkC;
 
       # date
-      $oWkC = $oWkS->{Cells}[$iR][$coldate];
+      $oWkC = $oWkS->{Cells}[$iR][$columns{'Date'}];
       next if( ! $oWkC );
 
       $date = create_date( ExcelFmt('yyyy-mm-dd', $oWkC->{Val}) );
@@ -138,23 +159,20 @@ sub ImportXLS {
       }
 
       # time
-      $oWkC = $oWkS->{Cells}[$iR][$coltime];
+      $oWkC = $oWkS->{Cells}[$iR][$columns{'Start'}];
       next if( ! $oWkC );
-
-
-
       my $time = 0;  # fix for  12:00AM
       $time=$oWkC->{Val} if( $oWkC->Value );
 
-	  #Convert Excel Time -> localtime
+	    #Convert Excel Time -> localtime
       $time = ExcelFmt('hh:mm', $time);
       $time =~ s/_/:/g; # They fail sometimes
 
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][$coltitle];
+      $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
       next if( ! $oWkC );
-      my $title = $oWkC->Value if( $oWkC->Value );
+      my $title = norm($oWkC->Value) if( $oWkC->Value );
 
       $title =~ s/\((r|p)\)//g if $title;
 
@@ -187,10 +205,7 @@ sub create_date
 {
   my ( $dinfo ) = @_;
 
-  print Dumper($dinfo);
-
-  my( $month, $day, $year );
-#      progress("Mdatum $dinfo");
+  my( $month, $monthname, $day, $year );
   if( $dinfo =~ /^\d{4}-\d{2}-\d{2}$/ ){ # format   '2010-04-22'
     ( $year, $month, $day ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
   } elsif( $dinfo =~ /^\d{2}.\d{2}.\d{4}$/ ){ # format '11/18/2011'
@@ -199,6 +214,10 @@ sub create_date
     ( $month, $day, $year ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
   } elsif( $dinfo =~ /^\d{1,2}\/\d{1,2}\/\d{2}$/ ){ # format '10-18-11' or '1-9-11'
     ( $month, $day, $year ) = ( $dinfo =~ /^(\d+)\/(\d+)\/(\d+)$/ );
+  } elsif( $dinfo =~ /^\d{1,2} .*$/ ){ # format '10-18-11' or '1-9-11'
+    ( $day, $monthname ) = ( $dinfo =~ /^(\d{1,2}) (.*)$/ );
+    $month = MonthNumber($monthname, "en");
+    $year = DateTime->now->year;
   }
 
   return undef if( ! $year );
