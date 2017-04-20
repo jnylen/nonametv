@@ -55,7 +55,7 @@ sub ImportContentFile {
 
   $self->{fileerror} = 0;
 
-  if( $file =~ /\.xls$/i ){
+  if( $file =~ /\.(xls|xlsx)$/i ){
     if(     $chd->{sched_lang} eq "sv") {
         $self->ImportFlatXLS( $file, $chd ) if $file =~ /swe*.*xls$/i;
     } elsif($chd->{sched_lang} eq "da") {
