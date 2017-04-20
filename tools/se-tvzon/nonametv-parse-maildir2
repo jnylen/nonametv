@@ -58,30 +58,30 @@ my $ds = CreateDataStore();
 
 my $root = "/content/maildir/.Projects/";
 my @folders = qw(
-                		 NonameTV-Data.DWDE
-                     NonameTV-Data.HaC
-                     NonameTV-Data.ETVMedia
-                     NonameTV-Data.VisjonNorge
-                     NonameTV-Data.Turner
-                     NonameTV-Data.DMB
-                     NonameTV-Data.PPS
-                     NonameTV-Data.ServusTV
-                     NonameTV-Data.DreiPlus
-                     NonameTV-Data.Classica
-                     NonameTV-Data.HopeChannel
-                     NonameTV-Data.Discovery
-                     NonameTV-Data.FightSports
-                     NonameTV-Data.YFE
-                     NonameTV-Data.Tele5
-                     NonameTV-Data.Matkanalen
-                     NonameTV-Data.Highview
-                     NonameTV-Data.MTV
-                     NonameTV-Data.Mezzo
-                     NonameTV-Data.HighTV
-                     NonameTV-Data.EBS
-                     NonameTV-Data.Euronews
-                     NonameTV-Data.Gospel
-                     NonameTV-Data.RTL2
+            NonameTV-Data.DWDE
+            NonameTV-Data.HaC
+            NonameTV-Data.ETVMedia
+            NonameTV-Data.VisjonNorge
+            NonameTV-Data.Turner
+            NonameTV-Data.DMB
+            NonameTV-Data.PPS
+            NonameTV-Data.ServusTV
+            NonameTV-Data.DreiPlus
+            NonameTV-Data.Classica
+            NonameTV-Data.HopeChannel
+            NonameTV-Data.Discovery
+            NonameTV-Data.FightSports
+            NonameTV-Data.YFE
+            NonameTV-Data.Tele5
+            NonameTV-Data.Matkanalen
+            NonameTV-Data.Highview
+            NonameTV-Data.MTV
+            NonameTV-Data.Mezzo
+            NonameTV-Data.HighTV
+            NonameTV-Data.EBS
+            NonameTV-Data.Euronews
+            NonameTV-Data.Gospel
+            NonameTV-Data.RTL2
         );
 #
 # Flag messages AFTER they have been processed. Then I normally
@@ -198,32 +198,35 @@ sub guess_channel
   #print Dumper($dir, $from, $subject, $filename, $type, $size);
 
  if( $dir =~ /Turner/ ) {
-    # Word files
-	return "cartoonnetwork.se" if $filename =~ /^cn\s*nordic\s+\(swe\)\s*\b/i;
-	return "boomerangtv.se"    if $filename =~ /^boomerang\s*nordic\s*\(swe\)\s*\b/i;
+   # Tivo took it over
+   if($filename =~ /Boomerang_Nordic/i and $filename =~ /XML/i) {
+     return "boomerangtv.eu"    if $filename =~ /_ENG_/i;
+     return "boomerangtv.se"    if $filename =~ /_SWE_/i;
+     return "boomerangtv.no"    if $filename =~ /_NOR_/i;
+     return "boomerangtv.dk"    if $filename =~ /_DAN_/i;
+   }
 
-	return "cartoonnetwork.no" if $filename =~ /^cn\s*nordic\s+\(nor\)\s*\b/i;
-  return "boomerangtv.no"    if $filename =~ /^boomerang\s*nordic\s*\(nor\)\s*\b/i;
+   if($filename =~ /Cartoon_Network_Nordic/i and $filename =~ /XML/i) {
+     return "cartoonnetwork.com" if $filename =~ /_ENG_/i;
+     return "cartoonnetwork.se" if $filename =~ /_SWE_/i;
+     return "cartoonnetwork.no" if $filename =~ /_NOR_/i;
+     return "cartoonnetwork.dk" if $filename =~ /_DAN_/i;
+   }
 
-  return "cartoonnetwork.dk" if $filename =~ /^cn\s*nordic\s+\(dan\)\s*\b/i;
-  return "boomerangtv.dk"    if $filename =~ /^boomerang\s*nordic\s*\(dan\)\s*\b/i;
+   if($filename =~ /Cartoon_Network_CEE/i and $filename =~ /XML/i) {
+     return "cartoonnetwork.nl" if $filename =~ /_DUT_/i;
+   }
 
-  return "tcmeurope.com"     if $filename =~ /^tcm\s*nordic/i and $filename =~ /eng/i;
-  return "se.tcmeurope.com"  if $filename =~ /^tcm\s*nordic/i and $filename =~ /swe/i;
-  return "no.tcmeurope.com"  if $filename =~ /^tcm\s*nordic/i and $filename =~ /\(NOR\)/i and $filename !~ /dan/ and $filename !~ /\.xls$/i;
-  return "dk.tcmeurope.com"  if $filename =~ /^tcm\s*nordic/i and $filename =~ /dan/i;
+   if($filename =~ /TCM_Nordic/i and $filename =~ /XML/i) {
+     return "tcmeurope.com"     if $filename =~ /_ENG_/i;
+     return "se.tcmeurope.com"  if $filename =~ /_SWE_/i;
+     return "no.tcmeurope.com"  if $filename =~ /_NOR_/i;
+     return "dk.tcmeurope.com"  if $filename =~ /_DAN_/i;
+   }
 
-	# Excel (XLS)
-	if( $filename =~ /\.xls$/i ) {
-		# CNN
-		if( $filename =~ /cnn/i ) {
-		  return "cnn.com" if $filename =~ /\(in\s+cet\)/i;
-		}
-
-		# Cartoon network ENGLISH
-    return "cartoonnetwork.com" if $filename =~ /^cn\s*nordic/i;
-    return "cartoonnetwork.nl" if $filename =~ /^cn\s*dutch/i and $filename =~ /combo/i;
-	}
+   if($filename =~ /CNNi/i and $filename =~ /XML/i) {
+     return "cnn.com" if $filename =~ /_ENG_/i;
+   }
 
   # XLS Nordic
   if( $filename =~ /\.(xls|xlsx|xlsm)$/i ) {
