@@ -19,6 +19,10 @@ use XML::LibXML;
 use IO::Scalar;
 use TryCatch;
 
+## TEMP
+use Spreadsheet::ParseExcel;
+##
+
 use NonameTV qw/norm AddCategory/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error d p w f/;
@@ -50,6 +54,8 @@ sub ImportContentFile {
 
   if( $file =~ /\.xml$/i ){
     $self->ImportXML( $file, $chd );
+  } elsif( $file =~ /\.xls$/i ){
+    $self->ImportXLS( $file, $chd->{id}, $chd->{xmltvid} );
   } elsif( $file =~ /\.zip$/i ) {
   	# When ParseExcel can load a XLS file
   	# from a string Please remove this
@@ -192,6 +198,12 @@ sub ImportXML
       if( ( $season, $episode2, $newsub ) = ($ce->{subtitle} =~ m|^S.son (\d+) - Episode (\d+)\: (.*?)$| ) ){
         $ce->{episode} = ($season - 1) . ' . ' . ($episode2 - 1) . ' .';
         $ce->{subtitle} = norm($newsub);
+      } elsif( ( $season, $episode2, $newsub ) = ($ce->{subtitle} =~ m|^Sesong (\d+) - Episode (\d+)\: (.*?)$| ) ) {
+        $ce->{episode} = ($season - 1) . ' . ' . ($episode2 - 1) . ' .';
+        $ce->{subtitle} = norm($newsub);
+      } elsif( ( $season, $episode2, $newsub ) = ($ce->{subtitle} =~ m|^S.song (\d+) - Episod (\d+)\: (.*?)$| ) ) {
+        $ce->{episode} = ($season - 1) . ' . ' . ($episode2 - 1) . ' .';
+        $ce->{subtitle} = norm($newsub);
       }
     }
 
@@ -270,6 +282,225 @@ sub create_dt
     return undef;
   }
 }
+
+## TEMP XLS THINGS FOR CNN UNTIL TIVO TAKES OVER
+sub ImportXLS
+{
+  my $self = shift;
+  my( $file, $channel_id, $xmltvid ) = @_;
+
+  my $dsh = $self->{datastorehelper};
+  my $ds = $self->{datastore};
+
+  return if( $file !~ /\.xls$/i );
+
+  progress( "Turner XLS: $xmltvid: Processing $file" );
+
+  my $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );
+  if( not defined( $oBook ) ) {
+    error( "Turner XLS: Failed to parse xls" );
+    return;
+  }
+
+  my $date;
+  my $currdate = "x";
+  my @ces = ();
+
+  for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++){
+
+    my $oWkS = $oBook->{Worksheet}[$iSheet];
+    if( $oWkS->{Name} =~ /Header/ ){
+      progress("Turner XLS: $xmltvid: skipping worksheet '$oWkS->{Name}'");
+      next;
+    }
+    progress("Turner XLS: $xmltvid: processing worksheet '$oWkS->{Name}'");
+
+    # the time is in the column 0
+    # the columns from 1 to 7 are each for one day
+    for(my $iC = 1 ; $iC <= 7  ; $iC++) {
+
+      # get the date from row 1
+      my $oWkC = $oWkS->{Cells}[1][$iC];
+      next if( ! $oWkC );
+      $date = ParseDateXLS( $oWkC->Value );
+      next if( ! $date );
+
+      if( $date ne $currdate ) {
+
+        if( $currdate ne "x" ) {
+          # save last day if we have it in memory
+          FlushDayData( $xmltvid, $dsh , @ces );
+          $dsh->EndBatch( 1 );
+          @ces = ();
+        }
+
+        my $batch_id = $xmltvid . "_" . $date;
+        $dsh->StartBatch( $batch_id , $channel_id );
+        $dsh->StartDate( $date , "06:00" );
+        $currdate = $date;
+
+        progress("Turner XLS: $xmltvid: Date is: $date");
+      }
+
+      my $time;
+      my $title = "x";
+      my $description;
+      my $title_org;
+
+      # browse through the shows
+      # starting at row 2
+      for(my $iR = 2 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++){
+
+        my $oWkC = $oWkS->{Cells}[$iR][$iC];
+        next if( ! $oWkC );
+        my $text = $oWkC->Value;
+
+        if( isTimeAndTitle( $text ) ){
+
+          # check if we have something
+          # in the memory already
+          if( $title ne "x" ){
+
+      		  # Remove (UU) and so on
+      			$title =~ s/\(.*\)//g;
+      			$title =~ s/^NIEUW//i;
+      			$title =~ s/\- Season (\d+)//i;
+      			$title =~ s/^://i;
+
+            my $ce = {
+              channel_id   => $channel_id,
+              start_time => $time,
+              title => norm($title),
+            };
+
+            $ce->{description} = $description if $description;
+            $ce->{original_title} = norm($title_org) if defined($title_org) and $ce->{title} ne norm($title_org) and norm($title_org) ne "";
+
+            push( @ces , $ce );
+            $description = "";
+          }
+
+          ( $time, $title ) = ParseTimeAndTitle( $text );
+        } else {
+          $description .= $text;
+        }
+
+      } # next row
+
+    } # next column
+  } # next sheet
+
+  # save last day if we have it in memory
+  FlushDayData( $xmltvid, $dsh , @ces );
+
+  $dsh->EndBatch( 1 );
+
+  return;
+}
+
+sub FlushDayData {
+  my ( $xmltvid, $dsh , @data ) = @_;
+
+    if( @data ){
+      foreach my $element (@data) {
+
+      	# Get year from description
+      	if(defined($element->{description})) {
+      		my( $year ) = ( $element->{description} =~ /^(\d\d\d\d),/ );
+      		if($year) {
+      			$element->{production_date} = $year."-01-01";
+      		}
+
+      		# Credits
+      		if( $element->{description} =~ /Dir:/ ) {
+      			my ( $dirs, $actors ) = ( $element->{description} =~ /Dir:\s+([A-Z].+?),\s+Act:\s+([A-Z].+?),\s+Sub/ );
+						# Put them into the array
+						if(defined($dirs) and $dirs ne "") {
+							#print Dumper($dirs, $actors);
+							my @directors = split( /\s*,\s*/, $dirs );
+							$element->{directors} = join( ";", grep( /\S/, @directors ) );
+						}
+						if(defined($actors) and $actors ne "") {
+							my @actors = split( /\s*,\s*/, $actors );
+							$element->{actors} = join( ";", grep( /\S/, @actors ) );
+						}
+
+						# Movies
+						$element->{program_type} = "movie";
+      		}
+      	}
+
+        progress("Turner: $xmltvid: $element->{start_time} - $element->{title}");
+
+        $dsh->AddProgramme( $element );
+      }
+    }
+}
+
+sub ParseDateXLS {
+  my( $text ) = @_;
+
+#print "ParseDateXLS: >$text<\n";
+
+  return undef if ( ! $text );
+
+  my( $month, $day, $year );
+
+  if( $text =~ /^(\d{4})-(\d{2})-(\d{2})$/ ){ # format '2010-04-26'
+    ( $year, $month, $day ) = ( $text =~ /^(\d+)-(\d+)-(\d+)$/ );
+  } elsif( $text =~ /^(\d+)-(\d+)-(\d+)$/ ){ # format '8-1-08'
+    ( $month, $day, $year ) = ( $text =~ /^(\d+)-(\d+)-(\d+)$/ );
+  } elsif( $text =~ /^\d+\/\d+\/\d+$/ ) { # format '01/11/2008'
+    ( $day, $month, $year ) = ( $text =~ /^(\d+)\/(\d+)\/(\d+)$/ );
+  }
+
+  $year += 2000 if( $year < 100 );
+
+  return sprintf( '%04d-%02d-%02d', $year, $month, $day );
+}
+
+sub isShow {
+  my ( $text ) = @_;
+
+  # format 'UK 19.35 / CET 20.35 / CAT 20.35 And the title is here'
+  # or
+  # UK Time 05.30 / CET 06.30 / CAT 06.30 Looney Tunes
+  if( $text =~ /^UK\s+\S*\s*\d+\.\d+\s+\/\s+CET\s+\d+\.\d+\s+\/\s+CAT\s+\d+\.\d+\s+/i ){
+    return 1;
+  }
+
+  return 0;
+}
+
+sub ParseShow {
+  my( $text ) = @_;
+
+  my( $hour, $min, $title ) = ( $text =~ /^UK\s+\S*\s*\d+\.\d+\s+\/\s+CET\s+(\d+)\.(\d+)\s+\/\s+CAT\s+\d+\.\d+\s+(.*)/ );
+
+  return( $hour . ":" . $min , $title );
+}
+
+sub isTimeAndTitle {
+  my ( $text ) = @_;
+
+  # format '09:10 The Addams Family'
+  if( $text =~ /^\d{2}:\d{2}\s+\S+/ ){
+    return 1;
+  }
+
+  return 0;
+}
+
+sub ParseTimeAndTitle {
+  my( $text ) = @_;
+
+  my( $hour, $min, $title ) = ( $text =~ /^(\d{2}):(\d{2})\s+(.*)$/ );
+
+  return( $hour . ":" . $min , $title );
+}
+
+## END
+
 
 1;
 
