@@ -18,6 +18,8 @@ use Getopt::Long;
 use Digest::MD5;
 use Data::Dumper;
 
+use Time::Piece;
+
 use Encode qw/decode/;
 
 use NonameTV;
@@ -63,8 +65,6 @@ my @folders = qw(NonameTV-Data.GlobalListings
 		 NonameTV-Data.FuelTV
 		 NonameTV-Data.LuxeTV
 		 NonameTV-Data.GodTV
-		 NonameTV-Data.TVChile
-		 NonameTV-Data.TravelChannel
 		 NonameTV-Data.Kanal10
 		 NonameTV-Data.Bloomberg
 		 NonameTV-Data.Motors
@@ -98,19 +98,23 @@ foreach my $dir (@folders) {
   my $dir_pretty = $dir;
   $dir_pretty =~ s/NonameTV-Data\.//i;
   p "Running through $dir_pretty";
+  my $now = localtime;
 
   foreach my $message ($folder->messages) {
     # Flag for delete
     if($message->label( 'flagged' )) {
-        next; # Skip
+      my $before = localtime($message->timestamp);
+      if(($now - $before)->days > 110) {
+        $message->delete;
+      }
+
+      next; # Skip
     }
     #next unless $message->isMultipart;
 
     # Use Encode::MIME::Header
     my $subject = decode( 'MIME-Header', $message->get( 'Subject' ) ) || '';
     my $from = $message->get( 'From' );
-
-    #d "Processing $from - $subject";
 
     if( process_parts( $message, $dir, $from, $subject ) ) {
       $message->label( 'flagged' => 1 );
@@ -120,6 +124,9 @@ foreach my $dir (@folders) {
       d "Processing failed.";
     }
   }
+
+  # Close it
+  $folder->close;
 }
 
 $mgr->closeAllFolders;
