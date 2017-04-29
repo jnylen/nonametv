@@ -102,13 +102,14 @@ foreach my $dir (@folders) {
   my $now = localtime;
 
   foreach my $message ($folder->messages) {
+    my $before = localtime($message->timestamp);
+    if(($now - $before)->days > 110) {
+      $message->delete;
+      next;
+    }
+
     # Flag for delete
     if($message->label( 'flagged' )) {
-      my $before = localtime($message->timestamp);
-      if(($now - $before)->days > 110) {
-        $message->delete;
-      }
-
       next; # Skip
     }
     #next unless $message->isMultipart;

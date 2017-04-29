@@ -8,6 +8,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use Mail::Box;
 use Mail::Box::Manager;
+use Time::Piece;
 
 my $maildir = "/content/maildir/";
 my $infoldername = ".Projects/xmltv-data-in";
@@ -15,15 +16,20 @@ my $targetprefix = ".Projects/.NonameTV-Data.";
 
 my $folders;
 
+my $now = localtime;
 my $mgr = Mail::Box::Manager->new();
 
 my $rootfolder = $mgr->open( type => 'maildir', create => 1, folder => $maildir );
-#my @subs = $rootfolder->listSubFolders();
-#print join "\n", @subs;
-
 my $infolder = $rootfolder->openSubFolder( $infoldername, access => 'rw' );
 
 foreach my $msg ($infolder->messages) {
+  my $before = localtime($msg->timestamp);
+  if(($now - $before)->days > 180) {
+    $msg->delete;
+    next;
+  }
+
+  # Dont run on deleted
   next if $msg->isDeleted();
   my @from = $msg->from;
   my $fromaddr = $from[0]->format;
@@ -276,9 +282,7 @@ sub MoveMessage {
   my( $msg, $foldername ) = @_;
 
   if( not exists $folders->{$foldername} ) {
-    $folders->{$foldername} =
-	$rootfolder->openSubFolder( $targetprefix . $foldername,
-				    access => 'rw' );
+    $folders->{$foldername} = $rootfolder->openSubFolder( $targetprefix . $foldername, access => 'rw' );
   }
 
   print("Moved a mail to $foldername\n");
