@@ -235,6 +235,8 @@ sub ImportXML
     }
 
     $ce->{stereo} = "mono" if $audio eq "mono";
+    $ce->{stereo} = "stereo" if $audio eq "stereo";
+    $ce->{stereo} = "dolby digital" if $audio eq "dolby E5.1";
     $ce->{aspect} = "16:9" if $sixteenNine eq "true";
     $ce->{aspect} = "4:3"  if $sixteenNine eq "false" or $sixteenNine eq "";
     $ce->{production_date} = "$prodyear-01-01" if(defined($prodyear) and $prodyear ne "");
