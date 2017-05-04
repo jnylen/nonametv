@@ -14,6 +14,7 @@ use utf8;
 use DateTime;
 use XML::LibXML;
 use Data::Dumper;
+use TryCatch;
 
 use NonameTV qw/ParseXml norm AddCategory/;
 use NonameTV::DataStore::Helper;
@@ -122,7 +123,8 @@ sub ImportContent {
 
     p($start_time." $ce->{title}");
 
-    $dsh->AddProgramme( $ce );
+    try { $dsh->AddProgramme( $ce ); }
+    catch ($err) { print("error: $err"); next; }
 
   }
 
