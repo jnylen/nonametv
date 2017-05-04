@@ -404,7 +404,7 @@ sub guess_channel
      return "nauticalchannel.net";
  }
 
- if( $dir =~ /Motors/ and $filename =~ /\.xls$/i ) {
+ if( $dir =~ /Motors/ and $filename =~ /\.(xls|xlsx)$/i ) {
      return "motorstv.com" if $filename !~ /french/i;
  }
 
