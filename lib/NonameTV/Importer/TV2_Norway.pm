@@ -148,6 +148,11 @@ sub ImportContent
     my $rerun = $sc->findvalue( 'episode-num[@system="dd_replay"]' );
 
     #
+    # content?
+    #
+    my $content = $sc->findvalue( 'episode-num[@system="dd_content"]' );
+
+    #
     # image
     #
     my $image = $sc->findvalue( 'icon/@src' );
@@ -175,10 +180,6 @@ sub ImportContent
       guests       => norm($guests),
     };
 
-    if(defined ( $directors ) and ($directors ne "")) {
-      $ce->{program_type} = 'movie';
-    }
-
     if($ce->{title} =~ /^Film\:/i) {
         $ce->{title} =~ s/^Film\://gi;
         $ce->{title} = norm($ce->{title});
@@ -195,6 +196,15 @@ sub ImportContent
   		    AddCategory( $ce, $program_type, $category );
   		}
   	}
+
+    if(defined($content)) {
+      ($program_type, $category ) = $ds->LookupCat( "TV2NO_type", $content );
+      AddCategory( $ce, $program_type, $category );
+  	}
+
+    if(defined ( $directors ) and ($directors ne "")) {
+      $ce->{program_type} = 'movie';
+    }
 
     if( defined( $production_year ) and ($production_year =~ /(\d\d\d\d)/) )
     {
