@@ -19,6 +19,13 @@ use Text::CSV;
 use Data::Dumper;
 use File::Temp qw/tempfile/;
 
+use Spreadsheet::XLSX;
+use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
+use Spreadsheet::Read;
+
+use Text::Iconv;
+my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
+
 use NonameTV qw/norm AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
@@ -54,7 +61,7 @@ sub ImportContentFile {
 
   if( $file =~ /\.csv$/i ){
     $self->ImportCSV( $file, $chd );
-  } elsif( $file =~ /\.xls$/i ){
+  } elsif( $file =~ /\.(xls|xlsx)$/i ){
     $self->ImportXLS( $file, $chd );
   }
 
@@ -73,14 +80,16 @@ sub ImportXLS {
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
 
-  return if( $file !~ /\.xls$/i );
+  return if( $file !~ /\.(xls|xlsx)$/i );
   progress( "Motors XLS: $xmltvid: Processing $file" );
 
   my %columns = ();
   my $date;
   my $currdate = undef;
+  my $oBook;
 
-  my $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );
+  if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
+  else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
 
   # main loop
   for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
@@ -114,14 +123,14 @@ sub ImportXLS {
       # time - column 1 ('Horaire')
       $oWkC = $oWkS->{Cells}[$iR][1];
       next if( ! $oWkC );
-      my $time = $oWkC->Value if( $oWkC->Value );
-      
-      # Sometimes Motors somehow add 24:00:00 in the time field, that fucks the system up. 
+      my $time = ExcelFmt("hh:mm",$oWkC->Value ) if( $oWkC->Value );
+
+      # Sometimes Motors somehow add 24:00:00 in the time field, that fucks the system up.
       my ( $hour , $min ) = ( $time =~ /^(\d+):(\d+)/ );
       if($hour eq "24") {
       	$hour = "00";
       }
-      
+
       $time = $hour.":".$min;
 
       # title - column 2 ('Titre du produit')
