@@ -128,7 +128,6 @@ sub ImportContent {
       my $starttimefull = $prg->findvalue( 'start_time_full' );
       my $duration =      $prg->findvalue( 'duration' );
       my $lead =          $prg->findvalue( 'lead' );
-      my $thnimage =      $prg->findvalue( 'thn_image' );
       my $channelid =     $prg->findvalue( 'channel_id' );
       my $category =      $prg->findvalue( 'content_type' );
       my $genre =         $prg->findvalue( 'primary_genre' );
@@ -143,7 +142,12 @@ sub ImportContent {
 
       $ce->{schedule_id} = $scheduleid if ( $scheduleid =~ /\S/ );
       $ce->{description} = $lead if $lead;
-      $ce->{url_image_thumbnail} = $thnimage if ( $thnimage =~ /\S/ );
+
+      # Extra
+      my $extra = {};
+      $extra->{descriptions} = [];
+      $extra->{qualifiers} = [];
+      $extra->{images} = [];
 
       my( $pty, $cat );
       # Primary program_type
@@ -214,14 +218,16 @@ sub ImportContent {
       $ce->{episode} = $episode if $episode;
 
       # Image
-      if($prg->findvalue( 'thnImage' )) {
-        $ce->{fanart} = $prg->findvalue( 'thnImage' );
+      # Images
+      if(defined($prg->findvalue( 'thnImage' )) and $prg->findvalue( 'thnImage' ) ne "") {
+        push $extra->{images}, { url => $prg->findvalue( 'thnImage' ), source => "HBO" };
       }
 
       # New?
       my $premier = $prg->findvalue( 'premier' );
       if( $premier eq "1" )
       {
+        push $extra->{qualifiers}, "repeat";
         $ce->{new} = "0";
       }
       else
@@ -234,6 +240,8 @@ sub ImportContent {
         $ce->{extra_id} = "tt" . sprintf( "%07d", $imdbid );
         $ce->{extra_id_type} = "imdb";
       }
+
+      $ce->{extra} = $extra;
 
       $dsh->AddProgramme( $ce );
 

@@ -307,6 +307,13 @@ sub ImportContent {
           AddCategory( $ce, $pty, $cat );
       }
 
+      # Images
+      my $imgs = $pgm->find( './/images/image' );
+      foreach my $item ($imgs->get_nodelist)
+      {
+          push $extra->{images}, { url => $item->findvalue( 'original/@src' ), type => undef, title => undef, copyright => norm($item->findvalue( '@credits' )), source => "Viasat World" };
+      }
+
       $ce->{extra} = $extra;
 
       progress( "ViasatWorld: $chd->{xmltvid}: $start_time - $name" );

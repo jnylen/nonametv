@@ -137,6 +137,12 @@ sub ImportContent {
         title => norm(normLatin1($title)),
       };
 
+      # Extra
+      my $extra = {};
+      $extra->{descriptions} = [];
+      $extra->{qualifiers} = [];
+      $extra->{images} = [];
+
       my ($subtitle) = $programme->findvalue ('./UNTERTITEL');
       my ($subtitle_org) = $programme->findvalue ('./ZUSATZTITEL');
       if( $subtitle ){
@@ -247,8 +253,12 @@ sub ImportContent {
       my $imgs = $programme->find( './/BILD' );
       foreach my $item ($imgs->get_nodelist)
       {
-          $ce->{fanart} = $item->find('./URL_300DPI')->to_literal;
-          #print "IMG:" .$item->to_literal;
+        my $image = $item->find('./URL_300DPI')->to_literal;
+        my $imgtit = $item->find('./TITEL')->to_literal;
+        $imgtit =~ s/\:$//;
+        my( $copyright) = ($item->find('./LEGENDE')->to_literal =~ /\(Copyright (.*?)\)/ );
+
+        push $extra->{images}, { url => $image, title => $imgtit, copyright => $copyright, source => "SRF" };
       }
 
       $self->{datastorehelper}->AddProgramme( $ce );

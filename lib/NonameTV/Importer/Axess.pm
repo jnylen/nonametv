@@ -191,7 +191,13 @@ sub ImportContent {
       url         => $url,
     };
 
-	my ( $program_type, $category ) = ParseDescCatSwe( $ce->{description} );
+    # Extra
+    my $extra = {};
+    $extra->{descriptions} = [];
+    $extra->{qualifiers} = [];
+    $extra->{images} = [];
+
+	  my ( $program_type, $category ) = ParseDescCatSwe( $ce->{description} );
   	AddCategory( $ce, $program_type, $category );
 
     if( my( $dumperino, $dumptag, $year ) = ($description =~ /(Produktions.r|Produktion.r|Inspelat)(:|)\s+(\d\d\d\d)\./) )
@@ -254,11 +260,12 @@ sub ImportContent {
     $ce->{description} = normLatin1($ce->{description}) if defined $ce->{description};
 
     # Image
-    if($url ne "") {
+    if(defined($url) and $url ne "") {
       my ($program_id) = ($url =~ /(\d+)$/);
-      $ce->{fanart} = "http://www.axess.se/public/upload/images/tv_programs/" . $program_id . ".jpg";
+      push $extra->{images}, { url => "http://www.axess.se/public/upload/images/tv_programs/" . $program_id . ".jpg", source => "Axess" };
     }
 
+    $ce->{extra} = $extra;
 
     $dsh->AddProgramme( $ce );
   }

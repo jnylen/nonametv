@@ -187,6 +187,12 @@ sub ImportContent
 
     $ce->{title} =~ s/ - Sesongavslutning!//i;
 
+    # Extra
+    my $extra = {};
+    $extra->{descriptions} = [];
+    $extra->{qualifiers} = [];
+    $extra->{images} = [];
+
   	my($program_type, $category ) = undef;
 
   	if(defined($genre)) {
@@ -230,10 +236,7 @@ sub ImportContent
 
     # image
     if(defined($image) and $image ne "" and $image !~ /bilde_mangler/i) {
-        #static.tv2.no/presse/images/medium/GREYSANATOMY_Y9_186_019.jpg => presse.tv2.no/presse/images/original/GREYSANATOMY_Y9_186_019.jpg
-        $ce->{fanart} = $image;
-        $ce->{fanart} =~ s/static\./presse\./;
-        $ce->{fanart} =~ s/images\/medium/images\/original/;
+        push $extra->{images}, { url => $image, source => "TV2 Norway" };
     }
 
     # episode
@@ -248,9 +251,12 @@ sub ImportContent
     # replay
     if(defined($rerun) and norm($rerun) eq "true") {
       $ce->{new} = "0";
+      push $extra->{qualifiers}, "repeat";
     } else {
       $ce->{new} = "1";
     }
+
+    $ce->{extra} = $extra;
 
     $ce->{subtitle} = undef;
     progress("TV2_Norway: $chd->{xmltvid}: $start - $ce->{title}");

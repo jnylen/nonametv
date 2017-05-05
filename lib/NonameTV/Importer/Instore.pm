@@ -183,7 +183,7 @@ sub ImportContent
     my $rerun    = norm($sc->findvalue( './originalairdatesweden'));
 
 
-	my $ce = {
+	  my $ce = {
         channel_id 		=> $chd->{id},
         title 			=> $title,
         start_time 		=> $start,
@@ -193,12 +193,18 @@ sub ImportContent
 
     progress( "Instore: $chd->{xmltvid}: $start - $title" );
 
+    # Extra
+    my $extra = {};
+    $extra->{descriptions} = [];
+    $extra->{qualifiers} = [];
+    $extra->{images} = [];
+
     $ce->{subtitle} = $subtitle if $subtitle ne "";
 
     my($program_type, $category ) = $ds->LookupCat( 'Instore', $genre );
-	AddCategory( $ce, $program_type, $category );
+	  AddCategory( $ce, $program_type, $category );
 
-	# Episode info in xmltv-format
+	  # Episode info in xmltv-format
     if( ($episode ne "0" and $episode ne "") and ( $season ne "0" and $season ne "") )
     {
     	$episode = int $episode;
@@ -230,8 +236,9 @@ sub ImportContent
 
     $ce->{actors} = join( ";", grep( /\S/, @actors ) );
 
-    if($image ne "") {
+    if(defined($image) and $image ne "") {
         $ce->{fanart} = $image;
+        push $extra->{images}, { url => $image, source => "OUTTV" };
     }
 
     # Find rerun-info
@@ -241,8 +248,11 @@ sub ImportContent
 	  }
 	  else
 	  {
+      push $extra->{qualifiers}, "repeat";
 	    $ce->{new} = "0";
 	  }
+
+    $ce->{extra} = $extra;
 
 	  # Add Programme
 	  $dsh->AddCE( $ce );

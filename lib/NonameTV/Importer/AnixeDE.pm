@@ -98,10 +98,19 @@ sub ImportContent {
       $ce->{description} = norm($description);
     }
 
-    $ce->{fanart} = $image if defined($image) and $image ne "";
     $ce->{quality} = 'HDTV';
     $ce->{program_type} = 'series';
 
+    # Extra
+    my $extra = {};
+    $extra->{descriptions} = [];
+    $extra->{qualifiers} = [];
+    $extra->{images} = [];
+
+    # Images
+    if(defined($image) and $image ne "") {
+      push $extra->{images}, { url => $image, source => "Anixe" };
+    }
 
     my( $t, $st ) = ($ce->{title} =~ /(.*) - (.*)/);
     if( defined( $st ) )
@@ -119,6 +128,8 @@ sub ImportContent {
         $ce->{subtitle} = norm($st);
       }
     }
+
+    $ce->{extra} = $extra;
 
     $self->{datastore}->AddProgramme ($ce);
   }

@@ -109,6 +109,12 @@ sub ImportContent
         description => norm($desc)
     };
 
+    # Extra
+    my $extra = {};
+    $extra->{descriptions} = [];
+    $extra->{qualifiers} = [];
+    $extra->{images} = [];
+
     # Subtitle
     $ce->{subtitle} = norm($subtitle) if defined($subtitle);
     $ce->{original_subtitle} = norm($subtitle_org) if defined($subtitle_org);
@@ -139,12 +145,14 @@ sub ImportContent
     # Live?
     if( defined($live) and $live eq "true" ) {
       $ce->{live} = 1;
+      push $extra->{qualifiers}, "live";
     } else {
       $ce->{live} = 0;
     }
 
     if( defined($rerun) and $rerun eq "true" ) {
       $ce->{new} = 0;
+      push $extra->{qualifiers}, "repeat";
     } else {
       $ce->{new} = 1;
     }
@@ -201,10 +209,15 @@ sub ImportContent
     }
 
     # Images
-    my $image = $p->{'images'}->[0]->{'urlImage'};
-    if(defined($image) and $image ne "") {
-      $ce->{fanart} = $image;
+    my $images = $p->{'images'};
+    foreach my $img (@{$images})
+    {
+      if(defined($img->{'urlImage'}) and $img->{'urlImage'} ne "") {
+        push $extra->{images}, { url => $img->{'urlImage'}, source => "RTS" };
+      }
     }
+
+    $ce->{extra} = $extra;
 
     progress($start." $ce->{title}");
 

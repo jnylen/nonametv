@@ -126,15 +126,22 @@ sub ImportContentFile
 
     $ce->{subtitle} = norm($subtitle) if norm($subtitle) ne norm($title);
 
+    # Extra
+    my $extra = {};
+    $extra->{descriptions} = [];
+    $extra->{qualifiers} = [];
+    $extra->{images} = [];
+
     ## Image
     if($sc->findvalue( './icon/@src' )) {
-        $ce->{fanart} = $sc->findvalue( './icon/@src' );
-        $ce->{fanart} =~ s/\/s\//\/sd\//;
+        my $image = $sc->findvalue( './icon/@src' );
+        $image =~ s/\/s\//\/sd\//;
+        push $extra->{images}, { url => $image, source => "BibelTV" };
     }
 
     # Aspect (It's actually in the correct form)
-	my ($aspect) = $sc->findvalue ('./video/aspect');
-	$ce->{aspect} = norm($aspect) if $aspect;
+	  my ($aspect) = $sc->findvalue ('./video/aspect');
+	  $ce->{aspect} = norm($aspect) if $aspect;
 
     # The director and actor info are children of 'credits'
     my (@actors, @directors, @guests, @presenters);
@@ -170,6 +177,8 @@ sub ImportContentFile
         my ( $program_type, $categ ) = $ds->LookupCat( "BibelTV", $genre );
         AddCategory( $ce, $program_type, $categ );
     }
+
+    $ce->{extra} = $extra;
 
 
     $dsh->AddProgramme( $ce );

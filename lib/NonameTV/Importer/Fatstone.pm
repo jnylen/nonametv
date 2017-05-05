@@ -178,6 +178,7 @@ sub ParseDate {
   my( $text ) = @_;
 
   $text = ExcelFmt('yyyy-mm-dd', $text);
+  print("text: $text\n");
 
   $text =~ s/^\s+//;
 

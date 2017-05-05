@@ -311,9 +311,7 @@ sub ImportContent
     my $imgs = $pgm->find( './/item' );
     foreach my $item ($imgs->get_nodelist)
     {
-        $ce->{fanart} = $item->to_literal;
         push $extra->{images}, { url => $item->to_literal, type => undef, title => undef, copyright => undef, source => "TV4" };
-        #print "IMG:" .$item->to_literal;
     }
 
     # Fixes

@@ -151,6 +151,12 @@ sub ImportContent
         start_time => $start,
     };
 
+    # Extra
+    my $extra = {};
+    $extra->{descriptions} = [];
+    $extra->{qualifiers} = [];
+    $extra->{images} = [];
+
     if(defined($pgm->findvalue( 'original_title' )) and $genre ne "Film"){
       # Season
   	  if(defined($episode) and $episode ne "" and defined($season) and $season ne "") {
@@ -266,10 +272,7 @@ sub ImportContent
     # Each
     foreach my $ic ($images->get_nodelist)
     {
-        # Fanart
-        if(not defined $ce->{fanart}) {
-            $ce->{fanart} = $ic->findvalue( 'url' );
-        }
+        push $extra->{images}, { url => $ic->findvalue( 'url' ), title => $ic->findvalue( 'caption' ), copyright => $ic->findvalue( 'byline' ), source => "TV2 Denmark" };
     }
 
     ## New?
@@ -278,7 +281,10 @@ sub ImportContent
       $ce->{new} = 1;
     } else {
       $ce->{new} = 0;
+      push $extra->{qualifiers}, "repeat";
     }
+
+    $ce->{extra} = $extra;
 
     progress( "TV2: $chd->{xmltvid}: $start - ".norm($ce->{title}) );
 

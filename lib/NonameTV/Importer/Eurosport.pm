@@ -118,11 +118,22 @@ sub ImportContent {
         description => $desc,
       };
 
+      # Extra
+      my $extra = {};
+      $extra->{descriptions} = [];
+      $extra->{qualifiers} = [];
+      $extra->{images} = [];
+
       $ce->{quality} = "HDTV" if $hd eq "Yes";
-      $ce->{fanart} = $image if defined($image) and $image ne "";
+
+      # Images
+      if(defined($image) and $image ne "") {
+        push $extra->{images}, { url => $image, source => "Eurosport" };
+      }
 
       if(defined($bc_type) and ($bc_type eq "DIREKT" or $bc_type eq "LIVE" or $bc_type eq "Jälkilähetys" or $bc_type eq "NA ŻYWO")) {
         $ce->{live} = 1;
+        push $extra->{qualifiers}, "live";
       } else {
         $ce->{live} = 0;
       }
@@ -130,6 +141,7 @@ sub ImportContent {
 
       if(defined($bc_type) and ($bc_type eq "Repris" or $bc_type eq "Genudsendelse" or $bc_type eq "Replay" or $bc_type eq "Uusinta" or $bc_type eq "Reprise" or $bc_type eq "Powtórka")) {
         $ce->{new} = 0;
+        push $extra->{qualifiers}, "repeat";
       }
 
 
@@ -138,6 +150,8 @@ sub ImportContent {
   			my($program_type, $category ) = $ds->LookupCat( 'Eurosport', $sport );
   			AddCategory( $ce, "sports", $category );
   		}
+
+      $ce->{extra} = $extra;
 
       $ds->AddProgramme( $ce );
 

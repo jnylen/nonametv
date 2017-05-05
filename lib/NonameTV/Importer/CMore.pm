@@ -345,16 +345,13 @@ sub ImportContent
       {
         # Cover / Poster
         if($ic->findvalue( './@Category' ) eq 'Cover') {
-          push $extra->{images}, { url => 'http://cdn01.img.cmore.se/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'cover', title => undef, copyright => undef, source => "CMore" };
-          $ce->{poster} = 'http://cdn01.img.cmore.se/' . $ic->findvalue( './@Id' ) . '/8.img';
+          push $extra->{images}, { url => 'https://img-cdn-cmore.b17g.services/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'cover', title => undef, copyright => undef, source => "CMore" };
         } elsif($ic->findvalue( './@Category' ) eq 'Primary') {
           if($cate eq "Film") {
-            push $extra->{images}, { url => 'http://cdn01.img.cmore.se/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'landscape', title => undef, copyright => undef, source => "CMore" };
+            push $extra->{images}, { url => 'https://img-cdn-cmore.b17g.services/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'landscape', title => undef, copyright => undef, source => "CMore" };
           } else {
-            push $extra->{images}, { url => 'http://cdn01.img.cmore.se/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'episode', title => undef, copyright => undef, source => "CMore" };
+            push $extra->{images}, { url => 'https://img-cdn-cmore.b17g.services/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'episode', title => undef, copyright => undef, source => "CMore" };
           }
-
-          $ce->{fanart} = 'http://cdn01.img.cmore.se/' . $ic->findvalue( './@Id' ) . '/8.img';
         }
       }
     }
