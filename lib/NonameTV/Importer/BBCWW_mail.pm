@@ -127,16 +127,17 @@ sub ImportXLS
           if( $oWkS->{Cells}[$iR][$iC] ){
             $columns{$oWkS->{Cells}[$iR][$iC]->Value} = $iC;
 
-			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /English Title/ );
-			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Programme Title/ );
-			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Programme \(English\)$/ );
+      			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /English Title/ );
+      			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Programme Title/ );
+      			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Programme \(English\)$/ );
 
             $columns{'ORGTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /English Title/ );
-			$columns{'ORGTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Programme \(English\)$/ );
+			      $columns{'ORGTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Programme \(English\)$/ );
 
             $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /English Episode Title/ and not defined $columns{'Episode Title'} );
             $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(English\)/ and not defined $columns{'Episode Title'} );
             $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Title/ and not defined $columns{'Episode Title'} );
+            $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name/ and not defined $columns{'Episode Title'} );
 
             $columns{'Ser No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series No./ );
             $columns{'Ser No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series Number/ );
@@ -159,29 +160,29 @@ sub ImportXLS
             $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Synopsis\.$/ and not defined $columns{'Synopsis'} );
 
             # Swedish
-			if($chd->{sched_lang} eq "sv") {
-			    $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Swedish\)/ );
-			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis \(Swedish\)/ );
-			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(Swedish\)/ );
-			}elsif($chd->{sched_lang} eq "no") {
-                $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Norwegian\)/ );
-			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis \(Norwegian\)/ );
-			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(Norwegian\)/ );
-			}elsif($chd->{sched_lang} eq "da") {
-                $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Danish\)/ );
-			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis \(Danish\)/ );
-			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(Danish\)/ );
-			}elsif($chd->{sched_lang} eq "fi") {
-                $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Finnish\)/ );
-			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis \(Finnish\)/ );
-			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(Finnish\)/ );
-			}elsif($chd->{sched_lang} eq "en") {
-                $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Programme Title$/ );
-			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /English Synopsis/ );
-			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Episode Title$/ );
-			}elsif($chd->{sched_lang} eq "nl") {
-			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Dutch Synopsis/ );
-			}
+      			if($chd->{sched_lang} eq "sv") {
+      			    $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Swedish\)/ );
+      			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis \(Swedish\)/ );
+      			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(Swedish\)/ );
+      			}elsif($chd->{sched_lang} eq "no") {
+                      $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Norwegian\)/ );
+      			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis \(Norwegian\)/ );
+      			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(Norwegian\)/ );
+      			}elsif($chd->{sched_lang} eq "da") {
+                      $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Danish\)/ );
+      			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis \(Danish\)/ );
+      			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(Danish\)/ );
+      			}elsif($chd->{sched_lang} eq "fi") {
+                      $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Finnish\)/ );
+      			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis \(Finnish\)/ );
+      			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(Finnish\)/ );
+      			}elsif($chd->{sched_lang} eq "en") {
+                      $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Programme Title$/ );
+      			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /English Synopsis/ );
+      			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Episode Title$/ );
+      			}elsif($chd->{sched_lang} eq "nl") {
+      			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Dutch Synopsis/ );
+      			}
 
             $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
           }
@@ -255,6 +256,15 @@ sub ImportXLS
         } else {
           $ce->{episode} = sprintf( ". %d .", $epino-1 );
         }
+      }
+
+      # Remove subtitles with date in the subtitle
+      if($ce->{subtitle} =~ /^(\d+)\/(\d+)\/(\d\d\d\d)$/) {
+        $ce->{subtitle} = undef;
+      }
+
+      if($ce->{subtitle} =~ /^Series (\d+), Episode (\d+)$/i or $ce->{subtitle} =~ /^Episode (\d+)$/i) {
+        $ce->{subtitle} = undef;
       }
 
       # org title
