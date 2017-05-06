@@ -1514,3 +1514,7 @@
 1210,TmdbTV,^.*$,program_type,series,\N,guess
 1116,TmdbTV,"Law & Order: Los Angeles",program_type,series,32632,guess
 1116,TmdbTV,"Law & Order: Trial by Jury",program_type,series,3357,guess
+489,Fixups,"Brottskod: försvunnen",\N,\N,series,setprogram_type
+259,TmdbTV,"Doktorn kan komma",program_type,series,4014,guess
+259,TmdbTV,"Holby city",program_type,series,1028,guess
+259,TmdbTV,Kvinnofängelset,program_type,series,4275,guess

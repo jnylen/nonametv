@@ -1599,6 +1599,33 @@ Tele5_main,magazin/ratgeber,\N,series
 Tele5_main,serie,\N,series
 Tele5_main,sonstiges,\N,series
 Tele5_main,werbung,\N,series
+Tivo_genres,action,Action,
+Tivo_genres,adventure,Adventure,
+Tivo_genres,animated,Animated,
+Tivo_genres,biographical,Biography,
+Tivo_genres,biography,Biography,
+Tivo_genres,biopic,Biography,
+Tivo_genres,"black comedy",Comedy,
+Tivo_genres,cartoon,Cartoon,
+Tivo_genres,comedy,Comedy,
+Tivo_genres,crime,Crime,
+Tivo_genres,dance,Dance,
+Tivo_genres,documentary,Documentary,
+Tivo_genres,drama,Drama,
+Tivo_genres,fantasy,Fantasy,
+Tivo_genres,foreign,Foreign,
+Tivo_genres,horror,Horror,
+Tivo_genres,music,Music,
+Tivo_genres,musical,Musical,
+Tivo_genres,mystery,Mystery,
+Tivo_genres,political,Politics,
+Tivo_genres,romance,Romance,
+Tivo_genres,"romantic comedy",Romance/Comedy,
+Tivo_genres,sports,Sports,
+Tivo_genres,thriller,Thriller,
+Tivo_type,ff,\N,movie
+Tivo_type,s#,\N,series
+Tivo_type,sa,\N,series
 Tmdb_genre,10402,Music,
 Tmdb_genre,105,Disaster,
 Tmdb_genre,10748,Suspense,
@@ -1811,6 +1838,8 @@ TV2NO,ungdomsprogram,Youth,tvshow
 TV2NO,western,Western,
 TV2NO,westerndrama,Western/Drama,
 TV2NO,westernkomedie,Western/Comedy,
+TV2NO_type,f,\N,movie
+TV2NO_type,serie,\N,series
 TV4,aktuellt,\N,series
 TV4,animation,Animation,
 TV4,barnprogram,Kids,series
