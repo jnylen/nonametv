@@ -286,6 +286,14 @@ sub ImportContent
 
     $ce->{extra} = $extra;
 
+    # End of transmission
+    if($ce->{title} eq "Godnat") {
+      $ce->{title} = "end-of-transmission";
+    }
+
+    # Subtitles
+    $ce->{subtitle} =~ s|\s+del\s+(\d+)$| ($1)| if(defined($ce->{subtitle}));
+
     progress( "TV2: $chd->{xmltvid}: $start - ".norm($ce->{title}) );
 
     delete $ce->{directors} if defined $ce->{directors} and $ce->{directors} =~ /^\(/; # Failure to parse
