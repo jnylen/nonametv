@@ -207,6 +207,7 @@ sub ImportContent {
         my $extra = {};
         $extra->{descriptions} = [];
         $extra->{qualifiers} = [];
+        $extra->{images} = [];
 
 
         # Send back original swedish title
@@ -308,7 +309,7 @@ sub ImportContent {
       }
 
       # Images
-      my $imgs = $pgm->find( './/images/image' );
+      my $imgs = $emission->find( './/images/image' );
       foreach my $item ($imgs->get_nodelist)
       {
           push $extra->{images}, { url => $item->findvalue( 'original/@src' ), type => undef, title => undef, copyright => norm($item->findvalue( '@credits' )), source => "Viasat World" };
