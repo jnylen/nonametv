@@ -18,6 +18,7 @@ use Params::Validate qw(validate_with :types);
 use Locale::Codes::Language qw(all_language_codes);
 use Object::Tiny qw(apikey apiurl lang debug client encoder json);
 use WWW::Mechanize::GZip;
+use Sub::Retry;
 
 ### config
 ### NoUpdate won't check the http server for updates in 48 hours after first fetch.
@@ -128,31 +129,38 @@ sub talk {
     # Encode
     $url = $self->encoder->encode($url);
 
-    # Talk
-    warn "DEBUG: GET -> $url\n" if $self->debug;
-    my $response = $self->client->get($url);
+    # Talk (retry 3 times, 10s delay each time)
+    my $res = retry 3, 10, sub {
+      my $n = shift;
+      warn "DEBUG: GET -> $url (times: $n)\n" if $self->debug;
+      my $response = $self->client->get($url);
 
-    # Debug
-    if ( $self->debug ) {
-        warn "DEBUG: Got a successful response\n" if $response->{success};
-        warn "DEBUG: Got Status -> $response->{status}\n" if $response->{status};
-        warn "DEBUG: Got Reason -> $response->{reason}\n"
-          if $response->{reason};
-        warn "DEBUG: Got Content -> $response->{content}\n"
-          if $response->{content};
-    } ## end if ( $self->debug )
+      # Debug
+      if ( $self->debug ) {
+          warn "DEBUG: Got a successful response\n" if $response->{success};
+          warn "DEBUG: Got Status -> $response->{status}\n" if $response->{status};
+          warn "DEBUG: Got Reason -> $response->{reason}\n"
+            if $response->{reason};
+          warn "DEBUG: Got Content -> $response->{content}\n"
+            if $response->{content};
+      } ## end if ( $self->debug )
 
-    # Return
-    #print Dumper($response->{_content});
-    return unless $self->_check_status($response);
-    if ( $args->{want_headers} and exists $response->{_headers} ) {
-      # Return headers only
-      return $response->{_headers};
-    } ## end if ( $args->{want_headers...})
-  return unless $response->{_content};  # Blank Content
+      # Return
+      #print Dumper($response->{_content});
+      return undef unless $self->_check_status($response);
+      if ( $args->{want_headers} and exists $response->{_headers} ) {
+        # Return headers only
+        return $response->{_headers};
+      }
 
-  return $self->json->decode(
-        Encode::decode( 'utf-8-strict', $response->content ) ); # Real Response
+      return undef unless $response->{_content};  # Blank Content
+
+      return $self->json->decode(
+            Encode::decode( 'utf-8-strict', $response->content ) ); # Real Response
+    }, sub {
+        my $res = shift;
+        defined $res ? 0 : 1;
+    };
 } ## end sub talk
 
 ## ====================
@@ -220,7 +228,6 @@ sub _check_status {
               # Sleep for x amount of seconds
               # Travis: "We increased the rate limit to 40 requests every 10 seconds too, so there's a little bump."
               carp("TMDB API RATE LIMIT: Sleeping for 10 seconds..");
-              sleep(10);
             }
         }
     } ## end if ( $response->{content...})
