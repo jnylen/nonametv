@@ -137,16 +137,10 @@ sub talk {
 
       # Debug
       if ( $self->debug ) {
-          warn "DEBUG: Got a successful response\n" if $response->{success};
-          warn "DEBUG: Got Status -> $response->{status}\n" if $response->{status};
-          warn "DEBUG: Got Reason -> $response->{reason}\n"
-            if $response->{reason};
-          warn "DEBUG: Got Content -> $response->{content}\n"
-            if $response->{content};
-      } ## end if ( $self->debug )
+          warn "DEBUG: Got a successful response\n" if $response->{_msg} eq "OK";
+      }
 
       # Return
-      #print Dumper($response->{_content});
       return undef unless $self->_check_status($response);
       if ( $args->{want_headers} and exists $response->{_headers} ) {
         # Return headers only
@@ -232,7 +226,7 @@ sub _check_status {
         }
     } ## end if ( $response->{content...})
 
-  return;
+  return undef;
 } ## end sub _check_status
 
 #######################
