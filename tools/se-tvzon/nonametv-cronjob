@@ -40,6 +40,15 @@ then
   exit
 fi
 
+if [ $1x = --svtx ]
+then
+  # Run SkyDE specific commands
+  perl -I lib tools/se-tvzon/nonametv-filestore-svt
+  perl -I lib tools/nonametv-import Svt $Q
+
+  exit
+fi
+
 if [ $1x = --dailyx ]
 then
   # Run daily commands
