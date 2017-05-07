@@ -217,6 +217,11 @@ sub _check_status {
         if ( $ok and $code and $message ) {
             carp sprintf( 'TMDB API Error (%s): %s', $code, $message );
 
+            # 34 = Not Found (return 1 to not retry)
+            if($code eq "34" or $code eq 34) {
+              return 1;
+            }
+
             # Error 25 is rate limit
             if($code eq "25" or $code eq 25) {
               # Sleep for x amount of seconds
