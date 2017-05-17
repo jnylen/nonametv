@@ -258,12 +258,12 @@ sub guess_channel
     return "wild.natgeo.se" if $filename =~ /^ngwscan\s*\b/i;
 
 	  # History Channel
-	  if($filename =~ /\.xml$/i and ($filename =~ /his.eur./i or $filename =~ /history.eur./i or $filename =~ /history.europe./i or $filename =~ /history\s+europe/i)) {
-      return "historytv.se"  if $filename =~ /swe/i;
-      return "historytv.fi"  if $filename =~ /fin/i;
-      return "historytv.no"  if $filename =~ /nor/i;
-      return "historytv.dk"  if $filename =~ /dan/i;
-      return "historytv.eu"  if $filename =~ /eng/i;
+	  if($filename =~ /\.xml$/i and ($filename =~ /his.eur./i or $filename =~ /history.eur./i or $filename =~ /history.europe./i or $filename =~ /history\s+europe/i or $filename =~ /history\-/i)) {
+      return "historytv.se"  if $filename =~ /swe/i or $filename =~ /\-sv\-/i;
+      return "historytv.fi"  if $filename =~ /fin/i or $filename =~ /\-fi\-/i;
+      return "historytv.no"  if $filename =~ /nor/i or $filename =~ /\-nn\-/i;
+      return "historytv.dk"  if $filename =~ /dan/i or $filename =~ /\-da\-/i;
+      return "historytv.eu"  if $filename =~ /eng/i or $filename =~ /\-en\-/i;
     }
 
     return "crimeandinvestigation.eu"  if $filename =~ /cai.eng/i and $filename =~ /\.xml$/i;
@@ -306,12 +306,12 @@ sub guess_channel
 
 
     # H2
-    if(($filename =~ /h2\s+europe/i or $filename =~ /h2.eur./i or $filename =~ /h2.eu./i) and $filename =~ /\.xml$/i) {
-        return "h2.historytv.se"  if $filename =~ /swe/i;
-        return "h2.historytv.no"  if $filename =~ /nor/i;
-        return "h2.historytv.dk"  if $filename =~ /dan/i;
-        return "h2.historytv.fi"  if $filename =~ /fin/i;
-        return "h2.historytv.eu"  if $filename =~ /eng/i;
+    if(($filename =~ /h2\s+europe/i or $filename =~ /h2.eur./i or $filename =~ /h2.eu./i or $filename =~ /h2\-/i) and $filename =~ /\.xml$/i) {
+        return "h2.historytv.se"  if $filename =~ /swe/i or $filename =~ /\-sv\-/i;
+        return "h2.historytv.no"  if $filename =~ /nor/i or $filename =~ /\-nn\-/i;
+        return "h2.historytv.dk"  if $filename =~ /dan/i or $filename =~ /\-da\-/i;
+        return "h2.historytv.fi"  if $filename =~ /fin/i or $filename =~ /\-fi\-/i;
+        return "h2.historytv.eu"  if $filename =~ /eng/i or $filename =~ /\-en\-/i;
     }
 
     # Benelux schedules for Universal
