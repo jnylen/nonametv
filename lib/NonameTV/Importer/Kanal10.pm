@@ -91,7 +91,7 @@ sub ImportXLS {
   my $currdate = "x";
   my $coldate = 0;
   my $coltime = 1;
-  my $coltitle = 2;
+  my $coltitle = 3;
 
   my $oBook;
 
@@ -138,7 +138,7 @@ sub ImportXLS {
       my $oWkC;
 
       # date
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Date'}];
+      $oWkC = $oWkS->{Cells}[$iR][$coldate];
       next if( ! $oWkC );
 
       $date = create_date( ExcelFmt('yyyy-mm-dd', $oWkC->{Val}) );
@@ -159,7 +159,7 @@ sub ImportXLS {
       }
 
       # time
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Start'}];
+      $oWkC = $oWkS->{Cells}[$iR][$coltime];
       next if( ! $oWkC );
       my $time = 0;  # fix for  12:00AM
       $time=$oWkC->{Val} if( $oWkC->Value );
@@ -170,7 +170,7 @@ sub ImportXLS {
 
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
+      $oWkC = $oWkS->{Cells}[$iR][$coltitle];
       next if( ! $oWkC );
       my $title = norm($oWkC->Value) if( $oWkC->Value );
 
@@ -185,7 +185,7 @@ sub ImportXLS {
       };
 
       # Desc (only works on XLS files)
-      my $field = "D".$i;
+      my $field = "E".$i;
       my $desc = $ref->[1]{$field};
       $ce->{description} = normUtf8($desc) if( $desc );
       $desc = '';
