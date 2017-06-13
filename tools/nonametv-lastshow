@@ -72,6 +72,7 @@ if( $opt->{all} ){
   print "----------------------------------------------------------------\n";
   printf( "%32s | %19s | %7s\n", "channel xmltvid", "lastshow time", "in days" );
   print "----------------------------------------------------------------\n";
+  my $string = "";
 
   foreach my $ch (@{$chdb}) {
     my $lastshow = LastShow( $ch->{id} );
@@ -81,9 +82,13 @@ if( $opt->{all} ){
         printf( "%32s | %19s | %7d\n", $ch->{xmltvid}, $lastshow, $indays );
       }
     } else {
-      print "No shows found for $ch->{xmltvid}\n";
+      $string .= "No shows found for $ch->{xmltvid}\n";
     }
   }
+
+  # Channels with no data
+  print "\n\n----------------------------------------------------------------\n";
+  print $string;
 }
 
 exit;
