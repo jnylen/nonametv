@@ -128,7 +128,9 @@ $d tools/se-tvzon/nonametv-upload $Q
 # Compare - Only run daily
 $d tools/se-tvzon/nonametv-xmltv-compare-run
 $d rsync --delete -r /content/xmltv_compare/ /var/www/html/compare/
-$d tools/nonametv-lastshow --warndays 10 --all --verbose | mail -s "Channels with no data or < 10 days last show" me@jnylen.nu
+
+# Email lastshow
+$d tools/se-tvzon/nonametv-mail-lastshow
 
 $h tools/nonametv-export Honeybee --export-channels
 $h tools/nonametv-export Honeybee
