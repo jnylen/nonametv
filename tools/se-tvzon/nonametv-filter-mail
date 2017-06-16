@@ -9,6 +9,7 @@ use lib "$FindBin::Bin/../../lib";
 use Mail::Box;
 use Mail::Box::Manager;
 use Time::Piece;
+use Data::Dumper;
 
 my $maildir = "/content/maildir/";
 my $infoldername = ".Projects/xmltv-data-in";
@@ -82,7 +83,7 @@ foreach my $msg ($infolder->messages) {
     MoveMessage( $msg, "GlobalListings" );
   }
   elsif( $fromaddr =~ /\@jnylen.nu/i ) {
-    MoveMessage( $msg, "DWDE" );
+    MoveMessage( $msg, "HopeChannel" );
   }
   elsif( $fromaddr =~ /\@kanal10.se/i ) {
     MoveMessage( $msg, "Kanal10" );
@@ -229,6 +230,9 @@ foreach my $msg ($infolder->messages) {
     MoveMessage( $msg, "Classica" );
   }
   elsif( $fromaddr =~ /\@stimme-der-hoffnung.de/i ) {
+    MoveMessage( $msg, "HopeChannel" );
+  }
+  elsif( $fromaddr =~ /\@hope\-channel.de/i ) {
     MoveMessage( $msg, "HopeChannel" );
   }
   elsif( $fromaddr =~ /\@tele5.de/i ) {
