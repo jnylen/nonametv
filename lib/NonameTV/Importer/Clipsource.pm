@@ -153,6 +153,7 @@ sub ImportContent
     my $ed         = $events{$i2};
     my $start      = ParseDateTime($ed->{startTime});
     my $end        = ParseDateTime($ed->{endTime});
+    next if !defined($start) or !defined($end);
 
     my $live       = $ed->{live};
     my $rerun      = $ed->{rerun};
@@ -328,6 +329,7 @@ sub ParseDateTime {
   my( $str ) = @_;
 
   #print Dumper($str);
+  return undef if !defined($str);
 
   my( $year, $month, $day, $hour, $minute, $second ) =
       ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)/ );
