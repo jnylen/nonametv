@@ -227,13 +227,6 @@ sub guess_channel
      return "cartoonnetwork.nl" if $filename =~ /_DUT_/i;
    }
 
-   if($filename =~ /TCM_Nordic/i and $filename =~ /XML/i) {
-     return "tcmeurope.com"     if $filename =~ /_ENG_/i;
-     return "se.tcmeurope.com"  if $filename =~ /_SWE_/i;
-     return "no.tcmeurope.com"  if $filename =~ /_NOR_/i;
-     return "dk.tcmeurope.com"  if $filename =~ /_DAN_/i;
-   }
-
    if($filename =~ /CNNi/i and $filename =~ /XML/i) {
      return "cnn.com" if $filename =~ /_ENG_/i;
    }
@@ -470,7 +463,7 @@ sub guess_channel
  #  return "classica.de";
  }
 
- if( $dir =~ /HopeChannel/ and $filename =~ /\.xml$/i ) {
+ if( $dir =~ /HopeChannel/ ) {
    return "hope-channel.de";
  }
 
