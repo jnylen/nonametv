@@ -17,6 +17,15 @@ lwp (libwww-perl) 5.808 or later is preferred since if you have 5.805 or
 earlier, you will get a lot of harmless but annoying 
 "Parsing of undecoded UTF-8 will give garbage when decoding entities".
 
+Required libraries:
+libssl-dev
+libxml2 (-dev)
+libxslt1-dev
+zlib1g-dev
+zlibc
+libgdbm-dev
+wv
+
 INSTALLATION
 
 Create a directory called /var/local/nonametv.
