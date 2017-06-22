@@ -463,7 +463,7 @@ sub guess_channel
  #  return "classica.de";
  }
 
- if( $dir =~ /HopeChannel/ ) {
+ if( $dir =~ /HopeChannel/ and $filename =~ /\.xml$/i ) {
    return "hope-channel.de";
  }
 
