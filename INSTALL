@@ -60,6 +60,10 @@ nonametv.conf).
 
 Run 
 
+cpanm --cpanfile cpanfile --installdeps 
+
+to install dependencies.
+
 perl -I lib tools/nonametv-populatedb --rebuild database se
 
 to populate the database with sample data from the Swedish version of
