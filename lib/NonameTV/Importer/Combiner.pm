@@ -424,7 +424,7 @@ $channel_data{ "disneyjuniorse-viasatfilmdramase.tvtogo.viasat.se" } =
 
 $channel_data{ "nature-playboy.sat.viasat.se" } =
   {
-    "nature.disney.se" =>
+    "nature-crime.viasat.se" =>
       [
         {
           day => 'all',
