@@ -368,6 +368,11 @@ sub guess_channel
         return "xite.tv" if $filename =~ /^xite/i;
      }
 
+     # XLS XLSX
+     if($filename =~ /\.(xls|xlsx)$/i and $filename =~ /Kanal 10 Norge/i) {
+        return "kanal10.no";
+     }
+
      # Word
      if($filename =~ /\.doc$/i) {
         return "brazzerstveurope.com" if $filename =~ /^brazzers/i;
