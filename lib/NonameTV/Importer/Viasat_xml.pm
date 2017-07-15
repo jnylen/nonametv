@@ -57,11 +57,13 @@ sub Object2Url {
   my $self = shift;
   my( $objectname, $chd ) = @_;
 
-  my( $year, $week ) = ( $objectname =~ /(\d+)-(\d+)$/ );
+  my( $country_tld, $year, $week ) = ( $objectname =~ /\.(\w\w)_(\d+)-(\d+)$/ );
   my $pad_len = 2;
   $week = sprintf("%0${pad_len}d", $week);
+  $country_tld =~ s/^ee$/lt/i;
 
-  my $url = 'http://press.viasat.tv/press/cm/listings/'. $chd->{grabber_info} . $year . '-' . $week.'.xml';
+  my $url = 'http://' . $country_tld . '.press.viasat.tv/press/cm/listings/'. $chd->{grabber_info} . $year . '-' . $week.'.xml';
+  print("url: $url\n");
 
   return( $url, undef );
 }

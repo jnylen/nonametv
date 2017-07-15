@@ -86,9 +86,9 @@ sub ImportXLS {
 	my %columns = ();
   my $date;
   my $currdate = "x";
-  my $coldate = 0;
-  my $coltime = 1;
-  my $coltitle = 2;
+  my $coldate = 1;
+  my $coltime = 2;
+  my $coltitle = 3;
 
 my $oBook;
 
@@ -141,11 +141,14 @@ my $ref = ReadData ($file);
 
 
       my $time = 0;  # fix for  12:00AM
-      $time=$oWkC->{Val} if( $oWkC->Value );
+      my $field2 = "C".$i;
+      $time = $ref->[1]{$field2};
+      #$time=$oWkC->{Val} if( $oWkC->Value );
 
-	  #Convert Excel Time -> localtime
-      $time = ExcelFmt('hh:mm', $time);
+	    ##Convert Excel Time -> localtime
+      #$time = ExcelFmt('hh:mm', $time);
       $time =~ s/_/:/g; # They fail sometimes
+      $time =~ s/\./:/g;
 
 
       # title
@@ -159,12 +162,12 @@ my $ref = ReadData ($file);
 
       my $ce = {
         channel_id => $channel_id,
-        start_time => $time,
+        start_time => norm($time),
         title => norm($title),
       };
 
       # Desc (only works on XLS files)
-      my $field = "D".$i;
+      my $field = "E".$i;
       my $desc = $ref->[1]{$field};
       $ce->{description} = normUtf8($desc) if( $desc );
       $desc = '';
@@ -191,7 +194,7 @@ sub ParseDate
   if( $dinfo =~ /^\d{4}-\d{2}-\d{2}$/ ){ # format   '2010-04-22'
     ( $year, $month, $day ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
   } elsif( $dinfo =~ /^\d{2}.\d{2}.\d{4}$/ ){ # format '11/18/2011'
-    ( $month, $day, $year ) = ( $dinfo =~ /^(\d+).(\d+).(\d+)$/ );
+    ( $day, $month, $year ) = ( $dinfo =~ /^(\d+).(\d+).(\d+)$/ );
   } elsif( $dinfo =~ /^\d{1,2}-\d{1,2}-\d{2}$/ ){ # format '10-18-11' or '1-9-11'
     ( $month, $day, $year ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
   } elsif( $dinfo =~ /^\d{1,2}\/\d{1,2}\/\d{2}$/ ){ # format '10-18-11' or '1-9-11'

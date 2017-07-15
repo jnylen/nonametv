@@ -96,7 +96,9 @@ my $ref = ReadData ($file);
 	my $foundcolumns = 0;
 
     # browse through rows
+    my $i = 1;
     for(my $iR = 1 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+      $i++;
 
       # date - column 0 ('Date')
       my $oWkC = $oWkS->{Cells}[$iR][0];
@@ -126,15 +128,19 @@ my $ref = ReadData ($file);
       $time = ParseTime($time);
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][2];
-      next if( ! $oWkC );
-      my $title = $oWkC->Value if( $oWkC->Value );
+      #$oWkC = $oWkS->{Cells}[$iR][2];
+      #next if( ! $oWkC );
+      #my $title = $oWkC->Value if( $oWkC->Value );
+      my $field2 = "C".$i;
+      my $title = $ref->[1]{$field2};
       $title =~ s/&quot;/"/ig;
 
       # desc
-      $oWkC = $oWkS->{Cells}[$iR][3];
-      next if( ! $oWkC );
-      my $desc = $oWkC->Value if( $oWkC->Value );
+      #$oWkC = $oWkS->{Cells}[$iR][3];
+      #next if( ! $oWkC );
+      #my $desc = $oWkC->Value if( $oWkC->Value );
+      my $field3 = "D".$i;
+      my $desc = $ref->[1]{$field3};
 
   	  # extra info
   	  my $genre = norm($oWkS->{Cells}[$iR][4]->{Val}) if $oWkS->{Cells}[$iR][4];
@@ -178,7 +184,7 @@ sub ParseDate {
   my( $text ) = @_;
 
   $text = ExcelFmt('yyyy-mm-dd', $text);
-  print("text: $text\n");
+  #print("text: $text\n");
 
   $text =~ s/^\s+//;
 
@@ -190,6 +196,10 @@ sub ParseDate {
     $year += 2000 if $year lt 100;
   } elsif( $text =~ /^\d+\/\d+\/\d+$/ ) { # format '01/11/2008'
     ( $day, $month, $year ) = ( $text =~ /^(\d+)\/(\d+)\/(\d+)$/ );
+    $year += 2000 if $year lt 100;
+  } elsif( $text =~ /(.*?) (\d+), (\d+)$/ ) {
+    ( $monthname, $day, $year ) = ( $text =~ /, (.*?) (\d+), (\d+)$/ );
+    $month = MonthNumber($monthname, "en");
     $year += 2000 if $year lt 100;
   }
 
@@ -206,6 +216,10 @@ sub ParseTime {
 
   if( $text =~ /^\d+:\d+/ ){
     ( $hour , $min ) = ( $text =~ /^(\d+):(\d+)/ );
+  }
+
+  if($hour >= 24) {
+    $hour -= 24;
   }
 
   return sprintf( "%02d:%02d", $hour, $min );
