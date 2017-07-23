@@ -231,6 +231,21 @@ sub guess_channel
      return "cnn.com" if $filename =~ /_ENG_/i;
    }
 
+   # Germany
+   if($filename =~ /XML/i and $filename =~ /_GER_/i) {
+     return "boomerangtv.de" if $filename =~ /Boomerang_Germany_HD/i;
+     #return "cartoonnetwork.de" if $filename =~ /Boomerang_Germany_HD/i;
+     return "hd.tnt-glitz.tv" if $filename =~ /TNT_Comedy_Germany_HD/i;
+     return "tnt-serie.de" if $filename =~ /TNT_Serie_Germany_HD/i;
+     return "tnt-film.de" if $filename =~ /TNT_Film_Germany_HD/i;
+   }
+
+   # Poland
+   if($filename =~ /XML/i and $filename =~ /_POL_/i) {
+     return "cartoonnetwork.pl" if $filename =~ /Cartoon_Network_Poland/i;
+     return "tnt-tv.pl" if $filename =~ /TNT_HD_Poland\s+and(\s+|)Romania/i;
+   }
+
   # XLS Nordic
   if( $filename =~ /\.(xls|xlsx|xlsm)$/i ) {
     return "tnt-tv.se" if $filename =~ /^TNT/i and $filename =~ /Sweden/i;
