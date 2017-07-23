@@ -144,11 +144,6 @@ sub ImportXML
     my $epdesc  = $row->findvalue( './/episodeSynopsis' );
     my $desc    = $epdesc || $serdesc;
 
-    $title =~ s|(.*), the$|The $1|i;
-    $title =~ s|(.*), a$|A $1|i;
-    $title =~ s|(.*),the$|The $1|i;
-
-
     my ($start);
     try {
       $start = $self->create_dt( $row->findvalue( './/broadcastDate' ), $timezone );
@@ -186,6 +181,8 @@ sub ImportXML
     my $hd          = $row->findvalue( './/HD' );
     my @directors   = split(", ", $row->findvalue( './/directors' ));
     my @actors      = split(", ", $row->findvalue( './/actors' ));
+    my $episode      = $row->findvalue( './/episodeNb' );
+    my $of_episode   = $row->findvalue( './/episodeCount' );
 
     # Subtitle
     $ce->{subtitle} = norm($row->findvalue( './/episodeTitle' )) if defined $row->findvalue( './/episodeTitle' ) and $row->findvalue( './/episodeTitle' ) ne "";
@@ -193,7 +190,7 @@ sub ImportXML
     $ce->{subtitle} =~ s|(.*), a$|A $1|i if defined $ce->{subtitle};
     $ce->{subtitle} =~ s|(.*),the$|The $1|i if defined $ce->{subtitle};
 
-    my ($season, $episode2, $newsub);
+    my ($season, $episode2, $newsub, $newtitle);
     if(defined($ce->{subtitle})) {
       if( ( $season, $episode2, $newsub ) = ($ce->{subtitle} =~ m|^S.son (\d+) - Episode (\d+)\: (.*?)$| ) ){
         $ce->{episode} = ($season - 1) . ' . ' . ($episode2 - 1) . ' .';
@@ -207,10 +204,18 @@ sub ImportXML
       }
     }
 
+    # Season
+    if( ( $newtitle, $season ) = ($ce->{title} =~ m|^(.*?) - Season (\d+)$| )  ) {
+      $ce->{episode} = ($season - 1) . ' . ' . ($episode - 1) . ' .';
+      $ce->{title} = norm($newtitle);
+    }
+
+    $ce->{title} =~ s|(.*), the$|The $1|i;
+    $ce->{title} =~ s|(.*), a$|A $1|i;
+    $ce->{title} =~ s|(.*),the$|The $1|i;
+
 
     # Episodenum
-    my $episode      = $row->findvalue( './/episodeNb' );
-    my $of_episode   = $row->findvalue( './/episodeCount' );
     if(!defined($ce->{episode}) and ($episode ne "") and ( $of_episode ne "") )
     {
       $ce->{episode} = sprintf( ". %d/%d .", $episode-1, $of_episode );
@@ -244,7 +249,7 @@ sub ImportXML
     $ce->{directors} = join(";", @directors) if(@directors and scalar( @directors ) > 0 );
     $ce->{quality} = "HDTV" if $hd eq "true";
 
-    progress( "Tivo: $chd->{xmltvid}: $start - $title" );
+    progress( "Tivo: $chd->{xmltvid}: $start - $ce->{title}" );
     $dsh->AddProgramme( $ce );
 
   } # next row
