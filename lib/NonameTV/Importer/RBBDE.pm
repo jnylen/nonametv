@@ -54,7 +54,7 @@ sub Object2Url {
 
   # changes url in 2017 to https://www.rbb-online.de/unternehmen/presse/programmwochen/rbb-fernsehen/2017/01--programmwoche/xml-rbb.file.html/rbb-01.xml
   ## add --programmwochen
-  my $url = sprintf( "https://www.rbb-online.de/unternehmen/presse/programmwochen/rbb-fernsehen/%04d/%02d--programmwoche/xml-rbb.file.html/rbb-%02d.xml", $year, $week, $week);
+  my $url = sprintf( "https://www.rbb-online.de/unternehmen/presse/programmwochen/rbb-fernsehen/%04d/%02d-programmwoche/xml-rbb.file.html/rbb-%02d.xml", $year, $week, $week);
 
   return( $url, undef );
 }
@@ -70,7 +70,7 @@ sub FilterContent {
   my( $cref, $chd ) = @_;
 
   # a reexport without changes still doesn't need to be handled
-  $cref =~ s| exportzeit=\"[^\"]+\"| exportzeit=\"\"|;
+  $cref =~ s| exportzeit=\"[^\"]+\" | exportzeit=\"\"|;
 
   my $doc = ParseXml( $cref );
 

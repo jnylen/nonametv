@@ -243,39 +243,45 @@ sub ImportXLS
         description => norm( $desc ),
       };
 
-	  # Extra
-	  $ce->{subtitle}        = norm($oWkS->{Cells}[$iR][$columns{'Episode Title'}]->Value) if $oWkS->{Cells}[$iR][$columns{'Episode Title'}];
-	  $ce->{actors}          = parse_person_list(norm($oWkS->{Cells}[$iR][$columns{'Cast'}]->Value))          if defined($columns{'Cast'}) and $oWkS->{Cells}[$iR][$columns{'Cast'}];
-	  $ce->{directors}       = parse_person_list(norm($oWkS->{Cells}[$iR][$columns{'Director'}]->Value))      if defined($columns{'Director'}) and $oWkS->{Cells}[$iR][$columns{'Director'}];
-	  $ce->{presenters}      = parse_person_list(norm($oWkS->{Cells}[$iR][$columns{'Presenter'}]->Value))     if defined($columns{'Presenter'}) and $oWkS->{Cells}[$iR][$columns{'Presenter'}];
-      $ce->{production_date} = $year."-01-01" if defined($year) and $year ne "" and $year ne "0000";
+      # Extra
+  	  $ce->{subtitle}        = norm($oWkS->{Cells}[$iR][$columns{'Episode Title'}]->Value) if $oWkS->{Cells}[$iR][$columns{'Episode Title'}];
+  	  $ce->{actors}          = parse_person_list(norm($oWkS->{Cells}[$iR][$columns{'Cast'}]->Value))          if defined($columns{'Cast'}) and $oWkS->{Cells}[$iR][$columns{'Cast'}];
+  	  $ce->{directors}       = parse_person_list(norm($oWkS->{Cells}[$iR][$columns{'Director'}]->Value))      if defined($columns{'Director'}) and $oWkS->{Cells}[$iR][$columns{'Director'}];
+  	  $ce->{presenters}      = parse_person_list(norm($oWkS->{Cells}[$iR][$columns{'Presenter'}]->Value))     if defined($columns{'Presenter'}) and $oWkS->{Cells}[$iR][$columns{'Presenter'}];
+        $ce->{production_date} = $year."-01-01" if defined($year) and $year ne "" and $year ne "0000";
 
-      if( $epino ){
-        if( $seano ){
-          $ce->{episode} = sprintf( "%d . %d .", $seano-1, $epino-1 );
-        } else {
-          $ce->{episode} = sprintf( ". %d .", $epino-1 );
+        if( $epino ){
+          if( $seano ){
+            $ce->{episode} = sprintf( "%d . %d .", $seano-1, $epino-1 );
+          } else {
+            $ce->{episode} = sprintf( ". %d .", $epino-1 );
+          }
         }
-      }
 
-      # Remove subtitles with date in the subtitle
-      if($ce->{subtitle} =~ /^(\d+)\/(\d+)\/(\d\d\d\d)$/) {
-        $ce->{subtitle} = undef;
-      }
+        # Remove subtitles with date in the subtitle
+        if($ce->{subtitle} =~ /^(\d+)\/(\d+)\/(\d\d\d\d)$/) {
+          $ce->{subtitle} = undef;
+        }
 
-      if($ce->{subtitle} =~ /^Series (\d+), Episode (\d+)$/i or $ce->{subtitle} =~ /^Episode (\d+)$/i) {
-        $ce->{subtitle} = undef;
-      }
+        if($ce->{subtitle} =~ /^Series (\d+), Episode (\d+)$/i or $ce->{subtitle} =~ /^Episode (\d+)$/i) {
+          $ce->{subtitle} = undef;
+        }
 
-      # org title
-      if(defined $columns{'ORGTitle'}) {
-        $oWkC = $oWkS->{Cells}[$iR][$columns{'ORGTitle'}];
-        my $title_org = $oWkC->Value if( $oWkC->Value );
-        $ce->{original_title} = norm($title_org) if defined($title_org) and $ce->{title} ne norm($title_org) and norm($title_org) ne "";
-      }
+        # org title
+        if(defined $columns{'ORGTitle'}) {
+          $oWkC = $oWkS->{Cells}[$iR][$columns{'ORGTitle'}];
+          my $title_org = $oWkC->Value if( $oWkC->Value );
+          $ce->{original_title} = norm($title_org) if defined($title_org) and $ce->{title} ne norm($title_org) and norm($title_org) ne "";
+        }
+
+        # Remove <num>/<num> in desc
+        if($ce->{description} =~ /(\d+)\/(\d+)$/i) {
+          $ce->{description} =~ s/(\d+)\/(\d+)$//i;
+          $ce->{description} = norm($ce->{description});
+        }
 
 
-      $dsh->AddProgramme( $ce );
+        $dsh->AddProgramme( $ce );
 
     } # next row
   } # next worksheet

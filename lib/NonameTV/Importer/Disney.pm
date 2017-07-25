@@ -76,7 +76,7 @@ sub ImportContentFile {
     if( $chd->{sched_lang} eq "sv") {
         $self->ImportExcel( $file, $chd ) if $file =~ /swe/i and $file =~ /\.(xls|xlsx)$/i;
     } elsif($chd->{sched_lang} eq "da") {
-        $self->ImportExcel( $file, $chd ) if $file =~ /dan/i and $file =~ /\.(xls|xlsx)$/i;
+        $self->ImportExcel( $file, $chd ) if $file =~ /(dan|den)/i and $file =~ /\.(xls|xlsx)$/i;
     } elsif($chd->{sched_lang} eq "fi") {
         $self->ImportExcel( $file, $chd ) if $file =~ /fin/i and $file =~ /\.(xls|xlsx)$/i;
     } elsif($chd->{sched_lang} eq "no") {
@@ -102,7 +102,7 @@ sub ImportContentFile {
       if($chd->{sched_lang} eq "sv") {
         push( @filess, $member->{fileName} ) if $member->{fileName} =~ /swe/i and $member->{fileName} =~ /\.(xls|xlsx)$/i;
       } elsif($chd->{sched_lang} eq "da") {
-        push( @filess, $member->{fileName} ) if $member->{fileName} =~ /dan/i and $member->{fileName} =~ /\.(xls|xlsx)$/i;
+        push( @filess, $member->{fileName} ) if $member->{fileName} =~ /(dan|den)/i and $member->{fileName} =~ /\.(xls|xlsx)$/i;
       } elsif($chd->{sched_lang} eq "fi") {
         push( @filess, $member->{fileName} ) if $member->{fileName} =~ /fin/i and $member->{fileName} =~ /\.(xls|xlsx)$/i;
       } elsif($chd->{sched_lang} eq "no") {
