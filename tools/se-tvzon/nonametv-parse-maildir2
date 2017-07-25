@@ -223,7 +223,7 @@ sub guess_channel
      return "cartoonnetwork.dk" if $filename =~ /_DAN_/i;
    }
 
-   if($filename =~ /Cartoon_Network_CEE/i and $filename =~ /XML/i) {
+   if($filename =~ /Cartoon_Network(s|d|)_DUTCH/i and $filename =~ /XML/i) {
      return "cartoonnetwork.nl" if $filename =~ /_DUT_/i;
    }
 
@@ -234,7 +234,7 @@ sub guess_channel
    # Germany
    if($filename =~ /XML/i and $filename =~ /_GER_/i) {
      return "boomerangtv.de" if $filename =~ /Boomerang_Germany_HD/i;
-     #return "cartoonnetwork.de" if $filename =~ /Boomerang_Germany_HD/i;
+     return "cartoonnetwork.de" if $filename =~ /Cartoon_Network_Germany_HD/i;
      return "hd.tnt-glitz.tv" if $filename =~ /TNT_Comedy_Germany_HD/i;
      return "tnt-serie.de" if $filename =~ /TNT_Serie_Germany_HD/i;
      return "tnt-film.de" if $filename =~ /TNT_Film_Germany_HD/i;
@@ -398,11 +398,11 @@ sub guess_channel
    return "dw.de" if $filename =~ /English/i; #otherwise english.dw.de
    return "la.dw.de" if $filename =~ /Espanol/i;
    return "dw.de" if $filename =~ /Europa/i;
-   return "dw.de" if $filename =~ /^DW\s+/i;
 
-   return "asien.dw.de" if $filename =~ /Deutsch/i and $filename !~ /Deutsch\+/o;
+
+   return "asien.dw.de" if $filename =~ /Deutsch/i and $filename !~ /Deutsch\+/i;
    return "deutschplus.dw.de" if $filename =~ /Deutsch\+/i;
-
+   return "dw.de" if $filename =~ /^DW\s+/i;
  }
 
  if( $dir =~ /HaC/ and $filename =~ /\.xml$/i ) {

@@ -268,7 +268,9 @@ sub guess_channel
 
     return "crimeandinvestigation.eu"  if $filename =~ /cai.eng/i and $filename =~ /\.xml$/i;
     return "crimeandinvestigation.eu"  if $filename =~ /ci europe english/i and $filename =~ /\.xml$/i;
+    return "crimeandinvestigation.eu"  if $filename =~ /^crime-en/i and $filename =~ /\.xml$/i;
     return "crimeandinvestigation.pl"  if $filename =~ /cai.pol/i and $filename =~ /\.xml$/i;
+    return "crimeandinvestigation.pl"  if $filename =~ /^crime-pl/i and $filename =~ /\.xml$/i;
 
     return "natgeo.dk" if $filename =~ /^ngden/i and $filename =~ /\.xls$/i;
     return "natgeo.no" if $filename =~ /^ngnor/i and $filename =~ /\.xls$/i;
@@ -334,8 +336,8 @@ sub guess_channel
 
     # Poland
     return "crimeandinvestigation.pl"   if $filename =~ /^CI\.Polsat/i and $filename =~ /\.xml$/i;
-    return "h2.historytv.pl"            if ($filename =~ /^h2\s+europe\s+polish/i or $filename =~ /^h2\.eur\.pol/i) and $filename =~ /\.xml$/i;
-    return "historytv.pl"               if ($filename =~ /^history\.pol/i or $filename =~ /^history\.eur\.pol/i) and $filename =~ /\.xml$/i;
+    return "h2.historytv.pl"            if ($filename =~ /^h2\s+europe\s+polish/i or $filename =~ /^h2\.eur\.pol/i or $filename =~ /^h2\.eu\.pol/i) and $filename =~ /\.xml$/i;
+    return "historytv.pl"               if ($filename =~ /^history\.pol/i or $filename =~ /^history\.eur\.pol/i or $filename =~ /^history\.eu\.pol/i) and $filename =~ /\.xml$/i;
     return "lifetimetv.pl"              if ($filename =~ /^lifetime\s+poland/i or $filename =~ /^lifetime\.pol/i or $filename =~ /^life\.pol/i) and $filename =~ /\.xml$/i;
     return "natgeo.pl"                  if $filename =~ /^NGpol/i and $filename =~ /\.doc$/i;
     return "wild.natgeo.pl"             if $filename =~ /^NGWPol/i and $filename =~ /\.doc$/i;
