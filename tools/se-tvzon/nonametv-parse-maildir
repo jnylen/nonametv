@@ -367,6 +367,7 @@ sub guess_channel
         return "privatespice.com" if $filename =~ /^private/i;
         return "protv.ro" if $from =~ /\@protv.ro/i;
         return "xite.tv" if $from =~ /\@xite.nl/i;
+        return "xite.tv" if $from =~ /\@xite.com/i;
         return "xite.tv" if $filename =~ /^xite/i;
      }
 
