@@ -100,31 +100,18 @@ sub ImportXLS {
 
       my $oWkC;
 
-      # date
-      $oWkC = $oWkS->{Cells}[$iR][0];
-      next if( ! $oWkC );
-      $date = ParseDate( $oWkC->Value );
-      next if( ! $date );
-
-      # Current day
-      if( $date ne $currdate ){
-        progress("XITE: Date is $date");
-        $dsh->StartDate( $date , "00:00" );
-        $currdate = $date;
-      }
-
       # start
-      $oWkC = $oWkS->{Cells}[$iR][1];
+      $oWkC = $oWkS->{Cells}[$iR][2];
       next if( ! $oWkC );
-      my $start = $oWkC->Value if( $oWkC->Value );
+      my $start = $self->parseTimestamp($oWkC->Value) if( $oWkC->Value );
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][4];
+      $oWkC = $oWkS->{Cells}[$iR][0];
       next if( ! $oWkC );
       my $title = $oWkC->Value if( $oWkC->Value );
 
       # desc
-      $oWkC = $oWkS->{Cells}[$iR][5];
+      $oWkC = $oWkS->{Cells}[$iR][1];
       next if( ! $oWkC );
       my $desc = $oWkC->Value if( $oWkC->Value );
 
@@ -135,8 +122,8 @@ sub ImportXLS {
         description => norm($desc),
       };
 
-	  progress("XITE: $start - $title") if $title;
-      $dsh->AddProgramme( $ce ) if $title;
+	    progress("XITE: $start - $title") if $title;
+      $ds->AddProgramme( $ce ) if $title;
     }
 
   }
@@ -146,26 +133,39 @@ sub ImportXLS {
   return;
 }
 
-sub ParseDate
-{
-  my ( $dinfo ) = @_;
+sub parseTimestamp( $ ){
+  my $self = shift;
+  my ($timestamp, $date) = @_;
 
-  my( $month, $day, $year );
-#      progress("Mdatum $dinfo");
-  if( $dinfo =~ /^\d{4}-\d{2}-\d{2}$/ ){ # format   '2010-04-22'
-    ( $year, $month, $day ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
-  } elsif( $dinfo =~ /^\d{2}.\d{2}.\d{4}$/ ){ # format '11/18/2011'
-    ( $day, $month, $year ) = ( $dinfo =~ /^(\d+).(\d+).(\d+)$/ );
-  } elsif( $dinfo =~ /^\d{1,2}\/\d{1,2}\/\d{2}$/ ){ # format '10-18-11' or '1-9-11'
-    ( $day, $month, $year ) = ( $dinfo =~ /^(\d+)\/(\d+)\/(\d+)$/ );
+  #print ("date: $timestamp\n");
+
+  if( $timestamp ){
+    # 2011-11-12T20:15:00+01:00
+    my ($year, $month, $day, $hour, $minute, $second, $offset) = ($timestamp =~ m/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})([+-]\d{2}:\d{2}|)$/);
+    if( !defined( $year )|| !defined( $hour ) ){
+      w( "could not parse timestamp: $timestamp" );
+    }
+    if( $offset ){
+      $offset =~ s|:||;
+    } else {
+      $offset = 'Europe/Berlin';
+    }
+    my $dt = DateTime->new (
+      year      => $year,
+      month     => $month,
+      day       => $day,
+      hour      => $hour,
+      minute    => $minute,
+      second    => $second,
+      time_zone => $offset
+    );
+    $dt->set_time_zone( 'UTC' );
+
+    return( $dt );
+
+  } else {
+    return undef;
   }
-
-  return undef if( ! $year );
-
-  $year += 2000 if $year < 100;
-
-  my $date = sprintf( "%04d-%02d-%02d", $year, $month, $day );
-  return $date;
 }
 
 1;
