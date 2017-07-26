@@ -114,10 +114,7 @@ my $ref = ReadData ($file);
       my $oWkC;
 
       # date
-      $oWkC = $oWkS->{Cells}[$iR][$coldate];
-      next if( ! $oWkC );
-
-      $date = ParseDate( $oWkC->Value );
+      $date = ParseDate( $ref->[1]{"A" . $i} );
       next if( ! $date );
 
       if( $date ne $currdate ){
@@ -135,13 +132,8 @@ my $ref = ReadData ($file);
       }
 
       # time
-      $oWkC = $oWkS->{Cells}[$iR][$coltime];
-      next if( ! $oWkC );
-
-
-
       my $time = 0;  # fix for  12:00AM
-      my $field2 = "C".$i;
+      my $field2 = "B".$i;
       $time = $ref->[1]{$field2};
       #$time=$oWkC->{Val} if( $oWkC->Value );
 
@@ -152,9 +144,7 @@ my $ref = ReadData ($file);
 
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][$coltitle];
-      next if( ! $oWkC );
-      my $title = $oWkC->Value if( $oWkC->Value );
+      my $title = $ref->[1]{"C".$i};
 
       $title =~ s/\((r|p)\)//g if $title;
 
