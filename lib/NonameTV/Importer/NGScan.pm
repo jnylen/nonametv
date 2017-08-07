@@ -195,21 +195,15 @@ sub ImportXLS
       my $time = ParseTime($oWkC->Value) if( $oWkC->Value );
 
       # title
-      my ($firsttitle, $eptitle);
+      my ($firsttitle, $eptitle, $title);
       $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
       $firsttitle = norm($oWkC->Value) if defined $oWkC;
 
-      # eptitle
-      my $title;
-      if(defined($eptitle) and defined($columns{'Episode Title'})) {
-        $oWkC = $oWkS->{Cells}[$iR][$columns{'Episode Title'}];
-        $eptitle = norm($oWkC->Value);
+      # ep title
+      $oWkC = $oWkS->{Cells}[$iR][$columns{'Episode Title'}];
+      $eptitle = norm($oWkC->Value) if defined $oWkC;
 
-        $title = $firsttitle || $eptitle;
-      } else {
-        $title = $firsttitle;
-      }
-
+      $title = $firsttitle || $eptitle;
       next if( ! $title );
 
 	    # episode and season
