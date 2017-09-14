@@ -391,7 +391,8 @@ sub guess_channel
  }
 
  if( $dir =~ /VisjonNorge/ and $filename =~ /\.xls$/i ) {
-    return "visjonnorge.com";
+    return "visjonnorge.com" if $filename =~ /epgVN/i;
+    return "visionsverige.com" if $filename =~ /visionsverige/i;
  }
 
  if( $dir =~ /DWDE/ and $filename =~ /\.(xls|xlsx)/i ) {
