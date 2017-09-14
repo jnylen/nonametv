@@ -238,31 +238,31 @@ sub ImportContent {
       if( $widescreen eq "TRUE" )
       {
         $ce->{aspect} = "16:9";
-        #push $extra->{qualifiers}, "widescreen";
+        #push @{$extra->{qualifiers}}, "widescreen";
       }
       else
       {
         $ce->{aspect} = "4:3";
-        #push $extra->{qualifiers}, "smallscreen";
+        #push @{$extra->{qualifiers}}, "smallscreen";
       }
 
       # Find rerun-info
       if( $rerun eq "TRUE" )
       {
         $ce->{new} = "0";
-        push $extra->{qualifiers}, "repeat";
+        push @{$extra->{qualifiers}}, "repeat";
       }
       else
       {
         $ce->{new} = "1";
-        push $extra->{qualifiers}, "new";
+        push @{$extra->{qualifiers}}, "new";
       }
 
       # Find live-info
       if( $live eq "TRUE" or $lead eq "LIVE" or $lead eq "LIVE:" )
       {
         $ce->{live} = "1";
-        push $extra->{qualifiers}, "live";
+        push @{$extra->{qualifiers}}, "live";
       }
       else
       {
@@ -312,7 +312,7 @@ sub ImportContent {
       my $imgs = $emission->find( './/images/image' );
       foreach my $item ($imgs->get_nodelist)
       {
-          push $extra->{images}, { url => $item->findvalue( 'original/@src' ), type => undef, title => undef, copyright => norm($item->findvalue( '@credits' )), source => "Viasat World" };
+          push @{$extra->{images}}, { url => $item->findvalue( 'original/@src' ), type => undef, title => undef, copyright => norm($item->findvalue( '@credits' )), source => "Viasat World" };
       }
 
       $ce->{extra} = $extra;

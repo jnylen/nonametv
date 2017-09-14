@@ -236,16 +236,16 @@ sub ImportContent
     # Rerun?
     if($rerun eq "true") {
       $ce->{new} = "0";
-      push $extra->{qualifiers}, "repeat";
+      push @{$extra->{qualifiers}}, "repeat";
     } else {
       $ce->{new} = "1";
-      push $extra->{qualifiers}, "new";
+      push @{$extra->{qualifiers}}, "new";
     }
 
     # Live?
     if($live eq "true") {
       $ce->{live} = "1";
-      push $extra->{qualifiers}, "live";
+      push @{$extra->{qualifiers}}, "live";
     } else {
       $ce->{live} = "0";
     }
@@ -253,19 +253,19 @@ sub ImportContent
     # Audio?
     if(defined($a_format) and $a_format eq "mono") {
       $ce->{stereo} = "mono";
-      push $extra->{qualifiers}, "mono";
+      push @{$extra->{qualifiers}}, "mono";
     } elsif(defined($a_format) and $a_format eq "stereo") {
       $ce->{stereo} = "stereo";
-      push $extra->{qualifiers}, "stereo";
+      push @{$extra->{qualifiers}}, "stereo";
     }
 
     # Aspect
     if(defined($aspect) and $aspect eq "16:9") {
       $ce->{aspect} = "16:9";
-      push $extra->{qualifiers}, "widescreen";
+      push @{$extra->{qualifiers}}, "widescreen";
     } elsif(defined($aspect) and $aspect eq "4:3") {
       $ce->{aspect} = "4:3";
-      push $extra->{qualifiers}, "smallscreen";
+      push @{$extra->{qualifiers}}, "smallscreen";
     }
 
     # credits

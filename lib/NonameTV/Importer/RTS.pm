@@ -145,14 +145,14 @@ sub ImportContent
     # Live?
     if( defined($live) and $live eq "true" ) {
       $ce->{live} = 1;
-      push $extra->{qualifiers}, "live";
+      push @{$extra->{qualifiers}}, "live";
     } else {
       $ce->{live} = 0;
     }
 
     if( defined($rerun) and $rerun eq "true" ) {
       $ce->{new} = 0;
-      push $extra->{qualifiers}, "repeat";
+      push @{$extra->{qualifiers}}, "repeat";
     } else {
       $ce->{new} = 1;
     }
@@ -213,7 +213,7 @@ sub ImportContent
     foreach my $img (@{$images})
     {
       if(defined($img->{'urlImage'}) and $img->{'urlImage'} ne "") {
-        push $extra->{images}, { url => $img->{'urlImage'}, source => "RTS" };
+        push @{$extra->{images}}, { url => $img->{'urlImage'}, source => "RTS" };
       }
     }
 

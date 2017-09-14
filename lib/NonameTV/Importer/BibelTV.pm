@@ -136,7 +136,7 @@ sub ImportContentFile
     if($sc->findvalue( './icon/@src' )) {
         my $image = $sc->findvalue( './icon/@src' );
         $image =~ s/\/s\//\/sd\//;
-        push $extra->{images}, { url => $image, source => "BibelTV" };
+        push @{$extra->{images}}, { url => $image, source => "BibelTV" };
     }
 
     # Aspect (It's actually in the correct form)

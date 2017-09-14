@@ -262,7 +262,7 @@ sub ImportContent {
     # Image
     if(defined($url) and $url ne "") {
       my ($program_id) = ($url =~ /(\d+)$/);
-      push $extra->{images}, { url => "http://www.axess.se/public/upload/images/tv_programs/" . $program_id . ".jpg", source => "Axess" };
+      push @{$extra->{images}}, { url => "http://www.axess.se/public/upload/images/tv_programs/" . $program_id . ".jpg", source => "Axess" };
     }
 
     $ce->{extra} = $extra;

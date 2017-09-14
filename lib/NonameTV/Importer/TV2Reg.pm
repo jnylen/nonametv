@@ -153,17 +153,17 @@ sub ImportContent
     # Tags
     if($live eq "true") {
       $ce->{live} = "1";
-      push $extra->{qualifiers}, "live";
+      push @{$extra->{qualifiers}}, "live";
     } else {
       $ce->{live} = "0";
     }
 
     if($rerun eq "true") {
       $ce->{new} = "0";
-      push $extra->{qualifiers}, "rerun";
+      push @{$extra->{qualifiers}}, "rerun";
     } elsif($live ne "true") {
       $ce->{new} = "1";
-      push $extra->{qualifiers}, "new";
+      push @{$extra->{qualifiers}}, "new";
     }
 
     if($catchup eq "true") {

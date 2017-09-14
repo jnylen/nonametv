@@ -109,7 +109,7 @@ sub ImportContent {
 
     # Images
     if(defined($image) and $image ne "") {
-      push $extra->{images}, { url => $image, source => "Anixe" };
+      push @{$extra->{images}}, { url => $image, source => "Anixe" };
     }
 
     my( $t, $st ) = ($ce->{title} =~ /(.*) - (.*)/);

@@ -236,7 +236,7 @@ sub ImportContent
 
     # image
     if(defined($image) and $image ne "" and $image !~ /bilde_mangler/i) {
-        push $extra->{images}, { url => $image, source => "TV2 Norway" };
+        push @{$extra->{images}}, { url => $image, source => "TV2 Norway" };
     }
 
     # episode
@@ -251,7 +251,7 @@ sub ImportContent
     # replay
     if(defined($rerun) and norm($rerun) eq "true") {
       $ce->{new} = "0";
-      push $extra->{qualifiers}, "repeat";
+      push @{$extra->{qualifiers}}, "repeat";
     } else {
       $ce->{new} = "1";
     }

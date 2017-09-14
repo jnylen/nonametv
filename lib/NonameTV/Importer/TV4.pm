@@ -209,7 +209,7 @@ sub ImportContent
 	  if( $live eq "true" )
 	  {
 	    $ce->{live} = "1";
-      push $extra->{qualifiers}, "live";
+      push @{$extra->{qualifiers}}, "live";
 	  }
 	  else
 	  {
@@ -218,16 +218,16 @@ sub ImportContent
 
     if( $subtitles eq "textat" )
 	  {
-      push $extra->{qualifiers}, "cc";
+      push @{$extra->{qualifiers}}, "cc";
 	  }
 
 	# HDTV
 	  if( $definition eq "HD" or $chd->{xmltvid} eq "hd.tv4.se" )
 	  {
 	    $ce->{quality} = "HDTV";
-      push $extra->{qualifiers}, "HD";
+      push @{$extra->{qualifiers}}, "HD";
 	  } elsif( $definition eq "SD" ) {
-      push $extra->{qualifiers}, "SD";
+      push @{$extra->{qualifiers}}, "SD";
     }
 
     my @actors;
@@ -311,7 +311,7 @@ sub ImportContent
     my $imgs = $pgm->find( './/item' );
     foreach my $item ($imgs->get_nodelist)
     {
-        push $extra->{images}, { url => $item->to_literal, type => undef, title => undef, copyright => undef, source => "TV4" };
+        push @{$extra->{images}}, { url => $item->to_literal, type => undef, title => undef, copyright => undef, source => "TV4" };
     }
 
     # Fixes
@@ -351,10 +351,10 @@ sub ImportContent
     # replay
     if(defined($rerun) and norm($rerun) eq "false") {
       $ce->{new} = "1";
-      push $extra->{qualifiers}, "new";
+      push @{$extra->{qualifiers}}, "new";
     } else {
       $ce->{new} = "0";
-      push $extra->{qualifiers}, "rerun";
+      push @{$extra->{qualifiers}}, "rerun";
     }
 
     $ce->{extra} = $extra;

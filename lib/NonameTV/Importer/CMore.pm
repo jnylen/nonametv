@@ -211,7 +211,7 @@ sub ImportContent
 
     # descriptions
     if($bline and defined($bline) and norm($bline) ne "") {
-      push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($bline), type => "bline" };
+      push @{$extra->{descriptions}}, { lang => $chd->{sched_lang}, text => norm($bline), type => "bline" };
     }
     if($epi_desc and defined($epi_desc) and norm($epi_desc) ne "") {
       my $seriesdesc = $epi_desc;
@@ -219,14 +219,14 @@ sub ImportContent
 
       # Season / series
       if($seriesdesc =~ /(säsong|sæson|kausi|sesong)/i) {
-        push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($seriesdesc), type => "season" };
+        push @{$extra->{descriptions}}, { lang => $chd->{sched_lang}, text => norm($seriesdesc), type => "season" };
       } else {
-        push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($seriesdesc), type => "series" };
+        push @{$extra->{descriptions}}, { lang => $chd->{sched_lang}, text => norm($seriesdesc), type => "series" };
       }
 
     }
     if($med_desc and defined($med_desc) and norm($med_desc) ne "") {
-      push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($med_desc), type => "episode" };
+      push @{$extra->{descriptions}}, { lang => $chd->{sched_lang}, text => norm($med_desc), type => "episode" };
     }
 
     # Movie got another way of external id
@@ -345,12 +345,12 @@ sub ImportContent
       {
         # Cover / Poster
         if($ic->findvalue( './@Category' ) eq 'Cover') {
-          push $extra->{images}, { url => 'https://img-cdn-cmore.b17g.services/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'cover', title => undef, copyright => undef, source => "CMore" };
+          push @{$extra->{images}}, { url => 'https://img-cdn-cmore.b17g.services/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'cover', title => undef, copyright => undef, source => "CMore" };
         } elsif($ic->findvalue( './@Category' ) eq 'Primary') {
           if($cate eq "Film") {
-            push $extra->{images}, { url => 'https://img-cdn-cmore.b17g.services/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'landscape', title => undef, copyright => undef, source => "CMore" };
+            push @{$extra->{images}}, { url => 'https://img-cdn-cmore.b17g.services/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'landscape', title => undef, copyright => undef, source => "CMore" };
           } else {
-            push $extra->{images}, { url => 'https://img-cdn-cmore.b17g.services/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'episode', title => undef, copyright => undef, source => "CMore" };
+            push @{$extra->{images}}, { url => 'https://img-cdn-cmore.b17g.services/' . $ic->findvalue( './@Id' ) . '/8.img', type => 'episode', title => undef, copyright => undef, source => "CMore" };
           }
         }
       }
@@ -359,7 +359,7 @@ sub ImportContent
     # Live?
     if($type eq "Live") {
       $ce->{live} = 1;
-      push $extra->{qualifiers}, "live";
+      push @{$extra->{qualifiers}}, "live";
     } else {
       $ce->{live} = 0;
     }
@@ -367,20 +367,20 @@ sub ImportContent
     # Premiere
     if($premiere eq "true") {
       $ce->{new} = 1;
-      push $extra->{qualifiers}, "new";
+      push @{$extra->{qualifiers}}, "new";
     } else {
       $ce->{new} = 0;
-      push $extra->{qualifiers}, "repeat";
+      push @{$extra->{qualifiers}}, "repeat";
     }
 
     # Dubbed?
     if($dubbed eq "true") {
-      push $extra->{qualifiers}, "dubbed";
+      push @{$extra->{qualifiers}}, "dubbed";
     }
 
     # VOD?
     if($vod eq "true") {
-      push $extra->{qualifiers}, "catchup";
+      push @{$extra->{qualifiers}}, "catchup";
     }
 
     $ce->{extra} = $extra;

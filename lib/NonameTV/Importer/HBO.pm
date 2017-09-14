@@ -220,14 +220,14 @@ sub ImportContent {
       # Image
       # Images
       if(defined($prg->findvalue( 'thnImage' )) and $prg->findvalue( 'thnImage' ) ne "") {
-        push $extra->{images}, { url => $prg->findvalue( 'thnImage' ), source => "HBO" };
+        push @{$extra->{images}}, { url => $prg->findvalue( 'thnImage' ), source => "HBO" };
       }
 
       # New?
       my $premier = $prg->findvalue( 'premier' );
       if( $premier eq "1" )
       {
-        push $extra->{qualifiers}, "repeat";
+        push @{$extra->{qualifiers}}, "repeat";
         $ce->{new} = "0";
       }
       else

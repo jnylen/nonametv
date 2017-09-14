@@ -166,20 +166,20 @@ sub ImportContent {
     my $widescreen =  $b->findvalue( 'pro_publish[1]/ppu_video' );
     if( $widescreen eq '16:9' ){
      	$ce->{aspect} = '16:9';
-      push $extra->{qualifiers}, "widescreen";
+      push @{$extra->{qualifiers}}, "widescreen";
   	} elsif( $widescreen eq 'HD' ){
       $ce->{quality} = "HDTV";
-      push $extra->{qualifiers}, "HD";
+      push @{$extra->{qualifiers}}, "HD";
   	} elsif( $widescreen eq '4:3' ){
       $ce->{aspect} = '4:3';
-      push $extra->{qualifiers}, "smallscreen";
+      push @{$extra->{qualifiers}}, "smallscreen";
     }
 
 
     my $live = $b->findvalue( 'pro_publish[1]/ppu_islive' );
     if( $live eq "TRUE" ) {
       $ce->{live} = "1";
-      push $extra->{qualifiers}, "live";
+      push @{$extra->{qualifiers}}, "live";
     } else {
       $ce->{live} = "0";
     }
@@ -187,28 +187,28 @@ sub ImportContent {
     my $rerun = $b->findvalue( 'pro_publish[1]/ppu_isrerun' );
     if( $rerun eq "TRUE" ) {
       $ce->{rerun} = "1";
-      push $extra->{qualifiers}, "rerun";
+      push @{$extra->{qualifiers}}, "rerun";
     } else {
       $ce->{rerun} = "0";
     }
 
     my $subtitled = $b->findvalue( 'pro_publish[1]/ppu_subtext_type' );
     if( $subtitled eq "TTV" ) {
-      push $extra->{qualifiers}, "CC";
+      push @{$extra->{qualifiers}}, "CC";
     }
 
     my $catchup = $b->findvalue( 'pro_publish[1]/ppu_streaming_od' );
     if( $catchup eq "TRUE" ) {
-      push $extra->{qualifiers}, "catchup";
+      push @{$extra->{qualifiers}}, "catchup";
     }
 
     my $audio = $b->findvalue( 'pro_publish[1]/ppu_audio' );
     if( $audio eq "Stereo" ) {
-      push $extra->{qualifiers}, "stereo";
+      push @{$extra->{qualifiers}}, "stereo";
     } elsif( $audio eq "Surround" ) {
-      push $extra->{qualifiers}, "surround";
+      push @{$extra->{qualifiers}}, "surround";
     } elsif( $audio eq "5.1" ) {
-      push $extra->{qualifiers}, "DD 5.1";
+      push @{$extra->{qualifiers}}, "DD 5.1";
     }
 
     # Prod year

@@ -229,6 +229,11 @@ sub ImportContent {
             ( $original_title, $romanseason ) = ( $subtitle =~ /^(.*)\s+-\s+([IVX].*)$/ );
         }
 
+        # orgname (season num)
+        if(!defined $original_title and $subtitle =~ /^(.*)\s+\(season\s+(\d+)\)/) {
+            ( $original_title, $rsarab ) = ( $subtitle =~ /^(.*)\s+\(season\s+(\d+)\)/ );
+        }
+
         # title - romanseason
         if($ce->{title} =~ /^(.*)\s+-\s+([IVX].*)$/) {
             ( $titles, $romanseason ) = ( $ce->{title} =~ /^(.*)\s+-\s+([IVX].*)$/ );
@@ -247,7 +252,7 @@ sub ImportContent {
         }
 
         # Roman season found
-        if(defined($romanseason) and isroman($romanseason)) {
+        if(!defined($rsarab) and defined($romanseason) and isroman($romanseason)) {
             $rsarab = arabic($romanseason);
         }
     }
@@ -292,7 +297,7 @@ sub ImportContent {
     progress("$day $start - $titles");
 
     # Director (only movies)
-    my ( $duimmerino, $dir ) = ( $desc =~ /Instr(\.\:|\.|\:)\s+(.*?)./ );
+    my ( $duimmerino, $dir ) = ( $desc =~ /Instr(\.\:|\.|\:)\s+(.*?)\./ );
     if(defined($dir) and $dir ne "") {
     	$ce->{directors} = norm($dir);
     	$ce->{program_type} = 'movie';

@@ -123,25 +123,25 @@ sub ImportContent {
     if( defined($is_hd) and $is_hd eq "Yes" )
 	  {
 	    $ce->{quality} = "HDTV";
-      push $extra->{qualifiers}, "HD";
+      push @{$extra->{qualifiers}}, "HD";
 	  } elsif( defined($is_hd) and $is_hd eq "No" ) {
-      push $extra->{qualifiers}, "SD";
+      push @{$extra->{qualifiers}}, "SD";
     }
 
     # replay
     if(defined($rerun) and norm($rerun) eq "No") {
       $ce->{new} = "1";
-      push $extra->{qualifiers}, "new";
+      push @{$extra->{qualifiers}}, "new";
     } elsif(defined($rerun) and norm($rerun) eq "Yes") {
       $ce->{new} = "0";
-      push $extra->{qualifiers}, "rerun";
+      push @{$extra->{qualifiers}}, "rerun";
     }
 
     # Find live-info
   	if( $live eq "Yes" )
   	{
   	  $ce->{live} = "1";
-      push $extra->{qualifiers}, "live";
+      push @{$extra->{qualifiers}}, "live";
   	}
     else
     {

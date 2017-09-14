@@ -238,7 +238,7 @@ sub ImportContent
 
     if(defined($image) and $image ne "") {
         $ce->{fanart} = $image;
-        push $extra->{images}, { url => $image, source => "OUTTV" };
+        push @{$extra->{images}}, { url => $image, source => "OUTTV" };
     }
 
     # Find rerun-info
@@ -248,7 +248,7 @@ sub ImportContent
 	  }
 	  else
 	  {
-      push $extra->{qualifiers}, "repeat";
+      push @{$extra->{qualifiers}}, "repeat";
 	    $ce->{new} = "0";
 	  }
 

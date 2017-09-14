@@ -258,7 +258,7 @@ sub ImportContent {
         $imgtit =~ s/\:$//;
         my( $copyright) = ($item->find('./LEGENDE')->to_literal =~ /\(Copyright (.*?)\)/ );
 
-        push $extra->{images}, { url => $image, title => $imgtit, copyright => $copyright, source => "SRF" };
+        push @{$extra->{images}}, { url => $image, title => $imgtit, copyright => $copyright, source => "SRF" };
       }
 
       $self->{datastorehelper}->AddProgramme( $ce );

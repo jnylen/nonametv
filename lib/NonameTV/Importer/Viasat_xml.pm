@@ -279,16 +279,16 @@ sub ImportContent {
 
       # descriptions
       if($bline and defined($bline) and norm($bline) ne "") {
-        push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($bline), type => "bline" };
+        push @{$extra->{descriptions}}, { lang => $chd->{sched_lang}, text => norm($bline), type => "bline" };
       }
       if($desc_series and defined($desc_series) and norm($desc_series) ne "") {
-        push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($desc_series), type => "series" };
+        push @{$extra->{descriptions}}, { lang => $chd->{sched_lang}, text => norm($desc_series), type => "series" };
       }
       if($desc_logline and defined($desc_logline) and norm($desc_logline) ne "") {
-        push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($desc_logline), type => "logline" };
+        push @{$extra->{descriptions}}, { lang => $chd->{sched_lang}, text => norm($desc_logline), type => "logline" };
       }
       if($desc_episode and defined($desc_episode) and norm($desc_episode) ne "") {
-        push $extra->{descriptions}, { lang => $chd->{sched_lang}, text => norm($desc_episode), type => "episode" };
+        push @{$extra->{descriptions}}, { lang => $chd->{sched_lang}, text => norm($desc_episode), type => "episode" };
       }
 
 
@@ -320,31 +320,31 @@ sub ImportContent {
   	  if( $widescreen eq "true" )
   	  {
   	    $ce->{aspect} = "16:9";
-        #push $extra->{qualifiers}, "widescreen";
+        #push @{$extra->{qualifiers}}, "widescreen";
   	  }
   	  else
   	  {
   	    $ce->{aspect} = "4:3";
-        #push $extra->{qualifiers}, "smallscreen";
+        #push @{$extra->{qualifiers}}, "smallscreen";
   	  }
 
   	  # Find rerun-info
   	  if( $rerun eq "true" )
   	  {
   	    $ce->{new} = "0";
-        push $extra->{qualifiers}, "repeat";
+        push @{$extra->{qualifiers}}, "repeat";
   	  }
   	  else
   	  {
   	    $ce->{new} = "1";
-        push $extra->{qualifiers}, "new";
+        push @{$extra->{qualifiers}}, "new";
   	  }
 
   	  # Find live-info
   	  if( $live eq "true" or $lead eq "LIVE" or $lead eq "LIVE:" )
   	  {
   	    $ce->{live} = "1";
-        push $extra->{qualifiers}, "live";
+        push @{$extra->{qualifiers}}, "live";
   	  }
   	  else
   	  {

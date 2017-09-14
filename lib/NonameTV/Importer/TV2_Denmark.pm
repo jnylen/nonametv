@@ -272,7 +272,7 @@ sub ImportContent
     # Each
     foreach my $ic ($images->get_nodelist)
     {
-        push $extra->{images}, { url => $ic->findvalue( 'url' ), title => $ic->findvalue( 'caption' ), copyright => $ic->findvalue( 'byline' ), source => "TV2 Denmark" };
+        push @{$extra->{images}}, { url => $ic->findvalue( 'url' ), title => $ic->findvalue( 'caption' ), copyright => $ic->findvalue( 'byline' ), source => "TV2 Denmark" };
     }
 
     ## New?
@@ -281,7 +281,7 @@ sub ImportContent
       $ce->{new} = 1;
     } else {
       $ce->{new} = 0;
-      push $extra->{qualifiers}, "repeat";
+      push @{$extra->{qualifiers}}, "repeat";
     }
 
     $ce->{extra} = $extra;
