@@ -1518,3 +1518,18 @@
 259,TmdbTV,"Doktorn kan komma",program_type,series,4014,guess
 259,TmdbTV,"Holby city",program_type,series,1028,guess
 259,TmdbTV,Kvinnofängelset,program_type,series,4275,guess
+1895,TmdbTV,^.*$,program_type,series,\N,guess
+1896,TmdbTV,^.*$,program_type,series,\N,guess
+1887,TmdbTV,^.*$,program_type,series,\N,guess
+913,TvdbEN,^.*$,program_type,series,\N,guess
+1025,TvdbDE,^.*$,program_type,series,\N,guess
+1162,TvdbDE,^.*$,program_type,series,\N,guess
+1210,TvdbDE,^.*$,program_type,series,\N,guess
+1212,TvdbDE,^.*$,program_type,series,\N,guess
+1887,TvdbEN,^.*$,program_type,series,\N,guess
+1895,TvdbPL,^.*$,program_type,series,\N,guess
+1896,TvdbPL,^.*$,program_type,series,\N,guess
+1026,TvdbDE,^.*$,program_type,series,\N,guess
+1897,Fixups,"^.*(Masters of Horror)\s+-\s+(.*)$",\N,\N,\N,splittitle
+1897,TmdbTV,"Masters of Horror",program_type,series,3470,episodetitle
+1898,Tvdb2,^.*$,program_type,series,80348,guess

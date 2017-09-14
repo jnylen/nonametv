@@ -1,7 +1,7 @@
 200,"Axess TV",axess.se,"TV,Sweden",Axess,1,,1,,,sv,0,http://www.axess.se/,0
-201,Arte,arte.de,"TV,Germany,Norway,Denmark,Finland,Sweden,Austria",Arte,1,,1,,,de,0,http://www.arte.de/,0
+201,Arte,arte.de,"TV,Germany,Norway,Denmark,Finland,Sweden,Austria",DasErste,1,16,1,,,de,0,http://www.arte.de/,0
 203,"BBC Brit (SE)",bbcentertainment.com,"TV,Sweden",BBCWW,1,,1,,,sv,0,http://www.bbcentertainment.com/nordic/,0
-205,"BBC Earth (SE)",bbcknowledge.com,"TV,Sweden",BBCWW,1,,1,,,sv,0,http://www.bbcknowledge.com/nordic/,0
+205,"BBC Earth (SE)",bbcknowledge.com,"TV,Sweden",BBCWW,1,,1,,,en,0,http://www.bbcknowledge.com/nordic/,0
 207,"Disney Channel (SE)",disneychannel.se,"TV,Sweden",DisneyChannel,1,,1,series,Kids,sv,0,http://www.disneychannel.dk/,0
 209,"Disney XD (SE)",xd.disneychannel.se,"TV,Sweden",DisneyChannel,1,,1,series,Kids,sv,0,http://www.disneychannel.dk/,0
 232,"Kanal 5 (SE)",kanal5.se,"TV,Sweden,Finland",SBSTVSWE,1,se.sbsdiscovery.channel.5,1,series,Series,sv,0,\N,0
@@ -39,7 +39,6 @@
 303,Kunskapskanalen,kunskapskanalen.svt.se,"TV,Sweden,Finland,Denmark,Norway",Svt,1,,1,,,sv,0,\N,0
 306,SVT24,svt24.svt.se,"TV,Sweden,Finland,Denmark,Norway",Svt,1,,1,,,sv,0,\N,0
 307,Barnkanalen,svtb.svt.se,"TV,Sweden,Finland,Denmark,Norway",Svt,1,,1,,,sv,0,\N,0
-308,"SVT World",svtworld.svt.se,"TV,Sweden,Finland,Denmark,Norway",Svt,1,,1,,,sv,0,\N,0
 312,FTV,ftv.com,"TV,Norway,Sweden,Denmark,Finland,Austria,Poland",FTV,1,,1,tvshow,Fashion,en,0,http://www.ftv.com,0
 313,"Kanal 10 (SE)",kanal10.se,"TV,Sweden,Finland",Kanal10,1,,1,series,Series,sv,0,\N,0
 314,"Motorsport TV",motorstv.com,"TV,Norway,Sweden,Denmark,Finland",Motors,1,,1,,,en,0,\N,0
@@ -50,7 +49,7 @@
 326,"Lifestyle TV",lifestyletv.se,"TV,Sweden",LifestyleTV,1,,1,,,sv,0,\N,0
 327,"Boomerang (SE)",boomerangtv.se,"TV,Sweden",Tivo,1,,1,,,sv,0,\N,0
 330,CNN,cnn.com,"TV,Norway,Sweden,Denmark,Finland,Germany,Switzerland,Austria",Tivo,1,,1,,,en,0,\N,0
-332,TV5Monde,tv5monde.org,"TV,Norway,Sweden,Denmark,Finland,Germany,Austria,Switzerland",TV5Monde,1,,1,,,sv,0,\N,0
+332,TV5Monde,tv5monde.org,"TV,Norway,Sweden,Denmark,Finland,Germany,Austria,Switzerland",TV5Monde,1,en,1,,,en,0,\N,0
 335,SVTB/SVT24,svtb-svt24.svt.se,"TV,Sweden,Finland,Norway",Combiner,1,,1,,,sv,0,\N,0
 337,"Eurosport HD",hd.eurosport.se,"TV,Sweden",Downconverter,1,"eurosport.se, quality=HDTV",1,,,sv,0,http://www.eurosport.se,0
 338,"Kanal 5 HD",hd.kanal5.se,"TV,Sweden",Downconverter,1,"kanal5.se, quality=HDTV",1,,,sv,0,http://www.kanal5.se,0
@@ -162,12 +161,12 @@
 613,"HTV 2",htv2.hrt.hr,"TV,Croatia,Norway,Sweden,Denmark,Austria,Germany",HRT,1,mreza=3,1,,,hr,0,http://www.hrt.hr,0
 614,"HTV 3",htv3.hrt.hr,"TV,Croatia,Norway,Sweden,Denmark,Austria,Germany",HRT,1,mreza=4,1,,,hr,0,http://www.hrt.hr,0
 615,"HTV 4",htv4.hrt.hr,"TV,Croatia,Norway,Sweden,Denmark,Austria,Germany",HRT,1,mreza=40,1,,,hr,0,http://www.hrt.hr,0
-616,"Rai Uno",tv1.rai.it,"TV,Italy,Norway,Sweden,Denmark,Finland,Austria,Germany",RAI,1,RaiUno,1,series,Series,it,0,,0
-617,"Rai Movie",movie.rai.it,"TV,Italy",RAI,1,RaiMovie,1,series,Series,it,0,,0
-618,"Rai Due",tv2.rai.it,"TV,Italy,Norway,Sweden,Denmark,Finland,Austria,Germany",RAI,1,RaiDue,1,series,Series,it,0,,0
-619,"Rai Tre",tv3.rai.it,"TV,Italy,Norway,Sweden,Denmark,Finland,Austria,Germany",RAI,1,RaiTre,1,series,Series,it,0,,0
-620,"Rai 4",tv4.rai.it,"TV,Italy",RAI,1,Rai4,1,series,Series,it,0,,0
-621,"Rai 5",tv5.rai.it,"TV,Italy",RAI,1,Extra,1,series,Series,it,0,\N,0
+616,"Rai Uno",tv1.rai.it,"TV,Italy,Norway,Sweden,Denmark,Finland,Austria,Germany",RAI,0,RaiUno,1,series,Series,it,0,,0
+617,"Rai Movie",movie.rai.it,"TV,Italy",RAI,0,RaiMovie,1,series,Series,it,0,,0
+618,"Rai Due",tv2.rai.it,"TV,Italy,Norway,Sweden,Denmark,Finland,Austria,Germany",RAI,0,RaiDue,1,series,Series,it,0,,0
+619,"Rai Tre",tv3.rai.it,"TV,Italy,Norway,Sweden,Denmark,Finland,Austria,Germany",RAI,0,RaiTre,1,series,Series,it,0,,0
+620,"Rai 4",tv4.rai.it,"TV,Italy",RAI,0,Rai4,1,series,Series,it,0,,0
+621,"Rai 5",tv5.rai.it,"TV,Italy",RAI,0,Extra,1,series,Series,it,0,\N,0
 622,"RBB gemeinsam",rbb.rbb-online.de,"TV,Germany,Austria",RBBDE,1,RBB,1,,,de,0,\N,0
 623,"RBB Berlin Zusatz",rbbberl.rbb-online.de,"TV,Germany,Austria",RBBDE,1,RBBBERL,1,,,de,0,\N,0
 624,"RBB Brandenburg Zusatz",rbbbra.rbb-online.de,"TV,Germany,Austria",RBBDE,1,RBBBRA,1,,,de,0,\N,0
@@ -185,13 +184,13 @@
 671,"Viasat Explore (NO)",explorer.viasat.no,"TV,Norway",ViasatWorld,1,Viasat%20Explore%20Nordic/Norwegian/:ViasatExploreNordic,1,series,Documentary,no,0,http://www.viasatworld.com/,0
 672,"Viasat Film Family (NO)",family.film.viasat.no,"TV,Norway",ViasatNO,1,viasat_film_family_no_,1,movie,Movies,no,0,http://www.viasat.se/viasat-film,0
 673,"Viasat Film Premiere (NO)",film.viasat.no,"TV,Norway",ViasatNO,1,viasat_film_no_,1,movie,Movies,no,0,http://www.viasat.se/viasat-film,0
-674,"Viasat Fotball (NO)",fotball.viasat.no,"TV,Norway",ViasatNO,1,viasat_fotball_no_,1,sports,Soccer,no,0,http://www.viasatsport.se/,0
+674,"Viasport 2 (NO)",fotball.viasat.no,"TV,Norway",ViasatNO,1,viasport_2_no_,1,sports,Soccer,no,0,http://www.viasatsport.se/,0
 675,"Viasat Golf (NO)",golf.viasat.no,"TV,Norway",ViasatNO,1,viasat_golf_no_,1,sports,Golf,no,0,http://www.viasatsport.se/,0
 676,"Viasat History (NO)",history.viasat.no,"TV,Norway",ViasatWorld,1,Viasat%20History/Norwegian/:ViasatHistory,1,series,Documentary,no,0,http://www.viasatworld.com/,0
-677,"Viasat Hockey (NO)",hockey.viasat.no,"TV,Norway",ViasatNO,1,viasat_hockey_no_,1,sports,Sports,no,0,http://www.viasatsport.se/,0
-678,"Viasat Motor (NO)",motor.viasat.no,"TV,Norway",ViasatNO,1,viasat_motor_no_,1,sports,Motors,no,0,http://www.viasatsport.se/,0
+677,"Viasport+ (NO)",hockey.viasat.no,"TV,Norway",ViasatNO,1,viasport+_no_,1,sports,Sports,no,0,http://www.viasatsport.se/,0
+678,"Viasport 3 (NO)",motor.viasat.no,"TV,Norway",ViasatNO,1,viasport_3_no_,1,sports,Motors,no,0,http://www.viasatsport.se/,0
 679,"Viasat Nature (NO)",nature.viasat.no,"TV,Norway",ViasatWorld,1,Viasat%20Nature%20Nordic/Norwegian/:ViasatNatureNordic,1,series,Documentary,no,0,http://www.viasatworld.com/,0
-681,"Viasat Sport (NO)",sport.viasat.no,"TV,Norway",ViasatNO,1,viasatsport_no_,1,sports,Sports,no,0,http://www.viasatsport.se/,0
+681,"Viasport 1 (NO)",sport.viasat.no,"TV,Norway",ViasatNO,1,viasport_1_no_,1,sports,Sports,no,0,http://www.viasatsport.se/,0
 682,"TV6 (NO)",tv6norge.no,"TV,Norway",ViasatNO,1,tv6_norway_no_,1,series,Series,no,0,http://www.tv6.se/,0
 688,"Boomerang (NO)",boomerangtv.no,"TV,Norway",Tivo,1,,1,,,no,0,\N,0
 689,"Cartoon Network (NO)",cartoonnetwork.no,"TV,Norway",Tivo,1,,1,,,no,0,\N,0
@@ -216,14 +215,13 @@
 723,"Disney Junior (NO)",junior.disneychannel.no,"TV,Norway",DisneyChannel,1,,1,series,Kids,no,0,http://www.disneychannel.dk/,0
 724,"Disney XD (NO)",xd.disneychannel.no,"TV,Norway",DisneyChannel,1,,1,series,Kids,no,0,http://www.disneychannel.dk/,0
 725,"BBC Brit (NO)",no.bbcentertainment.no,"TV,Norway",BBCWW,1,,1,,,no,0,http://www.bbcentertainment.com/nordic/,0
-727,"BBC Earth (NO)",no.bbcknowledge.no,"TV,Norway",BBCWW,1,,1,,,no,0,http://www.bbcknowledge.com/nordic/,0
+727,"BBC Earth (NO)",no.bbcknowledge.no,"TV,Norway",BBCWW,1,,1,,,en,0,http://www.bbcknowledge.com/nordic/,0
 730,"CBS Reality",cbsreality.tv,"TV,Norway,Sweden,Denmark,Finland,Poland,Austria",EBS,1,85,1,,series,en,0,Reality,0
 732,TV12,tv12.tv4.se,"TV,Sweden",TV4,1,21,1,series,Series,sv,0,\N,0
 733,"Horse and Country TV",horseandcountry.tv,"TV,Norway,Sweden",HaC,1,,1,,,en,0,\N,0
 734,"Extreme Sports",extremesports.com,"TV,Norway,Sweden,Denmark,Finland,Poland,Austria,Germany",EBS,1,265,1,,sports,en,0,Sports,0
 735,"Outdoor Channel HD",outdoorchannel.com,"TV,Norway,Sweden,Denmark,Finland,Poland,Austria,Germany",EBS,1,568,1,,series,en,0,Wildlife,0
 737,"Viasat Film Action (FI)",action.film.viasat.fi,"TV,Finland",ViasatFI,1,viasat_film_action_fi_,1,movie,Movies,fi,0,http://www.viasat.se/viasat-film,0
-739,"Viasat Film Comedy (FI)",comedy.film.viasat.fi,"TV,Finland",ViasatFI,1,viasat_film_comedy_fi_,1,movie,Movies,fi,0,http://www.viasat.se/viasat-film,0
 741,"Viasat Explore (FI)",explorer.viasat.fi,"TV,Finland",ViasatWorld_Finland,1,Viasat%20Explore%20Nordic/Finnish/:ViasatExploreNordic,1,series,Documentary,fi,0,http://www.viasatworld.com/,0
 742,"Viasat Film Premiere (FI)",film.viasat.fi,"TV,Finland",ViasatFI,1,viasat_film_fi_,1,movie,Movies,fi,0,http://www.viasat.se/viasat-film,0
 743,"Viasat Golf (FI)",golf.viasat.fi,"TV,Finland",ViasatFI,1,viasat_golf_fi_,1,sports,Golf,fi,0,http://www.viasatsport.se/,0
@@ -234,14 +232,12 @@
 749,"Viasat Sport (FI)",sport.viasat.fi,"TV,Finland",ViasatFI,1,viasatsport_se_fi_,1,sports,Sports,fi,0,http://www.viasatsport.se/,0
 750,"Al Jazeera Arabic",arab.aljazeera.net,"TV,Norway,Sweden,Denmark,Finland,Switzerland,Austria,Germany",Infomedia,1,ALJ,1,,,en,0,\N,0
 753,"Viasat Film Action (DK)",action.film.viasat.dk,"TV,Denmark",ViasatDK,1,viasat_film_action_dk_,1,movie,Movies,da,0,http://www.viasat.se/viasat-film,0
-755,"Viasat Film Comedy (DK)",comedy.film.viasat.dk,"TV,Denmark",ViasatDK,1,viasat_film_comedy_dk_,1,movie,Movies,da,0,http://www.viasat.se/viasat-film,0
 757,"Viasat Explore (DK)",explorer.viasat.dk,"TV,Denmark",ViasatWorld,1,Viasat%20Explore%20Nordic/Danish/:ViasatExploreNordic,1,series,Documentary,da,0,http://www.viasatworld.com/,0
 758,"Viasat Film Family (DK)",family.film.viasat.dk,"TV,Denmark",ViasatDK,1,viasat_film_family_dk_,1,movie,Movies,da,0,http://www.viasat.se/viasat-film,0
 759,"Viasat Film Premiere (DK)",film.viasat.dk,"TV,Denmark",ViasatDK,1,viasat_film_dk_,1,movie,Movies,da,0,http://www.viasat.se/viasat-film,0
 760,"Viasat Golf (DK)",golf.viasat.dk,"TV,Denmark",ViasatDK,1,viasat_golf_dk_,1,sports,Golf,da,0,http://www.viasatsport.se/,0
 761,"Viasat History (DK)",history.viasat.dk,"TV,Denmark",ViasatWorld,1,Viasat%20History/Danish/:ViasatHistory,1,series,Documentary,da,0,http://www.viasatworld.com/,0
 762,"Viasat Nature (DK)",nature.viasat.dk,"TV,Denmark",ViasatWorld,1,Viasat%20Nature%20Nordic/Danish/:ViasatNatureNordic,1,series,Documentary,da,0,http://www.viasatworld.com/,0
-765,"Viasat Film Comedy (SE)",comedy.film.viasat.se,"TV,Sweden",Viasat,1,viasat_film_comedy_se_,1,movie,Movies,sv,0,http://www.viasat.se/viasat-film,0
 766,"NRK3/NRK Super TV",nrk3super.nrk.no,"TV,Norway",Combiner,1,,1,,,no,0,\N,0
 767,"Private TV",europe.daringtv.com,"TV,Norway,Denmark,Sweden,Finland,Poland,Germany",HustlerTV,1,,1,movie,Adult,en,0,\N,0
 768,"Gospel Channel",gospel.tv,"TV,Norway,Sweden,Denmark,Finland",Gospel,1,,1,series,Religion,en,0,\N,0
@@ -249,15 +245,14 @@
 788,"Disney Junior (DK)",junior.disneychannel.dk,"TV,Denmark",DisneyChannel,1,,1,series,Kids,da,0,http://www.disneychannel.dk/,0
 789,"Disney XD (DK)",xd.disneychannel.dk,"TV,Denmark",DisneyChannel,1,,1,series,Kids,da,0,http://www.disneychannel.dk/,0
 798,"CNBC Europe",europe.cnbc.com,"TV,Norway,Denmark,Finland,Sweden,Switzerland,Germany,Austria",CNBC,1,,1,,,en,0,http://www.cnbceurope.com/,0
-799,"Viasat Film Comedy (NO)",comedy.film.viasat.no,"TV,Norway",ViasatNO,1,viasat_film_comedy_no_,1,movie,Movies,no,0,http://www.viasat.se/viasat-film,0
 800,"DW (Europe)",dw.de,"TV,Germany,Sweden,Denmark,Norway,Austria,Switzerland,Poland,Netherlands,Finland",DWDE,1,,1,series,News,en,0,http://www.dw.de,0
 802,"TV4 Film (Boxer)",tv4film.boxer.se,"TV,Sweden",Combiner,1,,1,,,sv,0,\N,0
 804,"MTV Live HD",hd.mtv.se,"TV,Norway,Sweden,Denmark,Finland,Poland",Mtve_mail,1,Live,1,series,Music,en,0,\N,0
 810,"Eurosport (DK)",eurosport.dk,"TV,Denmark",EurosportDK,1,EurosportNordic,1,sports,Sports,da,0,http://www.eurosport.se/,0
 812,"BBC Brit (DK)",bbcentertainment.dk,"TV,Denmark",BBCWW,1,,1,,,da,0,http://www.bbcentertainment.com/nordic/,0
 813,"BBC Brit (FI)",bbcentertainment.fi,"TV,Finland",BBCWW,1,,1,,,fi,0,http://www.bbcentertainment.com/nordic/,0
-816,"BBC Earth (DK)",bbcknowledge.dk,"TV,Denmark",BBCWW,1,,1,,,da,0,http://www.bbcknowledge.com/nordic/,0
-817,"BBC Earth (FI)",bbcknowledge.fi,"TV,Finland",BBCWW,1,,1,,,fi,0,http://www.bbcknowledge.com/nordic/,0
+816,"BBC Earth (DK)",bbcknowledge.dk,"TV,Denmark",BBCWW,1,,1,,,en,0,http://www.bbcknowledge.com/nordic/,0
+817,"BBC Earth (FI)",bbcknowledge.fi,"TV,Finland",BBCWW,1,,1,,,en,0,http://www.bbcknowledge.com/nordic/,0
 822,"Nat. Geo. Wild (DK)",wild.natgeo.dk,"TV,Denmark",NatGeoWild,1,,1,,,da,0,\N,0
 823,"Nat. Geo. Wild (NO)",wild.natgeo.no,"TV,Norway",NatGeoWild,1,,1,,,no,0,\N,0
 828,"TV Finland",tvfinland.yle.fi,"TV,Norway,Sweden,Denmark,Finland",Venetsia,1,,1,series,Series,fi,0,http://yle.fi/tvfinland/svenska.htm,0
@@ -277,7 +272,6 @@
 847,"Ruutu+ Urheilu 1",pro1.nelonen.fi,"TV,Finland",Venetsia,1,,1,sports,Sports,fi,0,http://www.nelonen.fi/,0
 848,"Ruutu+ Urheilu 2",pro2.nelonen.fi,"TV,Finland",Venetsia,1,,1,sports,Sports,fi,0,http://www.nelonen.fi/,0
 852,Sub,sub.fi,"TV,Finland",Venetsia,1,,1,series,Series,fi,0,http://sub.fi/,0
-853,"Yle Teema",teema.yle.fi,"TV,Finland,Sweden",Venetsia,1,,1,series,Series,fi,0,http://yle.fi/teema/,0
 854,"Yle TV1",tv1.yle.fi,"TV,Finland,Sweden",Venetsia,1,,1,series,Series,fi,0,http://yle.fi/tv1/,0
 855,"Yle TV2",tv2.yle.fi,"TV,Finland,Sweden",Venetsia,1,,1,series,Series,fi,0,http://yle.fi/tv2/,0
 856,TV5,tv5.fi,"TV,Finland",Venetsia,1,,1,series,Series,fi,0,http://tv5.fi/,0
@@ -349,10 +343,6 @@
 949,"Disney Junior (English)",junior.disneychannel.com,TV,DisneyChannel,1,,1,series,Kids,en,0,http://www.disneychannel.dk/,0
 950,"Disney XD (English)",xd.disneychannel.com,TV,DisneyChannel,1,,1,series,Kids,en,0,http://www.disneychannel.dk/,0
 952,"E! Entertainment (English)",eu.eonline.com,"TV,Poland,Finland,Sweden,Norway,Denmark",Discovery,1,,1,series,Series,en,0,http://www.eonline.com/,0
-953,"TCM (SE)",se.tcmeurope.com,"TV,Sweden",Tivo,1,,1,,,sv,0,\N,0
-954,"TCM (DK)",dk.tcmeurope.com,"TV,Denmark",Tivo,1,,1,,,da,0,\N,0
-955,"TCM (NO)",no.tcmeurope.com,"TV,Norway",Tivo,1,,1,,,no,0,\N,0
-956,"TCM (English)",tcmeurope.com,TV,Tivo,1,,1,,,en,0,\N,0
 969,ORF3,orf3.orf.at,"TV,Austria,Germany",ORF,1,ORF3,1,series,Series,de,0,\N,0
 970,"ORF Sport Plus",sportplus.orf.at,"TV,Austria,Germany",ORF,1,ORFS,1,series,Series,de,0,\N,0
 972,"kabel eins classics",classics.kabel1.de,"TV,Germany,Austria",ProSieben,1,,1,series,Series,de,0,,0
@@ -390,8 +380,8 @@
 1015,"E! Entertainment HD (DE)",de.eonline.com,"TV,Germany,Austria",SkyDE,1,"E! ENTERTAINMENT HD",1,series,Series,de,0,\N,0
 1019,"VIVA (AT)",at.viva.tv,"TV,Austria",MTV_novg,1,2:de:DE,1,,,de,0,\N,0
 1022,RTL2,rtl2.de,"TV,Germany,Austria,Switzerland,Sweden,Denmark,Finland,Norway",RTL2,1,,1,series,Series,de,0,\N,0
-1025,"Boomerang (DE)",boomerangtv.de,"TV,Germany,Austria",SkyDE,1,BOOMERANG,1,,,de,0,\N,0
-1026,"Cartoon Network (DE)",cartoonnetwork.de,"TV,Germany,Austria",SkyDE,1,"CARTOON NETWORK",1,,,de,0,\N,0
+1025,"Boomerang HD (DE)",boomerangtv.de,"TV,Germany,Austria",Tivo,1,,1,,,de,0,\N,0
+1026,"Cartoon Network (DE)",cartoonnetwork.de,"TV,Germany,Austria",Tivo,1,,1,,,de,0,\N,0
 1027,"Crime & Investigation Europe",crimeandinvestigation.eu,"TV,Netherlands",History_xml,1,,1,series,Series,en,0,\N,0
 1028,"ProTV International",protv.ro,"TV,Sweden,Norway,Denmark,Netherlands,Germany,Finland,Austria",ProTV,1,,1,series,Series,ro,0,\N,0
 1034,"DW (Deutsch)",asien.dw.de,"TV,Austria,Finland,Poland,Russia",DWDE,1,,1,series,News,de,0,http://www.dw.de,0
@@ -422,7 +412,6 @@
 1076,"TNT (DK)",tnt-tv.dk,"TV,Denmark",NonstopXLS,1,,1,series,Series,da,0,\N,0
 1077,"TNT (NO)",tnt-tv.no,"TV,Norway",NonstopXLS,1,,1,series,Series,no,0,\N,0
 1078,"TNT (SE)",tnt-tv.se,"TV,Sweden",NonstopXLS,1,,1,series,Series,sv,0,\N,0
-1079,"Paramount Channel (SE)",paramountchannel.se,"TV,Sweden",MTVde,1,101:sv:SE,1,movie,Movies,sv,0,\N,0
 1080,"RT International",international.rt.com,"TV,Germany,Austria,Sweden,Norway,Denmark,Finland",RussiaToday,1,,1,series,Series,en,0,\N,0
 1081,"RT Russia",russia.rt.com,"TV,Germany,Austria,Sweden,Norway,Denmark,Finland",RussiaToday,1,,1,series,Series,en,0,\N,0
 1082,"Sky News International",international.skynews.com,"TV,Germany,Austria,Sweden,Norway,Denmark,Finland",SkyNews,1,,1,,,en,0,\N,0
@@ -444,7 +433,6 @@
 1117,"Blue Movie 1",1.bluemovie.de,"TV,Germany,Austria",SkyDE,1,"BLUE MOVIE 1",1,movie,Adult,de,0,\N,0
 1118,"Blue Movie 2",2.bluemovie.de,"TV,Germany,Austria",SkyDE,1,"BLUE MOVIE 2",1,movie,Adult,de,0,\N,0
 1119,"Blue Movie 3",3.bluemovie.de,"TV,Germany,Austria",SkyDE,1,"BLUE MOVIE 3",1,movie,Adult,de,0,\N,0
-1120,"Sky 3D",3d.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY HD-3D",1,,,de,0,\N,0
 1121,"Sky Cinema Action",action.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Cinema Action",1,,,de,0,\N,0
 1123,"A&E (DE)",ae-tv.de,"TV,Germany,Austria",SkyDE,1,A&E,1,,,de,0,\N,0
 1124,"Sky Atlantic",atlantic.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY ATLANTIC",1,,,de,0,\N,0
@@ -457,7 +445,7 @@
 1153,"FOX (DE)",foxchannel.de,"TV,Germany,Austria",SkyDE,1,FOX,1,,,de,0,\N,0
 1154,"GOLDSTAR TV",goldstar-tv.de,"TV,Germany,Austria",SkyDE,1,"GOLDSTAR TV",1,,,de,0,\N,0
 1158,"History HD (DE)",hd.historytv.de,"TV,Germany,Austria",SkyDE,1,"HISTORY HD",1,,,de,0,\N,0
-1162,"TNT Comedy HD",hd.tnt-glitz.tv,"TV,Germany,Austria",SkyDE,1,"TNT COMEDY HD",1,,,de,0,\N,0
+1162,"TNT Comedy HD",hd.tnt-glitz.tv,"TV,Germany,Austria",Tivo,1,,1,,,de,0,\N,0
 1164,Heimatkanal,heimatkanal.de,"TV,Germany,Austria",SkyDE,1,HEIMATKANAL,1,,,de,0,\N,0
 1165,"Sky Cinema Hits",hits.sky.de,"TV,Germany,Austria",SkyDE,1,"Sky Cinema Hits",1,,,de,0,\N,0
 1167,"Junior (DE)",junior.tv,"TV,Germany,Austria",SkyDE,1,JUNIOR,1,,,de,0,\N,0
@@ -479,8 +467,8 @@
 1195,"sportdigital TV",sportdigital.tv,"TV,Germany,Austria",SkyDE,1,SPORTDIGITAL.TV,1,,,de,0,\N,0
 1207,"Sky Sport News",sportnews.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY SPORT NEWS",1,,,de,0,\N,0
 1209,"Syfy (DE)",syfy.de,"TV,Germany,Austria",SkyDE,1,"SCI FI",1,,,de,0,\N,0
-1210,"TNT Film",tnt-film.de,"TV,Germany,Austria",SkyDE,1,"TNT FILM",1,,,de,0,\N,0
-1212,"TNT Serie",tnt-serie.de,"TV,Germany,Austria",SkyDE,1,"TNT SERIE",1,,,de,0,\N,0
+1210,"TNT Film HD",tnt-film.de,"TV,Germany,Austria",Tivo,1,,1,,,de,0,\N,0
+1212,"TNT Serie HD",tnt-serie.de,"TV,Germany,Austria",Tivo,1,,1,,,de,0,\N,0
 1213,"Universal Channel HD (DE)",universalchannel.de,"TV,Germany,Austria",SkyDE,1,"UNIVERSAL CHANNEL HD",1,,,de,0,\N,0
 1214,"Nat. Geo. Wild (DE)",wild.natgeo.de,"TV,Germany,Austria",SkyDE,1,"NATIONAL GEOGRAPHIC WILD",1,,,de,0,\N,0
 1216,"Jukebox (DE)",jukebox-tv.de,"TV,Germany,Austria",SkyDE,1,JUKEBOX,1,,,de,0,\N,0
@@ -530,7 +518,7 @@
 1304,"Nat. Geo. Wild (PL)",wild.natgeo.pl,"TV,Poland",TravelChannel,1,,1,,,pl,0,\N,0
 1305,"KBS World (English)",world.kbs.co.kr,"TV,Germany,Poland,Sweden,Denmark",KBSWorld,1,,1,series,Series,en,0,http://world.kbs.co.kr/,0
 1306,"Phoenix Chinese News & Entertainment",phoenixtv.com.cn,"TV,Norway,Sweden,Denmark,Finland,Switzerland,Austria,Germany",Infomedia,1,CNE,1,,,en,0,\N,0
-1307,"XITE Germany",xite.tv,"TV,Germany",XITE,1,,1,tvshow,Music,de,0,http://www.xite.tv/de/,0
+1307,"XITE (DE)",xite.tv,"TV,Germany",XITE,1,,1,tvshow,Music,de,0,\N,0
 1308,"MTV Sport 1 HD",hd.sport1.mtv.fi,"TV,Finland",Downconverter,1,"sport1.mtv.fi, quality=HDTV",1,,,fi,0,http://www.3sat.de/,0
 1309,"MTV Sport 2 HD",hd.sport2.mtv.fi,"TV,Finland",Downconverter,1,"sport2.mtv.fi, quality=HDTV",1,,,fi,0,http://www.3sat.de/,0
 1310,"C More Sport 1 (FI)",sport1.mtv.fi,"TV,Finland",Venetsia,1,,1,sports,Sports,fi,0,http://mtv.fi/,0
@@ -713,7 +701,6 @@
 1605,"kabel eins Doku",doku.kabel1.de,"TV,Germany,Austria",ProSieben,1,,1,series,Series,de,0,\N,0
 1606,TV2/Fyn,tv2fyn.dk,"TV,Denmark",TV2Reg,1,fyn,1,series,Series,da,0,\N,0
 1607,"Uptown Classic",classic.uptown.dk,"TV,Denmark",Uptown,1,,1,,,en,0,\N,0
-1608,"VH1 Europe",vh1.eu,"TV,Sweden,Germany,Norway,Denmark,Finland,Austria,Switzerland,Poland",MTV_xmltv,1,"VH1 Euro IMM",1,,,en,0,\N,0
 1609,"Sky Arts HD",arts.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY ARTS HD",1,,,de,0,\N,0
 1610,"Sky Atlantic +1 HD",atlanticp1.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY ATLANTIC +1 HD",1,,,de,0,\N,0
 1611,"Sky Cinema Family",family.cinema.sky.de,"TV,Germany,Austria",SkyDE,1,"SKY CINEMA FAMILY",0,,,de,0,\N,0
@@ -747,11 +734,6 @@
 1646,"Deluxe Music",deluxemusic.tv,"TV,Germany,Austria,Switzerland",Highview,1,,1,tvshow,Music,de,0,\N,0
 1647,RCK,rck-tv.de,"TV,Germany,Austria,Switzerland",Highview,1,,0,tvshow,Music,de,0,\N,0
 1648,"TRACE Urban International",urbanint.trace.tv,"TV,Germany,Norway,Denmark,Finland,Sweden,Austria,Switzerland,Poland,Netherlands",Trace,1,,0,,,en,0,http://trace.tv,0
-1649,"TRACE Gospel",gospel.trace.tv,DEV,Trace,1,,0,,,en,0,\N,0
-1650,"TRACE Sport Stars",sportstars.trace.tv,DEV,Trace,1,,0,,,en,0,\N,0
-1651,"TRACE Toca",toca.trace.tv,DEV,Trace,1,,0,,,en,0,\N,0
-1652,"TRACE Tropical",tropical.trace.tv,DEV,Trace,1,,0,,,en,0,\N,0
-1653,"TRACE Urban (France)",urbanfr.trace.tv,DEV,Trace,1,,0,,,fr,0,\N,0
 1654,"National Geographic (DK)",natgeo.dk,"TV,Denmark",NGScan,1,,1,,,da,0,\N,0
 1655,"BBC Brit HD (SE)",hd.bbcentertainment.com,"TV,Sweden",Downconverter,1,"bbcentertainment.com, quality=HDTV",0,,,sv,0,\N,0
 1656,"TV3 Sport HD (SE)",sporthd.tv3.se,"TV,Sweden",Downconverter,1,"sport.tv3.se, quality=HDTV",0,,,sv,0,\N,0
@@ -779,7 +761,7 @@
 1682,"3+ (EE)",3plus.ee,"TV,Estonia",ViasatEE,1,3+_ee_,0,series,Series,ee,0,http://www.3plus.ee/,0
 1683,"eSports TV (EE)",esports.viasat.ee,"TV,Estonia",ViasatEE,1,esportstv_ee_,0,sports,Esports,en,0,http://www.viasat.ee/,0
 1684,"Viasat Golf (EE)",golf.viasat.ee,"TV,Estonia",ViasatEE,1,viasat_golf_ee_,0,sports,Golf,ee,0,http://www.viasat.ee/,0
-1685,"Viasat Hockey (EE)",hockey.viasat.ee,"TV,Estonia",ViasatEE,1,viasat_hoeckey_ee_,0,sports,Hockey,ee,0,http://www.viasat.ee/,0
+1685,"Viasat Hockey (EE)",hockey.viasat.ee,"TV,Estonia",ViasatEE,1,viasat_hockey_ee_,0,sports,Hockey,ee,0,http://www.viasat.ee/,0
 1686,"Viasat Motor (EE)",motor.viasat.ee,"TV,Estonia",ViasatEE,1,viasat_motor_ee_,0,sports,Motor,ee,0,http://www.viasat.ee/,0
 1687,"Viasat Sport Baltic (EE)",sportbaltic.viasat.ee,"TV,Estonia",ViasatEE,1,viasatsport_baltic_ee_,0,sports,Sports,ee,0,http://www.viasat.ee/,0
 1688,"TV3 (EE)",tv3.ee,"TV,Estonia",ViasatEE,1,tv3_ee_,0,series,Series,ee,0,http://www.tv3.ee/,0
@@ -827,9 +809,9 @@
 1735,"TV1000 Comedy HD (EE)",tv1000comedyhd.ee.viasatworld.com,"TV,Estonia",ViasatWorld_Finland,1,TV1000%20Comedy%20HD/Estonian/:TV1000ComedyHD,0,movie,Movies,ee,0,http://www.viasatworld.com/,0
 1736,"TV1000 Comedy HD (LT)",tv1000comedyhd.lt.viasatworld.com,"TV,Lithuania",ViasatWorld_Finland,1,TV1000%20Comedy%20HD/Lithuanian/:TV1000ComedyHD,0,movie,Movies,lt,0,http://www.viasatworld.com/,0
 1737,"TV1000 Comedy HD (LV)",tv1000comedyhd.lv.viasatworld.com,"TV,Latvia",ViasatWorld_Finland,1,TV1000%20Comedy%20HD/Latvian/:TV1000ComedyHD,0,movie,Movies,lv,0,http://www.viasatworld.com/,0
-1738,"TV1000 Kino (EE)",tv1000kino.ee.viasatworld.com,"TV,Estonia",ViasatWorld_Finland,1,TV1000%20Kino/Estonian/:TV1000Kino,0,movie,Movies,ee,0,http://www.viasatworld.com/,0
-1739,"TV1000 Kino (LT)",tv1000kino.lt.viasatworld.com,"TV,Lithuania",ViasatWorld_Finland,1,TV1000%20Kino/Lithuanian/:TV1000Kino,0,movie,Movies,lt,0,http://www.viasatworld.com/,0
-1740,"TV1000 Kino (LV)",tv1000kino.lv.viasatworld.com,"TV,Latvia",ViasatWorld_Finland,1,TV1000%20Kino/Latvian/:TV1000Kino,0,movie,Movies,lv,0,http://www.viasatworld.com/,0
+1738,"TV1000 Global Kino (EE)",tv1000kino.ee.viasatworld.com,"TV,Estonia",ViasatWorld_Finland,1,TV1000%20Global%20Kino/Estonian/:TV1000GlobalKino,0,movie,Movies,ee,0,http://www.viasatworld.com/,0
+1739,"TV1000 Global Kino (LT)",tv1000kino.lt.viasatworld.com,"TV,Lithuania",ViasatWorld_Finland,1,TV1000%20Global%20Kino/Lithuanian/:TV1000GlobalKino,0,movie,Movies,lt,0,http://www.viasatworld.com/,0
+1740,"TV1000 Global Kino (LV)",tv1000kino.lv.viasatworld.com,"TV,Latvia",ViasatWorld_Finland,1,TV1000%20Global%20Kino/Latvian/:TV1000GlobalKino,0,movie,Movies,lv,0,http://www.viasatworld.com/,0
 1742,"Sky Cinema Action HD",actionhd.sky.de,"TV,Germany,Austria",Downconverter,1,"action.sky.de, quality=HDTV",1,,,de,0,\N,0
 1743,"Sky Atlantic HD",atlantichd.sky.de,"TV,Germany,Austria",Downconverter,1,"atlantic.sky.de, quality=HDTV",1,,,de,0,\N,0
 1744,"Sky Sport Bundesliga HD 1",bundesligahd1.sky.de,"TV,Germany,Austria",Downconverter,1,"bundesliga1.sky.de, quality=HDTV",1,,,de,0,\N,0
@@ -883,11 +865,9 @@
 1792,"Viasat Explore HD (SE)",explorehd.viasat.se,"TV,Sweden",Downconverter,1,"explorer.viasat.se, quality=HDTV",0,series,Documentary,sv,0,http://www.viasatworld.com/,0
 1793,"BBC Brit HD (DK)",hd.bbcentertainment.dk,"TV,Denmark",Downconverter,1,"bbcentertainment.dk, quality=HDTV",0,,,da,0,\N,0
 1794,"BBC Brit HD (FI)",hd.bbcentertainment.fi,"TV,Finland",Downconverter,1,"bbcentertainment.fi, quality=HDTV",0,,,fi,0,\N,0
-1795,"BBC Brit HD (NO)",hd.bbcentertainment.no,"TV,Norway",Downconverter,1,"bbcentertainment.no, quality=HDTV",0,,,no,0,\N,0
 1796,"BBC Earth HD (SE)",hd.bbcknowledge.com,"TV,Sweden",Downconverter,1,"bbcknowledge.com, quality=HDTV",0,,,sv,0,\N,0
 1797,"BBC Earth HD (DK)",hd.bbcknowledge.dk,"TV,Denmark",Downconverter,1,"bbcknowledge.dk, quality=HDTV",0,,,da,0,\N,0
 1798,"BBC Earth HD (FI)",hd.bbcknowledge.fi,"TV,Finland",Downconverter,1,"bbcknowledge.fi, quality=HDTV",0,,,fi,0,\N,0
-1799,"BBC Earth HD (NO)",hd.bbcknowledge.no,"TV,Norway",Downconverter,1,"bbcknowledge.no, quality=HDTV",0,,,no,0,\N,0
 1800,"Comedy Central HD (NO)",hd.comedycentral.no,"TV,Norway",Downconverter,1,"comedycentral.no, quality=HDTV",0,series,Series,no,0,\N,0
 1801,"Disney Channel HD (DK)",hd.disneychannel.dk,"TV,Denmark",Downconverter,1,"disneychannel.dk, quality=HDTV",0,series,Kids,da,0,http://disney.com,0
 1802,"Disney Channel HD (FI)",hd.disneychannel.fi,"TV,Finland",Downconverter,1,"disneychannel.fi, quality=HDTV",0,series,Kids,fi,0,http://disney.com,0
@@ -976,3 +956,13 @@
 1886,"Viasat Sport Premium (FI)",sportpremium.viasat.fi,"TV,Finland",ViasatFI,1,viasat_sport_premium_fi_,0,sports,Sports,fi,0,http://www.viasatsport.se/,0
 1887,"Boomerang (ENG)",boomerangtv.eu,"TV,Sweden",Tivo,1,,0,,,en,0,\N,0
 1890,"Mini TV",mojamini.tv,"TV,Croatia",NovaTV,1,,0,series,Series,hr,0,\N,0
+1892,"VH1 Europe",vh1.eu,"TV,Sweden,Germany,Norway,Denmark,Finland,Austria,Switzerland,Poland",MTVde,1,93:sv:SE,1,,,en,0,\N,0
+1893,"BBC Brit HD (NO)",hd.bbcentertainment.no,"TV,Norway",Downconverter,1,"no.bbcentertainment.no, quality=HDTV",0,,,no,0,\N,0
+1894,"BBC Earth HD (NO)",hd.bbcknowledge.no,"TV,Norway",Downconverter,1,"no.bbcknowledge.no, quality=HDTV",0,,,no,0,\N,0
+1895,"Cartoon Network (PL)",cartoonnetwork.pl,"TV,Poland",Tivo,1,,0,,,pl,0,\N,0
+1896,"TNT HD (PL)",tnt-tv.pl,"TV,Poland",Tivo,1,,0,,,pl,0,\N,0
+1898,"National Geographic (TEST)",natgeo.test,DEV,NGScan_test,0,,0,,,sv,0,\N,0
+1899,"HR 1",hr1.hrt.hr,"RADIO,Croatia",HRT,1,mreza=16,0,,,hr,0,http://www.hrt.hr,0
+1900,"HR 2",hr2.hrt.hr,"RADIO,Croatia",HRT,1,mreza=17,0,,,hr,0,http://www.hrt.hr,0
+1901,"HR 3",hr3.hrt.hr,"RADIO,Croatia",HRT,1,mreza=18,0,,,hr,0,http://www.hrt.hr,0
+1902,"Vision Sverige",visionsverige.com,"TV,Sweden",VisjonNorge,1,,0,,,sv,0,\N,0

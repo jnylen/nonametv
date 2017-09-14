@@ -2,9 +2,9 @@ DROP TABLE IF EXISTS `batches`;
 CREATE TABLE `batches` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL DEFAULT '',
-  `last_update` int(11) NOT NULL DEFAULT '0',
-  `message` text NOT NULL,
-  `abort_message` text NOT NULL,
+  `last_update` int(11) NOT NULL DEFAULT 0,
+  `message` text DEFAULT NULL,
+  `abort_message` text DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -16,15 +16,15 @@ CREATE TABLE `channels` (
   `xmltvid` varchar(100) NOT NULL DEFAULT '',
   `chgroup` varchar(100) NOT NULL,
   `grabber` varchar(25) NOT NULL DEFAULT '',
-  `export` tinyint(1) NOT NULL DEFAULT '0',
+  `export` tinyint(1) NOT NULL DEFAULT 0,
   `grabber_info` varchar(100) NOT NULL DEFAULT '',
-  `logo` tinyint(4) NOT NULL DEFAULT '0',
+  `logo` tinyint(4) NOT NULL DEFAULT 0,
   `def_pty` varchar(20) DEFAULT '',
   `def_cat` varchar(20) DEFAULT '',
   `sched_lang` varchar(4) NOT NULL DEFAULT '',
-  `empty_ok` tinyint(1) NOT NULL DEFAULT '0',
+  `empty_ok` tinyint(1) NOT NULL DEFAULT 0,
   `url` varchar(100) DEFAULT NULL,
-  `allowcredits` tinyint(1) NOT NULL DEFAULT '0',
+  `allowcredits` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `chgroup` (`chgroup`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -35,17 +35,17 @@ CREATE TABLE `channelgroups` (
   `display_name` varchar(100) CHARACTER SET latin1 NOT NULL,
   `position` tinyint(10) unsigned NOT NULL,
   `sortby` varchar(32) NOT NULL,
-  `hidden` tinyint(1) NOT NULL DEFAULT '0',
+  `hidden` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`abr`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `files`;
 CREATE TABLE `files` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `channelid` int(11) NOT NULL DEFAULT '0',
+  `channelid` int(11) NOT NULL DEFAULT 0,
   `filename` varchar(80) NOT NULL DEFAULT '',
   `successful` tinyint(1) DEFAULT NULL,
-  `message` text NOT NULL,
+  `message` text DEFAULT NULL,
   `earliestdate` datetime DEFAULT NULL,
   `latestdate` datetime DEFAULT NULL,
   `md5sum` varchar(33) NOT NULL DEFAULT '',
@@ -56,34 +56,34 @@ CREATE TABLE `files` (
 DROP TABLE IF EXISTS `programs`;
 CREATE TABLE `programs` (
   `category` varchar(100) NOT NULL DEFAULT '',
-  `channel_id` int(11) NOT NULL DEFAULT '0',
+  `channel_id` int(11) NOT NULL DEFAULT 0,
   `start_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `end_time` datetime DEFAULT '0000-00-00 00:00:00',
-  `schedule_id` varchar(100) NOT NULL,
-  `title_id` varchar(100) NOT NULL,
+  `schedule_id` varchar(100) DEFAULT NULL,
+  `title_id` varchar(100) DEFAULT NULL,
   `title` varchar(100) NOT NULL DEFAULT '',
   `title_lang` varchar(5) DEFAULT NULL,
-  `subtitle` mediumtext,
+  `subtitle` mediumtext DEFAULT NULL,
   `subtitle_lang` varchar(5) DEFAULT NULL,
-  `description` text,
+  `description` text DEFAULT NULL,
   `description_lang` varchar(5) DEFAULT NULL,
-  `batch_id` int(11) NOT NULL DEFAULT '0',
+  `batch_id` int(11) NOT NULL DEFAULT 0,
   `program_type` varchar(20) DEFAULT '',
   `episode` varchar(20) DEFAULT NULL,
   `production_date` date DEFAULT NULL,
   `aspect` enum('unknown','4:3','16:9') NOT NULL DEFAULT 'unknown',
-  `quality` varchar(40) NOT NULL,
-  `stereo` varchar(40) NOT NULL,
-  `rating` varchar(20) NOT NULL,
-  `directors` text NOT NULL,
-  `actors` text NOT NULL,
-  `writers` text NOT NULL,
-  `adapters` text NOT NULL,
-  `producers` text NOT NULL,
-  `presenters` text NOT NULL,
-  `commentators` text NOT NULL,
-  `guests` text NOT NULL,
-  `url` varchar(100) DEFAULT NULL,
+  `quality` varchar(40) DEFAULT NULL,
+  `stereo` varchar(40) DEFAULT NULL,
+  `rating` varchar(20) DEFAULT NULL,
+  `directors` text DEFAULT NULL,
+  `actors` text DEFAULT NULL,
+  `writers` text DEFAULT NULL,
+  `adapters` text DEFAULT NULL,
+  `producers` text DEFAULT NULL,
+  `presenters` text DEFAULT NULL,
+  `commentators` text DEFAULT NULL,
+  `guests` text DEFAULT NULL,
+  `url` varchar(250) DEFAULT NULL,
   `star_rating` varchar(20) DEFAULT NULL,
   `live` int(1) DEFAULT NULL,
   `rerun` int(1) DEFAULT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE `programs` (
   `poster` varchar(255) DEFAULT NULL,
   `fanart` varchar(255) DEFAULT NULL,
   `external_ids` varchar(255) DEFAULT NULL,
-  `extra` text,
+  `extra` text DEFAULT NULL,
   PRIMARY KEY (`channel_id`,`start_time`),
   UNIQUE KEY `languages` (`description_lang`,`title_lang`,`subtitle_lang`),
   KEY `batch` (`batch_id`,`start_time`),
@@ -108,7 +108,7 @@ CREATE TABLE `programs` (
 DROP TABLE IF EXISTS `state`;
 CREATE TABLE `state` (
   `name` varchar(60) NOT NULL DEFAULT '',
-  `value` text,
+  `value` text DEFAULT NULL,
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -141,7 +141,7 @@ CREATE TABLE `languagestrings` (
 DROP TABLE IF EXISTS `epgservers`;
 CREATE TABLE `epgservers` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `active` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `active` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `name` varchar(100) NOT NULL DEFAULT '',
   `description` varchar(100) NOT NULL DEFAULT '',
   `vendor` varchar(100) NOT NULL DEFAULT '',
@@ -161,7 +161,7 @@ DROP TABLE IF EXISTS `networks`;
 CREATE TABLE `networks` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `nid` int(11) NOT NULL,
-  `active` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `active` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `epgserver` int(11) unsigned NOT NULL,
   `name` varchar(100) NOT NULL,
   `operator` varchar(100) NOT NULL DEFAULT '',
@@ -176,7 +176,7 @@ DROP TABLE IF EXISTS `services`;
 CREATE TABLE `services` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `dbchid` int(11) unsigned NOT NULL,
-  `active` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `active` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `network` int(11) unsigned NOT NULL,
   `transportstream` int(11) unsigned NOT NULL,
   `servicename` varchar(100) NOT NULL DEFAULT '',
@@ -199,7 +199,7 @@ DROP TABLE IF EXISTS `transportstreams`;
 CREATE TABLE `transportstreams` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `tsid` int(11) NOT NULL,
-  `active` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `active` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `network` int(11) unsigned NOT NULL,
   `description` varchar(100) NOT NULL DEFAULT '',
   `muxmainprotocol` varchar(100) NOT NULL DEFAULT '',
@@ -222,8 +222,8 @@ CREATE TABLE `admins` (
   `fullname` varchar(64) NOT NULL DEFAULT '',
   `email` varchar(64) NOT NULL DEFAULT '',
   `language` varchar(32) NOT NULL DEFAULT '',
-  `ismaster` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `roleeditor` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `ismaster` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `roleeditor` tinyint(1) unsigned NOT NULL DEFAULT 0,
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -247,7 +247,7 @@ CREATE TABLE `jobs` (
   `deleteafter` datetime NOT NULL,
   `duration` varchar(20) NOT NULL,
   `success` tinyint(4) NOT NULL,
-  `message` mediumtext,
+  `message` mediumtext DEFAULT NULL,
   `lastok` datetime DEFAULT '0000-00-00 00:00:00',
   `lastfail` datetime DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`type`,`name`)
@@ -256,9 +256,9 @@ CREATE TABLE `jobs` (
 DROP TABLE IF EXISTS `dvb_service_pointer`;
 CREATE TABLE `dvb_service_pointer` (
   `channel_id` int(11) NOT NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
   `original_network_id` int(5) NOT NULL,
-  `transport_id` int(5) NOT NULL DEFAULT '0',
+  `transport_id` int(5) NOT NULL DEFAULT 0,
   `service_id` int(5) NOT NULL,
   `description` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`original_network_id`,`transport_id`,`service_id`,`active`),
