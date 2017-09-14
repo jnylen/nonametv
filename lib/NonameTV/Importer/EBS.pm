@@ -15,7 +15,7 @@ Features:
 use DateTime;
 use XML::LibXML;
 use Data::Dumper;
-use POSIX;
+use Scalar::Util qw(looks_like_number);
 
 use NonameTV qw/MyGet norm AddCategory/;
 use NonameTV::Log qw/progress error/;
@@ -146,7 +146,7 @@ sub ImportContent
     if(norm($subtitle2) =~ /Serie (\d+), aflevering (\d+)/i) {
         $subtitle2 = undef;
     }
-    if (defined($subtitle2) and !isdigit($subtitle2)) {
+    if (defined($subtitle2) and !looks_like_number($subtitle2)) {
         $subtitle = $subtitle2; # Only set the subtitle if its not a number.
     }
 

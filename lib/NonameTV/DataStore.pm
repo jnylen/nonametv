@@ -455,6 +455,7 @@ sub AddProgrammeRaw {
       if ($err) {
         w $err;
       } else {
+        print Dumper($data, $self);
         w "FIXME error but empty err variable! (might be field in ce that is not in the programs table)";
       }
       $self->{batcherror} = 1;
