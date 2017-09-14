@@ -31,7 +31,6 @@ $NONAMETV NRK $1 $2 $3
 $NONAMETV ORF $1 $2 $3
 $NONAMETV OKV $1 $2 $3
 $NONAMETV OUTTV_web $1 $2 $3
-$NONAMETV RadioSeven $1 $2 $3
 $NONAMETV RBBDE $1 $2 $3
 $NONAMETV RAI $1 $2 $3
 $NONAMETV SBSTV $1 $2 $3
@@ -67,6 +66,7 @@ $NONAMETV RTS $1 $2 $3
 $NONAMETV Arirang $1 $2 $3
 $NONAMETV MTGRadio $1 $2 $3
 $NONAMETV Fjorton $1 $2 $3
+$NONAMETV TV5Monde $1 $2 $3
 
 # Download files
 wget -O /content/channels/tv_grab/ok54.xml http://epg.ok-rlp.de/xmltv/trier.xml
