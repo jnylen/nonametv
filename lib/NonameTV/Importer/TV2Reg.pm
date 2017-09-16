@@ -167,7 +167,7 @@ sub ImportContent
     }
 
     if($catchup eq "true") {
-      push $extra->{qualifiers}, "catchup";
+      push @{$extra->{qualifiers}}, "catchup";
     }
 
     $ce->{extra} = $extra;
