@@ -618,42 +618,42 @@ sub WriteEntry
     $d->{video}->{quality} = $entry->{quality};
   }
 
-  if( $entry->{directors} =~ /\S/ )
+  if( defined($entry->{directors}) and $entry->{directors} =~ /\S/ )
   {
     $d->{credits}->{director} = ParseCredits($entry->{directors});
   }
 
-  if( $entry->{actors} =~ /\S/ )
+  if( defined($entry->{actors}) and $entry->{actors} =~ /\S/ )
   {
     $d->{credits}->{actor} = ParseCredits($entry->{actors});
   }
 
-  if( $entry->{writers} =~ /\S/ )
+  if( defined($entry->{writers}) and $entry->{writers} =~ /\S/ )
   {
     $d->{credits}->{writer} = ParseCredits($entry->{writers});
   }
 
-  if( $entry->{adapters} =~ /\S/ )
+  if( defined($entry->{adapters}) and $entry->{adapters} =~ /\S/ )
   {
     $d->{credits}->{adapter} = ParseCredits($entry->{adapters});
   }
 
-  if( $entry->{producers} =~ /\S/ )
+  if( defined($entry->{producers}) and $entry->{producers} =~ /\S/ )
   {
     $d->{credits}->{producer} = ParseCredits($entry->{producers});
   }
 
-  if( $entry->{presenters} =~ /\S/ )
+  if( defined($entry->{presenters}) and $entry->{presenters} =~ /\S/ )
   {
     $d->{credits}->{presenter} = ParseCredits($entry->{presenters});
   }
 
-  if( $entry->{commentators} =~ /\S/ )
+  if( defined($entry->{commentators}) and $entry->{commentators} =~ /\S/ )
   {
     $d->{credits}->{commentator} = ParseCredits($entry->{commentators});
   }
 
-  if( $entry->{guests} =~ /\S/ )
+  if( defined($entry->{guests}) and $entry->{guests} =~ /\S/ )
   {
     $d->{credits}->{guest} = ParseCredits($entry->{guests});
   }
