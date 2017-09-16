@@ -32,16 +32,16 @@ the job is regarded as failed (success=0)
 
 =cut
 
-BEGIN 
+BEGIN
 {
   use Exporter   ();
   our (@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-  
+
   @ISA         = qw(Exporter);
   @EXPORT      = qw( );
   %EXPORT_TAGS = ( );     # eg: TAG => [ qw!name1 name2! ],
   @EXPORT_OK   = qw/StartJob EndJob/;
-  
+
 }
 our @EXPORT_OK;
 
@@ -65,7 +65,7 @@ sub StartJob {
     starttime => DateTime->now(),
     deleteafter => $ddt->ymd() . " " . $ddt->hms(),
   };
-  
+
   StartLogSection( $name, 1 );
 }
 
@@ -73,17 +73,17 @@ sub EndJob {
   die if not defined $curr;
 
   my $message = EndLogSection( $curr->{name} );
-  
+
   delete $curr->{h};
 
-  $curr->{success} = $message eq "";
+  $curr->{success} = 1 if $message eq "";
   $curr->{message} = $message;
 
   my $duration = DateTime->now()->subtract_datetime_absolute(
 		   $curr->{starttime} );
 
   $curr->{duration} = $duration->delta_seconds();
-  $curr->{starttime} = $curr->{starttime}->ymd() . " " . 
+  $curr->{starttime} = $curr->{starttime}->ymd() . " " .
       $curr->{starttime}->hms();
 
   if( $curr->{success} ) {
@@ -95,7 +95,7 @@ sub EndJob {
 
   my $ds = CreateDataStore();
 
-  if( $ds->sa->Update( "jobs", { type => $curr->{type}, 
+  if( $ds->sa->Update( "jobs", { type => $curr->{type},
 				 name => $curr->{name} },
 		       $curr ) != 1 ) {
     $ds->sa->Add( "jobs", $curr );
