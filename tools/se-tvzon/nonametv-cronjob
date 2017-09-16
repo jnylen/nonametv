@@ -103,7 +103,6 @@ $h tools/se-tvzon/nonametv-import-allhttp $Q --short-grab
 
 # Remove old
 $d perl -I lib/ tools/nonametv-export Xmltv --remove-old
-$d perl -I lib/ tools/nonametv-export Json_extra --remove-old
 $d perl -I lib/ tools/nonametv-export Json --remove-old
 $d perl -I lib/ tools/nonametv-export Honeybee --remove-old
 $d tools/nonametv-icon-update --quiet --unattended
