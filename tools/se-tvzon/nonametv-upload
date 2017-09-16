@@ -36,13 +36,5 @@ rsync -c --delete -r $NROOT/full/json/ /var/www/json/
 
 $V && echo "honeybee"
 
-rsync -c --delete -r $NROOT/full/json_extra/ honeybee:/xmltv_files/json_extra/
-rsync -c --delete -r $NROOT/full/json/ honeybee:/xmltv_files/json/
-rsync -c --delete -r $NROOT/full/honeybee/ honeybee:/xmltv_files/honeybee/
-rsync -c --delete -r $NROOT/full/xmltv/ honeybee:/xmltv_files/xmltv/
-rsync -c --delete -r $NROOT/full/datalist.xml.gz honeybee:/xmltv_files/datalist.xml.gz
-rsync -c --delete -r $NROOT/full/honeybee_datalist.js.gz honeybee:/xmltv_files/datalist.js.gz
-
-$V && echo "epgio"
-#rsync -c --delete -r $NROOT/full/honeybee/ epgio:/xmltv_files/honeybee/
-#rsync -c --delete -r $NROOT/full/honeybee_datalist.js.gz epgio:/xmltv_files/datalist.js.gz
+#rsync -c --delete -r $NROOT/full/honeybee/ honeybee:/xmltv_files/honeybee/
+#rsync -c --delete -r $NROOT/full/honeybee_datalist.js.gz honeybee:/xmltv_files/datalist.js.gz
