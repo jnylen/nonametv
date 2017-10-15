@@ -77,7 +77,7 @@ sub series {
 sub _search {
     my $self = shift;
     my $args = shift;
-  return $self->session->talk($args);
+  return $self->session->paginate_results($args);
 } ## end sub _search
 
 #######################
