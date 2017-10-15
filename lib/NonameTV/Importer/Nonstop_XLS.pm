@@ -61,7 +61,7 @@ sub ImportContentFile {
 
   $self->{fileerror} = 0;
 
-  if( $file =~ /\.(xlsm)$/i ){
+  if( $file =~ /\.(xlsm|xlsx)$/i ){
     $self->ImportXLS( $file, $chd );
   } else {
     error( "Nonstop_XLS: Unknown file format: $file" );
