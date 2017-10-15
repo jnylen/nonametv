@@ -227,6 +227,9 @@ sub guess_channel
     elsif( $subject =~ /junior/i and $filename =~ /\((0500|0600)/i ) {
       return "junior.disney.se";
     }
+    elsif( $subject =~ /junior/i and $filename =~ /(0500|0600)/i ) {
+      return "junior.disney.se";
+    }
     elsif( $subject =~ /drj/i and $filename =~ /\((0500|0600)/i ) {
       return "junior.disney.se";
     }
