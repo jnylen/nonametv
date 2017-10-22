@@ -155,7 +155,7 @@ sub ImportContent
     #
     # image
     #
-    my $image = $sc->findvalue( 'icon/@src' );
+    my $image = $sc->findvalue( 'episode-num[@system="dd_main-program-image"]' );
 
     # The director and actor info are children of 'credits'
     my $directors = parse_person_list($sc->find( 'credits/director' ));
