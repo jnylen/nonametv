@@ -41,6 +41,11 @@ sub new {
       $self->{OnlyAugmentFacts} = 0;
     }
 
+    # only consider Ratings with 10 or more votes by default
+    if( !defined( $self->{MinRatingCount} ) ){
+      $self->{MinRatingCount} = 10;
+    }
+
     $self->{search} = $self->{tvdb2}->search();
 
     return $self;
@@ -58,25 +63,20 @@ sub FillHash( $$$$ ) {
   # YOU HAVE GUESTS in $episodes->guest_stars
   # CREW IN $EPISODES->crew
 
-  ############ EPISODE
+  # Actors
+  my $actors = $series->actors;
+  my @actors_array = ();
+  if (exists($actors->{data})) {
+    foreach my $actor ( @{ $actors->{data} } ){
+      my $name = normUtf8( norm ( $actor->{name} ) );
 
-  if( $episode->{firstAired} ) {
-    $resultref->{production_date} = $episode->{firstAired};
-  }
+      # Role played
+      if( defined ($actor->{role}) and $actor->{role} ne "" ) {
+        $name .= " (".normUtf8( norm ( $actor->{role} ) ).")";
+      }
 
-  print Dumper($series->info, $episode);
-
-  # Subtitle / Episode num
-  if( $episode->{airedSeason} == 0 ){
-    # it's a special
-    $resultref->{episode} = undef;
-    $resultref->{subtitle} = norm( "Special - ".$episode->{episodeName} );
-  }else{
-    $resultref->{episode} = sprintf( "%d . %d . ", $episode->{airedSeason}-1, $episode->{airedEpisodeNumber}-1 );
-
-    # use episode title
-    #print Dumper($episode);
-    $resultref->{subtitle} = norm( $episode->{episodeName} ) if(norm( $episode->{episodeName} ) ne "" and (!defined($ceref->{subtitle}) or $ceref->{subtitle} eq ""));
+       push @actors_array, $name;
+    }
   }
 
   # Genre
@@ -92,7 +92,79 @@ sub FillHash( $$$$ ) {
     AddCategory( $resultref, undef, $cat );
   }
 
+  ############ EPISODE
+  # Fetch more episode data?
+  my $newepisodedata = $self->{tvdb2}->episode( id => $episode->{id})->info;
+  my $newepisode = undef;
+  if(exists($newepisodedata->{data})) {
+    $newepisode = $newepisodedata->{data};
+  }
+
+  # Guest stars
+  # always add the episode cast
+  if( defined($newepisode) and $newepisode->{guestStars} ) {
+    foreach my $gactor ( @{ $newepisode->{guestStars} } ) {
+      push( @actors_array, $gactor );
+    }
+  }
+  foreach( @actors_array ){
+    $_ = normUtf8( norm( $_ ) );
+    if( $_ eq '' ){
+      $_ = undef;
+    }
+  }
+  @actors_array = grep{ defined } @actors_array;
+
+  # firstAired
+  if( $episode->{firstAired} ) {
+    $resultref->{production_date} = $episode->{firstAired};
+  }
+
+  # Subtitle / Episode num
+  if( $episode->{airedSeason} == 0 ){
+    # it's a special
+    $resultref->{episode} = undef;
+    $resultref->{subtitle} = norm( "Special - ".$episode->{episodeName} );
+  }else{
+    $resultref->{episode} = sprintf( "%d . %d . ", $episode->{airedSeason}-1, $episode->{airedEpisodeNumber}-1 );
+
+    # use episode title
+    #print Dumper($episode);
+    $resultref->{subtitle} = norm( $episode->{episodeName} ) if(norm( $episode->{episodeName} ) ne "" and (!defined($ceref->{subtitle}) or $ceref->{subtitle} eq ""));
+  }
+
+  # Use episode rating if there are more then MinRatingCount ratings for the episode. If the
+  # episode does not have enough ratings consider using the series rating instead (if that has enough ratings)
+  # if not rating qualifies leave it away.
+  # the Rating at Tvdb is 1-10, turn that into 0-9 as xmltv ratings always must start at 0
+  if(defined($newepisode) and exists($newepisode->{siteRatingCount}) and defined($self->{MinRatingCount})) {
+  	if( $newepisode->{siteRatingCount} >= $self->{MinRatingCount} ){
+    	$resultref->{'star_rating'} = $newepisode->{siteRating}-1 . ' / 9';
+  	} elsif( $series->info->{siteRatingCount} >= $self->{MinRatingCount} ){
+    	$resultref->{'star_rating'} = $series->info->{siteRating}-1 . ' / 9';
+  	}
+  }
+
   $resultref->{program_type} = 'series';
+
+  # Add actors
+  if( @actors_array ) {
+  	  # replace programme's actors
+	  $resultref->{actors} = join( ';', @actors_array );
+	} else {
+	  # remove existing actors from programme
+	  $resultref->{actors} = undef;
+  }
+
+  # add directors
+  if(defined($newepisode)) {
+    $resultref->{directors} = join( ';', @{ $newepisode->{directors} } );
+  }
+
+  # add writers
+  if(defined($newepisode)) {
+    $resultref->{writers} = join( ';', @{ $newepisode->{writers} } );
+  }
 
   ############ EXTERNAL LINKS
 
