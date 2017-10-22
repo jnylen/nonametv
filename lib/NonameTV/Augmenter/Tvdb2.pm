@@ -58,10 +58,17 @@ sub FillHash( $$$$ ) {
 
 
   # Genres
-
-
-  # YOU HAVE GUESTS in $episodes->guest_stars
-  # CREW IN $EPISODES->crew
+  my @cats;
+  if( exists( $series->info()->{genre} ) ){
+    foreach my $genre ( @{ $series->info()->{genre} } ){
+      print Dumper($genre);
+      my ( $program_type, $categ ) = $self->{datastore}->LookupCat( "Tvdb2", $genre );
+      # set category, unless category is already set!
+      push @cats, $categ if defined $categ;
+    }
+    my $cat = join "/", @cats;
+    AddCategory( $resultref, undef, $cat );
+  }
 
   # Actors
   my $actors = $series->actors;
@@ -77,19 +84,6 @@ sub FillHash( $$$$ ) {
 
        push @actors_array, $name;
     }
-  }
-
-  # Genre
-  my @cats;
-  if( exists( $series->info()->{genre} ) ){
-    foreach my $genre ( @{ $series->info()->{genre} } ){
-      print Dumper($genre);
-      my ( $program_type, $categ ) = $self->{datastore}->LookupCat( "Tvdb2", $genre );
-      # set category, unless category is already set!
-      push @cats, $categ if defined $categ;
-    }
-    my $cat = join "/", @cats;
-    AddCategory( $resultref, undef, $cat );
   }
 
   ############ EPISODE
@@ -216,11 +210,10 @@ sub AugmentProgram( $$$ ){
 
   return( undef, 'matchby was undefined?' ) if !defined($matchby);
 
-#  if( $ceref->{url} && $ceref->{url} =~ m|^http://thetvdb\.com/| ) {
-#    $result = "programme is already linked to thetvdb, ignoring";
-#    $resultref = undef;
-#} els
-  if( $matchby eq 'episodeseason' ) {
+  if( $ceref->{url} && $ceref->{url} =~ m|^http://thetvdb\.com/| ) {
+    $result = "programme is already linked to thetvdb, ignoring";
+    $resultref = undef;
+  } elsif( $matchby eq 'episodeseason' ) {
     # Find episode by season and episode.
 
     if( defined $ceref->{episode} ){
@@ -484,10 +477,10 @@ sub find_episode_by_name($$$$ ) {
 
   # Subtitles
   if(defined $ceref->{subtitle}) {
-    $subtitle = lc(RemoveSpecialChars(CleanSubtitle($ceref->{subtitle})));
+    $subtitle = $self->cleanup_sub(lc(RemoveSpecialChars(CleanSubtitle($ceref->{subtitle}))));
   }
   if(defined $ceref->{original_subtitle}) {
-    $org_subtitle = lc(RemoveSpecialChars(CleanSubtitle($ceref->{original_subtitle})));
+    $org_subtitle = $self->cleanup_sub(lc(RemoveSpecialChars(CleanSubtitle($ceref->{original_subtitle}))));
   }
 
   # Each season check for eps
@@ -518,6 +511,37 @@ sub find_episode_by_name($$$$ ) {
   } else {
     return undef;
   }
+}
+
+# clean up subtitle
+sub cleanup_sub($$ ) {
+  my($self, $episodetitle)=@_;
+
+  $episodetitle =~ s|\s+-\s+Teil\s+(\d+)$| ($1)|;   # _-_Teil_#
+  $episodetitle =~ s|\s+\/\s+Teil\s+(\d+)$| ($1)|;  # _/_Teil_#
+  $episodetitle =~ s|,\s+Teil\s+(\d+)$| ($1)|;      # ,_Teil #
+  $episodetitle =~ s|\s+Teil\s+(\d+)$| ($1)|;       # _Teil #
+  $episodetitle =~ s|\s+\(Teil\s+(\d+)\)$| ($1)|;   # _(Teil_#)
+  $episodetitle =~ s|\s+-\s+(\d+)\.\s+Teil$| ($1)|; # _-_#._Teil
+
+  $episodetitle =~ s|\s*\(Part\s+(\d+)\)$| ($1)|;   # _(Part_#) for Comedy Central Germany
+  $episodetitle =~ s|\s+-\s+\((\d+)\)$| ($1)|;      # _-_(#) for Comedy Central Germany
+  $episodetitle =~ s|\bPart\s+(\d+)$| ($1)|;        # ...Part_# for Comedy Central Germany
+
+  $episodetitle =~ s|\s*-\s+part\s+(\d+)$| ($1)|;   # _(Part_#) for Al Jazeera International
+
+  $episodetitle =~ s|\s+-\s+(\d+)$| ($1)|;          # _-_# for ORF
+
+  # Discovery
+  $episodetitle =~ s|\s+\s+| |;           # Two spaces to one space
+  $episodetitle =~ s|\s+-\s+\(| \(|;      # " - (" to " ("
+  $episodetitle =~ s|,\s+\(| \(|;         # ", (" to " ("
+  $episodetitle =~ s|\:\s+\(| \(|;        # ": (" to " ("
+
+  # " - - " to " - " for Eisenbahnromantik on SWR, maybe happens when shuffling title/subtitle around
+  $episodetitle =~ s|\s+-\s+-\s+| - |;
+
+  return $episodetitle;
 }
 
 1;
