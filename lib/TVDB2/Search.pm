@@ -51,12 +51,15 @@ sub new {
 ## ====================
 sub series {
   my $self    = shift;
-  my $string = shift || {};
+  my $string = shift || undef;
   my $params = shift || {};
 
   # Trim
-  $string =~ s{(?:^\s+)|(?:\s+$)}{};
-  $params->{name} = $string;
+  if(defined($string)) {
+    $string =~ s{(?:^\s+)|(?:\s+$)}{};
+    $params->{name} = $string;
+  }
+
 
   warn "DEBUG: Searching for $string\n" if $self->session->debug;
   return $self->_search(
