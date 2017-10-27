@@ -108,7 +108,7 @@ sub ImportXML
         $end = $self->create_dt( $row->findvalue( './/BROADCAST_END_TIME' ) );
       }
       catch ($err) { print("error: $err"); next; }
-      
+
 
 
       my $date = $start->ymd("-");
@@ -136,6 +136,10 @@ sub ImportXML
 	  my $year         = $row->findvalue( './/PROGRAMME//PROGRAMME_YEAR' );
 	  my $premiere     = $row->findvalue( './/BROADCAST_INFO/@PREMIERE' );
 
+    if(defined($season)) {
+      ($season) = ($season =~ /(\d+)/);
+    }
+
 
       my $ce = {
         channel_id => $chd->{id},
@@ -153,7 +157,7 @@ sub ImportXML
     	}
 
       # Episode info in xmltv-format
-      if( ($episode ne "") and ( $of_episode ne "") and ( $season ne "") and ($season > 0) )
+      if( ($episode ne "") and ( $of_episode ne "") and defined($season) and ( $season ne "") and ($season > 0) )
       {
         $ce->{episode} = sprintf( "%d . %d/%d .", $season-1, $episode-1, $of_episode );
       }
@@ -161,7 +165,7 @@ sub ImportXML
       {
         $ce->{episode} = sprintf( ". %d/%d .", $episode-1, $of_episode );
       }
-      elsif( ($episode ne "") and ( $season ne "") and ($season > 0) )
+      elsif( ($episode ne "") and defined($season) and ( $season ne "") and ($season > 0) )
       {
         $ce->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 );
       }
