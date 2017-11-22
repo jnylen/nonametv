@@ -7,7 +7,7 @@ use warnings;
 
 Import data from FOX
 
-Channels: FOX (SWEDEN)
+Channels: FOX (SWEDEN), FOX (NORWAY), Nat Geo Scandinavia & Iceland
 
 =cut
 
@@ -117,8 +117,9 @@ sub ImportXML
 
   foreach my $row ($rows->get_nodelist) {
     my($day, $month, $year, $date);
-    my $title = norm($row->findvalue( 'ProgrammeTitle' ) );
+    my $title_lang = norm($row->findvalue( 'ProgrammeTitle' ) );
     my $title_org = norm($row->findvalue( 'OriginalTitle' ) );
+    my $title = $title_lang || $title_org;
 
     my $start = $row->findvalue( 'StartTime' );
     ($day, $month, $year) = ($row->findvalue( 'Date' ) =~ /^(\d\d)\/(\d\d)\/(\d\d\d\d)$/);
@@ -184,19 +185,19 @@ sub ImportXML
     $ce->{subtitle} = norm($subtitle) if defined($subtitle) and $subtitle ne "" and $subtitle ne "null";
 
     # Episode info in xmltv-format
-    if( ($ep_num ne "0" and $ep_num ne "") and ( $of_num ne "0" and $of_num ne "") and ( $se_num ne "0" and $se_num ne "") )
+    if( ($ep_num ne "0" and $ep_num ne "" and $ep_num ne "-") and ( $of_num ne "0" and $of_num ne "" and $of_num ne "-") and ( $se_num ne "0" and $se_num ne "" and $se_num ne "-") )
     {
         $ce->{episode} = sprintf( "%d . %d/%d .", $se_num-1, $ep_num-1, $of_num );
     }
-    elsif( ($ep_num ne "0" and $ep_num ne "") and ( $of_num ne "0" and $of_num ne "") )
+    elsif( ($ep_num ne "0" and $ep_num ne "" and $ep_num ne "-") and ( $of_num ne "0" and $of_num ne "" and $of_num ne "-") )
     {
       	$ce->{episode} = sprintf( ". %d/%d .", $ep_num-1, $of_num );
     }
-    elsif( ($ep_num ne "0" and $ep_num ne "") and ( $se_num ne "0" and $se_num ne "") )
+    elsif( ($ep_num ne "0" and $ep_num ne "" and $ep_num ne "-") and ( $se_num ne "0" and $se_num ne "" and $se_num ne "-") )
     {
         $ce->{episode} = sprintf( "%d . %d .", $se_num-1, $ep_num-1 );
     }
-    elsif( $ep_num ne "0" and $ep_num ne "" )
+    elsif( $ep_num ne "0" and $ep_num ne "" and $ep_num ne "-" )
     {
         $ce->{episode} = sprintf( ". %d .", $ep_num-1 );
     }
@@ -284,12 +285,14 @@ sub ImportXLS {
             $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Program Title$/ );
 
             $columns{'ORGTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Original Title$/ );
+            $columns{'ORGTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Original Program Title$/ );
 
             $columns{'Ser No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Season Number/ );
             $columns{'Ser Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Season Synopsis/ );
 
             $columns{'Ep No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Number/ );
-            $columns{'Ep Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Title/ );
+            $columns{'Ep Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Episode Title/ );
+            $columns{'Ep TitleORG'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Original Episode Title/ );
             $columns{'Ep Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Synopsis/ );
             $columns{'Eps'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Number of episodes in the Season/ );
 
