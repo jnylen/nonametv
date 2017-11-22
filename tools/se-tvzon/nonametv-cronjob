@@ -89,6 +89,10 @@ $d tools/se-tvzon/nonametv-filestore-prosieben $Q
 $d tools/se-tvzon/nonametv-filestore-tele5 $Q
 $d tools/se-tvzon/nonametv-filestore-carusmedia $Q
 
+# FOX Nat Geo
+$d lftp -f /content/ftp/foxngmirror.x
+$d tools/se-tvzon/nonametv-filestore-natgeo $Q
+
 # Ruby importers for files
 $d ruby ftv_importer.rb
 $d ruby highview_importer.rb
