@@ -32,9 +32,20 @@ my $filestore = $conf->{FileStore};
 
 # Channels
 my %channel_data;
+# NG Channel
 $channel_data{ "NGC_SE" } = "natgeo.se";
 $channel_data{ "NGC_NO" } = "natgeo.no";
 $channel_data{ "NGC_DK" } = "natgeo.dk";
+$channel_data{ "NGC_FI" } = "natgeo.fi";
+
+# WILD
+$channel_data{ "WILD_FI" } = "wild.natgeo.fi";
+$channel_data{ "WILD_SE" } = "wild.natgeo.se";
+$channel_data{ "WILD_NO" } = "wild.natgeo.no";
+$channel_data{ "WILD_DK" } = "wild.natgeo.dk";
+
+# NG People
+$channel_data{ "NGP_DK" } = "people.natgeo.dk";
 
 # list files inside of the channel directory and check when they have been touched
 opendir(DIR, "/content/ftp/foxng/");
