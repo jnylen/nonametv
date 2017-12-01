@@ -75,8 +75,8 @@ sub ImportContent
     my $eid = $ei->findvalue( 'contentIdRef' );
 
     my $e = {
-      startTime       => norm($ei->findvalue( 'timeList/startTime' )),
-      endTime         => norm($ei->findvalue( 'timeList/endTime' )),
+      startTime       => norm($ei->findvalue( 'timeList/time/startTime' )),
+      endTime         => norm($ei->findvalue( 'timeList/time/endTime' )),
       live            => norm($ei->findvalue( 'live' )),
       rerun           => norm($ei->findvalue( 'rerun' )),
       materialIdRef   => norm($ei->findvalue( 'materialIdRef' ))
@@ -168,7 +168,8 @@ sub ImportContent
     # content
     my $desc   = $xpc->findvalue( 'descriptionList/description[@type="content"]' );
 
-    my $title        = $xpc->findvalue( 'genericTitleList/title' );
+    my $title        = $xpc->findvalue( 'genericTitleList/title[@type="content"][1]' );
+    $title         ||= $xpc->findvalue( 'titleList/title[@type="content"][1]' );
     my $titles       = $xpc->findnodes( 'titleList/title' );
 
     # extra
@@ -210,7 +211,12 @@ sub ImportContent
 
       # original?
       if($titles2->findvalue('./@original') eq "true" and $titles2->findvalue( './@language' ) eq "eng" and defined($titler) and $titler ne "") {
-        $ce->{original_title} = FixSubtitle(norm($titler)) if norm($titler) ne norm($title);
+        if(!defined($title) or $title eq "") {
+          $ce->{title} = norm($titler);
+        } else {
+          $ce->{original_title} = FixSubtitle(norm($titler)) if norm($titler) ne norm($ce->{title});
+        }
+
       }
     }
 
@@ -273,6 +279,11 @@ sub ImportContent
     ParseCredits( $ce, 'directors',  'director', $xpc, 'creditList/credit' );
     ParseCredits( $ce, 'presenters', 'host',     $xpc, 'creditList/credit' );
     ParseCredits( $ce, 'guests',     'guest',    $xpc, 'creditList/credit' );
+
+    # Sometimes things doesnt get marked as movie
+    if(defined($ce->{directors}) and !defined($ce->{episode})) {
+      $ce->{program_type} = "movie";
+    }
 
     # Data
     progress("Clipsource: $chd->{xmltvid}: $ce->{start_time} - $ce->{title}");
@@ -353,7 +364,7 @@ sub Object2Url {
 
   my( $date ) = ($batch_id =~ /_(.*)/);
 
-  my $url = sprintf( "http://clipsource.se/epg/api?key=%s&date=%s&channelId=%s", $self->{ApiKey}, $date, $data->{grabber_info});
+  my $url = sprintf( "http://clipsource.se/epg/api/v4.2.0?key=%s&date=%s&channelId=%s", $self->{ApiKey}, $date, $data->{grabber_info});
   #my $url = sprintf( "http://clipsource.se/epg/xml/%s/%s/%s/download", $date, $date, $data->{grabber_info} );
   #my $url = "http://converter.xmltv.se/contentcache/Clipsource/dev.kanal5.se_2015-08-22.content.zip";
 
@@ -374,10 +385,10 @@ sub FilterContent {
   unzip $zref => \$cref;
 
   # remove
-  $cref =~ s| xmlns="http://common.tv.se/schedule/v4_0"||g;
-  $cref =~ s| xmlns="http://common.tv.se/event/v4_0"||g;
-  $cref =~ s| xmlns="http://common.tv.se/content/v4_0"||g;
-  $cref =~ s| xmlns="http://common.tv.se/material/v4_0"||g;
+  $cref =~ s| xmlns="http://common.tv.se/schedule/v4_2_0"||g;
+  $cref =~ s| xmlns="http://common.tv.se/event/v4_2_0"||g;
+  $cref =~ s| xmlns="http://common.tv.se/content/v4_2_0"||g;
+  $cref =~ s| xmlns="http://common.tv.se/material/v4_2_0"||g;
   $cref =~ s| xs="http://www.w3.org/2001/XMLSchema"||g;
 
   my $doc = ParseXml( \$cref );
