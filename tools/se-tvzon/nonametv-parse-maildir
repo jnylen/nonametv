@@ -255,9 +255,6 @@ sub guess_channel
     return "international.rt.com" if $filename =~ /^RTINT/i;
     return "russia.rt.com" if $filename =~ /^RTRUS/i;
 
-   	# Nat geo wild sends in XLS format
-    return "wild.natgeo.se" if $filename =~ /^ngwscan\s*\b/i;
-
 	  # History Channel
 	  if($filename =~ /\.xml$/i and ($filename =~ /his.eur./i or $filename =~ /history.eur./i or $filename =~ /history.europe./i or $filename =~ /history\s+europe/i or $filename =~ /history\-/i or $filename =~ /^history\s+/i)) {
       return "historytv.se"  if $filename =~ /swe/i or $filename =~ /\-sv\-/i;
@@ -274,8 +271,6 @@ sub guess_channel
     return "crimeandinvestigation.pl"  if $filename =~ /cai.pol/i and $filename =~ /\.xml$/i;
     return "crimeandinvestigation.pl"  if $filename =~ /^crime-pl/i and $filename =~ /\.xml$/i;
     return "crimeandinvestigation.pl"  if $filename =~ /^crime/i and $filename =~ /investigation/i and $filename =~ /polsat/i and $filename =~ /\.xml$/i;
-
-    return "people.natgeo.dk" if $filename =~ /^ngppl\.den/i and $filename =~ /\.xls$/i;
 
 	  # Travel Channel
     return "travelchanneltv.se" if $filename =~ /^travel.eu.swe/i and $filename =~ /\.xls$/i;
