@@ -5,7 +5,7 @@ use warnings;
 
 =pod
 
-Importer for data from Mezzo Classic music channel. 
+Importer for data from Mezzo Classic music channel.
 One file per month downloaded from LNI site.
 The downloaded file is in xls format.
 
@@ -185,7 +185,7 @@ print ">$cl<\n";
 
         progress("Mezzo: $channel_xmltvid: Date is: $date");
       }
-      
+
       # Time
       $oWkC = $oWkS->{Cells}[$iR][$columns{'TIME'}];
       next if( ! $oWkC );
