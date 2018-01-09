@@ -109,7 +109,7 @@ sub ImportXLS
         $year = $year + 1;
       }
 
-      my $date = sprintf("%d-%d-%02d", $year, $month, $day);
+      my $date = sprintf("%d-%02d-%02d", $year, $month, $day);
 
       # Startdate
       if( defined($date) and $date !~ /^19/ and $date ne $currdate ) {
@@ -197,7 +197,12 @@ sub ImportXLS
       } elsif( ( $eps ) = ($ce->{title} =~ /ep (\d+)$/i) ) {
         $ce->{title} =~ s/ep (\d+)$//i;
         $ce->{episode} = sprintf( ". %d .", $eps-1 );
+      } elsif( ( $eps ) = ($ce->{title} =~ /\(ep\. (\d+)\)$/i) ) {
+        $ce->{title} =~ s/\(ep\. (\d+)\)$//i;
+        $ce->{episode} = sprintf( ". %d .", $eps-1 );
       }
+
+      $ce->{title} =~ s/\(TAPED\/NOT TO BE CONFUSED WITH "BEST OF"\)$//i;
 
       # norm it
       $ce->{title} = norm($ce->{title});
