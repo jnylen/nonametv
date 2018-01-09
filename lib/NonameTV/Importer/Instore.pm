@@ -18,7 +18,7 @@ use XML::LibXML;
 use HTTP::Date;
 use Data::Dumper;
 use Math::Round 'nearest';
-use TryCatch;
+use Try::Tiny;
 
 use NonameTV qw/ParseXml norm AddCategory/;
 use NonameTV::DataStore::Helper;
@@ -142,7 +142,7 @@ sub ImportContent
     try {
       $start = $self->create_dt( $sc->findvalue( './date' ) . " " . $sc->findvalue( './time' ) );
     }
-    catch ($err) { print("error: $err"); next; }
+    catch { print("error: $_"); next; };
 
     if( not defined $start )
     {

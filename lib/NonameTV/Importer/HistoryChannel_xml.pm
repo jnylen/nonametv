@@ -15,7 +15,7 @@ use utf8;
 use DateTime;
 use XML::LibXML;
 use IO::Scalar;
-use TryCatch;
+use Try::Tiny;
 
 use NonameTV qw/norm ParseXml AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
@@ -107,7 +107,7 @@ sub ImportXML
         $start = $self->create_dt( $row->findvalue( './/BROADCAST_START_DATETIME' ) );
         $end = $self->create_dt( $row->findvalue( './/BROADCAST_END_TIME' ) );
       }
-      catch ($err) { print("error: $err"); next; }
+      catch { print("error: $_"); next; };
 
 
 

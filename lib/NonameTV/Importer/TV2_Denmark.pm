@@ -2,7 +2,7 @@ package NonameTV::Importer::TV2_Denmark;
 
 use strict;
 use warnings;
-use TryCatch;
+use Try::Tiny;
 
 =pod
 
@@ -112,7 +112,7 @@ sub ImportContent
     try {
       $start  = ParseDateTime($pgm->findvalue( 'time' ));
     }
-    catch ($err) { print("error: $err"); next; }
+    catch { print("error: $_"); next; };
 
   	my $date  = $start->ymd("-");
     my $title = $pgm->findvalue( 'title' );

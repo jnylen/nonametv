@@ -17,7 +17,7 @@ use DateTime;
 use XML::LibXML;
 use Data::Dumper;
 use Encode qw/encode decode/;
-use TryCatch;
+use Try::Tiny;
 
 use NonameTV qw/ParseXml MyGet norm AddCountry AddCategory/;
 use NonameTV::Log qw/progress error/;
@@ -91,7 +91,7 @@ sub ImportContent
     try {
       $start = $self->create_dt( $sc->findvalue( './@start' ) );
     }
-    catch ($err) { print("error: $err"); next; }
+    catch { print("error: $_"); next; };
 
     if( not defined $start )
     {

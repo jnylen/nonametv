@@ -22,7 +22,7 @@ use Data::Dumper;
 use Spreadsheet::Read;
 
 use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
+use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel int2col);
 use Spreadsheet::Read;
 
 use Text::Iconv;
@@ -86,23 +86,12 @@ sub ImportXLS
   progress( "Nonstop_XLS: $chd->{xmltvid}: Processing $file" );
   if ( $file =~ /\.(xlsx|xlsm)$/i ){ $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
   else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
-  #my $ref = ReadData ($file);
-
-  # fields
-  my $num_date = 0;
-  my $num_time = 1;
-  my $num_title = 2;
-  my $num_subtitle = 3;
-  my $num_genre = 4;
-  my $num_directors = 7;
-  my $num_actors = 6;
-  my $num_prodyear = 5;
-  my $num_country = 9;
-  my $num_desc = 10;
+  my $ref = ReadData ($file);
 
   # main loop
   #for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
   foreach my $oWkS (@{$oBook->{Worksheet}}) {
+    my $foundcolumns = 0;
 
     #my $oWkS = $oBook->{Worksheet}[$iSheet];
     progress( "Nonstop_XLS: $chd->{xmltvid}: Processing worksheet: $oWkS->{Name}" );
@@ -112,14 +101,42 @@ sub ImportXLS
     for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
       $i++;
 
+      if( not %columns ){
+        # the column names are stored in the first row
+        # so read them and store their column positions
+        # for further findvalue() calls
+
+        for(my $iC = $oWkS->{MinCol} ; defined $oWkS->{MaxCol} && $iC <= $oWkS->{MaxCol} ; $iC++) {
+          if( $oWkS->{Cells}[$iR][$iC] ){
+      			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Series Title/i );
+            $columns{'EpTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode\/program Title/i );
+            $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Day/i );
+            $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/i );
+            $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time/i );
+            $columns{'Season'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Season/i );
+            $columns{'Episode'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode/i );
+            $columns{'Description'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Description/i );
+            $columns{'Production Year'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Production Year/i );
+            $columns{'Actors'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Actors/i );
+            $columns{'Directors'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Directors/i );
+
+
+            $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /(Day|Date)/i );
+          }
+        }
+        %columns = () if( $foundcolumns eq 0 );
+
+        next;
+      }
+
       # date - column 0 ('Date')
-      my $oWkC = $oWkS->{Cells}[$iR][$num_date];
+      my $oWkC = $oWkS->{Cells}[$iR][$columns{'Date'}];
       next if( ! $oWkC );
       next if( ! $oWkC->Value );
       $date = ParseDate( $oWkC->Value );
       next if( ! $date );
 
-	  # Startdate
+      # Batch
       if( $date ne $currdate ) {
       	if( $currdate ne "x" ) {
 			     # save last day if we have it in memory
@@ -134,25 +151,40 @@ sub ImportXLS
         $currdate = $date;
       }
 
-	  # time
-	  $oWkC = $oWkS->{Cells}[$iR][$num_time];
+	    # time
+	    $oWkC = $oWkS->{Cells}[$iR][$columns{'Time'}];
       next if( ! $oWkC );
       my $time = 0;  # fix for  12:00AM
       $time=$oWkC->{Val} if( $oWkC->Value );
       $time = ExcelFmt('hh:mm', $time);
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][$num_title];
-      next if( ! $oWkC );
+      $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
+      #next if( ! $oWkC );
 
-      my $title = $oWkC->{Val} if( $oWkC->{Val} );
-      $title =~ s/&amp;/&/ if( $oWkC->{Val} );
+      my $field2 = int2col($columns{'Title'}).$i;
+      my $title = $ref->[1]{$field2};
+
+      $title =~ s/&amp;/&/ if( $title );
+      $title =~ s/- Season (\d+)(.*)//i if( $title );
+
+      # Episode Title
+      my $subtitle;
+      if(defined($columns{'EpTitle'})) {
+        my $field3 = int2col($columns{'EpTitle'}).$i;
+        $subtitle = $ref->[1]{$field3};
+      }
+
+      if(!defined($title) and defined($subtitle)) {
+        $title = $subtitle;
+        $subtitle = undef;
+      }
+
       next if( ! $title );
-      $title =~ s/- Season (\d+)(.*)//i;
 
-	  # extra info
-	  my $desc = $oWkS->{Cells}[$iR][$num_desc]->Value if $oWkS->{Cells}[$iR][$num_desc];
-	  my $year = $oWkS->{Cells}[$iR][$num_prodyear]->Value if $oWkS->{Cells}[$iR][$num_prodyear];
+  	  # extra info
+  	  my $desc = $oWkS->{Cells}[$iR][$columns{'Description'}]->Value if defined $columns{'Description'} and $oWkS->{Cells}[$iR][$columns{'Description'}];
+  	  my $year = $oWkS->{Cells}[$iR][$columns{'Production Year'}]->Value if defined $columns{'Production Year'} and $oWkS->{Cells}[$iR][$columns{'Production Year'}];
 
       progress("Nonstop_XLS: $chd->{xmltvid}: $time - $title");
 
@@ -160,60 +192,32 @@ sub ImportXLS
         channel_id => $chd->{channel_id},
         title => norm( $title ),
         start_time => $time,
-        description => norm($desc),
       };
 
-	  # Extra
-    $ce->{title}           =~ s/&amp;/&/g;
-	  $ce->{subtitle}        = norm($oWkS->{Cells}[$iR][$num_subtitle]->Value) if $oWkS->{Cells}[$iR][$num_subtitle];
-    $ce->{subtitle}        =~ s/&amp;/&/g if defined($ce->{subtitle});
-    $ce->{subtitle}        =~ s/Finale\: //i if defined($ce->{subtitle});
-    $ce->{subtitle}        =~ s/Pilot\: //i if defined($ce->{subtitle});
-	  $ce->{actors}          = parse_person_list(norm($oWkS->{Cells}[$iR][$num_actors]->Value))          if defined($num_actors) and $oWkS->{Cells}[$iR][$num_actors];
-	  $ce->{directors}       = parse_person_list(norm($oWkS->{Cells}[$iR][$num_directors]->Value))       if defined($num_directors) and $oWkS->{Cells}[$iR][$num_directors];
+  	  # Extra
+      $ce->{description}     = norm($desc) if defined($desc);
+      $ce->{title}           =~ s/&amp;/&/g;
+      $ce->{subtitle}        = $subtitle if defined($subtitle) and $subtitle ne $title;
+      $ce->{subtitle}        =~ s/&amp;/&/g if defined($ce->{subtitle});
+      $ce->{subtitle}        =~ s/Finale\: //i if defined($ce->{subtitle});
+      $ce->{subtitle}        =~ s/Pilot\: //i if defined($ce->{subtitle});
+  	  $ce->{actors}          = parse_person_list(norm($oWkS->{Cells}[$iR][$columns{'Actors'}]->Value))  if defined($columns{'Actors'}) and $oWkS->{Cells}[$iR][$columns{'Actors'}];
+  	  $ce->{directors}       = parse_person_list(norm($oWkS->{Cells}[$iR][$columns{'Directors'}]->Value))  if defined($columns{'Directors'}) and $oWkS->{Cells}[$iR][$columns{'Directors'}];
       $ce->{production_date} = $year."-01-01" if defined($year) and $year ne "" and $year ne "0000";
 
-      # Sometimes desc doesn't exist
-      if(defined($ce->{description})) {
-        # Episode info
-        my ( $dummy, $season, $dummy3, $dummy2, $episode ) = ($ce->{description} =~ /\((S.song|Season|S.son)\s*(\d+)(, | )(avsnitt|episode|afsnit)\s*(\d+)\)/i );
+      ## Episode
+      $oWkC = $oWkS->{Cells}[$iR][$columns{'Episode'}];
+      my $episode = $oWkC->Value if( $oWkC );
 
-        if(defined $season)
-        {
-            $ce->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 );
-            $ce->{program_type} = "series";
-        }
+      $oWkC = $oWkS->{Cells}[$iR][$columns{'Season'}];
+      my $season = $oWkC->Value if( $oWkC );
 
-        # Check subtitle
-        if(!defined($season) and defined($ce->{subtitle})) {
-            my ( $dummy21, $season2, $dummy23, $dummy22, $episode2 ) = ($ce->{subtitle} =~ /(S.song|Season|S.son)\s*(\d+)(, | )(avsnitt|episode|afsnit)\s*(\d+)/i );
-
-            if(defined $season2 )
-            {
-                $ce->{episode} = sprintf( "%d . %d .", $season2-1, $episode2-1 );
-                $ce->{program_type} = "series";
-            }
-
-            $ce->{subtitle} =~ s/(S.song|Season|S.son)\s*(\d+)(, | )(avsnitt|episode|afsnit)\s*(\d+)//i;
-            $ce->{subtitle} = norm($ce->{subtitle});
-
-            # remove subtitle if its empty
-            if($ce->{subtitle} eq "") { delete($ce->{subtitle}); }
-        }
-
-        # clean
-        $ce->{description} =~ s/\((S.song|Season|S.son)\s*(\d+)(, | )(avsnitt|episode|afsnit)\s*(\d+)\)//i;
-        $ce->{description} = norm($ce->{description});
+      if(defined($episode) and $episode ne "" and $episode > 0) {
+        $ce->{episode} = ". " . ($episode-1) . " ." if $episode ne "";
       }
 
-      # It's a movie
-      if(defined($ce->{directors}) and $ce->{directors} ne "") {
-        # Not a director
-        if($ce->{directors} =~ /^\-/) {
-            delete($ce->{directors});
-        } else {
-            $ce->{program_type} = 'movie';
-        }
+      if(defined($ce->{episode}) and defined($season) and norm($season) ne "" and $season > 0) {
+        $ce->{episode} = $season-1 . $ce->{episode};
       }
 
       $ce->{subtitle} =~ s|\s*-\s+part\s+(\d+)$| ($1)|i if defined $ce->{subtitle};
@@ -221,11 +225,14 @@ sub ImportXLS
       $ce->{subtitle} =~ s|(.*), A$|A $1| if defined $ce->{subtitle};
       $ce->{subtitle} =~ s|(.*), An$|An $1| if defined $ce->{subtitle};
 
-      # Series
-      $ce->{program_type} = "series" if defined($ce->{subtitle}) and $ce->{subtitle} ne "";
+      # It's a movie
+      if(not defined($ce->{episode}) and $title !~ /Teleshopping/i) {
+        $ce->{program_type} = 'movie';
+      } elsif(defined($ce->{subtitle}) and $ce->{subtitle} ne "") {
+        $ce->{program_type} = "series";
+      }
 
       $dsh->AddProgramme( $ce );
-
     } # next row
   } # next worksheet
 
