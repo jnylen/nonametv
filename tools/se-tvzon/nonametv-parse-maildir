@@ -227,6 +227,9 @@ sub guess_channel
     elsif( $subject =~ /junior/i and $filename =~ /\((0500|0600)/i ) {
       return "junior.disney.se";
     }
+    elsif( $subject =~ /junior/i and $filename =~ /(0500|0600)/i ) {
+      return "junior.disney.se";
+    }
     elsif( $subject =~ /drj/i and $filename =~ /\((0500|0600)/i ) {
       return "junior.disney.se";
     }
@@ -252,13 +255,8 @@ sub guess_channel
     return "international.rt.com" if $filename =~ /^RTINT/i;
     return "russia.rt.com" if $filename =~ /^RTRUS/i;
 
-    return "hd.natgeo.se" if $filename =~ /^ng\s*swe\s*hd\b/i;
-
-   	# Nat geo wild sends in XLS format
-    return "wild.natgeo.se" if $filename =~ /^ngwscan\s*\b/i;
-
 	  # History Channel
-	  if($filename =~ /\.xml$/i and ($filename =~ /his.eur./i or $filename =~ /history.eur./i or $filename =~ /history.europe./i or $filename =~ /history\s+europe/i or $filename =~ /history\-/i)) {
+	  if($filename =~ /\.xml$/i and ($filename =~ /his.eur./i or $filename =~ /history.eur./i or $filename =~ /history.europe./i or $filename =~ /history\s+europe/i or $filename =~ /history\-/i or $filename =~ /^history\s+/i)) {
       return "historytv.se"  if $filename =~ /swe/i or $filename =~ /\-sv\-/i;
       return "historytv.fi"  if $filename =~ /fin/i or $filename =~ /\-fi\-/i;
       return "historytv.no"  if $filename =~ /nor/i or $filename =~ /\-nn\-/i;
@@ -267,16 +265,12 @@ sub guess_channel
     }
 
     return "crimeandinvestigation.eu"  if $filename =~ /cai.eng/i and $filename =~ /\.xml$/i;
+    return "crimeandinvestigation.eu"  if $filename =~ /cai.eng/i and $filename =~ /\.txt$/i;
     return "crimeandinvestigation.eu"  if $filename =~ /ci europe english/i and $filename =~ /\.xml$/i;
     return "crimeandinvestigation.eu"  if $filename =~ /^crime-en/i and $filename =~ /\.xml$/i;
     return "crimeandinvestigation.pl"  if $filename =~ /cai.pol/i and $filename =~ /\.xml$/i;
     return "crimeandinvestigation.pl"  if $filename =~ /^crime-pl/i and $filename =~ /\.xml$/i;
-
-    return "natgeo.dk" if $filename =~ /^ngden/i and $filename =~ /\.xls$/i;
-    return "natgeo.no" if $filename =~ /^ngnor/i and $filename =~ /\.xls$/i;
-    return "natgeo.se" if $filename =~ /^ngswe/i and $filename =~ /\.xls$/i and $filename !~ /^ngden/i;
-    return "natgeo.fi" if $filename =~ /^ngfin/i and $filename =~ /\.xls$/i and $filename !~ /^ngden/i;
-    return "people.natgeo.dk" if $filename =~ /^ngppl\.den/i and $filename =~ /\.xls$/i;
+    return "crimeandinvestigation.pl"  if $filename =~ /^crime/i and $filename =~ /investigation/i and $filename =~ /polsat/i and $filename =~ /\.xml$/i;
 
 	  # Travel Channel
     return "travelchanneltv.se" if $filename =~ /^travel.eu.swe/i and $filename =~ /\.xls$/i;
@@ -304,8 +298,6 @@ sub guess_channel
     return "foxtv.se"       if $filename =~ /^fox\s*sweden/i and $filename =~ /\.(xls|xlsx)$/i;
     return "foxtv.no"       if $filename =~ /^fox_norway/i and $filename =~ /\.(xls|xlsx)$/i;
     return "foxtv.se"       if $filename =~ /^fox_sweden/i and $filename =~ /\.(xls|xlsx)$/i;
-
-
 
     # H2
     if(($filename =~ /h2\s+europe/i or $filename =~ /h2.eur./i or $filename =~ /h2.eu./i or $filename =~ /h2\-/i) and $filename =~ /\.xml$/i) {

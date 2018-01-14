@@ -43,32 +43,34 @@ $channel_data{ "S1" }  = "sat1.de";
 $channel_data{ "S1G" } = "gold.sat1.de";
 $channel_data{ "SX" }  = "sixx.de";
 $channel_data{ "P8CH" }  = "puls8.ch";
+$channel_data{ "AT1" }  = "atv.at";
+$channel_data{ "AT2" }  = "atv2.at";
 
-  # list files inside of the channel directory and check when they have been touched
-  opendir(DIR, "/content/ftp/prosieben/");
+# list files inside of the channel directory and check when they have been touched
+opendir(DIR, "/content/ftp/prosieben/");
 
-  foreach my $cff (readdir(DIR))
-  {
-    if($cff =~ /^\./) { next; }
-    my ( $id, $week, $year ) = split(/_/, $cff);
+foreach my $cff (readdir(DIR))
+{
+  if($cff =~ /^\./) { next; }
+  my ( $id, $week, $year ) = split(/_/, $cff);
 
-    my $cftype = join(',', File::Util->file_type( "/content/ftp/prosieben/$cff" ) );
+  my $cftype = join(',', File::Util->file_type( "/content/ftp/prosieben/$cff" ) );
 
-    if( $cff !~ /\.xml$/i ){
-        #progress( "File $cff isn't a xml file - skipping" );
-        next;
-    }
-
-    if( not exists( $channel_data{$id} ) )
-    {
-        print "Files with name $id hasnt been specified as a channel.\n";
-        #unlink "/content/ftp/prosieben/$cff";
-    } else {
-      make_path(dirname("$filestore/$channel_data{$id}/$cff"));
-      move( "/content/ftp/prosieben/$cff", "$filestore/$channel_data{$id}/$cff" );
-      print "$cff moved to $channel_data{$id}\n";
-    }
-
+  if( $cff !~ /\.xml$/i ){
+      #progress( "File $cff isn't a xml file - skipping" );
+      next;
   }
+
+  if( not exists( $channel_data{$id} ) )
+  {
+      print "Files with name $id hasnt been specified as a channel.\n";
+      #unlink "/content/ftp/prosieben/$cff";
+  } else {
+    make_path(dirname("$filestore/$channel_data{$id}/$cff"));
+    move( "/content/ftp/prosieben/$cff", "$filestore/$channel_data{$id}/$cff" );
+    print "$cff moved to $channel_data{$id}\n";
+  }
+
+}
 
 exit;

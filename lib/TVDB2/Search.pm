@@ -51,12 +51,15 @@ sub new {
 ## ====================
 sub series {
   my $self    = shift;
-  my $string = shift || {};
+  my $string = shift || undef;
   my $params = shift || {};
 
   # Trim
-  $string =~ s{(?:^\s+)|(?:\s+$)}{};
-  $params->{name} = $string;
+  if(defined($string)) {
+    $string =~ s{(?:^\s+)|(?:\s+$)}{};
+    $params->{name} = $string;
+  }
+
 
   warn "DEBUG: Searching for $string\n" if $self->session->debug;
   return $self->_search(
@@ -77,7 +80,7 @@ sub series {
 sub _search {
     my $self = shift;
     my $args = shift;
-  return $self->session->talk($args);
+  return $self->session->paginate_results($args);
 } ## end sub _search
 
 #######################

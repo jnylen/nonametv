@@ -17,7 +17,7 @@ use Archive::Zip qw/:ERROR_CODES/;
 
 use XML::LibXML;
 use IO::Scalar;
-use TryCatch;
+use Try::Tiny;
 
 ## TEMP
 use Spreadsheet::ParseExcel;
@@ -148,7 +148,7 @@ sub ImportXML
     try {
       $start = $self->create_dt( $row->findvalue( './/broadcastDate' ), $timezone );
     }
-    catch ($err) { print("error: $err"); next; }
+    catch { print("error: $_"); next; };
 
     my $date = $start->ymd("-");
 

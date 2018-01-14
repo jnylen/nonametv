@@ -193,8 +193,10 @@ sub getConf {
 sub _download {
 	my ($self, $fmt, $url, @parm) = @_;
 
+	my $url2= $url;
+
 	# Make URL
-	$url = sprintf($fmt, $url, @parm);
+	$url = sprintf($fmt, $url2, @parm);
 
 	#$url =~ s/\$/%24/g;
 	$url =~ s/#/%23/g;

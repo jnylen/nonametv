@@ -215,7 +215,7 @@ sub _check_status {
         };
 
         if ( $ok and $code and $message ) {
-            carp sprintf( 'TMDB API Error (%s): %s', $code, $message );
+            carp sprintf( 'TMDB API Error (%s): %s', $code, $message ) unless $code eq 34;
 
             # 34 = Not Found (return 1 to not retry)
             if($code eq "34" or $code eq 34) {
@@ -226,7 +226,7 @@ sub _check_status {
             if($code eq "25" or $code eq 25) {
               # Sleep for x amount of seconds
               # Travis: "We increased the rate limit to 40 requests every 10 seconds too, so there's a little bump."
-              carp("TMDB API RATE LIMIT: Sleeping for 10 seconds..");
+              #carp("TMDB API RATE LIMIT: Sleeping for 10 seconds..");
             }
         }
     } ## end if ( $response->{content...})

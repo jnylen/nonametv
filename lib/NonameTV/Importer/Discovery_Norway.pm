@@ -12,7 +12,7 @@ use DateTime;
 use XML::LibXML;
 use HTTP::Date;
 use Data::Dumper;
-use TryCatch;
+use Try::Tiny;
 
 use NonameTV qw/ParseXml norm AddCategory AddCountry/;
 use NonameTV::Log qw/w progress error f/;
@@ -181,7 +181,7 @@ sub ImportContent
         $start2 = $self->create_dt( $start );
         $stop2 = $self->create_dt( $end );
       }
-      catch ($err) { print("error: $err"); next; }
+      catch { print("error: $_"); next; };
 
 
       my $title_original = $sc->findvalue( './originaltitle' );

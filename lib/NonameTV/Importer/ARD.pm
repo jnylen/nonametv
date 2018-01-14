@@ -30,13 +30,13 @@ use constant {
   ST_END => 3,
 };
 
-sub new 
+sub new
 {
   my $proto = shift;
   my $class = ref($proto) || $proto;
   my $self  = $class->SUPER::new( @_ );
   bless ($self, $class);
-  
+
 
   my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
   $self->{datastorehelper} = $dsh;
@@ -72,7 +72,7 @@ sub ImportFull
 {
   my $self = shift;
   my( $filename, $doc, $chd ) = @_;
-  
+
   my $dsh = $self->{datastorehelper};
 
   # Find all div-entries.
@@ -82,7 +82,7 @@ sub ImportFull
     error( "ARD: $chd->{xmltvid}: No programme entries found in $filename" );
     return;
   }
-  
+
 return if( $filename !~ /Pressedienst1310/i );
 
   progress( "ARD: $chd->{xmltvid}: Processing $filename" );

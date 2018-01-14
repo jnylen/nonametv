@@ -7,7 +7,7 @@ use warnings;
 
 Import data from FOX
 
-Channels: FOX (SWEDEN)
+Channels: FOX (SWEDEN), FOX (NORWAY), Nat Geo Scandinavia & Iceland
 
 =cut
 
@@ -41,7 +41,9 @@ sub new {
   my $self  = $class->SUPER::new( @_ );
   bless ($self, $class);
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
+  $self->{Timezone} = "Europe/Stockholm" unless defined $self->{Timezone};
+
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, $self->{Timezone} );
   $self->{datastorehelper} = $dsh;
 
   $self->{datastore}->{augment} = 1;
@@ -117,8 +119,9 @@ sub ImportXML
 
   foreach my $row ($rows->get_nodelist) {
     my($day, $month, $year, $date);
-    my $title = norm($row->findvalue( 'ProgrammeTitle' ) );
-    my $title_org = norm($row->findvalue( 'OriginalTitle' ) );
+    my $title_lang = norm($row->findvalue( 'ProgrammeTitle' ) ) if norm($row->findvalue( 'ProgrammeTitle' ) ) ne "-";
+    my $title_org = norm($row->findvalue( 'OriginalTitle' ) ) if norm($row->findvalue( 'OriginalTitle' ) ) ne "-";
+    my $title = $title_lang || $title_org;
 
     my $start = $row->findvalue( 'StartTime' );
     ($day, $month, $year) = ($row->findvalue( 'Date' ) =~ /^(\d\d)\/(\d\d)\/(\d\d\d\d)$/);
@@ -184,19 +187,19 @@ sub ImportXML
     $ce->{subtitle} = norm($subtitle) if defined($subtitle) and $subtitle ne "" and $subtitle ne "null";
 
     # Episode info in xmltv-format
-    if( ($ep_num ne "0" and $ep_num ne "") and ( $of_num ne "0" and $of_num ne "") and ( $se_num ne "0" and $se_num ne "") )
+    if( ($ep_num ne "0" and $ep_num ne "" and $ep_num ne "-") and ( $of_num ne "0" and $of_num ne "" and $of_num ne "-") and ( $se_num ne "0" and $se_num ne "" and $se_num ne "-") )
     {
         $ce->{episode} = sprintf( "%d . %d/%d .", $se_num-1, $ep_num-1, $of_num );
     }
-    elsif( ($ep_num ne "0" and $ep_num ne "") and ( $of_num ne "0" and $of_num ne "") )
+    elsif( ($ep_num ne "0" and $ep_num ne "" and $ep_num ne "-") and ( $of_num ne "0" and $of_num ne "" and $of_num ne "-") )
     {
       	$ce->{episode} = sprintf( ". %d/%d .", $ep_num-1, $of_num );
     }
-    elsif( ($ep_num ne "0" and $ep_num ne "") and ( $se_num ne "0" and $se_num ne "") )
+    elsif( ($ep_num ne "0" and $ep_num ne "" and $ep_num ne "-") and ( $se_num ne "0" and $se_num ne "" and $se_num ne "-") )
     {
         $ce->{episode} = sprintf( "%d . %d .", $se_num-1, $ep_num-1 );
     }
-    elsif( $ep_num ne "0" and $ep_num ne "" )
+    elsif( $ep_num ne "0" and $ep_num ne "" and $ep_num ne "-" )
     {
         $ce->{episode} = sprintf( ". %d .", $ep_num-1 );
     }
@@ -284,12 +287,14 @@ sub ImportXLS {
             $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Program Title$/ );
 
             $columns{'ORGTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Original Title$/ );
+            $columns{'ORGTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Original Program Title$/ );
 
             $columns{'Ser No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Season Number/ );
             $columns{'Ser Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Season Synopsis/ );
 
             $columns{'Ep No'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Number/ );
-            $columns{'Ep Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Title/ );
+            $columns{'Ep Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Episode Title/ );
+            $columns{'Ep TitleORG'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Original Episode Title/ );
             $columns{'Ep Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Synopsis/ );
             $columns{'Eps'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Number of episodes in the Season/ );
 
@@ -342,9 +347,12 @@ sub ImportXLS {
 
       # title
       my $title_field = int2col($columns{'Title'}).$i;
-      my $title = $ref->[1]{$title_field};
+      my $title_lang = norm($ref->[1]{$title_field}) if norm($ref->[1]{$title_field}) ne "-";
 
       my $title_org = norm($oWkS->{Cells}[$iR][$columns{'ORGTitle'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'ORGTitle'}]);
+
+      my $title = $title_lang || $title_org;
+
 
       my $hd = norm($oWkS->{Cells}[$iR][$columns{'HD'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'HD'}]);
       my $ws = norm($oWkS->{Cells}[$iR][$columns{'169'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'169'}]);
@@ -356,7 +364,7 @@ sub ImportXLS {
       my $se_field = int2col($columns{'Ser Synopsis'}).$i;
       my $se_desc = $ref->[1]{$se_field};
 
-      my $subtitle = norm($oWkS->{Cells}[$iR][$columns{'Ep Title'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'Ep Title'}]);
+      my $subtitle = norm($oWkS->{Cells}[$iR][$columns{'Ep Title'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'Ep Title'}]) and norm($oWkS->{Cells}[$iR][$columns{'Ep Title'}]->Value ) ne "-";
       my $ep_num   = norm($oWkS->{Cells}[$iR][$columns{'Ep No'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'Ep No'}]);
       my $se_num   = norm($oWkS->{Cells}[$iR][$columns{'Ser No'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'Ser No'}]);
       my $of_num   = norm($oWkS->{Cells}[$iR][$columns{'Eps'}]->Value ) if defined($oWkS->{Cells}[$iR][$columns{'Eps'}]);

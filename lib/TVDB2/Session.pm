@@ -190,9 +190,16 @@ sub talk {
   $url = $self->encoder->encode($url);
 
   # Talk (retry 3 times, 10s delay each time)
-  my $res = retry 3, 10, sub {
+  # Except for search, 1 time only
+  my $times = 3;
+  if($url =~ /\/search\//i) {
+    $times = 1;
+  }
+
+  my $res = retry $times, 10, sub {
     my $n = shift;
     warn "DEBUG: GET -> $url (times: $n)\n" if $self->debug;
+    #warn "BEARER: $token\n";
     my $client = WWW::Mechanize::GZip->new( agent => $default_ua, headers => {
         'Accept'       => 'application/json',
         'Content-Type' => 'application/json',

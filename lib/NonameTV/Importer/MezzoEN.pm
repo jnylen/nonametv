@@ -185,7 +185,7 @@ else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
         channel_id  => $channel_id,
         start_time  => $time,
         title 		=> norm($title),
-        description => norm($desc),
+
       };
 
       # Prod year
@@ -399,12 +399,12 @@ sub ImportXLS
 
       my $ce = {
         channel_id => $chd->{id},
-        title => $title,
+        title => norm($title),
         start_time => $time,
       };
 
-      $ce->{description} = $description if $description;
-      $ce->{directors} = $directors if $directors;
+      $ce->{description} = norm($description) if $description;
+      $ce->{directors} = norm($directors) if $directors;
 
       if( $year and ( $year =~ /(\d\d\d\d)/ ) ){
         $ce->{production_date} = "$1-01-01";

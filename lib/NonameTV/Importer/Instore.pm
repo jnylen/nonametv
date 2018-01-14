@@ -18,7 +18,7 @@ use XML::LibXML;
 use HTTP::Date;
 use Data::Dumper;
 use Math::Round 'nearest';
-use TryCatch;
+use Try::Tiny;
 
 use NonameTV qw/ParseXml norm AddCategory/;
 use NonameTV::DataStore::Helper;
@@ -142,7 +142,7 @@ sub ImportContent
     try {
       $start = $self->create_dt( $sc->findvalue( './date' ) . " " . $sc->findvalue( './time' ) );
     }
-    catch ($err) { print("error: $err"); next; }
+    catch { print("error: $_"); next; };
 
     if( not defined $start )
     {
@@ -187,8 +187,7 @@ sub ImportContent
         channel_id 		=> $chd->{id},
         title 			=> $title,
         start_time 		=> $start,
-        description 	=> $desc,
-        production_date => $year."-01-01",
+        description 	=> $desc
     };
 
     progress( "Instore: $chd->{xmltvid}: $start - $title" );
@@ -223,6 +222,10 @@ sub ImportContent
     	$ce->{directors} = norm($dir);
     }
 
+    if(defined($year) and $year ne "") {
+      $ce->{production_date} = $year."-01-01";
+    }
+
     # Make arrays
     my @actors;
 
@@ -230,7 +233,7 @@ sub ImportContent
     for( my $v=1; $v<=6; $v++ ) {
     	my $actor_name = norm($sc->findvalue( './actor'.$v));
         if(defined($actor_name) and $actor_name ne "") {
-    		push(@actors, $actor_name);
+    		push @actors, $actor_name;
     	}
     }
 

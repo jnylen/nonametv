@@ -7,7 +7,7 @@ use warnings;
 use utf8;
 use Env;
 use Data::Dumper;
-use TryCatch;
+use Try::Tiny;
 
 use Encode;
 use File::Slurp;
@@ -1076,7 +1076,7 @@ sub create_dt
                             );
 
     return $dt;
-  } catch ($err) {
+  } catch {
     return undef;
   }
 }
@@ -1141,7 +1141,7 @@ sub MonthNumber {
     @months_1 = qw/jan fav mar avr mai jui jul aou sep oct nov dec/;
     @months_2 = qw/JANVIER FÉVRIER mars avril mai juin juillet Août septembre octobre novembre DÉCEMBRE/;
     @months_3 = qw/janvier favrier mMARS AVRIL MAI JUIN juillet AOÛT septembre octobre novembre DÉCEMBRE/;
-    @months_4 = qw/1 Février 3 4 5 6 7 8 9 10 11 12/;
+    @months_4 = qw/1 Février 3 4 5 6 7 8 9 10 11 décembre/;
     @months_5 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_6 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_7 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;

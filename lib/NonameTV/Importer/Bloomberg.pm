@@ -102,14 +102,14 @@ sub ImportXLS
     progress( "Bloomberg: $chd->{xmltvid}: Processing worksheet: $oWkS->{Name}" );
 
     # Parse monthname and day
-    if(my($day, $monthname) = ($oWkS->{Name} =~ /(\d+) (.*?)$/)) {
+    if(my($day, $dumbcat, $monthname) = ($oWkS->{Name} =~ /(\d+)( |-)(.*?)$/)) {
       my $month = MonthNumber($monthname, "en");
       my $year = DateTime->now->year();
       if($monthname eq "January") {
         $year = $year + 1;
       }
 
-      my $date = sprintf("%d-%d-%02d", $year, $month, $day);
+      my $date = sprintf("%d-%02d-%02d", $year, $month, $day);
 
       # Startdate
       if( defined($date) and $date !~ /^19/ and $date ne $currdate ) {
@@ -131,16 +131,18 @@ sub ImportXLS
 		my $foundcolumns = 0;
     %columns = ();
 
+    my $oldtime = undef;
+
     # browse through rows
     for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
       if( not %columns ){
         for(my $iC = $oWkS->{MinCol} ; defined $oWkS->{MaxCol} && $iC <= $oWkS->{MaxCol} ; $iC++) {
           if( $oWkS->{Cells}[$iR][$iC] ){
             $columns{$oWkS->{Cells}[$iR][$iC]->Value} = $iC;
-            $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Pan Europe/ );
-            $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^CET/ );
+            $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Pan Europe/i );
+            $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^CET/ or $oWkS->{Cells}[$iR][$iC]->Value =~ /^CEST/ );
 
-            $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^CET/ );
+            $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^CET/ or $oWkS->{Cells}[$iR][$iC]->Value =~ /^CEST/ );
           }
 
         }
@@ -164,6 +166,17 @@ sub ImportXLS
       $time=$oWkC->{Val} if( $oWkC->Value );
       $time = ExcelFmt('hh:mm', $time);
 
+      # if its blank then minute is 30
+      if(!defined($time) or norm($time) eq "") {
+        next if !defined($oldtime);
+        my( $newhour , $newmin ) = ( $oldtime =~ /^(\d+):(\d+)$/ );
+        $newmin = 30;
+
+        $time = sprintf( "%02d:%02d", $newhour, $newmin );
+      }
+
+      $oldtime = $time;
+
       my $ce = {
         channel_id => $chd->{channel_id},
         title => norm( $title ),
@@ -184,7 +197,12 @@ sub ImportXLS
       } elsif( ( $eps ) = ($ce->{title} =~ /ep (\d+)$/i) ) {
         $ce->{title} =~ s/ep (\d+)$//i;
         $ce->{episode} = sprintf( ". %d .", $eps-1 );
+      } elsif( ( $eps ) = ($ce->{title} =~ /\(ep\. (\d+)\)$/i) ) {
+        $ce->{title} =~ s/\(ep\. (\d+)\)$//i;
+        $ce->{episode} = sprintf( ". %d .", $eps-1 );
       }
+
+      $ce->{title} =~ s/\(TAPED\/NOT TO BE CONFUSED WITH "BEST OF"\)$//i;
 
       # norm it
       $ce->{title} = norm($ce->{title});

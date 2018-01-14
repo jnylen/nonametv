@@ -23,7 +23,7 @@ use DateTime;
 use XML::LibXML;
 use HTTP::Date;
 use Data::Dumper;
-use TryCatch;
+use Try::Tiny;
 
 use NonameTV qw/ParseXml norm AddCategory AddCountry/;
 use NonameTV::Log qw/w progress error f/;
@@ -273,6 +273,7 @@ sub ImportContent {
       };
 
       my $extra = {};
+      $extra->{sport} = {};
       $extra->{descriptions} = [];
       $extra->{external} = { type => "viasat", id => $emission->findvalue( 'uniqueId' )};
       $extra->{qualifiers} = [];
@@ -341,7 +342,7 @@ sub ImportContent {
   	  }
 
   	  # Find live-info
-  	  if( $live eq "true" or $lead eq "LIVE" or $lead eq "LIVE:" )
+  	  if( $live eq "true" or $lead eq "LIVE" or $lead eq "LIVE:" or $lead eq "DIREKTE:" )
   	  {
   	    $ce->{live} = "1";
         push @{$extra->{qualifiers}}, "live";
@@ -407,6 +408,81 @@ sub ImportContent {
         $ce->{program_type} = "sports";
       }
 
+      # sports
+      if($ce->{program_type} eq "sports" and ($other_name =~ /^(.*?)\: (.*?)$/)) {
+        my $league_gotten = 0;
+        my ($game, $teams_cat) = ($original_name =~ /^(.*?)\: (.*?)$/);
+        # $1 = League or sport
+        # $2 = Teams or league
+        # League name can sometimes be in BLINE
+        my $one = $1;
+        my $two = $2;
+        my($league3, $game3 );
+
+        ## Danish
+        if($chd->{xmltvid} =~ /\.dk$/i) {
+          # These are not real sports games
+          if($bline =~ /(H.jdepunkter|Optakt|Magasin)/i) {
+            $league_gotten = 0;
+          } else {
+            ($league3, $game3 ) = $ds->LookupLeague( "Viasat_LeagueDK", $bline );
+            print Dumper($league3, $game3);
+            print Dumper(split("-", $teams_cat));
+          }
+        }
+
+        ## Finnish
+        if($chd->{xmltvid} =~ /\.fi$/i) {
+          # These are not real sports games
+          ($league3, $game3 ) = $ds->LookupLeague( "Viasat_LeagueFI", $one );
+          print Dumper($league3, $game3);
+          print Dumper(split("-", $teams_cat));
+        }
+
+        ## Swedish
+        if($chd->{xmltvid} =~ /\.se$/i) {
+          # These are not real sports games
+          ($league3, $game3 ) = $ds->LookupLeague( "Viasat_LeagueSE", $one );
+          print Dumper($league3, $game3);
+          print Dumper(split("-", $teams_cat));
+        }
+
+        ## Norway
+        if($chd->{xmltvid} =~ /\.no$/i) {
+          # These are not real sports games
+          if($bline =~ /(H.ydepunkter|Magasin)/i) {
+            $league_gotten = 0;
+          } else {
+            ($league3, $game3 ) = $ds->LookupLeague( "Viasat_LeagueNO", $bline );
+            print Dumper($league3, $game3);
+            print Dumper(split("-", $teams_cat));
+          }
+        }
+
+        # Get game
+        my ( $pty2, $game2 );
+        if($league_gotten and (( $pty2, $game2 ) = $ds->LookupCat( 'Viasat_games', $game ))) {
+          $extra->{sport}->{game}   = lc($game2);
+        }
+
+        # Date should be in synopsis, but if its live then its the current day's date
+        if($league_gotten and ($desc_logline =~ /\((.*?)\)$/)) {
+          if(my $dateparsed = ParseDate($1)) {
+            $extra->{sport}->{date} = $dateparsed;
+          }
+        } elsif($league_gotten and defined($ce->{live}) and $ce->{live} eq "1") {
+          $extra->{sport}->{date} = $currdate;
+        }
+
+        # Round
+        if($league_gotten and defined($desc_logline) and ($desc_logline =~ /Omg.ng (\d+)/i)) {
+          $extra->{sport}->{round} = $1;
+        }elsif($league_gotten and defined($desc_logline) and ($desc_logline =~ /(\d+)\. Runde/i)) {
+          $extra->{sport}->{round} = $1;
+        }
+
+      }
+
   	  #$ce->{external_ids} = 'viasat_' . $emission->findvalue( 'uniqueId' ); # only for non-commercial
       $ce->{extra} = $extra;
 
@@ -431,6 +507,24 @@ sub parse_person_list
   }
 
   return join( ";", grep( /\S/, @persons ) );
+}
+
+## For sports
+sub ParseDate {
+  my ( $text ) = @_;
+
+  my( $dayname, $day, $month, $year );
+
+  #
+  if( $text =~ /^\d+\.\d+\.\d+$/i ){
+    ( $day, $month, $year ) = ( $text =~ /^(\d+)\.(\d+)\.(\d+)$/i );
+  }elsif( $text =~ /^\d+\/\d+\-\d+$/i ){
+    ( $day, $month, $year ) = ( $text =~ /^(\d+)\/(\d+)\-(\d+)$/i );
+  }
+
+  $year += 2000 if $year < 100;
+
+  return sprintf( '%04d-%02d-%02d', $year, $month, $day );
 }
 
 1;

@@ -18,6 +18,7 @@ use Locale::Codes::Country qw(all_country_codes);
 # LOAD DIST MODULES
 #######################
 use TVDB2::Session;
+use Data::Dumper;
 
 #######################
 # VERSION
@@ -56,13 +57,13 @@ sub new {
 sub info {
     my $self   = shift;
     my $params = {};
-    my $info = $self->session->talk(
+    my $info = $self->session->paginate_results(
         {
             method => 'series/' . $self->id
         }
     );
   return unless $info;
-    $self->{id} = $info->{id};  # Reset TMDB ID
+  #  $self->{id} = $info->{id};  # Reset TMDB ID
   return $info;
 } ## end sub info
 
@@ -76,9 +77,9 @@ sub episodes {
 } ## end sub episodes
 
 ## ====================
-## EPISODE
+## EPISODE QUERY
 ## ====================
-sub episode {
+sub episode_query {
     my $self    = shift;
     my $params = shift || {};
 
@@ -88,6 +89,34 @@ sub episode {
           params => $params
         }
     );
+} ## end sub episode
+
+## ====================
+## EPISODE
+## ====================
+sub episode {
+    my $self = shift;
+    my $params = shift || {};
+
+    my @matches;
+    my @episodes = $self->episodes();
+    foreach (@episodes) {
+      if ($params->{episode} and $params->{season})
+      {
+        push @matches, $_ if ( $_->{airedSeason} eq $params->{season} and $_->{airedEpisodeNumber} eq $params->{episode} );
+      } elsif($params->{absolutenumber}) {
+        push @matches, $_ if ( defined($_->{absoluteNumber}) and $_->{absoluteNumber} eq $params->{absolutenumber} );
+      } elsif($params->{episodeid}) {
+        push @matches, $_ if ( $_->{id} eq $params->{episodeid} );
+      } elsif($params->{episode} and $params->{year}) {
+        #my $year = ($_->{firstAired} =~ /^(\d\d\d\d)/);
+        #push @matches, $_ if ( $year =~ /2007/ and $_->{airedEpisodeNumber} eq $params->{episode} );
+      }
+
+    }
+
+  return @matches if wantarray;
+  return $matches[0];
 } ## end sub episode
 
 ## ====================

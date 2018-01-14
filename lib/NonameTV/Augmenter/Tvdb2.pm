@@ -6,8 +6,10 @@ use warnings;
 use TVDB2;
 use utf8;
 use Data::Dumper;
+use Text::LevenshteinXS qw(distance);
+use Encode;
 
-use NonameTV qw/norm normUtf8 AddCategory/;
+use NonameTV qw/norm normUtf8 AddCategory RemoveSpecialChars CleanSubtitle/;
 use NonameTV::Augmenter::Base;
 use NonameTV::Config qw/ReadConfig/;
 use NonameTV::Log qw/w d/;
@@ -29,13 +31,19 @@ sub new {
     $self->{tvdb2} = TVDB2->new(
         apikey => $self->{ApiKey},
         username => $self->{Username},
-        userkey => $self->{Userkey},
+        userkey => $self->{UserKey},
         lang   => $self->{Language},
+        debug => 1
     );
 
     # only copy the synopsis if you trust their rights clearance enough!
     if( !defined( $self->{OnlyAugmentFacts} ) ){
       $self->{OnlyAugmentFacts} = 0;
+    }
+
+    # only consider Ratings with 10 or more votes by default
+    if( !defined( $self->{MinRatingCount} ) ){
+      $self->{MinRatingCount} = 10;
     }
 
     $self->{search} = $self->{tvdb2}->search();
@@ -50,20 +58,113 @@ sub FillHash( $$$$ ) {
 
 
   # Genres
+  my @cats;
+  if( exists( $series->info()->{genre} ) ){
+    foreach my $genre ( @{ $series->info()->{genre} } ){
+      print Dumper($genre);
+      my ( $program_type, $categ ) = $self->{datastore}->LookupCat( "Tvdb2", $genre );
+      # set category, unless category is already set!
+      push @cats, $categ if defined $categ;
+    }
+    my $cat = join "/", @cats;
+    AddCategory( $resultref, undef, $cat );
+  }
 
+  # Actors
+  my $actors = $series->actors;
+  my @actors_array = ();
+  if (exists($actors->{data})) {
+    foreach my $actor ( @{ $actors->{data} } ){
+      my $name = normUtf8( norm ( $actor->{name} ) );
 
-  # YOU HAVE GUESTS in $episodes->guest_stars
-  # CREW IN $EPISODES->crew
+      # Role played
+      if( defined ($actor->{role}) and $actor->{role} ne "" ) {
+        $name .= " (".normUtf8( norm ( $actor->{role} ) ).")";
+      }
+
+       push @actors_array, $name;
+    }
+  }
 
   ############ EPISODE
+  # Fetch more episode data?
+  my $newepisodedata = $self->{tvdb2}->episode( id => $episode->{id})->info;
+  my $newepisode = undef;
+  if(exists($newepisodedata->{data})) {
+    $newepisode = $newepisodedata->{data};
+  }
 
+  # Guest stars
+  # always add the episode cast
+  if( defined($newepisode) and $newepisode->{guestStars} ) {
+    foreach my $gactor ( @{ $newepisode->{guestStars} } ) {
+      push( @actors_array, $gactor );
+    }
+  }
+  foreach( @actors_array ){
+    $_ = normUtf8( norm( $_ ) );
+    if( $_ eq '' ){
+      $_ = undef;
+    }
+  }
+  @actors_array = grep{ defined } @actors_array;
 
+  # firstAired
+  if( $episode->{firstAired} ) {
+    $resultref->{production_date} = $episode->{firstAired};
+  }
+
+  # Subtitle / Episode num
+  if( $episode->{airedSeason} == 0 ){
+    # it's a special
+    $resultref->{episode} = undef;
+    $resultref->{subtitle} = norm( "Special - ".$episode->{episodeName} );
+  }else{
+    $resultref->{episode} = sprintf( "%d . %d . ", $episode->{airedSeason}-1, $episode->{airedEpisodeNumber}-1 );
+
+    # use episode title
+    #print Dumper($episode);
+    $resultref->{subtitle} = norm( $episode->{episodeName} ) if(norm( $episode->{episodeName} ) ne "" and (!defined($ceref->{subtitle}) or $ceref->{subtitle} eq ""));
+  }
+
+  # Use episode rating if there are more then MinRatingCount ratings for the episode. If the
+  # episode does not have enough ratings consider using the series rating instead (if that has enough ratings)
+  # if not rating qualifies leave it away.
+  # the Rating at Tvdb is 1-10, turn that into 0-9 as xmltv ratings always must start at 0
+  if(defined($newepisode) and exists($newepisode->{siteRatingCount}) and defined($self->{MinRatingCount})) {
+  	if( $newepisode->{siteRatingCount} >= $self->{MinRatingCount} ){
+    	$resultref->{'star_rating'} = $newepisode->{siteRating}-1 . ' / 9';
+  	} elsif( $series->info->{siteRatingCount} >= $self->{MinRatingCount} ){
+    	$resultref->{'star_rating'} = $series->info->{siteRating}-1 . ' / 9';
+  	}
+  }
+
+  $resultref->{program_type} = 'series';
+
+  # Add actors
+  if( @actors_array ) {
+  	  # replace programme's actors
+	  $resultref->{actors} = join( ';', @actors_array );
+	} else {
+	  # remove existing actors from programme
+	  $resultref->{actors} = undef;
+  }
+
+  # add directors
+  if(defined($newepisode)) {
+    $resultref->{directors} = join( ';', @{ $newepisode->{directors} } );
+  }
+
+  # add writers
+  if(defined($newepisode)) {
+    $resultref->{writers} = join( ';', @{ $newepisode->{writers} } );
+  }
 
   ############ EXTERNAL LINKS
 
   $resultref->{url} = sprintf(
-    'http://thetvdb.com/?tab=series&id=%d',
-    $series->info->{id}
+    'http://thetvdb.com/?tab=episode&id=%d&seasonid=%d&id=%d',
+    $series->info->{id}, $episode->{airedSeasonID}, $episode->{id}
   );
   $resultref->{extra_id} = $series->info->{ id };
   $resultref->{extra_id_type} = "thetvdb";
@@ -109,10 +210,86 @@ sub AugmentProgram( $$$ ){
 
   return( undef, 'matchby was undefined?' ) if !defined($matchby);
 
-  if( $ceref->{url} && $ceref->{url} =~ m|^http://www\.thetvdb\.com/| ) {
+  if( $ceref->{url} && $ceref->{url} =~ m|^http://thetvdb\.com/| ) {
     $result = "programme is already linked to thetvdb, ignoring";
     $resultref = undef;
-  }else{
+  } elsif( $matchby eq 'episodeseason' ) {
+    # Find episode by season and episode.
+
+    if( defined $ceref->{episode} ){
+      my( $season, $episode )=( $ceref->{episode} =~ m|^\s*(\d+)\s*\.\s*(\d+)\s*/?\s*\d*\s*\.\s*$| );
+
+      # It had episode and season!
+      if( (defined $episode) and (defined $season) ){
+        $episode += 1;
+        $season += 1;
+
+        my $series = $self->find_series($ceref, $ruleref);
+
+        # Matched?
+        if( (defined $series)){
+          # match episode
+          if(($season ne "") and ($episode ne "")) {
+            #print $series->info->{name};
+            my $episode2 = $series->episode({episode => $episode, season => $season});
+
+            # Fil?
+          	if( defined( $episode2 ) ) {
+            	$self->FillHash( $resultref, $series, $episode2, $ceref );
+          	} else {
+            	w( "no episode " . $episode . " of season " . $season . " found for '" . $ceref->{title} . "'" );
+          	}
+          }
+
+        }
+
+      }
+
+    }
+
+  } elsif( $matchby eq 'episodetitle' ) {
+    ## You need to fetch first the show,
+    ## then the season one by one to get the titles.
+
+    if( defined($ceref->{subtitle}) or defined($ceref->{original_subtitle}) ){
+
+      my $series = $self->find_series($ceref, $ruleref);
+
+      # Match shit
+      if( (defined $series) ){
+        # Check if the year matches
+        my $epid = undef;
+
+        # Find by episode title
+        my $eps = $self->find_episode_by_name($ceref, $ruleref, $series);
+        if(defined($eps)) {
+          $epid = $eps->{id};
+        }
+
+        # match
+        if(defined($epid)) {
+          # Matched!
+          my $episode2 = $series->episode({episodeid => $epid});
+
+          # Fil?
+          if( defined( $episode2 ) and !defined( $episode2->{status_code} ) ) {
+            $self->FillHash( $resultref, $series, $episode2, $ceref );
+          } else {
+            if(defined($ceref->{subtitle})) {
+              w( "episode not found by title nor org subtitle: " . $ceref->{title} . " - \"" . $ceref->{subtitle} . "\"" );
+            }
+
+            if(defined($ceref->{original_subtitle})) {
+              w( "episode not found by title nor org subtitle: " . $ceref->{title} . " - \"" . $ceref->{original_subtitle} . "\"" );
+            }
+          }
+        } else {
+          w( "episode not found by title nor org subtitle: " . $ceref->{title} );
+        }
+
+      }
+    }
+  } else{
     $result = "don't know how to match by '" . $ruleref->{matchby} . "'";
     $resultref = undef;
   }
@@ -136,11 +313,14 @@ sub find_series($$$ ) {
     return $self->{tvdb2}->series( id => $ruleref->{remoteref} );
   } else {
     @candidates = $self->{search}->series( $ceref->{title} );
+
     foreach my $c ( @candidates ){
       if( defined( $c->{id} ) ) {
         push( @ids, $c->{id} );
       }
     }
+
+    print ("HELLO\n");
 
 
     # No data? Try the original title
@@ -297,10 +477,10 @@ sub find_episode_by_name($$$$ ) {
 
   # Subtitles
   if(defined $ceref->{subtitle}) {
-    $subtitle = lc(RemoveSpecialChars(CleanSubtitle($ceref->{subtitle})));
+    $subtitle = $self->cleanup_sub(lc(RemoveSpecialChars(CleanSubtitle($ceref->{subtitle}))));
   }
   if(defined $ceref->{original_subtitle}) {
-    $org_subtitle = lc(RemoveSpecialChars(CleanSubtitle($ceref->{original_subtitle})));
+    $org_subtitle = $self->cleanup_sub(lc(RemoveSpecialChars(CleanSubtitle($ceref->{original_subtitle}))));
   }
 
   # Each season check for eps
@@ -331,6 +511,37 @@ sub find_episode_by_name($$$$ ) {
   } else {
     return undef;
   }
+}
+
+# clean up subtitle
+sub cleanup_sub($$ ) {
+  my($self, $episodetitle)=@_;
+
+  $episodetitle =~ s|\s+-\s+Teil\s+(\d+)$| ($1)|;   # _-_Teil_#
+  $episodetitle =~ s|\s+\/\s+Teil\s+(\d+)$| ($1)|;  # _/_Teil_#
+  $episodetitle =~ s|,\s+Teil\s+(\d+)$| ($1)|;      # ,_Teil #
+  $episodetitle =~ s|\s+Teil\s+(\d+)$| ($1)|;       # _Teil #
+  $episodetitle =~ s|\s+\(Teil\s+(\d+)\)$| ($1)|;   # _(Teil_#)
+  $episodetitle =~ s|\s+-\s+(\d+)\.\s+Teil$| ($1)|; # _-_#._Teil
+
+  $episodetitle =~ s|\s*\(Part\s+(\d+)\)$| ($1)|;   # _(Part_#) for Comedy Central Germany
+  $episodetitle =~ s|\s+-\s+\((\d+)\)$| ($1)|;      # _-_(#) for Comedy Central Germany
+  $episodetitle =~ s|\bPart\s+(\d+)$| ($1)|;        # ...Part_# for Comedy Central Germany
+
+  $episodetitle =~ s|\s*-\s+part\s+(\d+)$| ($1)|;   # _(Part_#) for Al Jazeera International
+
+  $episodetitle =~ s|\s+-\s+(\d+)$| ($1)|;          # _-_# for ORF
+
+  # Discovery
+  $episodetitle =~ s|\s+\s+| |;           # Two spaces to one space
+  $episodetitle =~ s|\s+-\s+\(| \(|;      # " - (" to " ("
+  $episodetitle =~ s|,\s+\(| \(|;         # ", (" to " ("
+  $episodetitle =~ s|\:\s+\(| \(|;        # ": (" to " ("
+
+  # " - - " to " - " for Eisenbahnromantik on SWR, maybe happens when shuffling title/subtitle around
+  $episodetitle =~ s|\s+-\s+-\s+| - |;
+
+  return $episodetitle;
 }
 
 1;

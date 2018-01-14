@@ -102,7 +102,11 @@ sub ImportContentFile {
       if($chd->{sched_lang} eq "sv") {
         push( @filess, $member->{fileName} ) if $member->{fileName} =~ /swe/i and $member->{fileName} =~ /\.(xls|xlsx)$/i;
       } elsif($chd->{sched_lang} eq "da") {
-        push( @filess, $member->{fileName} ) if $member->{fileName} =~ /(dan|den)/i and $member->{fileName} =~ /\.(xls|xlsx)$/i;
+        if($chd->{xmltvid} eq "disneychannel.dk") {
+          push( @filess, $member->{fileName} ) if $member->{fileName} =~ /(dan|den)/i and $member->{fileName} =~ /2959/i and $member->{fileName} =~ /\.(xls|xlsx)$/i;
+        } else {
+          push( @filess, $member->{fileName} ) if $member->{fileName} =~ /(dan|den)/i and $member->{fileName} =~ /\.(xls|xlsx)$/i;
+        }
       } elsif($chd->{sched_lang} eq "fi") {
         push( @filess, $member->{fileName} ) if $member->{fileName} =~ /fin/i and $member->{fileName} =~ /\.(xls|xlsx)$/i;
       } elsif($chd->{sched_lang} eq "no") {

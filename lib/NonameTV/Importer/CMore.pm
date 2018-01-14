@@ -14,7 +14,7 @@ The downloaded file is in xml-format.
 use DateTime;
 use XML::LibXML;
 use HTTP::Date;
-use TryCatch;
+use Try::Tiny;
 
 use Compress::Zlib;
 
@@ -144,10 +144,9 @@ sub ImportContent
 
     try {
       $start = $self->create_dt( $sc->findvalue( './@CalendarDate' ) );
-    }
-    catch ($err) { print("error: $err"); next; }
+    } catch { print("error: $_\n"); next; };
 
-    if( not defined $start )
+    if(!defined($start) )
     {
       w "Invalid starttime '" . $sc->findvalue( './@CalendarDate' ) . "'. Skipping.";
       next;
@@ -155,6 +154,8 @@ sub ImportContent
 
     my $series_title = $sc->findvalue( './Program/@SeriesTitle' );
     my $org_title = $sc->findvalue( './Program/@Title' );
+
+    my $firstcd = norm($sc->findvalue( './Program/@FirstCalendarDate' ));
 
     my $bline = $sc->findvalue( './Program/Synopsis/ExtraShort' );
     my $org_desc = $sc->findvalue( './Program/Synopsis/Short' );
@@ -208,6 +209,7 @@ sub ImportContent
     $extra->{descriptions} = [];
     $extra->{qualifiers} = [];
     $extra->{images} = [];
+    $extra->{sport} = {};
 
     # descriptions
     if($bline and defined($bline) and norm($bline) ne "") {
@@ -381,6 +383,28 @@ sub ImportContent
     # VOD?
     if($vod eq "true") {
       push @{$extra->{qualifiers}}, "catchup";
+    }
+
+    # Sports data
+    if(defined($cate) and $cate eq "Game") {
+      my($league3, $game3 ) = $ds->LookupLeague( "CMore_league", $series_title );
+
+      if(defined($league3)) {
+        $extra->{sport}->{league} = $league3;
+        @{$extra->{sport}->{teams}}  = split(" - ", $title_org);
+        $extra->{sport}->{game}   = lc($game3);
+
+        # Air date
+        if( defined( $firstcd ) and ($firstcd =~ /(\d\d\d\d)-(\d\d)-(\d\d)/) )
+        {
+          $extra->{sport}->{date} = "$1-$2-$3";
+        }
+
+        # Round
+        if(defined($org_desc) and ($org_desc =~ /Omg.ng (\d+)/)) {
+          $extra->{sport}->{round} = $1;
+        }
+      }
     }
 
     $ce->{extra} = $extra;

@@ -614,6 +614,55 @@ sub LookupCountry {
 
 }
 
+sub LookupLeague {
+  my $self = shift;
+  my ( $type, $org ) = @_;
+
+  return ( undef, undef ) if ( not defined($org) ) or ( $org !~ /\S/ );
+
+  $org =~ s/^\s+//;
+  $org =~ s/\s+$//;
+
+  # I should be using locales, but I don't dare turn them on.
+  $org = lc($org);
+  $org =~ tr/ÅÄÖ/åäö/;
+
+  # The field has room for 50 characters. Unicode may occupy
+  # several bytes with one character.
+  # Treat all leagues with the same X character prefix
+  # as equal.
+  $org = substr( $org, 0, 44 );
+
+  $self->LoadLeagues()
+    if not exists( $self->{leagues} );
+
+  if ( not exists( $self->{leagues}->{"$type++$org"} ) ) {
+
+    # MySQL considers some characters as equal, e.g. e and é.
+    # Trying to insert both anime and animé will give an error-message
+    # from MySql. Therefore, I try to lookup the new entry before adding
+    # it to see if MySQL thinks it already exists. I should probably
+    # normalize the strings before inserting them instead...
+    my $data =
+      $self->{sa}->Lookup( "trans_leagues", { type => $type, original => $org } );
+    if ( defined($data) ) {
+      $self->{leagues}->{ $type . "++" . $org } =
+        [ $data->{real_name}, $data->{game} ];
+    }
+    else {
+      $self->AddLeague( $type, $org );
+    }
+  }
+
+  if ( defined( $self->{leagues}->{"$type++$org"} ) ) {
+    return @{ ( $self->{leagues}->{"$type++$org"} ) };
+  }
+  else {
+    return ( undef, undef );
+  }
+
+}
+
 =item Reset
 
 Reset the datastore-object to its initial state. This method can be called
@@ -735,6 +784,41 @@ sub AddCountry {
     }
   );
   $self->{countries}->{"$type++$org"} = [ undef, undef ];
+}
+
+sub LoadLeagues {
+  my $self = shift;
+
+  my $d = {};
+
+  my $sth = $self->{sa}->Iterate( 'trans_leagues', {} );
+  if ( not defined($sth) ) {
+    $self->{leagues} = {};
+    w "No leagues found in database.";
+    return;
+  }
+
+  while ( my $data = $sth->fetchrow_hashref() ) {
+    $d->{ $data->{type} . "++" . $data->{original} } =
+      [ $data->{real_name}, $data->{game} ];
+  }
+  $sth->finish();
+
+  $self->{leagues} = $d;
+}
+
+sub AddLeague {
+  my $self = shift;
+  my ( $type, $org ) = @_;
+
+  $self->{sa}->Add(
+    'trans_leagues',
+    {
+      type     => $type,
+      original => $org
+    }
+  );
+  $self->{leagues}->{"$type++$org"} = [ undef, undef ];
 }
 
 =item sa

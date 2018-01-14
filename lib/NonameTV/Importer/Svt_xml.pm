@@ -159,8 +159,11 @@ sub ImportXML
         channel_id => $chd->{id},
         title => norm2($title),
         start_time => $start,
-        end_time => $end,
       };
+
+      if(norm2($title) ne "Morgonstudion") {
+        $ce->{end_time} = $end;
+      }
 
       if( defined( $year ) and ($year =~ /(\d\d\d\d)/) )
       {

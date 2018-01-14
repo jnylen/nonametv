@@ -20,8 +20,9 @@ use Data::Dumper;
 use File::Temp qw/tempfile/;
 
 use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
+use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel int2col);
 use Spreadsheet::Read;
+use Text::Capitalize qw/capitalize_title/;
 
 use Text::Iconv;
 my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
@@ -90,21 +91,49 @@ sub ImportXLS {
 
   if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
   else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
+  my $ref = ReadData ($file);
 
   # main loop
   for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
+    my $foundcolumns = 0;
+    my $i = 0;
 
     my $oWkS = $oBook->{Worksheet}[$iSheet];
     progress( "Motors XLS: $chd->{xmltvid}: Processing worksheet: $oWkS->{Name}" );
 
     # browse through rows
-    for(my $iR = 1 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+    for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+      $i++;
+      if( not %columns ){
+        # the column names are stored in the first row
+        # so read them and store their column positions
+        # for further findvalue() calls
+
+        for(my $iC = $oWkS->{MinCol} ; defined $oWkS->{MaxCol} && $iC <= $oWkS->{MaxCol} ; $iC++) {
+          if( $oWkS->{Cells}[$iR][$iC] ){
+            $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Titre du produit/i );
+            $columns{'EpTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Titre de/i );
+            $columns{'Description'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /PRESSE UK/i );
+            $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Horaire/i );
+            $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date de diffusion/i );
+
+
+            $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date de diffusion/i ); # Only import if date is found
+          }
+        }
+        %columns = () if( $foundcolumns eq 0 );
+
+        next;
+      }
+
 
 
       # date - column 0 ('Date de diffusion')
-      my $oWkC = $oWkS->{Cells}[$iR][0];
-      if( $oWkC ){
-        if( $date = ParseDate( $oWkC->Value ) ){
+      #print Dumper(%columns);
+      my $field2 = int2col($columns{'Date'}).$i;
+      my $dater = $ref->[1]{$field2};
+      if( $dater ){
+        if( $date = ParseDate( $dater ) ){
 
           $dsh->EndBatch( 1 ) if defined $currdate;
 
@@ -119,14 +148,18 @@ sub ImportXLS {
         }
       }
 
+      next if !$currdate;
+
 
       # time - column 1 ('Horaire')
-      $oWkC = $oWkS->{Cells}[$iR][1];
+      my $oWkC = $oWkS->{Cells}[$iR][$columns{'Time'}];
       next if( ! $oWkC );
-      my $time = ExcelFmt("hh:mm",$oWkC->Value ) if( $oWkC->Value );
+      my $time = ExcelFmt("hh:mm", $oWkC->{Val} ) if( $oWkC->{Val} );
+      $time = "00:00" if !defined($time);
 
       # Sometimes Motors somehow add 24:00:00 in the time field, that fucks the system up.
       my ( $hour , $min ) = ( $time =~ /^(\d+):(\d+)/ );
+      next if !defined($hour);
       if($hour eq "24") {
       	$hour = "00";
       }
@@ -134,21 +167,21 @@ sub ImportXLS {
       $time = $hour.":".$min;
 
       # title - column 2 ('Titre du produit')
-      $oWkC = $oWkS->{Cells}[$iR][2];
+      $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
       next if( ! $oWkC );
       my $title = $oWkC->Value if( $oWkC->Value );
       $title =~ s/\(Live\)//g; # Dont keep live in the text
-      $title = ucfirst(lc(norm($title))); # make it prettieh
+      $title = capitalize_title(lc(norm($title))); # make it prettieh
 
 
 
       my ( $subtitle, $description );
 
       # subtitle - column 3 ('Titre de l'ésode')
-      $subtitle = $oWkS->{Cells}[$iR][3]->Value if $oWkS->{Cells}[$iR][3];
+      $subtitle = $oWkS->{Cells}[$iR][$columns{'EpTitle'}]->Value if defined($columns{'EpTitle'}) and $oWkS->{Cells}[$iR][$columns{'EpTitle'}];
 
       # description - column 4 ('PRESSE UK')
-      $description = $oWkS->{Cells}[$iR][5]->Value if $oWkS->{Cells}[$iR][5];
+      $description = $oWkS->{Cells}[$iR][$columns{'Description'}]->Value if defined($columns{'Description'}) and $oWkS->{Cells}[$iR][$columns{'Description'}];
 
       progress("Motors XLS: $xmltvid: $time - $title");
 
@@ -170,100 +203,11 @@ sub ImportXLS {
   return;
 }
 
-sub ImportCSV {
-  my $self = shift;
-  my( $file, $chd ) = @_;
-
-  $self->{fileerror} = 0;
-
-  my $xmltvid = $chd->{xmltvid};
-  my $channel_id = $chd->{id};
-  my $dsh = $self->{datastorehelper};
-  my $ds = $self->{datastore};
-
-  return if( $file !~ /\.csv$/i );
-  progress( "Motors CSV: $xmltvid: Processing $file" );
-
-  my $date;
-  my $currdate = "x";
-
-  open my $CSVFILE, "<", $file or die $!;
-
-  my $csv = Text::CSV->new( {
-    sep_char => ';',
-    allow_whitespace => 1,
-    blank_is_undef => 1,
-    binary => 1,
-  } );
-
-  # get the column names from the first line
-  my @columns = $csv->column_names( $csv->getline( $CSVFILE ) );
-#foreach my $cl (@columns) {
-#print "$cl\n";
-#}
-
-  # main loop
-  while( my $row = $csv->getline_hr( $CSVFILE ) ){
-
-    # Date
-    if( $row->{'Date de diffusion'} ){
-      $date = ParseDate( $row->{'Date de diffusion'} );
-
-      if( $date and ( $date ne $currdate ) ){
-
-        if( $currdate ne "x" ) {
-          $dsh->EndBatch( 1 );
-        }
-
-        my $batch_id = $xmltvid . "_" . $date;
-        $dsh->StartBatch( $batch_id , $channel_id );
-        $dsh->StartDate( $date , "07:00" );
-        $currdate = $date;
-
-        progress( "Motors CSV: $xmltvid: Date is $date" );
-      }
-    }
-
-    # Time
-    my $time = $row->{'Horaire'};
-    next if not $time;
-    next if ( $time !~ /^\d\d\:\d\d$/ );
-
-    # Title
-    my $title = $row->{'Titre du produit'};
-    next if not $title;
-
-    # Subtitle
-    my $subtitle = $row->{"Titre de l'épisode"};
-
-    # Description
-    my $description = $row->{'PRESSE UK'};
-
-    progress( "Tiji: $xmltvid: $time - $title" );
-
-    my $ce = {
-      channel_id => $channel_id,
-      title => $title,
-      start_time => $time,
-    };
-
-    $ce->{subtitle} = $subtitle if $subtitle;
-    $ce->{description} = $description if $description;
-
-    $dsh->AddProgramme( $ce );
-
-  }
-
-  $dsh->EndBatch( 1 );
-
-  return;
-}
-
-
 sub ParseDate {
   my( $text ) = @_;
+  print("text: $text\n");
 
-  return undef if( ! $text );
+  return undef if( ! $text or $text eq "" );
 
   # Format 'VENDREDI 27 FAVRIER   2009'
   if( $text =~ /\S+\s+\d\d\s\S+\s+\d\d\d\d/ ){

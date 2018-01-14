@@ -4,7 +4,7 @@ NROOT=/content
 
 # Xmltv
 tools/nonametv-export Xmltv --export-channels
-tools/nonametv-export Xmltv --force-export $1 $2 $3
+tools/nonametv-export Xmltv $1 $2 $3
 tools/nonametv-export Xmltv --export-channels --channel-group TV
 tools/nonametv-export Xmltv --export-channels --channel-group RADIO
 tools/nonametv-export Xmltv --export-channels --channel-group DEV
@@ -25,10 +25,8 @@ tools/nonametv-export Xmltv --export-channels --channel-group Estonia
 
 
 # JSON
-tools/nonametv-export Json_extra --export-channels $1 $2 $3
-tools/nonametv-export Json_extra $1 --force-export $3
 tools/nonametv-export Json --export-channels $1 $2 $3
-tools/nonametv-export Json $1 --force-export $3
+tools/nonametv-export Json $1 $2 $3
 
 tools/nonametv-export Json --export-channels --channel-group TV
 tools/nonametv-export Json --export-channels --channel-group RADIO
@@ -50,4 +48,4 @@ tools/nonametv-export Json --export-channels --channel-group Estonia
 
 # Honeybee-specific json
 tools/nonametv-export Honeybee --export-channels $1 $2 $3
-tools/nonametv-export Honeybee --force-export $1 $2 $3
+tools/nonametv-export Honeybee $1 $2 $3

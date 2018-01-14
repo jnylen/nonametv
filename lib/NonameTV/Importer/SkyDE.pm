@@ -34,9 +34,6 @@ sub new {
   my $self  = $class->SUPER::new( @_ );
   bless ($self, $class);
 
-  # Silence
-  $self->{SILENCE_DUPLICATE_SKIP} = 1;
-
   # use augment
   $self->{datastore}->{augment} = 1;
 
@@ -50,6 +47,8 @@ sub ImportContentFile {
   my $channel_id = $chd->{id};
   my $ds = $self->{datastore};
   my $dsh = $self->{datastorehelper};
+  $ds->{SILENCE_END_START_OVERLAP}=1;
+  $ds->{SILENCE_DUPLICATE_SKIP}=1;
 
   my( $service_id, $usedesc ) = split( /:/, $chd->{grabber_info} );
 

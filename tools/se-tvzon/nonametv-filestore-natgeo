@@ -1,0 +1,84 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use DateTime;
+use Data::Dumper;
+use File::Util;
+use File::Copy qw/copy move/;
+use File::Basename;
+use File::Path qw/make_path/;
+
+use NonameTV;
+use NonameTV::DataStore;
+use NonameTV::Config qw/ReadConfig/;
+use NonameTV::Log qw/progress error d p w f/;
+
+use Getopt::Long;
+
+my $opt = { 'verbose' => 0 };
+
+my $res = GetOptions( $opt, qw/verbose/ );
+
+NonameTV::Log::SetVerbosity( $opt->{verbose} );
+
+# Read configuration
+my $conf = ReadConfig();
+my $ds = NonameTV::DataStore->new( $conf->{DataStore} );
+my $filestore = $conf->{FileStore};
+
+# Channels
+my %channel_data;
+# NG Channel
+$channel_data{ "NGC_SE" } = "natgeo.se";
+$channel_data{ "NGC_NO" } = "natgeo.no";
+$channel_data{ "NGC_DK" } = "natgeo.dk";
+$channel_data{ "NGC_FI" } = "natgeo.fi";
+
+# WILD
+$channel_data{ "WILD_FI" } = "wild.natgeo.fi";
+$channel_data{ "WILD_SE" } = "wild.natgeo.se";
+$channel_data{ "WILD_NO" } = "wild.natgeo.no";
+$channel_data{ "WILD_DK" } = "wild.natgeo.dk";
+
+# NG People
+$channel_data{ "NGP_DK" } = "people.natgeo.dk";
+
+# list files inside of the channel directory and check when they have been touched
+opendir(DIR, "/content/ftp/foxng/");
+
+foreach my $cff2 (readdir(DIR))
+{
+  my $dir = "/content/ftp/foxng/$cff2/";
+  opendir(DIR2, $dir);
+  foreach my $cff(readdir(DIR2))
+  {
+    if($cff =~ /^\./) { next; }
+    my ( $id, $year, $month ) = ($cff =~ /^(.*?)_(\d+)_(\d+)/i);
+    next if(!defined($id));
+
+    my $cftype = join(',', File::Util->file_type( "$dir$cff" ) );
+
+    if( $cff !~ /\.(xls|xlsx)$/i ){
+        #progress( "File $cff isn't a xml file - skipping" );
+        next;
+    }
+
+    if( not exists( $channel_data{$id} ) )
+    {
+        print "Files with name $id hasnt been specified as a channel.\n";
+        #unlink "/content/ftp/prosieben/$cff";
+    } else {
+      make_path(dirname("$filestore/$channel_data{$id}/$cff"));
+      copy( "$dir$cff", "$filestore/$channel_data{$id}/$cff" );
+      print "$cff copied to $channel_data{$id}\n";
+    }
+
+    #print Dumper($cff);
+  }
+}
+
+exit;
