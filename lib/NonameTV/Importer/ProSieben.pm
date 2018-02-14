@@ -113,8 +113,8 @@ sub ImportContentFile
         my $ce = ();
         $ce->{channel_id} = $chd->{id};
 
-        $ce->{start_time} = $start->ymd("-") . " " . $start->hms(":");
-        $ce->{end_time} = $end->ymd("-") . " " . $end->hms(":");
+        $ce->{start_time} = $start->ymd("-") . " " . $start->hms(":"); #
+        $ce->{end_time} = $end->ymd("-") . " " . $end->hms(":"); #
 
         if($start->ymd("-") ne $currdate ) {
           #$dsh->StartDate( $start->ymd("-") , "06:00" );
@@ -219,6 +219,7 @@ sub ImportContentFile
         $ce->{description} = norm($desc) if $self->{KeepDesc} and $desc and $desc ne "";
 
         $ds->AddProgrammeRaw( $ce );
+        #$dsh->AddProgramme( $ce );
 
         progress("ProSieben: $chd->{xmltvid}: ".$ce->{start_time}." - ".$ce->{title});
   }
@@ -228,39 +229,31 @@ sub ImportContentFile
   return 1;
 }
 
-sub parseTimestamp( $ ){
+sub parseTimestamp( $ )
+{
   my $self = shift;
-  my ($timestamp, $date) = @_;
+  my( $str ) = @_;
 
-  #print ("date: $timestamp\n");
+  my( $date, $time ) = split( 'T', $str );
 
-  if( $timestamp ){
-    # 2011-11-12T20:15:00+01:00
-    my ($year, $month, $day, $hour, $minute, $second, $offset) = ($timestamp =~ m/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})([+-]\d{2}:\d{2}|)$/);
-    if( !defined( $year )|| !defined( $hour ) ){
-      w( "could not parse timestamp: $timestamp" );
-    }
-    if( $offset ){
-      $offset =~ s|:||;
-    } else {
-      $offset = 'Europe/Berlin';
-    }
-    my $dt = DateTime->new (
-      year      => $year,
-      month     => $month,
-      day       => $day,
-      hour      => $hour,
-      minute    => $minute,
-      second    => $second,
-      time_zone => $offset
-    );
-    $dt->set_time_zone( 'UTC' );
+  my( $year, $month, $day ) = split( '-', $date );
 
-    return( $dt );
+  # Remove the dot and everything after it.
+  $time =~ s/\..*$//;
 
-  } else {
-    return undef;
-  }
+  my( $hour, $minute, $second ) = split( ":", $time );
+
+  my $dt = DateTime->new( year   => $year,
+                          month  => $month,
+                          day    => $day,
+                          hour   => $hour,
+                          minute => $minute,
+                          time_zone => 'Europe/Berlin',
+                          );
+
+  $dt->set_time_zone( "UTC" );
+
+  return $dt;
 }
 
 # call with sce, target field, sendung element, xpath expression
