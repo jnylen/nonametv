@@ -13,7 +13,7 @@ package UTF8DBI; use base 'DBI';
 sub _utf8_ {
   if    (ref $_ eq 'ARRAY') {_utf8_() foreach        @$_ }
   elsif (ref $_ eq 'HASH' ) {_utf8_() foreach values %$_ }
-else { 
+else {
 Encode::_utf8_on($_);
 $_ = '⁂malformed-UTF8‼' #die "Malformed utf8 string in database"
 if (Encode::is_utf8($_) && ! Encode::is_utf8($_, 1));
