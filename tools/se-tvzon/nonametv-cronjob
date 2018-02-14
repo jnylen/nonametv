@@ -40,15 +40,6 @@ then
   exit
 fi
 
-if [ $1x = --svtx ]
-then
-  # Run SkyDE specific commands
-  perl -I lib tools/se-tvzon/nonametv-filestore-svt
-  perl -I lib tools/nonametv-import Svt $Q
-
-  exit
-fi
-
 if [ $1x = --dailyx ]
 then
   # Run daily commands
@@ -83,6 +74,8 @@ $d perl -I lib tools/nonametv-update-tvdb nl
 $d perl -I lib tools/nonametv-update-tvdb fr
 
 # Import files sent through ftp
+$h tools/se-tvzon/nonametv-filestore-svt $Q
+$h tools/se-tvzon/nonametv-filestore-prosieben $Q
 $d tools/se-tvzon/nonametv-filestore-svt $Q
 $d tools/se-tvzon/nonametv-filestore-venetsia $Q
 $d tools/se-tvzon/nonametv-filestore-prosieben $Q
@@ -103,6 +96,8 @@ $d tools/se-tvzon/nonametv-import-allhttp $Q
 $d tools/nonametv-import Discovery_xml $Q
 $d tools/se-tvzon/nonametv-import-allmail $Q
 
+$h tools/nonametv-import Svt $Q --short-grab
+$h tools/nonametv-import ProSieben $Q --short-grab
 $h tools/se-tvzon/nonametv-import-allhttp $Q --short-grab
 
 # Remove old
