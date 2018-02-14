@@ -30,9 +30,9 @@ rsync -c --delete -r /content/headers/displayfile.html $NROOT/full/xmltv/display
 rsync -c --delete -r /content/headers/listing.xsl $NROOT/full/xmltv/listing.xsl
 
 # upload
-rsync -c --delete -r $NROOT/full/xmltv/ /var/www/xmltv/
-rsync -c --delete -r $NROOT/full/json_extra/ /var/www/json_extra/
-rsync -c --delete -r $NROOT/full/json/ /var/www/json/
+#rsync -c --delete -r $NROOT/full/xmltv/ /var/www/xmltv/
+#rsync -c --delete -r $NROOT/full/json_extra/ /var/www/json_extra/
+#rsync -c --delete -r $NROOT/full/json/ /var/www/json/
 
 $V && echo "honeybee"
 
