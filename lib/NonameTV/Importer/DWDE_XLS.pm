@@ -151,9 +151,9 @@ sub ImportXLS {
   }else {
     $coldate  = 0;
     $coltime  = 1;
-    $coltitle = 2;
-    $colgenre = 3;
-    $coldesc  = 4;
+    $coltitle = 3;
+    $colgenre = 6;
+    $coldesc  = 5;
   }
 
 
@@ -187,7 +187,7 @@ sub ImportXLS {
       $oWkC = $oWkS->{Cells}[$iR][$coldate];
       next if( ! $oWkC );
 
-      $date = ParseDate( $oWkC->Value );
+      $date = ParseDate( ExcelFmt('yyyy-mm-dd', $oWkC->Value ) );
       next if( ! $date );
 
       if( $date ne $currdate ){
@@ -260,12 +260,14 @@ sub ParseDate
 {
   my ( $dinfo ) = @_;
 
-  #print Dumper($dinfo);
+  print Dumper($dinfo);
 
   my( $month, $day, $year );
 #      progress("Mdatum $dinfo");
   if( $dinfo =~ /^\d{4}-\d{2}-\d{2}$/ ){ # format   '2010-04-22'
     ( $year, $month, $day ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
+  } elsif( $dinfo =~ /^\d{1,2}\/\d{1,2}\/\d{4}$/ ){ # format '10-18-11' or '1-9-11'
+    ( $day, $month, $year ) = ( $dinfo =~ /^(\d+)\/(\d+)\/(\d+)$/ );
   } elsif( $dinfo =~ /^\d{2}.\d{2}.\d{4}$/ ){ # format '11/18/2011'
     ( $month, $day, $year ) = ( $dinfo =~ /^(\d+).(\d+).(\d+)$/ );
   } elsif( $dinfo =~ /^\d{1,2}-\d{1,2}-\d{2}$/ ){ # format '10-18-11' or '1-9-11'
