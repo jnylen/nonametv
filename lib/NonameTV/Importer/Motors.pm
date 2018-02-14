@@ -27,7 +27,7 @@ use Text::Capitalize qw/capitalize_title/;
 use Text::Iconv;
 my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
 
-use NonameTV qw/norm AddCategory MonthNumber/;
+use NonameTV qw/norm normUtf8 AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 
@@ -215,12 +215,15 @@ sub ParseDate {
     my( $dayname, $day, $monthname, $year ) = ( $text =~ /(\S+)\s+(\d\d)\s(\S+)\s+(\d\d\d\d)/ );
 #print "$dayname\n";
 #print "$day\n";
+#    $monthname =~ s/É/e/i;
+#    $monthname =~ s/É/e/i;
 #print "$monthname\n";
+#print ">". normUtf8($monthname) ."<\n";
 #print "$year\n";
 
     $year += 2000 if $year lt 100;
 
-    my $month = MonthNumber( $monthname, 'fr' );
+    my $month = MonthNumber( normUtf8($monthname), 'fr' );
 #print "$month\n";
 
     my $date = sprintf( "%04d-%02d-%02d", $year, $month, $day );
