@@ -17,10 +17,10 @@ use utf8;
 use DateTime;
 use Spreadsheet::ParseExcel;
 use Spreadsheet::Read;
+use Try::Tiny;
 
 use Spreadsheet::XLSX;
 use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
-use Spreadsheet::Read;
 
 use Text::Iconv;
 my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
@@ -106,7 +106,7 @@ sub ImportXLS {
   my $coltime = 1;
   my $coltitle = 4;
   my $colepisode = 5;
-  my $coldesc = 6;
+  my $coldesc = 7;
 
 my $oBook;
 
@@ -124,8 +124,8 @@ else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
 
 	my $foundcolumns = 0;
     # browse through rows
-    my $i = 0;
-    for(my $iR = $oWkS->{MinRow} ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+    my $i = 1;
+    for(my $iR = 1 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
     $i++;
 
       my $oWkC;
@@ -134,10 +134,16 @@ else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
       $oWkC = $oWkS->{Cells}[$iR][$coldate];
       next if( ! $oWkC );
 
-      $date = ParseDate( $oWkC->Value );
-      next if( ! $date );
+      try {
+        $date = ParseDate( $oWkC->Value );
+        next if( ! $date );
+      }
+      catch {
+        print("error: $_");
+        next;
+      };
 
-      if( $date ne $currdate ){
+      if( defined($date) and $date ne $currdate ){
 
         progress("Ginx: Date is $date");
 
@@ -149,6 +155,8 @@ else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
         $dsh->StartBatch( $batch_id , $channel_id );
         $dsh->StartDate( $date , "00:00" );
         $currdate = $date;
+      } elsif(!defined($date)) {
+        next;
       }
 
       # time
@@ -222,9 +230,7 @@ sub ParseDate
 
   $dinfo = ExcelFmt('yyyy-mm-dd', $dinfo);
 
-  my( $day, $monthname, $year );
-
-#print ">$dinfo<\n";
+  my( $day, $monthname, $month, $year );
 
   # format '033 03 Jul 2008'
   if( $dinfo =~ /^\d+\s+\d+\s+\S+\s+\d+$/ ){
@@ -244,6 +250,9 @@ sub ParseDate
   } elsif( $dinfo =~ /^\d+-\d+-\d+$/ ) { # format '2011-07-01'
     ( $year, $monthname, $day ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
     $year += 2000 if $year lt 100;
+  } elsif( $dinfo =~ /^\d+\/\d+\/\d+$/ ) { # format '2011-07-01'
+    ( $day, $monthname, $year ) = ( $dinfo =~ /^(\d+)\/(\d+)\/(\d+)$/ );
+    $year += 2000 if $year lt 100;
   }
 
   else {
@@ -254,7 +263,13 @@ sub ParseDate
 
   $year+= 2000 if $year< 100;
 
-  my $mon = MonthNumber( $monthname, "en" );
+  my ($mon);
+  #if(!defined($month)) {
+    $mon = MonthNumber( $monthname, "en" );
+  #} else {
+  #  $mon = $month;
+    $mon+=0; 
+  #}
 
   my $dt = DateTime->new( year   => $year,
                           month  => $mon,
