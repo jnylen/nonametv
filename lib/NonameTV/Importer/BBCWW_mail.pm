@@ -75,8 +75,10 @@ sub ImportXLS
 
   # Depending on what timezone
   my $dsh = undef;
-  if($chd->{grabber_info} ne "") {
-    $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "UTC" );
+  if($chd->{grabber_info} eq "Finland") {
+    $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "EET" );
+  } elsif($chd->{grabber_info} ne "") {
+    $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Stockholm" );
   } else {
     $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
   }
@@ -93,22 +95,14 @@ sub ImportXLS
   # main loop
   #for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
   foreach my $oWkS (@{$oBook->{Worksheet}}) {
+    my $grabberino = $chd->{grabber_info};
 
     # worksheets
-    if($chd->{grabber_info} eq "English") {
-        my $grabberino = $chd->{grabber_info};
-        # main worksheet is "$grabberino"
-        if( $oWkS->{Name} !~ /$grabberino/ or $oWkS->{Name} = ~ /Hungary/ ){
-              progress( "BBCWW: $chd->{xmltvid}: Skipping worksheet: $oWkS->{Name}" );
-              next;
-        }
-    } else {
-        # main worksheet is "Schedule" if thats not the right one, jump to "Hungary"
-        if( $oWkS->{Name} !~ /Schedule/ and $oWkS->{Name} !~ /Hungary/ and $oWkS->{Name} !~ /English/ ){
-              progress( "BBCWW: $chd->{xmltvid}: Skipping worksheet: $oWkS->{Name}" );
-              next;
-        }
-    }
+    # main worksheet is "Schedule" if thats not the right one, jump to "Hungary"
+    if( $oWkS->{Name} !~ /$grabberino/ ){ #$oWkS->{Name} !~ /English/
+      progress( "BBCWW: $chd->{xmltvid}: Skipping worksheet: $oWkS->{Name}" );
+      next;
+     }
 
     #my $oWkS = $oBook->{Worksheet}[$iSheet];
     progress( "BBCWW: $chd->{xmltvid}: Processing worksheet: $oWkS->{Name}" );
@@ -165,19 +159,21 @@ sub ImportXLS
       			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis \(Swedish\)/ );
       			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(Swedish\)/ );
       			}elsif($chd->{sched_lang} eq "no") {
-                      $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Norwegian\)/ );
+                $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Norwegian\)/ );
       			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis \(Norwegian\)/ );
       			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(Norwegian\)/ );
       			}elsif($chd->{sched_lang} eq "da") {
-                      $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Danish\)/ );
+                $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Danish\)/ );
       			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis \(Danish\)/ );
       			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(Danish\)/ );
       			}elsif($chd->{sched_lang} eq "fi") {
-                      $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Finnish\)/ );
+                $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme \(Finnish\)/ );
       			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis \(Finnish\)/ );
       			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Name \(Finnish\)/ );
+                $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ and $oWkS->{Cells}[$iR][$iC]->Value =~ /EET/ );
+                $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time/ and $oWkS->{Cells}[$iR][$iC]->Value =~ /EET/ );
       			}elsif($chd->{sched_lang} eq "en") {
-                      $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Programme Title$/ );
+                $columns{'Title'}         = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Programme Title$/ );
       			    $columns{'Synopsis'}      = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /English Synopsis/ );
       			    $columns{'Episode Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Episode Title$/ );
       			}elsif($chd->{sched_lang} eq "nl") {
