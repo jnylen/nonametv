@@ -73,7 +73,6 @@ my @folders = qw(NonameTV-Data.GlobalListings
 		 NonameTV-Data.Playboy
 		 NonameTV-Data.Hustler
 		 NonameTV-Data.YaS
-		 NonameTV-Data.ATV
      NonameTV-Data.Fatstone
      NonameTV-Data.Disney
      NonameTV-Data.Uptown
@@ -109,7 +108,7 @@ foreach my $dir (@folders) {
     }
 
     # Flag for delete
-    if($message->label( 'flagged' )) {
+    if($message->label( 'flagged' ) and $dir !~ /Uptown/i) {
       next; # Skip
     }
     #next unless $message->isMultipart;
@@ -364,7 +363,7 @@ sub guess_channel
      }
 
      # XLS XLSX
-     if($filename =~ /\.(xls|xlsx)$/i and $filename =~ /Kanal 10 Norge/i) {
+     if($filename =~ /\.(xls|xlsx)$/i and $filename =~ /(Kanal 10 Norge|K10 Norge)/i) {
         return "kanal10.no";
      }
 
@@ -444,11 +443,6 @@ sub guess_channel
     return "oppnakanalengoteborg.se";
  }
 
- if ( $dir =~ /ATV/ and $filename =~ /\.xml$/i ) {
-    return "atv.at" if $filename =~ /^ATV/i and $filename !~ /^ATV2/i;
-    return "atv2.at" if $filename =~ /^ATV2/i;
- }
-
  if( $dir =~ /Uptown/ and $filename =~ /\.xls$/i ) {
      return "classic.uptown.dk" if $filename =~ /classic/i;
  }
@@ -494,6 +488,11 @@ sub guess_channel
    return "domatv.hr" if $filename =~ /doma/i;
    return "mojamini.tv" if $filename =~ /mini/i;
    return "novatv.hr";
+ }
+
+ # Not added
+ if($filename =~ /\.(xml|xls|xlsx|txt|doc|rtf|docx)/i) {
+  print("Not added: dir: $dir -> from: $from -> subject: $subject -> file: $filename\n");
  }
 
  return undef;
