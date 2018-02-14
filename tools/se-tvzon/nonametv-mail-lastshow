@@ -1,2 +1,2 @@
 #!/bin/sh
-tools/nonametv-lastshow --warndays 10 --all --verbose | mail -s "Channels with no data or < 10 days last show" me@jnylen.nu
+tools/nonametv-lastshow --warndays 10 --all --verbose | mutt -s "Channels with no data or < 10 days last show" me@jnylen.nu
