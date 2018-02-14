@@ -289,6 +289,7 @@ sub Object2Url {
   my( $batch_id, $data ) = @_;
 
   my $url = $self->{UrlRoot} . "\?$data->{grabber_info}";
+  print("Fetching: $url\n");
 
   return( $url, undef );
 }

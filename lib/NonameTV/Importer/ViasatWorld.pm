@@ -57,6 +57,7 @@ sub Object2Url {
   my( $directory, $name ) = split( /:/, $chd->{grabber_info} );
 
   my $url = $self->{UrlRoot} . $directory . $year . '-' . $month.'-'. $name .'-' . $self->{Timezone} . '.xml';
+  print("url: $url\n");
 
   return( $url, undef );
 }

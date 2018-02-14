@@ -263,7 +263,7 @@ sub ImportExcel
       my $title = $ref->[1]{$field2};
       next if( ! $title );
       $title =~ s/S(\d+)$//;
-      $title = FixSubtitle(norm($title));
+      $title = FixSubtitle(normUtf8($title));
 
       $oWkC = $oWkS->{Cells}[$iR][$columns{'ORGTitle'}];
       my $title_org = norm($oWkC->Value) if( $oWkC );
@@ -271,7 +271,7 @@ sub ImportExcel
       my $ce = {
         channel_id => $channel_id,
         start_time => $time,
-        title => norm($title),
+        title => $title,
       };
 
       ## Episode
