@@ -19,7 +19,7 @@ use Spreadsheet::ParseExcel;
 use Spreadsheet::Read;
 
 use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
+use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel int2col);
 use Spreadsheet::Read;
 
 use Text::Iconv;
@@ -101,42 +101,59 @@ sub ImportXLS {
   # Only process .xls or .xlsx files.
   progress( "GOD_Channel: $xmltvid: Processing $file" );
 
-	my %columns = ();
-  my $date;
+  my $oBook;
   my $currdate = "x";
-  my $coldate = 0;
-  my $coltime = 1;
-  my $coltitle = 2;
-  my $coldesc = 4;
 
-my $oBook;
-
-if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
-else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }   #  staro, za .xls
-#elsif ( $file =~ /\.xml$/i ){ $oBook = Spreadsheet::ParseExcel::Workbook->Parse($file); progress( "using .xml" );    }   #  staro, za .xls
-#print Dumper($oBook);
-my $ref = ReadData ($file);
+  if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
+  else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }   #  staro, za .xls
+  #elsif ( $file =~ /\.xml$/i ){ $oBook = Spreadsheet::ParseExcel::Workbook->Parse($file); progress( "using .xml" );    }   #  staro, za .xls
+  #print Dumper($oBook);
+  my $ref = ReadData ($file);
+  my %columns = ();
 
   # main loop
   for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
     my $oWkS = $oBook->{Worksheet}[$iSheet];
-    next if $oWkS->{Name} ne "GMT" and $oWkS->{Name} ne "CET";
+    #next if $oWkS->{Name} ne "GMT" and $oWkS->{Name} ne "CET";
 
     progress( "GOD_Channel: Processing worksheet: $oWkS->{Name}" );
 
 	  my $foundcolumns = 0;
     # browse through rows
     my $i = 0;
-    for(my $iR = 7 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
-    $i++;
+    for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+      $i++;
+
+      if( not %columns ){
+        # the column names are stored in the first row
+        # so read them and store their column positions
+        # for further findvalue() calls
+
+        for(my $iC = $oWkS->{MinCol} ; defined $oWkS->{MaxCol} && $iC <= $oWkS->{MaxCol} ; $iC++) {
+          if( $oWkS->{Cells}[$iR][$iC] ){
+      			$columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/i );
+            $columns{'Start'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Start time/i );
+            $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programme Title/i );
+            $columns{'Description'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis/i );
+            $columns{'Season'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Season number/i );
+            $columns{'Episode'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /(Episodenumber|Episode number)/i );
+
+
+            $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/i ); # Only import if season number is found
+          }
+        }
+        %columns = () if( $foundcolumns eq 0 );
+
+        next;
+      }
 
       my $oWkC;
 
       # date
-      $oWkC = $oWkS->{Cells}[$iR][$coldate];
+      $oWkC = $oWkS->{Cells}[$iR][$columns{'Date'}];
       next if( ! $oWkC );
 
-	    $date = $oWkC->{Val} if( $oWkC->Value );
+	    my $date = $oWkC->{Val} if( $oWkC->Value );
       $date = ParseDate( ExcelFmt('yyyy-mm-dd', $date) );
       next if( ! $date );
 
@@ -155,21 +172,12 @@ my $ref = ReadData ($file);
       }
 
       # time
-      my $field2 = "B".$i;
-      my $time = $ref->[1]{$field2};
-      $time =~ s/\./:/;
-      print Dumper($time);
-      my ( $hour, $min ) = ( $time =~ /^(\d+):(\d\d)/ );
-      $hour = $hour-24 if($hour >= 24);
-
-
-      # Strpad
-      $time = sprintf( "%02d:%02d", $hour, $min );
-
-
+      $oWkC = $oWkS->{Cells}[$iR][$columns{'Start'}];
+      my $time = ExcelFmt('hh:mm', $oWkC->{Val}) if( $oWkC->Value );
+      $time = "00:00" if(!defined($time));
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][$coltitle];
+      $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
       next if( ! $oWkC );
       my $title = $oWkC->Value if( $oWkC->Value );
       $title =~ s/&amp;/&/g;
@@ -201,12 +209,12 @@ my $ref = ReadData ($file);
     }
 
       # Desc (only works on XLS files)
-      	my $field = "E".$i;
-      	my $desc = $ref->[1]{$field};
-      	$ce->{description} = normUtf8($desc) if( $desc and $desc ne "WITHOUT SYNOPSIS" );
-      	$desc = '';
+      my $field = int2col($columns{'Description'}).$i;
+    	my $desc = $ref->[1]{$field};
+    	$ce->{description} = normUtf8($desc) if( $desc and $desc ne "WITHOUT SYNOPSIS" );
+    	$desc = '';
 
-	  progress("GOD_Channel: $time - $title") if $title;
+	    progress("GOD_Channel: $time - $title") if $title;
       $dsh->AddProgramme( $ce ) if $title;
     }
 
@@ -235,8 +243,9 @@ sub ParseDate
 {
   my ( $dinfo ) = @_;
 
+  #print Dumper($dinfo);
+
   my( $month, $day, $year, $monthname );
-      progress("Mdatum $dinfo");
   if( $dinfo =~ /^\d{4}-\d{2}-\d{2}$/ ){ # format   '2010-04-22'
     ( $year, $month, $day ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
   } elsif( $dinfo =~ /^\d{2}.\d{2}.\d{4}$/ ){ # format '11/18/2011'
