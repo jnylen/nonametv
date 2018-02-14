@@ -29,38 +29,22 @@ my $conf = ReadConfig();
 my $ds = NonameTV::DataStore->new( $conf->{DataStore} );
 my $filestore = $conf->{FileStore};
 
-# Channels
-my %channel_data;
-$channel_data{ "24" } = "svt24.svt.se";
-$channel_data{ "SVT1" } = "svt1.svt.se";
-$channel_data{ "SVT2" } = "svt2.svt.se";
-$channel_data{ "SVTB" } = "svtb.svt.se";
-$channel_data{ "SVTE" } = "svtworld.svt.se";
-$channel_data{ "SVTK" } = "kunskapskanalen.svt.se";
-
-
-  # list files inside of the channel directory and check when they have been touched
+# list files inside of the channel directory and check when they have been touched
   opendir(DIR, "/content/ftp/svt/");
   foreach my $cff (readdir(DIR))
   {
     if($cff =~ /^\./) { next; }
     my $org_cff = $cff;
-    $cff =~ s/SVT_SCHEDULE_//g if $cff;
+    $cff =~ s/SVT_public_schedule_//g if $cff;
 
     my ( $id, $date, $enddate ) = split(/_/, $cff);
 
     my $cftype = join(',', File::Util->file_type( "/content/ftp/svt/$cff" ) );
     my $fsftype = join(',', File::Util->file_type( "/content/ftp/svt/$cff" ) );
 
-    if( not exists( $channel_data{$id} ) )
-    {
-        print "Files with name $id hasnt been specified as a channel.\n";
-        #unlink "/content/ftp/svt/$org_cff";
-    } else {
-      make_path(dirname("$filestore/$channel_data{$id}/$org_cff"));
-      move( "/content/ftp/svt/$org_cff", "$filestore/$channel_data{$id}/$org_cff" );
-      print "$cff moved to $channel_data{$id}\n";
-    }
+    make_path(dirname("$filestore/svt1.svt.se/$org_cff"));
+    move( "/content/ftp/svt/$org_cff", "$filestore/svt1.svt.se/$org_cff" );
+    print "$cff moved to svt1.svt.se\n";
 
   }
 
