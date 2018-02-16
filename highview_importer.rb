@@ -4,6 +4,7 @@ require 'pathname'
 require 'fileutils'
 require 'nokogiri'
 require 'dotenv'
+require 'logger'
 
 # Load dotenv
 Dotenv.load
@@ -11,8 +12,11 @@ Dotenv.load
 a = Mechanize.new { |agent|
   # Sky refreshes after login
   agent.follow_meta_refresh = true
-  agent.user_agent_alias = (Mechanize::AGENT_ALIASES.keys - ['Mechanize']).sample
+  agent.user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36"
 }
+
+a.log = Logger.new $stderr
+a.agent.http.debug_output = $stderr
 
 puts "Fetching login page..."
 a.get('http://www.highview.com/presse/login/login/nc.html') do |home_page|
