@@ -42,7 +42,7 @@ a.get('http://info.sky.de/inhalt/de/programm_info_presseexport_start.jsp') do |h
 
     xml_files.each do |link|
       # Download files to the folder
-      file_name = Pathname.new(link.href).basename.to_s.gsub(/\.gz$/, ".xml").gsub(/(\d\d)(\d\d)_(\d\d)(\d\d)(\d\d)_xml/, "").gsub(/(\d\d)(\d\d)_xml/, "")
+      file_name = Pathname.new(link.href).basename.to_s.gsub(/\.gz$/, ".xml").gsub(/(\d\d)(\d\d)_(\d\d)(\d\d)(\d\d)_xml/, "").gsub(/(\d\d)(\d\d)_xml/, "").gsub("2017", "2018")
 
       # If it exists, check if it differs otherwise just add it already
       if File.exist?('/content/skyde/' + file_name)
@@ -89,7 +89,7 @@ Dir.foreach('/content/skyde') do |item|
     week, year = result.captures
 
     if (week.to_i < (cur_week-1)) or (year.to_i < cur_year-1)
-      FileUtils.rm('/content/skyde/' + item)
+      #FileUtils.rm('/content/skyde/' + item)
       puts "Removed #{item}"
     end
   end
