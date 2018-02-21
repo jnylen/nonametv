@@ -248,14 +248,6 @@ sub ImportContent
       $ce->{program_type} = 'series';
     }
 
-    # replay
-    if(defined($rerun) and norm($rerun) eq "true") {
-      $ce->{new} = "0";
-      push @{$extra->{qualifiers}}, "repeat";
-    } else {
-      $ce->{new} = "1";
-    }
-
     $ce->{extra} = $extra;
 
     $ce->{subtitle} = undef;

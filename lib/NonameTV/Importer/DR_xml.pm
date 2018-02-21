@@ -183,15 +183,6 @@ sub ImportContent {
     } else {
       $ce->{live} = "0";
     }
-
-    my $rerun = $b->findvalue( 'pro_publish[1]/ppu_isrerun' );
-    if( $rerun eq "TRUE" ) {
-      $ce->{rerun} = "1";
-      push @{$extra->{qualifiers}}, "rerun";
-    } else {
-      $ce->{rerun} = "0";
-    }
-
     my $subtitled = $b->findvalue( 'pro_publish[1]/ppu_subtext_type' );
     if( $subtitled eq "TTV" ) {
       push @{$extra->{qualifiers}}, "CC";

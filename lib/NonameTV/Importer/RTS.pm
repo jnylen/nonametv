@@ -150,13 +150,6 @@ sub ImportContent
       $ce->{live} = 0;
     }
 
-    if( defined($rerun) and $rerun eq "true" ) {
-      $ce->{new} = 0;
-      push @{$extra->{qualifiers}}, "repeat";
-    } else {
-      $ce->{new} = 1;
-    }
-
 
 
     # Credits

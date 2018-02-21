@@ -262,16 +262,6 @@ sub ImportXML
         $ce->{production_date} = "$1-01-01";
     }
 
-    # Find rerun-info
-	  if( $rerun eq "ja" )
-	  {
-	    $ce->{new} = "0";
-	  }
-	  else
-	  {
-	    $ce->{new} = "1";
-	  }
-
     # Add programme
     $ds->AddProgrammeRaw( $ce );
     progress( "DreiPlus: $chd->{xmltvid}: $ce->{start_time} - $stitle" );

@@ -128,15 +128,6 @@ sub ImportContent {
       push @{$extra->{qualifiers}}, "SD";
     }
 
-    # replay
-    if(defined($rerun) and norm($rerun) eq "No") {
-      $ce->{new} = "1";
-      push @{$extra->{qualifiers}}, "new";
-    } elsif(defined($rerun) and norm($rerun) eq "Yes") {
-      $ce->{new} = "0";
-      push @{$extra->{qualifiers}}, "rerun";
-    }
-
     # Find live-info
   	if( $live eq "Yes" )
   	{

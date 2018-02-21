@@ -377,12 +377,6 @@ sub ImportContent {
 
     $ce->{quality} = "HDTV" if $hd eq "yes";
 
-    if($rerun eq "yes" or $rerun eq "1") {
-      $ce->{new} = "0";
-    } else {
-      $ce->{new} = "1";
-    }
-
     $dsh->AddProgramme( $ce );
   }
 

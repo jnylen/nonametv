@@ -148,14 +148,6 @@ sub ImportContent {
       push @{$extra->{images}}, { url => $image, source => "Arirang" };
     }
 
-    if(defined($first_run) and $first_run eq 1) {
-      $ce->{new} = 1;
-    } else {
-      $ce->{new} = 0;
-      push @{$extra->{qualifiers}}, "rerun";
-    }
-
-
     $ce->{extra} = $extra;
 
     p( "Arirang: $chd->{xmltvid}: $ce->{start_time} - $title" );

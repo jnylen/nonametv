@@ -164,14 +164,6 @@ sub ImportContent( $$$ ) {
 	{
 		$ce->{live} = "0";
 	}
-	if( $repeat eq "1" )
-	{
-		$ce->{rerun} = "1";
-	}
-	else
-	{
-		$ce->{rerun} = "0";
-	}
 
     progress("MTVNN: $chd->{xmltvid}: ".$start->ymd("-") . " " . $start->hms(":")." - $title");
 

@@ -348,15 +348,6 @@ sub ImportContent
       delete($ce->{episode}) if defined($ce->{episode});
     }
 
-    # replay
-    if(defined($rerun) and norm($rerun) eq "false") {
-      $ce->{new} = "1";
-      push @{$extra->{qualifiers}}, "new";
-    } else {
-      $ce->{new} = "0";
-      push @{$extra->{qualifiers}}, "rerun";
-    }
-
     $ce->{extra} = $extra;
 
     progress($date." ".$starttime." - ".$ce->{title});

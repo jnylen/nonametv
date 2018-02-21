@@ -239,14 +239,6 @@ sub ImportContent {
             }
         }
 
-        # Rerun?
-        if(defined($rerun) and norm($rerun) eq "(R)") {
-          $ce->{new} = "0";
-        } else {
-          $ce->{new} = "1";
-        }
-
-
         progress("$start - $end : $ce->{title}");
 
         $dsh->AddProgramme( $ce );

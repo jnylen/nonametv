@@ -315,14 +315,6 @@ sub ImportContent
           $ce->{program_type} = 'movie';
       }
 
-      # replay
-      if(defined($rerun) and norm($rerun) eq "true") {
-        $ce->{new} = "0";
-      } else {
-        $ce->{new} = "1";
-      }
-
-
       $dsh->AddProgramme( $ce );
     }
   }

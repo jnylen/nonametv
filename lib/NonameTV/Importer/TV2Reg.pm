@@ -158,14 +158,6 @@ sub ImportContent
       $ce->{live} = "0";
     }
 
-    if($rerun eq "true") {
-      $ce->{new} = "0";
-      push @{$extra->{qualifiers}}, "rerun";
-    } elsif($live ne "true") {
-      $ce->{new} = "1";
-      push @{$extra->{qualifiers}}, "new";
-    }
-
     if($catchup eq "true") {
       push @{$extra->{qualifiers}}, "catchup";
     }

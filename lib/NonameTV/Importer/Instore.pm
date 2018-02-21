@@ -244,17 +244,6 @@ sub ImportContent
         push @{$extra->{images}}, { url => $image, source => "OUTTV" };
     }
 
-    # Find rerun-info
-	  if( !defined($rerun) or $rerun eq "" )
-	  {
-	    $ce->{new} = "1";
-	  }
-	  else
-	  {
-      push @{$extra->{qualifiers}}, "repeat";
-	    $ce->{new} = "0";
-	  }
-
     $ce->{extra} = $extra;
 
 	  # Add Programme

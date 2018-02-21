@@ -183,17 +183,6 @@ sub ImportContent {
      	 	$ce->{quality} = "HDTV";
   	}
 
-    # Rerun?
-    my $rerun = $b->findvalue( 'pro_publish[1]/ppu_isrerun' );
-  	if( $rerun eq "TRUE" )
-  	{
-  		$ce->{new} = "0";
-  	}
-  	else
-  	{
-  		$ce->{new} = "1";
-  	}
-
     # Prod year
     $ce->{production_date} = "$year-01-01" if $year ne "";
 

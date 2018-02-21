@@ -275,15 +275,6 @@ sub ImportContent
         push @{$extra->{images}}, { url => $ic->findvalue( 'url' ), title => $ic->findvalue( 'caption' ), copyright => $ic->findvalue( 'byline' ), source => "TV2 Denmark" };
     }
 
-    ## New?
-    my $new = $pgm->findvalue( 'new' );
-    if($new eq "1") {
-      $ce->{new} = 1;
-    } else {
-      $ce->{new} = 0;
-      push @{$extra->{qualifiers}}, "repeat";
-    }
-
     $ce->{extra} = $extra;
 
     # End of transmission

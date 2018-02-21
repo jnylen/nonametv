@@ -151,7 +151,7 @@ sub ImportXML
       numberOfEpisodes  => norm($ci->findvalue( 'v41:numberOfEpisodes' )),
       productionYear    => norm($ci->findvalue( 'v41:productionYear' )),
       countryOfOrigin   => join("||", ParseIt($ci, 'v41:countryOfOriginList/v41:country')),
-      title             => norm($ci->findvalue( 'v41:titleList/v41:title[@type="content"]' )),
+      title             => norm($ci->findvalue( 'v41:titleList/v41:title[@type="season"]' )),
       description_med   => norm($ci->findvalue( 'v41:descriptionList/v41:description[@length="medium"]' )),
       keywords          => join("||", ParseIt($ci, 'v41:categoryList/v41:category/v41:treeNode')),
     };
@@ -438,13 +438,6 @@ sub ImportXML
         $ce->{live} = "1";
     } else {
         $ce->{live} = "0";
-    }
-
-    # Rerun?
-    if($is_rerun eq "true") {
-        $ce->{new} = "0";
-    } else {
-        $ce->{new} = "1";
     }
 
     # Keywords / Genres

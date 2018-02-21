@@ -239,15 +239,6 @@ sub ImportContent
       AddCategory( $ce, $program_type, $category );
     }
 
-    # Rerun?
-    if($rerun eq "true") {
-      $ce->{new} = "0";
-      push @{$extra->{qualifiers}}, "repeat";
-    } else {
-      $ce->{new} = "1";
-      push @{$extra->{qualifiers}}, "new";
-    }
-
     # Live?
     if($live eq "true") {
       $ce->{live} = "1";

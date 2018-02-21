@@ -246,19 +246,7 @@ sub ImportContent {
         $ce->{aspect} = "4:3";
         #push @{$extra->{qualifiers}}, "smallscreen";
       }
-
-      # Find rerun-info
-      if( $rerun eq "TRUE" )
-      {
-        $ce->{new} = "0";
-        push @{$extra->{qualifiers}}, "repeat";
-      }
-      else
-      {
-        $ce->{new} = "1";
-        push @{$extra->{qualifiers}}, "new";
-      }
-
+      
       # Find live-info
       if( $live eq "TRUE" or $lead eq "LIVE" or $lead eq "LIVE:" )
       {

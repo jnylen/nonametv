@@ -36,6 +36,10 @@ sub new {
   $self->{datastorehelper} = $dsh;
 
   $self->{datastore}->{SILENCE_END_START_OVERLAP} = 1;
+
+  # use augment
+  $self->{datastore}->{augment} = 1;
+
   return $self;
 }
 

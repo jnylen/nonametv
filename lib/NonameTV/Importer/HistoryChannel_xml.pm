@@ -177,16 +177,6 @@ sub ImportXML
       $ce->{original_title}    = norm($title_org) if defined $title_org and norm($title_org) ne $ce->{title} and $title_org ne "";
       $ce->{original_subtitle} = norm($subtitle_org) if defined $subtitle_org and norm($subtitle_org) ne $ce->{title} and norm($subtitle_org) ne norm($subtitle) and $subtitle_org ne "";
 
-      # Find rerun-info
-      if( $premiere eq "Yes" )
-      {
-        $ce->{new} = "1";
-      }
-      else
-      {
-        $ce->{new} = "0";
-      }
-
       progress( "HistoryXML: $chd->{xmltvid}: $start - $title" );
       $ds->AddProgramme( $ce );
 
