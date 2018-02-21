@@ -1098,7 +1098,7 @@ sub MonthNumber {
     @months_3 = qw/january february march april may june july august september october november december/;
     @months_4 = qw/Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/;
     @months_5 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
-    @months_6 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
+    @months_6 = qw/01 02 03 04 05 06 07 08 09 10 11 12/;
     @months_7 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_8 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
   } elsif( $lang =~ /^de$/ ){
@@ -1142,7 +1142,7 @@ sub MonthNumber {
     @months_2 = qw/JANVIER FÉVRIER mars avril mai juin juillet Août septembre octobre novembre DÉCEMBRE/;
     @months_3 = qw/janvier favrier mMARS AVRIL MAI JUIN juillet AOÛT septembre octobre novembre DÉCEMBRE/;
     @months_4 = qw/1 Février 3 4 5 6 7 8 9 10 11 décembre/;
-    @months_5 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
+    @months_5 = qw/1 fevrier 3 4 5 6 7 8 9 10 11 decembre/;
     @months_6 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_7 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_8 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
