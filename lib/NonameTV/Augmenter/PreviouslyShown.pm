@@ -37,9 +37,16 @@ sub AugmentProgram( $$$ ){
   	my( $self, $ceref, $ruleref ) = @_;
 
  	# empty hash to get all attributes to change
-  	my $resultref = {};
-  	# result string, empty/false for success, message/true for failure
-  	my $result = '';
+  my $resultref = {};
+
+  # result string, empty/false for success, message/true for failure
+  my $result = '';
+
+	# Check if it's a live programme or not, if it is don't match
+	if($ceref->{live} and ($ceref->{live} eq 1 or $ceref->{live} eq "1")) {
+		print("Live programme. Skipping.\n");
+		return( $resultref, $result );
+	}
   	
 	# So, we have a channelgroup which we want previously_shown for.
 	# It first checks so it got everything it needs, which is:
