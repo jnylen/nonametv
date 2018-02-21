@@ -440,7 +440,6 @@ sub guess_channel
     # Sony Entertainment TV, Gmbh.
     if($filename =~ /\.xml$/i or $filename =~ /\.xls$/i) {
         return "axntv.de" if $filename =~ /^AXN-/i;
-        return "animax.tv" if $filename =~ /^AAX-/i;
         return "sonyentertainment.tv" if $filename =~ /^SEN-/i;
     }
 

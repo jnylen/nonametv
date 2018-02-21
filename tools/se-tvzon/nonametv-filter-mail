@@ -37,6 +37,9 @@ foreach my $msg ($infolder->messages) {
   if( $fromaddr =~ /\@vimn.com/i ) {
     MoveMessage( $msg, "MTV" );
   }
+  elsif( $fromaddr =~ /\@vimnmix.com/i ) {
+    MoveMessage( $msg, "MTV" );
+  }
   elsif( $fromaddr =~ /\@disney.com/i ) {
     MoveMessage( $msg, "Disney" );
   }
