@@ -111,14 +111,7 @@ sub ImportContent
   $ds->{SILENCE_END_START_OVERLAP}=1;
   $ds->{SILENCE_DUPLICATE_SKIP}=1;
 
-  my $xml = XML::LibXML->new;
-  my $doc;
-  eval { $doc = $xml->parse_string($$cref); };
-  if( $@ ne "" )
-  {
-    f "Failed to parse $@";
-    return 0;
-  }
+  my $doc = ParseXml($cref);
 
   # Find all "Schedule"-entries.
   my $ns = $doc->find( "//Schedule" );
