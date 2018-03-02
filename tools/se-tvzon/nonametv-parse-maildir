@@ -59,7 +59,9 @@ EOHELP
 my $ds = CreateDataStore();
 
 my $root = "/content/maildir/.Projects/";
-my @folders = qw(NonameTV-Data.GlobalListings
+my @folders = qw(
+     NonameTV-Data.KinoPolska
+     NonameTV-Data.GlobalListings
 		 NonameTV-Data.France24
 		 NonameTV-Data.CNBC
 		 NonameTV-Data.FuelTV
@@ -76,7 +78,6 @@ my @folders = qw(NonameTV-Data.GlobalListings
      NonameTV-Data.Fatstone
      NonameTV-Data.Disney
      NonameTV-Data.Uptown
-     NonameTV-Data.KinoPolska
      NonameTV-Data.Trace
      NonameTV-Data.Nova
 		 );
@@ -267,9 +268,11 @@ sub guess_channel
     return "crimeandinvestigation.eu"  if $filename =~ /cai.eng/i and $filename =~ /\.txt$/i;
     return "crimeandinvestigation.eu"  if $filename =~ /ci europe english/i and $filename =~ /\.xml$/i;
     return "crimeandinvestigation.eu"  if $filename =~ /^crime-en/i and $filename =~ /\.xml$/i;
+    return "crimeandinvestigation.eu"  if $filename =~ /^crime/i and $filename =~ /investigation/i and $filename =~ /english/i and $filename =~ /\.xml$/i;
     return "crimeandinvestigation.pl"  if $filename =~ /cai.pol/i and $filename =~ /\.xml$/i;
     return "crimeandinvestigation.pl"  if $filename =~ /^crime-pl/i and $filename =~ /\.xml$/i;
     return "crimeandinvestigation.pl"  if $filename =~ /^crime/i and $filename =~ /investigation/i and $filename =~ /polsat/i and $filename =~ /\.xml$/i;
+    return "crimeandinvestigation.pl"  if $filename =~ /^crime/i and $filename =~ /investigation/i and $filename =~ /polish/i and $filename =~ /\.xml$/i;
 
 	  # Travel Channel
     return "travelchanneltv.se" if $filename =~ /^travel.eu.swe/i and $filename =~ /\.xls$/i;
@@ -308,13 +311,13 @@ sub guess_channel
     }
 
     # Benelux schedules for Universal
-    return "13thstreet.nl" if $filename =~ /^13\.Ben\.Dut/i;
-    return "en.13thstreet.nl" if $filename =~ /^13\.Ben\.Eng/i;
-    return "syfy.nl" if $filename =~ /^Syfy\.Ben\.Dut/i;
-    return "en.syfy.nl" if $filename =~ /^Syfy\.Ben\.Eng/i;
+    #return "13thstreet.nl" if $filename =~ /^13\.Ben\.Dut/i;
+    #return "en.13thstreet.nl" if $filename =~ /^13\.Ben\.Eng/i;
+    #return "syfy.nl" if $filename =~ /^Syfy\.Ben\.Dut/i;
+    #return "en.syfy.nl" if $filename =~ /^Syfy\.Ben\.Eng/i;
 
-    return "syfy.nl" if $filename =~ /^Syfy\s*Benelux/i and $filename =~ /DUT/;
-    return "en.syfy.nl" if $filename =~ /^Syfy\s*Benelux/i and $filename =~ /ENG/;
+    #return "syfy.nl" if $filename =~ /^Syfy\s*Benelux/i and $filename =~ /DUT/;
+    #return "en.syfy.nl" if $filename =~ /^Syfy\s*Benelux/i and $filename =~ /ENG/;
 
     # Sky News
     return "international.skynews.com" if $filename =~ /^SKYNI/i and $filename =~ /\.txt$/i;
@@ -328,8 +331,11 @@ sub guess_channel
     # Poland
     return "crimeandinvestigation.pl"   if $filename =~ /^CI\.Polsat/i and $filename =~ /\.xml$/i;
     return "h2.historytv.pl"            if ($filename =~ /^h2\s+europe\s+polish/i or $filename =~ /^h2\.eur\.pol/i or $filename =~ /^h2\.eu\.pol/i) and $filename =~ /\.xml$/i;
+    return "h2.historytv.pl"            if ($filename =~ /^h2/i and $filename =~ /polish/i) and $filename =~ /\.xml$/i;
     return "historytv.pl"               if ($filename =~ /^history\.pol/i or $filename =~ /^history\.eur\.pol/i or $filename =~ /^history\.eu\.pol/i) and $filename =~ /\.xml$/i;
+    return "historytv.pl"               if ($filename =~ /^history/i and $filename =~ /polish/i) and $filename =~ /\.xml$/i;
     return "lifetimetv.pl"              if ($filename =~ /^lifetime\s+poland/i or $filename =~ /^lifetime\.pol/i or $filename =~ /^life\.pol/i) and $filename =~ /\.xml$/i;
+    return "lifetimetv.pl"              if ($filename =~ /^lifetime/i and $subject =~ /poland/i) and $filename =~ /\.xml$/i;
     return "natgeo.pl"                  if $filename =~ /^NGpol/i and $filename =~ /\.doc$/i;
     return "wild.natgeo.pl"             if $filename =~ /^NGWPol/i and $filename =~ /\.doc$/i;
     return "wild.natgeo.pl"             if $filename =~ /^NGW\(CEE\)Pol/i and $filename =~ /\.doc$/i;
@@ -337,7 +343,7 @@ sub guess_channel
 
  }
 
- if( $dir =~ /Kanal10/ and ($filename =~ /\.doc$/i or $filename =~ /\.(xls|xlsx)$/i) and $from =~ /\@kanal10.se/i ) {
+ if( $dir =~ /Kanal10/ and ($filename =~ /\.doc$/i or $filename =~ /\.(xls|xlsx|ods)$/i) and $from =~ /\@kanal10.se/i ) {
      return "kanal10.se";
  }
 
@@ -447,23 +453,22 @@ sub guess_channel
      return "classic.uptown.dk" if $filename =~ /classic/i;
  }
 
- if ( $dir =~ /KinoPolska/ and $filename =~ /\.xlsx$/i ) {
+ if ( $dir =~ /KinoPolska/ and $filename =~ /\.(xlsx|xlsm)$/i ) {
     return "kinopolska.pl" if $filename =~ /Kino Polska/i and $filename !~ /International/i;
     return "kinopolska.pl" if $filename =~ /\s+KP\s+/i and $filename !~ /INT/i;
     return "int.kinopolska.pl" if $filename =~ /Kino Polska International/i;
     return "int.kinopolska.pl" if $filename =~ /KP INT/i;
-    return "int.kinopolska.pl" if $filename =~ /KP USA/i; # Looks like it changed name to KP USA
     return "kinopolskamuzyka.pl" if $filename =~ /KPM/i and $filename !~ /INT/i;
     return "int.kinopolskamuzyka.pl" if $filename =~ /KPM INT/i;
 
     # GMT+2
-    return "360tunebox.spi.pl" if $filename =~ /^360TuneBox/i and $filename =~ /UTC\+2/i;
-    return "docubox.spi.pl" if $filename =~ /^DocuBox/i and $filename =~ /UTC\+2/i;
-    return "erox.spi.pl" if $filename =~ /^Erox/i and $filename =~ /UTC\+2/i;
-    return "eroxxx.spi.pl" if $filename =~ /^Eroxxx/i and $filename =~ /UTC\+2/i;
-    return "fashionbox.spi.pl" if $filename =~ /^FashionBox/i and $filename =~ /UTC\+2/i;
-    return "fastandfun.spi.pl" if $filename =~ /^Fast&Fun/i and $filename =~ /UTC\+2/i;
-    return "fightbox.spi.pl" if $filename =~ /^FightBox/i and $filename =~ /UTC\+2/i;
+    return "360tunebox.spi.pl" if $filename =~ /^360TuneBox/i and $filename =~ /UTC\./i;
+    return "docubox.spi.pl" if $filename =~ /^DocuBox/i and $filename =~ /UTC\./i;
+    return "erox.spi.pl" if $filename =~ /^Erox/i and $filename =~ /UTC\./i;
+    return "eroxxx.spi.pl" if $filename =~ /^Eroxxx/i and $filename =~ /UTC\./i;
+    return "fashionbox.spi.pl" if $filename =~ /^FashionBox/i and $filename =~ /UTC\./i;
+    return "fastandfun.spi.pl" if $filename =~ /^Fast&Fun/i and $filename =~ /UTC\./i;
+    return "fightbox.spi.pl" if $filename =~ /^FightBox/i and $filename =~ /UTC\./i;
 
     # These ones are weird, different files each month
     return "filmboxbasic.spi.pl" if $filename =~ /^FilmBox_Basic/i and $filename =~ /HU/i;
@@ -472,7 +477,7 @@ sub guess_channel
     return "filmboxplus.spi.pl" if $filename =~ /^FilmBox_Plus/i and $filename =~ /HU/i;
     return "filmboxpremium.spi.pl" if $filename =~ /^FilmBox_Premium/i and $filename =~ /HU/i;
 
-    return "arthouse.spi.pl" if $filename =~ /^Arthouse/i and $filename =~ /EN/i;
+    return "arthouse.spi.pl" if $filename =~ /^Arthouse/i and $filename !~ /RU/i;
  }
 
  if( $dir =~ /Trace/ and $filename =~ /\.(xls|xlsx)$/i ) {
