@@ -5,9 +5,9 @@ use warnings;
 
 =pod
 
-Channels: Kanal10 (http://kanal10.se/)
+Channels: Kanal10 (http://kanal10.se/), Kanal10 (http://kanal10.no)
 
-Import data from Word-files delivered via e-mail.  Each day
+Import data from Excel-files delivered via e-mail.  Each day
 is handled as a separate batch.
 
 Features:
@@ -18,19 +18,10 @@ use utf8;
 
 use POSIX;
 use DateTime;
-use XML::LibXML;
 use Encode qw/decode/;
 use Data::Dumper;
 
-use Spreadsheet::ParseExcel;
-use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
-use Spreadsheet::Read;
-
-use Text::Iconv;
-my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
-
-use NonameTV qw/MyGet Wordfile2Xml Htmlfile2Xml norm MonthNumber normUtf8/;
+use NonameTV qw/norm ParseExcel formattedCell MonthNumber normUtf8/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 
@@ -62,10 +53,8 @@ sub ImportContentFile {
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
 
-  if( $file =~ /\.xls|.xlsx$/i ){
+  if( $file =~ /\.xls|.xlsx|ods$/i ){
     $self->ImportXLS( $file, $chd );
-  } elsif($file =~ /\.doc$/i) {
-    $self->ImportDOC( $file, $chd );
   }
 
 
@@ -83,117 +72,99 @@ sub ImportXLS {
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
 
-  # Only process .xls or .xlsx files.
+  # Process
   progress( "Kanal10: $xmltvid: Processing $file" );
 
-	my %columns = ();
-  my $date;
+  my $doc = ParseExcel($file);
+
+  if( not defined( $doc ) ) {
+    error( "Kanal10: $file: Failed to parse excel" );
+    return;
+  }
+
   my $currdate = "x";
-  my $coldate = 0;
-  my $coltime = 1;
-  my $coltitle = 3;
-
-  my $oBook;
-
-  if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
-  else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }   #  staro, za .xls
-
-  my $ref = ReadData ($file);
 
   # main loop
-  for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
+    my $oWkS = $doc->sheet($iSheet);
+    progress( "Kanal10: Processing worksheet: $oWkS->{label}" );
 
-    my $oWkS = $oBook->{Worksheet}[$iSheet];
-    progress( "Kanal10: Processing worksheet: $oWkS->{Name}" );
+    my $foundcolumns = 0;
+    my %columns = ();
 
-	  my $foundcolumns = 0;
+    # Rows
+    #print Dumper($oWkS);
+    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
+        # Columns
+        if( not %columns ){
+            # the column names are stored in the first row
+            # so read them and store their column positions
 
-    # browse through rows
-    my $i = 1;
+            for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
+                # Does the cell exist?
+                if($oWkS->cell($iC, $iR)) {
+                    # Kanal 10 Norge
+                    $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Program/i );
+                    $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Dato/i );
+                    $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Klokkeslett/i );
 
-    for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
-      $i++;
+                    # Kanal 10 Sverige
+                    $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Program/i );
+                    $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Datum/i );
+                    $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Fr.n$/i );
+                    $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Beskrivning$/i );
 
-      if( not %columns ){
-        # the column names are stored in the first row
-        # so read them and store their column positions
-        # for further findvalue() calls
+                    $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /^(Dato|Datum)/i ); # Only import if date is found
+                }
+            }
 
-        for(my $iC = $oWkS->{MinCol} ; defined $oWkS->{MaxCol} && $iC <= $oWkS->{MaxCol} ; $iC++) {
-          if( $oWkS->{Cells}[$iR][$iC] ){
-            $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Program/ );
-            $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Datum/ );
-            $columns{'Start'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Från$/ );
-            $columns{'End'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Till/ );
-            $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /^Beskrivning/ );
-
-            $foundcolumns = 1 if( $columns{'Title'} ); # Only import if season number is found
-          }
-        }
-        %columns = () if( $foundcolumns eq 0 );
-
-        next;
-      }
-
-      my $oWkC;
-
-      # date
-      $oWkC = $oWkS->{Cells}[$iR][$coldate];
-      next if( ! $oWkC );
-
-      $date = create_date( ExcelFmt('yyyy-mm-dd', $oWkC->{Val}) );
-      next if( ! $date );
-
-      if( $date ne $currdate ){
-
-        progress("Kanal10: Date is $date");
-
-        if( $currdate ne "x" ) {
-          $dsh->EndBatch( 1 );
+            %columns = () if( $foundcolumns eq 0 );
+            next;
         }
 
-        my $batch_id = $xmltvid . "_" . $date;
-        $dsh->StartBatch( $batch_id , $channel_id );
-        $dsh->StartDate( $date , "00:00" );
-        $currdate = $date;
-      }
+        # Date
+        my $date = ParseDate(formattedCell($oWkS, $columns{'Date'}, $iR), $file);
+        next if( ! $date );
 
-      # time
-      $oWkC = $oWkS->{Cells}[$iR][$coltime];
-      next if( ! $oWkC );
-      my $time = 0;  # fix for  12:00AM
-      $time=$oWkC->{Val} if( $oWkC->Value );
+        if( $date ne $currdate ){
+            progress("Kanal10: Date is $date");
 
-	    #Convert Excel Time -> localtime
-      $time = ExcelFmt('hh:mm', $time);
-      $time =~ s/_/:/g; # They fail sometimes
+            if( $currdate ne "x" ) {
+                $dsh->EndBatch( 1 );
+            }
 
+            my $batch_id = $xmltvid . "_" . $date;
+            $dsh->StartBatch( $batch_id , $channel_id );
+            $dsh->StartDate( $date , "00:00" );
+            $currdate = $date;
+        }
 
-      # title
-      $oWkC = $oWkS->{Cells}[$iR][$coltitle];
-      next if( ! $oWkC );
-      my $title = norm($oWkC->Value) if( $oWkC->Value );
+        # Time
+        next if( ! $columns{'Time'} );
+        my $time = norm(formattedCell($oWkS, $columns{'Time'}, $iR));
+        next if( ! $time );
 
-      $title =~ s/\((r|p)\)//g if $title;
+        # Title
+        next if( ! $columns{'Title'} );
+        my $title = norm(formattedCell($oWkS, $columns{'Title'}, $iR));
+        $title =~ s/\((r|p)\)//g if $title;
+        next if( ! $title );
 
+        # CE
+        my $ce = {
+            channel_id  => $channel_id,
+            start_time  => $time,
+            title       => norm($title),
+        };
 
+        # Description
+        if(defined($columns{'Synopsis'})) {
+            $ce->{description} = norm(formattedCell($oWkS, $columns{'Synopsis'}, $iR));
+        }
 
-      my $ce = {
-        channel_id => $channel_id,
-        start_time => $time,
-        title => norm($title),
-      };
-
-      # Desc (only works on XLS files)
-      my $field = "E".$i;
-      my $desc = $ref->[1]{$field};
-      $ce->{description} = normUtf8($desc) if( $desc );
-      $desc = '';
-
-	    progress("Kanal10: $time - $title") if $title;
-      $dsh->AddProgramme( $ce ) if $title;
+        progress("Kanal10: $time - $title") if $title;
+        $dsh->AddProgramme( $ce ) if $title;
     }
-
   }
 
   $dsh->EndBatch( 1 );
@@ -201,15 +172,17 @@ sub ImportXLS {
   return;
 }
 
-sub create_date
+sub ParseDate
 {
-  my ( $dinfo ) = @_;
+  my ( $dinfo, $file ) = @_;
 
-  my( $month, $monthname, $day, $year );
+  #print Dumper($dinfo);
+
+  my( $month, $day, $year, $monthname );
   if( $dinfo =~ /^\d{4}-\d{2}-\d{2}$/ ){ # format   '2010-04-22'
     ( $year, $month, $day ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
-  } elsif( $dinfo =~ /^\d{2}.\d{2}.\d{4}$/ ){ # format '11/18/2011'
-    ( $month, $day, $year ) = ( $dinfo =~ /^(\d+).(\d+).(\d+)$/ );
+  } elsif( $dinfo =~ /^\d{2}\.\d{2}\.\d{4}$/ ){ # format '11/18/2011'
+    ( $day, $month, $year ) = ( $dinfo =~ /^(\d+)\.(\d+)\.(\d+)$/ );
   } elsif( $dinfo =~ /^\d{1,2}-\d{1,2}-\d{2}$/ ){ # format '10-18-11' or '1-9-11'
     ( $month, $day, $year ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
   } elsif( $dinfo =~ /^\d{1,2}\/\d{1,2}\/\d{2}$/ ){ # format '10-18-11' or '1-9-11'
@@ -217,7 +190,11 @@ sub create_date
   } elsif( $dinfo =~ /^\d{1,2} .*$/ ){ # format '10-18-11' or '1-9-11'
     ( $day, $monthname ) = ( $dinfo =~ /^(\d{1,2}) (.*)$/ );
     $month = MonthNumber($monthname, "en");
-    $year = DateTime->now->year;
+
+    ( $year ) = ( $dinfo =~ /(\d\d\d\d)/ );
+    if(!defined($year)) {
+        $year = DateTime->now->year;
+    }
   }
 
   return undef if( ! $year );
