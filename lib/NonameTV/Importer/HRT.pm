@@ -17,7 +17,7 @@ use DateTime;
 use XML::LibXML;
 use Encode qw/encode decode/;
 
-use NonameTV qw/MyGet norm AddCategory/;
+use NonameTV qw/norm ParseXml AddCategory/;
 use NonameTV::Log qw/progress error/;
 
 use NonameTV::Importer::BaseOne;
@@ -38,6 +38,17 @@ sub new {
     return $self;
 }
 
+sub Object2Url {
+  my $self = shift;
+  my( $objectname, $chd ) = @_;
+
+  my $url = $self->{UrlRoot} . "\?$chd->{grabber_info}";
+
+  progress("HRT: Fetching data from $url");
+
+  return( $url, undef );
+}
+
 sub ImportContent
 {
   my $self = shift;
@@ -47,14 +58,7 @@ sub ImportContent
   my $ds = $self->{datastore};
   $ds->{SILENCE_END_START_OVERLAP}=1;
 
-  my $xml = XML::LibXML->new;
-  my $doc;
-  eval { $doc = $xml->parse_string($$cref); };
-  if( $@ ne "" )
-  {
-    error( "$batch_id: Failed to parse $@" );
-    return 0;
-  }
+  my $doc = ParseXml($cref);
 
   # Find all "programme"-entries.
   my $ns = $doc->find( "//programme" );
@@ -282,16 +286,6 @@ sub create_dt
   $dt->set_time_zone( "UTC" );
 
   return $dt;
-}
-
-sub Object2Url {
-  my $self = shift;
-  my( $batch_id, $data ) = @_;
-
-  my $url = $self->{UrlRoot} . "\?$data->{grabber_info}";
-  print("Fetching: $url\n");
-
-  return( $url, undef );
 }
 
 sub ContentExtension {
