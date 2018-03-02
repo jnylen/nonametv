@@ -126,7 +126,7 @@ sub isToWarn {
                             minute => $min,
                             second => $sec,
                             nanosecond => 0,
-                            time_zone => 'Europe/Zagreb',
+
     );
 
   my $checktime = $now->clone->add( days => $warndays );
