@@ -19,6 +19,7 @@ use Archive::Zip qw/:ERROR_CODES/; # DOCX
 use NonameTV::StringMatcher;
 use NonameTV::Log qw/w/;
 use XML::LibXML;
+use Spreadsheet::Read;
 
 BEGIN {
     use Exporter   ();
@@ -40,6 +41,7 @@ BEGIN {
                       ParseDescCatDan
                       ParseDescCatSwe FixProgrammeData
     		              ParseXml ParseXmltv ParseJson
+                      ParseExcel formattedCell
                       MonthNumber DayNumber
                       CompareArrays
                       RemoveSpecialChars CleanSubtitle FixSubtitle
@@ -1049,6 +1051,42 @@ sub ParseXmltv {
   }
 
   return \@d;
+}
+
+=pod
+
+my $doc = ParseExcel( $file );
+
+Parse an Excel file (ODS, XLS, XLSX, CSV, PRL, SXC) into an document.
+Take a file url as the only reference.
+
+=cut
+
+sub ParseExcel {
+  my( $file ) = @_;
+
+  my $doc;
+  eval {
+    $doc = Spreadsheet::Read->new ($file, dtfmt => "yyyy-mm-dd", strip => 1);
+  };
+  if( $@ )   {
+    w "Failed to parse file: $@";
+    return undef;
+  }
+
+  return $doc;
+}
+
+=pod
+
+
+
+=cut
+
+sub formattedCell {
+  my( $spreadsheet, $column, $row ) = @_;
+
+  return $spreadsheet->cell($spreadsheet->cr2cell($column, $row));
 }
 
 sub create_dt
