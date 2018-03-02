@@ -15,7 +15,6 @@ Features:
 use utf8;
 
 use DateTime;
-use XML::LibXML;
 use Data::Dumper;
 use File::Temp qw/tempfile/;
 use File::Slurp qw/write_file read_file/;
@@ -23,15 +22,8 @@ use IO::Scalar;
 
 use Archive::Zip qw/:ERROR_CODES/;
 
-use Spreadsheet::ParseExcel;
-use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel int2col);
-use Spreadsheet::Read;
 
-use Text::Iconv;
-my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
-
-use NonameTV qw/norm normUtf8 AddCategory MonthNumber FixSubtitle/;
+use NonameTV qw/norm ParseExcel formattedCell AddCategory MonthNumber FixSubtitle/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error d p w f/;
 
@@ -61,17 +53,6 @@ sub ImportContentFile {
   $self->{fileerror} = 0;
 
   if( $file =~ /\.xml$/i ) {
-    if( $chd->{sched_lang} eq "sv") {
-    #    $self->ImportXML( $file, $chd ) if $file =~ /swe*.*xml$/i;
-    } elsif($chd->{sched_lang} eq "da") {
-    #    $self->ImportXML( $file, $chd ) if $file =~ /dan*.*xml$/i;
-    } elsif($chd->{sched_lang} eq "fi") {
-    #    $self->ImportXML( $file, $chd ) if $file =~ /fin*.*xml$/i;
-    } elsif($chd->{sched_lang} eq "no") {
-    #    $self->ImportXML( $file, $chd ) if $file =~ /nor*.*xml$/i;
-    } elsif($chd->{sched_lang} eq "en") {
-    #    $self->ImportXML( $file, $chd ) if $file =~ /eng*.*xml$/i and $file !~ /swe*.*xml$/i;
-    }
   } elsif( $file =~ /\.(xls|xlsx)$/i ){
     if( $chd->{sched_lang} eq "sv") {
         $self->ImportExcel( $file, $chd ) if $file =~ /swe/i and $file =~ /\.(xls|xlsx)$/i;
@@ -157,183 +138,189 @@ sub ImportExcel
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
 
-  progress( "Disney Excel: $chd->{xmltvid}: Processing $file" );
-  my $oBook;
-  if ( $file =~ /\.xlsx$/i ){  $oBook = Spreadsheet::XLSX -> new ($file, $converter); } else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
-  my $ref = ReadData ($file);
+  # Process
+  progress( "Disney: $xmltvid: Processing $file" );
 
-  my($iR, $oWkS, $oWkC);
-  my %columns = ();
-  my $date;
+  my $doc = ParseExcel($file);
+
+  if( not defined( $doc ) ) {
+    error( "Disney: $file: Failed to parse excel" );
+    return;
+  }
+
   my $currdate = "x";
-  my @ces;
 
   # main loop
-  foreach my $oWkS (@{$oBook->{Worksheet}}) {
-    my $foundcolumns = 0;
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
+    my $oWkS = $doc->sheet($iSheet);
+    progress( "Disney: Processing worksheet: $oWkS->{label}" );
 
-    # Rows and columns
-    my $i = 0;
-    for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
-      $i++;
+    my $foundcolumns = 0;
+    my $batch_id;
+    my %columns = ();
+
+    # Rows
+    #print Dumper($oWkS);
+    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
+      # Columns
       if( not %columns ){
         # the column names are stored in the first row
         # so read them and store their column positions
-        # for further findvalue() calls
 
-        for(my $iC = $oWkS->{MinCol} ; defined $oWkS->{MaxCol} && $iC <= $oWkS->{MaxCol} ; $iC++) {
-          if( $oWkS->{Cells}[$iR][$iC] ){
-      			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Title/ );
-            $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /\(NOT\) Title/ ); # Often SWE Title
-			      $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /\(NOR\) Title/ );
+        for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
+          # Does the cell exist?
+          if($oWkS->cell($iC, $iR)) {
+            $columns{'Title'} = $iC    if( $oWkS->cell($iC, $iR) =~ /Title/ );
+            $columns{'Title'} = $iC    if( $oWkS->cell($iC, $iR) =~ /\(NOT\) Title/ ); # Often SWE Title
+			      $columns{'Title'} = $iC    if( $oWkS->cell($iC, $iR) =~ /\(NOR\) Title/ );
 
-            $columns{'ORGTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /\(ENG\) Title/ );
-      			$columns{'ORGTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Title/ ) and ( $oWkS->{Cells}[$iR][$iC]->Value =~ /English/ );
+            $columns{'ORGTitle'} = $iC if( $oWkS->cell($iC, $iR) =~ /\(ENG\) Title/ );
+      		  $columns{'ORGTitle'} = $iC if( $oWkS->cell($iC, $iR) =~ /Title/ ) and ( $oWkS->cell($iC, $iR) =~ /English/ );
 
-      			$columns{'Year'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Production Yr/ );
+            $columns{'Year'} = $iC     if( $oWkS->cell($iC, $iR) =~ /Production Yr/ );
 
-            $columns{'Time'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Time/ );
-          	$columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Date/ );
-          	$columns{'Season'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Season Number/ );
-          	$columns{'Episode'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episode Number/ );
-          	$columns{'Genre'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Genre/ );
-          	$columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis/ );
+            $columns{'Time'} = $iC     if( $oWkS->cell($iC, $iR) =~ /Time/ );
+          	$columns{'Date'} = $iC     if( $oWkS->cell($iC, $iR) =~ /Date/ );
+          	$columns{'Season'} = $iC   if( $oWkS->cell($iC, $iR) =~ /Season Number/i );
+          	$columns{'Episode'} = $iC  if( $oWkS->cell($iC, $iR) =~ /Episode Number/i );
+          	$columns{'Genre'} = $iC    if( $oWkS->cell($iC, $iR) =~ /^Genre/ );
+          	$columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /Synopsis/ );
 
-          	if($chd->{sched_lang} eq "sv") {
-              $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /\(SWE\) Title/ );
-          	  $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Title/ ) and ( $oWkS->{Cells}[$iR][$iC]->Value =~ /Swedish/ );
-              $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis/ ) and ( $oWkS->{Cells}[$iR][$iC]->Value =~ /Swedish/ );
+            if($chd->{sched_lang} eq "sv") {
+              $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /\(SWE\) Title/ );
+          	  $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /Title/ ) and ( $oWkS->cell($iC, $iR) =~ /Swedish/ );
+              $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /Synopsis/ ) and ( $oWkS->cell($iC, $iR) =~ /Swedish/ );
           	} elsif($chd->{sched_lang} eq "fi") {
-              $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /\(FIN\) Title/ );
-          	  $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Title/ ) and ( $oWkS->{Cells}[$iR][$iC]->Value =~ /Finnish/ );
-              $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis/ ) and ( $oWkS->{Cells}[$iR][$iC]->Value =~ /Finnish/ );
+              $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /\(FIN\) Title/ );
+          	  $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /Title/ ) and ( $oWkS->cell($iC, $iR) =~ /Finnish/ );
+              $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /Synopsis/ ) and ( $oWkS->cell($iC, $iR) =~ /Finnish/ );
           	} elsif($chd->{sched_lang} eq "no") {
-              $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /\(NOR\) Title/ );
-          	  $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Title/ ) and ( $oWkS->{Cells}[$iR][$iC]->Value =~ /Norwegian/ );
-              $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis/ ) and ( $oWkS->{Cells}[$iR][$iC]->Value =~ /Norwegian/ );
+              $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /\(NOR\) Title/ );
+          	  $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /Title/ ) and ( $oWkS->cell($iC, $iR) =~ /Norwegian/ );
+              $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /Synopsis/ ) and ( $oWkS->cell($iC, $iR) =~ /Norwegian/ );
           	} elsif($chd->{sched_lang} eq "da") {
-              $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /\(DAN\) Title/ );
-              $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Title/ ) and ( $oWkS->{Cells}[$iR][$iC]->Value =~ /Danish/ );
-              $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis/ ) and ( $oWkS->{Cells}[$iR][$iC]->Value =~ /Danish/ );
+              $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /\(DAN\) Title/ );
+              $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /Title/ ) and ( $oWkS->cell($iC, $iR) =~ /Danish/ );
+              $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /Synopsis/ ) and ( $oWkS->cell($iC, $iR) =~ /Danish/ );
           	} elsif($chd->{sched_lang} eq "en") {
-              $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /\(ENG\) Title/ );
-          	  $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Title/ ) and ( $oWkS->{Cells}[$iR][$iC]->Value =~ /English/ );
-              $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Synopsis/ ) and ( $oWkS->{Cells}[$iR][$iC]->Value =~ /English/ );
+              $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /\(ENG\) Title/ );
+          	  $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /Title/ ) and ( $oWkS->cell($iC, $iR) =~ /English/ );
+              $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /Synopsis/ ) and ( $oWkS->cell($iC, $iR) =~ /English/ );
           	}
 
-            $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Season/ ); # Only import if season number is found
+            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /Season/ ); # Only import if season number is found
           }
         }
-        %columns = () if( $foundcolumns eq 0 );
 
+        %columns = () if( $foundcolumns eq 0 );
         next;
       }
 
       # Date
-      next if(!defined($columns{'Date'}));
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Date'}];
-	    my $date = ParseDate( $oWkC->Value );
-      next if(!$date);
+      my $date = ParseDate(formattedCell($oWkS, $columns{'Date'}, $iR), $file);
+      next if( ! $date );
 
-  	  if($date ne $currdate ) {
+      if( $date ne $currdate ){
+        progress("Disney: Date is $date");
+
         if( $currdate ne "x" ) {
-    		    # save last day if we have it in memory
-            #FlushDayData( $xmltvid, $dsh , @ces );
-    			  $dsh->EndBatch( 1 );
+          $dsh->EndBatch( 1 );
         }
 
-        my $batchid = $chd->{xmltvid} . "_" . $date;
-        $dsh->StartBatch( $batchid , $chd->{id} );
-        $dsh->StartDate( $date , "05:00" );
+        $batch_id = $xmltvid . "_" . $date;
+        $dsh->StartBatch( $batch_id , $channel_id );
+        $dsh->StartDate( $date , "00:00" );
         $currdate = $date;
-
-        progress("Disney: Date is: $date");
       }
 
       # Time
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Time'}];
-      next if( ! $oWkC );
-      my $time = ParseTime( $oWkC->Value );
+      next if( ! $columns{'Time'} );
+      my $time = ParseTime(norm(formattedCell($oWkS, $columns{'Time'}, $iR)));
       next if( ! $time );
 
-      # program_title
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
-      next if( ! $oWkC );
-      my $field2 = int2col($columns{'Title'}).$i;
-      my $title = $ref->[1]{$field2};
+      # Title
+      next if( ! $columns{'Title'} );
+      my $title = norm(formattedCell($oWkS, $columns{'Title'}, $iR));
       next if( ! $title );
       $title =~ s/S(\d+)$//;
-      $title = FixSubtitle(normUtf8($title));
+      $title = FixSubtitle($title);
 
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'ORGTitle'}];
-      my $title_org = norm($oWkC->Value) if( $oWkC );
+      # ORGTitle
+      my $title_org;
+      if(defined($columns{'ORGTitle'})) {
+        $title_org = norm(formattedCell($oWkS, $columns{'ORGTitle'}, $iR));
+      }
 
+      # CE
       my $ce = {
-        channel_id => $channel_id,
-        start_time => $time,
-        title => $title,
+        channel_id  => $channel_id,
+        start_time  => $time,
+        title       => norm($title),
       };
 
-      ## Episode
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Episode'}];
-      my $episode = $oWkC->Value if( $oWkC );
-
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Season'}];
-      my $season = $oWkC->Value if( $oWkC );
-
-      # genre (column 6)
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Genre'}];
-      my $genre = norm($oWkC->Value) if( $oWkC );
+      # Episode & Season
+      my($episode, $season);
+      if(defined($columns{'Episode'})) {
+        $episode = norm(formattedCell($oWkS, $columns{'Episode'}, $iR));
+      }
+      if(defined($columns{'Season'})) {
+        $season = norm(formattedCell($oWkS, $columns{'Season'}, $iR));
+      }
 
       if(defined($episode) and $episode ne "" and $episode > 0) {
         $ce->{episode} = ". " . ($episode-1) . " ." if $episode ne "";
       }
 
-      # Genre
-      if( defined($genre) and $genre ne "" ){
-        my ($program_type2, $category2 ) = $ds->LookupCat( 'DisneyChannel', $genre );
-        AddCategory( $ce, $program_type2, $category2 );
-      }
-
       if(defined($ce->{episode}) and defined($season) and norm($season) ne "" and $season > 0) {
         $ce->{episode} = $season-1 . $ce->{episode};
       }
-      ## END
 
-      # Desc
-      my $field = int2col($columns{'Synopsis'}).$i;
-      my $desc = $ref->[1]{$field};
-      $ce->{description} = normUtf8($desc) if defined($desc);
-      $desc = '';
+      # Genre
+      my($genre);
+      if(defined($columns{'Genre'})) {
+        $genre = norm(formattedCell($oWkS, $columns{'Genre'}, $iR));
 
-      # Find production year from description.
-      if(defined($desc) and defined($ce->{description}) and $ce->{description} =~ /\((\d\d\d\d)\)/)
-      {
-        $ce->{description} =~ s/\((\d\d\d\d)\) //;
-        $ce->{production_date} = "$1-01-01";
+        # Add to CE
+        if( defined($genre) and $genre ne "" ){
+            my ($program_type2, $category2 ) = $ds->LookupCat( 'DisneyChannel', $genre );
+            AddCategory( $ce, $program_type2, $category2 );
+        }
       }
 
-      # Org title
-      $ce->{original_title} = FixSubtitle(norm($title_org)) if $ce->{title} ne norm($title_org) and norm($title_org) ne "";
+      # Description
+      my($desc);
+      if(defined($columns{'Synopsis'})) {
+        $ce->{description} = norm(formattedCell($oWkS, $columns{'Synopsis'}, $iR));
+
+        # Find production year from description.
+        if(defined($ce->{description}) and $ce->{description} =~ /\((\d\d\d\d)\)/)
+        {
+            $ce->{description} =~ s/\((\d\d\d\d)\) //;
+            $ce->{production_date} = "$1-01-01";
+        }
+      }
+
+      # ORG. Title
+      if(defined($title_org)) {
+        $ce->{original_title} = FixSubtitle(norm($title_org)) if $ce->{title} ne norm($title_org) and norm($title_org) ne "";
+      }
 
       # Production Year
-      if(defined $columns{'Year'}) {
-          $oWkC = $oWkS->{Cells}[$iR][$columns{'Year'}];
-          my $year = $oWkC->Value if( $oWkC );
+      my($year);
+      if(defined($columns{'Year'})) {
+        $year = norm(formattedCell($oWkS, $columns{'Year'}, $iR));
 
-          if(defined $year and $year =~ /(\d\d\d\d)/ )
-          {
-              $ce->{production_date} = "$1-01-01";
-          }
+        if(defined $year and $year =~ /(\d\d\d\d)/ )
+        {
+            $ce->{production_date} = "$1-01-01";
+        }
       }
 
-      progress("$time - $title");
+      progress("$batch_id: $time - $title");
       $dsh->AddProgramme( $ce );
     }
-
   }
 
-  #FlushDayData( $xmltvid, $dsh , @ces );
   $dsh->EndBatch( 1 );
   return;
 }
@@ -341,7 +328,7 @@ sub ImportExcel
 sub ParseDate {
   my ( $text ) = @_;
 
-#print ">$text<\n";
+  return undef if !defined($text);
 
   my( $year, $day, $month );
 
@@ -358,20 +345,11 @@ sub ParseDate {
 
   $year += 2000 if $year < 100;
 
-  my $dt = DateTime->new(
-    year => $year,
-    month => $month,
-    day => $day,
-    time_zone => "Europe/Stockholm"
-  );
-
-	return $dt->ymd("-");
+  return sprintf( '%d-%02d-%02d', $year, $month, $day );
 }
 
 sub ParseTime {
   my( $text2 ) = @_;
-
-#print "ParseTime: >$text2<\n";
 
   my( $hour , $min, $secs );
 
