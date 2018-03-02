@@ -47,6 +47,12 @@ sub AugmentProgram( $$$ ){
 		print("Live programme. Skipping.\n");
 		return( $resultref, $result );
 	}
+
+	# Already have previously shown
+	if(defined($ceref->{previously_shown}) and $ceref->{previously_shown} ne "") {
+		print("Already have previously_shown.\n");
+		return( $resultref, $result );
+	}
   	
 	# So, we have a channelgroup which we want previously_shown for.
 	# It first checks so it got everything it needs, which is:
