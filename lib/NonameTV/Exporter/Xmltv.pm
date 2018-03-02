@@ -798,7 +798,7 @@ sub WriteEntry
     my $timestamp2 = create_dt( $timestamp, "UTC" );
     $timestamp2->set_time_zone( "Europe/Stockholm" );
 
-    $d->{'previously-shown'} = { start => $timestamp2->strftime( "%Y%m%d%H%M%S %z" ), channel => $channelname };
+   # $d->{'previously-shown'} = { start => $timestamp2->strftime( "%Y%m%d%H%M%S %z" ), channel => $channelname };
   }
 
   $w->write_programme( $d );
