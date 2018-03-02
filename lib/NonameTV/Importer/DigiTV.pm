@@ -17,7 +17,7 @@ use DateTime;
 use XML::LibXML;
 use Encode qw/encode decode/;
 
-use NonameTV qw/MyGet norm AddCategory/;
+use NonameTV qw/MyGet ParseXml norm AddCategory/;
 use NonameTV::Log qw/progress error/;
 
 use NonameTV::Importer::BaseOne;
@@ -50,14 +50,7 @@ sub ImportContent
   my $ds = $self->{datastore};
   $ds->{SILENCE_END_START_OVERLAP}=1;
 
-  my $xml = XML::LibXML->new;
-  my $doc;
-  eval { $doc = $xml->parse_string($$cref); };
-  if( $@ ne "" )
-  {
-    error( "$batch_id: Failed to parse $@" );
-    return 0;
-  }
+  my $doc = ParseXml($cref);
   
   # Find all "programme"-entries.
   my $ns = $doc->find( "//programme" );
