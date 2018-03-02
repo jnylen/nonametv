@@ -79,7 +79,6 @@ my @folders = qw(
             NonameTV-Data.Highview
             NonameTV-Data.MTV
             NonameTV-Data.Mezzo
-            NonameTV-Data.HighTV
             NonameTV-Data.EBS
             NonameTV-Data.Euronews
             NonameTV-Data.Gospel
@@ -224,7 +223,7 @@ sub guess_channel
    }
 
    if($filename =~ /Cartoon_Network(s|d|)_DUTCH/i and $filename =~ /XML/i) {
-     return "cartoonnetwork.nl" if $filename =~ /_DUT_/i;
+     #return "cartoonnetwork.nl" if $filename =~ /_DUT_/i;
    }
 
    if($filename =~ /CNNi/i and $filename =~ /XML/i) {
@@ -311,10 +310,6 @@ sub guess_channel
         return "hd.mezzo.tv" if $filename =~ /hd/i; # import mezzo live hd channel
         return "mezzo.tv" if $filename !~ /hd/i; # dont import mezzo live hd channel
     }
- }
-
- if( $dir =~ /HighTV/ and $filename =~ /\.xls$/i ) {
-     return "hightv.tv" if $filename =~ /epg/i;
  }
 
  # BBC
