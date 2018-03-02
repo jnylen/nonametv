@@ -65,26 +65,9 @@ sub ImportContentFile {
 
   if( $file =~ /\.xls|.xlsx$/i ){
     $self->ImportXLS( $file, $chd );
-  }elsif( $file =~ /\.xml$/i ){
-    $self->ImportXML( $file, $chd );
   }
 
-
   return;
-}
-
-sub ImportXML {
-	my $self = shift;
-  my( $file, $chd ) = @_;
-  my $dsh = $self->{datastorehelper};
-  my $ds = $self->{datastore};
-  $self->{fileerror} = 1;
-
-	# Do something beautiful here later on.
-
-	error("From now on you need to convert XML files to XLS files.");
-
-	return 0;
 }
 
 sub ImportXLS {
