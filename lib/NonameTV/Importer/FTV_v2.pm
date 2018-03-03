@@ -8,33 +8,13 @@ use warnings;
 Import data for FTV.
 Version 2 - Web - Working.
 
-Notes:
-FTV changes the names for the EPG files, like every month.
-So, this is the best way to do it.
-Download the epg files (EXCEL!) to the channel's "files (where all the files is)"
-and the channel automaticly puts it in the database.
-
-Until FTV does this good, you will have to get the files every month, manually.
-
-Features:
-
 =cut
 
 use utf8;
 
 use DateTime;
-use Spreadsheet::ParseExcel;
 
-use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
-use Spreadsheet::Read;
-
-use Text::Iconv;
-my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
-
-#use Data::Dumper;
-
-use NonameTV qw/norm normLatin1 AddCategory MonthNumber/;
+use NonameTV qw/norm ParseExcel formattedCell AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 use NonameTV::Config qw/ReadConfig/;
@@ -78,65 +58,64 @@ sub ImportFlatXLS
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
 
-  my %columns = ();
-  my $date;
-  my $currdate = "x";
+  # Process
+  progress( "FTV: $chd->{xmltvid}: Processing $file" );
 
-  progress( "FTV FlatXLS: $chd->{xmltvid}: Processing flat XLS $file" );
+  my $doc = ParseExcel($file);
 
-  my $oBook;
-
-  if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
-  else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }   #  staro, za .xls
-
-  my($iR, $oWkS, $oWkC);
-
-  my( $time, $episode );
-  my( $program_title , $program_description );
-  my @ces;
+  if( not defined( $doc ) ) {
+    error( "FTV: $file: Failed to parse excel" );
+    return;
+  }
 
   # main loop
-  for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
-	# Not using this yet.
-	my $oWkS = $oBook->{Worksheet}[$iSheet];
-	if( $oWkS->{Name} !~ /EPG/ ){
-      progress( "FTV: $chd->{xmltvid}: Skipping (Not epg): $oWkS->{Name}" );
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
+    my $oWkS = $doc->sheet($iSheet);
+
+	  if( $oWkS->{label} !~ /EPG/ ){
+      progress( "FTV: $chd->{xmltvid}: Skipping (Not epg): $oWkS->{label}" );
       next;
     }
 
-    progress( "FTV: Processing worksheet: $oWkS->{Name}" );
+    my $foundcolumns = 0;
+    my %columns = ();
+    my $currdate = "x";
+
+    progress( "FTV: Processing worksheet: $oWkS->{label}" );
 
     # start from row 2
-    # the first row looks like one cell saying like "EPG DECEMBER 2007  (Yamal - HotBird)"
-    # the 2nd row contains column names Date, Time (local), Progran, Description
-    #for(my $iR = $oWkS->{MinRow} ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
-    my $i = 0;
-    for(my $iR = 2 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
-      $i++;
+    # Rows
+    for(my $iR = 2 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
 
-      # date (column 1)
-      $oWkC = $oWkS->{Cells}[$iR][0];
-      next if( ! $oWkC );
-      $date = $oWkC->{Val} if( $oWkC->Value );
-      $date = ExcelFmt('yyyy-mm-dd', $date);
-      $date = ParseDate( $date );
+       # Columns
+      if( not %columns ){
+        # the column names are stored in the first row
+        # so read them and store their column positions
 
-		#$date = $oWkC->Value;
-      next if( ! $date );
+        for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
+          # Does the cell exist?
+          if($oWkS->cell($iC, $iR)) {
+            $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Program/i );
+            $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Date/i );
+            $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Time/i );
+            $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Description/i );
 
-	  unless( $date ) {
-		progress("SKIPPING :D");
-	  next;
-	  }
-
-	  if($date ne $currdate ) {
-        if( $currdate ne "x" ) {
-			# save last day if we have it in memory
-		#	FlushDayData( $channel_xmltvid, $dsh , @ces );
-			$dsh->EndBatch( 1 );
+            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /^Date/i ); # Only import if date is found
+          }
         }
 
+        %columns = () if( $foundcolumns eq 0 );
+        next;
+      }
 
+      # date (column 1)
+      my $date = ParseDate( formattedCell($oWkS, $columns{'Date'}, $iR));
+      next if( ! $date );
+
+	    if($date ne $currdate ) {
+        if( $currdate ne "x" ) {
+			    $dsh->EndBatch( 1 );
+        }
 
         my $batchid = $chd->{xmltvid} . "_" . $date;
         $dsh->StartBatch( $batchid , $chd->{id} );
@@ -146,61 +125,27 @@ sub ImportFlatXLS
         progress("FTV: Date is: $date");
       }
 
-	  	#if($iR == 28) { next; }
-
-	# time (column 1)
-	 #  print "hejhejhej";
-      $oWkC = $oWkS->{Cells}[$iR][1];
-
-      next if( ! $oWkC );
-      #my $time = ParseTime( $oWkC->Value );
-      my $time = 0;  # fix for  12:00AM
-      $time=$oWkC->{Val} if( $oWkC->Value );
-
-	  #Convert Excel Time -> localtime
-      $time = ExcelFmt('hh:mm', $time);
+	    # time (column 1)
+      my $time = formattedCell($oWkS, $columns{'Time'}, $iR);
       next if( ! $time );
 
-	  #use Data::Dumper; print Dumper($oWkS->{Cells}[28]);
+      my $title = norm(formattedCell($oWkS, $columns{'Title'}, $iR));
 
-
-	  my $title;
-	  my $test;
-
-	  # print "hejhej";
-      # program_title (column 3)
-      $oWkC = $oWkS->{Cells}[$iR][2];
-
-      # Here's where the magic happends.
-	  # Love goes out to DrForr.
-	  $test = $oWkC->Value;
-
-	  $title = normLatin1($test) if $test ne "";
-	  # If no series title, get it from episode name.
-
-	  # description
-	  $oWkC = $oWkS->{Cells}[$iR][3];
-	  my $desc = $oWkC->Value;
+      # Desc
+      my $desc = norm(formattedCell($oWkS, $columns{'Synopsis'}, $iR));
 
       if( $time and $title ){
-
-	  # empty last day array
-      undef @ces;
 
         progress("$time $title");
 
         my $ce = {
           channel_id   => $chd->{id},
-		      title		     => normLatin1($title),
+		      title		     => $title,
           start_time   => $time,
-          description  => normLatin1($desc),
+          description  => $desc,
         };
 
-		## END
-
         $dsh->AddProgramme( $ce );
-
-		push( @ces , $ce );
       }
 
     } # next row
