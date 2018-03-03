@@ -14,10 +14,9 @@ Features:
 =cut
 
 use DateTime;
-use XML::LibXML;
 use Encode qw/encode decode/;
 
-use NonameTV qw/MyGet norm AddCountry AddCategory/;
+use NonameTV qw/norm ParseXml AddCountry AddCategory/;
 use NonameTV::Log qw/progress error w f p/;
 use NonameTV::DataStore::Helper;
 
@@ -50,10 +49,8 @@ sub ImportContent
   $ds->{SILENCE_END_START_OVERLAP}=1;
   $ds->{SILENCE_DUPLICATE_SKIP}=1;
 
-  my $xml = XML::LibXML->new;
-  my $doc;
-  eval { $doc = $xml->parse_string($$cref); };
-  if( $@ ne "" )
+  my $doc = ParseXml($cref);
+  if( !defined($doc) )
   {
     error( "$batch_id: Failed to parse $@" );
     return 0;
