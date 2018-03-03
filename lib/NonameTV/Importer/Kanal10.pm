@@ -73,7 +73,7 @@ sub ImportXLS {
   my $ds = $self->{datastore};
 
   # Process
-  progress( "Kanal10: $xmltvid: Processing $file" );
+  progress( "Kanal10: $chd->{xmltvid}: Processing $file" );
 
   my $doc = ParseExcel($file);
 
