@@ -18,7 +18,7 @@ use POSIX;
 use DateTime;
 use Data::Dumper;
 
-use NonameTV qw/norm ParseExcel formattedCell normLatin1 AddCategory MonthNumber/;
+use NonameTV qw/norm ParseExcel formattedCell AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error /;
 use NonameTV::Config qw/ReadConfig/;
