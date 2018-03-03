@@ -94,32 +94,32 @@ sub ImportXLS {
 
     # Rows
     for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
-        # Columns
-        if( not %columns ){
-            # the column names are stored in the first row
-            # so read them and store their column positions
+      # Columns
+      if( not %columns ){
+        # the column names are stored in the first row
+        # so read them and store their column positions
 
-            for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
-                # Does the cell exist?
-                if($oWkS->cell($iC, $iR)) {
-                    # Kanal 10 Norge
-                    $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Program/i );
-                    $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Dato/i );
-                    $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Klokkeslett/i );
+        for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
+          # Does the cell exist?
+          if($oWkS->cell($iC, $iR)) {
+            # Kanal 10 Norge
+            $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Program/i );
+            $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Dato/i );
+            $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Klokkeslett/i );
 
-                    # Kanal 10 Sverige
-                    $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Program/i );
-                    $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Datum/i );
-                    $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Fr.n$/i );
-                    $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Beskrivning$/i );
+            # Kanal 10 Sverige
+            $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Program/i );
+            $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Datum/i );
+            $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Fr.n$/i );
+            $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Beskrivning$/i );
 
-                    $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /^(Dato|Datum)/i ); # Only import if date is found
-                }
-            }
-
-            %columns = () if( $foundcolumns eq 0 );
-            next;
+            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /^(Dato|Datum)/i ); # Only import if date is found
+          }
         }
+
+        %columns = () if( $foundcolumns eq 0 );
+        next;
+      }
 
         # Date
         my $date = ParseDate(formattedCell($oWkS, $columns{'Date'}, $iR), $file);
