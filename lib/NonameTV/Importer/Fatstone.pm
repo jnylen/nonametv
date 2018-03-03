@@ -15,19 +15,9 @@ use utf8;
 
 use POSIX;
 use DateTime;
-use XML::LibXML;
-use Spreadsheet::ParseExcel;
-
-
-use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
-use Spreadsheet::Read;
 use Data::Dumper;
 
-use Text::Iconv;
-my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
-
-use NonameTV qw/AddCategory norm MonthNumber/;
+use NonameTV qw/AddCategory ParseExcel formattedCell norm MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 use NonameTV::Config qw/ReadConfig/;
@@ -78,36 +68,59 @@ sub ImportXLS
   my %columns = ();
   my $date;
   my $currdate = "x";
-  my $oBook;
 
-if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
-else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }   #  staro, za .xls
-#elsif ( $file =~ /\.xml$/i ){ $oBook = Spreadsheet::ParseExcel::Workbook->Parse($file); progress( "using .xml" );    }   #  staro, za .xls
-#print Dumper($oBook);
-my $ref = ReadData ($file);
+  # Process
+  progress( "Fatstone: $chd->{xmltvid}: Processing $file" );
+
+  my $doc = ParseExcel($file);
+
+  if( not defined( $doc ) ) {
+    error( "Fatstone: $file: Failed to parse excel" );
+    return;
+  }
 
   # main loop
-  #for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
-  foreach my $oWkS (@{$oBook->{Worksheet}}) {
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
+    my $oWkS = $doc->sheet($iSheet);
 
-    #my $oWkS = $oBook->{Worksheet}[$iSheet];
-    progress( "Fatstone: $chd->{xmltvid}: Processing worksheet: $oWkS->{Name}" );
+    progress( "Fatstone: $chd->{xmltvid}: Processing worksheet: $oWkS->{label}" );
 
-	my $foundcolumns = 0;
+	  my $foundcolumns = 0;
 
     # browse through rows
-    my $i = 1;
-    for(my $iR = 1 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
-      $i++;
+    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
+      # Columns
+      if( not %columns ){
+        # the column names are stored in the first row
+        # so read them and store their column positions
+
+        for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
+          # Does the cell exist?
+          if($oWkS->cell($iC, $iR)) {
+            $columns{'Title'}    = $iC if( $oWkS->cell($iC, $iR) =~ /^title/i );
+            $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^desc/i );
+            $columns{'Genre'}    = $iC if( $oWkS->cell($iC, $iR) =~ /^category/i );
+            $columns{'Time'}     = $iC if( $oWkS->cell($iC, $iR) =~ /^start/i );
+            $columns{'End'}      = $iC if( $oWkS->cell($iC, $iR) =~ /^stop/i );
+            $columns{'Ep No'}    = $iC if( $oWkS->cell($iC, $iR) =~ /^episodeNum/i );
+            $columns{'Ses No'}   = $iC if( $oWkS->cell($iC, $iR) =~ /^sesongNum/i );
+            $columns{'Year'}     = $iC if( $oWkS->cell($iC, $iR) =~ /^year/i );
+            $columns{'Country'}  = $iC if( $oWkS->cell($iC, $iR) =~ /^origin/i );
+            $columns{'Date'}  = $iC if( $oWkS->cell($iC, $iR) =~ /^date/i );
+
+            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /^date/i ); # Only import if date is found
+          }
+        }
+
+        %columns = () if( $foundcolumns eq 0 );
+        next;
+      }
 
       # date - column 0 ('Date')
-      my $oWkC = $oWkS->{Cells}[$iR][0];
-      next if( ! $oWkC );
-      next if( ! $oWkC->Value );
-      $date = ParseDate( $oWkC->Value );
+      $date = ParseDate( formattedCell($oWkS, $columns{'Date'}, $iR) );
       next if( ! $date );
 
-	  # Startdate
+	    # Startdate
       if( $date ne $currdate ) {
       	if( $currdate ne "x" ) {
 			       $dsh->EndBatch( 1 );
@@ -120,30 +133,17 @@ my $ref = ReadData ($file);
         $currdate = $date;
       }
 
-	  # time
-      $oWkC = $oWkS->{Cells}[$iR][5];
-      next if( ! $oWkC );
-      my $time = 0;  # fix for  12:00AM
-      $time=$oWkC->{Val} if( $oWkC->Value );
-      $time = ParseTime($time);
+	    # time
+      my $time = ParseTime(formattedCell($oWkS, $columns{'Time'}, $iR));
 
       # title
-      #$oWkC = $oWkS->{Cells}[$iR][2];
-      #next if( ! $oWkC );
-      #my $title = $oWkC->Value if( $oWkC->Value );
-      my $field2 = "C".$i;
-      my $title = $ref->[1]{$field2};
-      $title =~ s/&quot;/"/ig;
+      my $title = formattedCell($oWkS, $columns{'Title'}, $iR);
 
       # desc
-      #$oWkC = $oWkS->{Cells}[$iR][3];
-      #next if( ! $oWkC );
-      #my $desc = $oWkC->Value if( $oWkC->Value );
-      my $field3 = "D".$i;
-      my $desc = $ref->[1]{$field3};
+      my $desc = formattedCell($oWkS, $columns{'Synopsis'}, $iR);
 
   	  # extra info
-  	  my $genre = norm($oWkS->{Cells}[$iR][4]->{Val}) if $oWkS->{Cells}[$iR][4];
+  	  my $genre = norm(formattedCell($oWkS, $columns{'Genre'}, $iR)) if formattedCell($oWkS, $columns{'Genre'}, $iR);
 
       my $ce = {
         channel_id => $chd->{channel_id},
@@ -153,13 +153,14 @@ my $ref = ReadData ($file);
       };
 
       # parsing subtitles and ep
-      my ($episode, $subtitle);
-      if( ( $title, $episode ) = ($ce->{title} =~ /^(.*?) ep (\d+)$/i ) ) {
-        $ce->{title} = norm($title);
+      my ($episode, $season);
+      ( $episode ) = (formattedCell($oWkS, $columns{'Ep No'}, $iR) =~ /^ep (\d+)$/i );
+      ( $season )  = (formattedCell($oWkS, $columns{'Ses No'}, $iR) =~ /^S\. (\d+)$/i );
+
+      if( defined($season) and $season ne "" and defined($episode) and $episode ne "" ) {
+        $ce->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 );
+      } elsif( defined($episode) and $episode ne "" ) {
         $ce->{episode} = sprintf( " . %d . ", $episode-1 );
-      } elsif( ( $title, $subtitle ) = ($ce->{title} =~ /^(.*?) - (.*?)$/i ) ) {
-        $ce->{title} = norm($title);
-        $ce->{subtitle} = norm($subtitle);
       }
 
       # Genre
@@ -183,11 +184,6 @@ my $ref = ReadData ($file);
 sub ParseDate {
   my( $text ) = @_;
 
-  $text = ExcelFmt('yyyy-mm-dd', $text);
-  #print("text: $text\n");
-
-  $text =~ s/^\s+//;
-
   my( $dayname, $day, $monthname, $year );
   my $month;
 
@@ -209,13 +205,15 @@ sub ParseDate {
 sub ParseTime {
   my( $text ) = @_;
 
-  $text =~ s/ AM\/PM//g; # They fail sometimes
-  $text = ExcelFmt('hh:mm', $text);
+  my( $hour , $min, $secs, $ampm );
 
-  my( $hour , $min );
-
-  if( $text =~ /^\d+:\d+/ ){
+  if( $text =~ /^\d+:\d+:\d+ (am|pm)/i ){
+    ( $hour , $min, $secs, $ampm ) = ( $text =~ /^(\d+):(\d+):(\d+) (AM|PM)/ );
+    $hour = ($hour % 12) + (($ampm eq 'AM') ? 0 : 12);
+  } elsif($text =~ /^\d+:\d+$/i) {
     ( $hour , $min ) = ( $text =~ /^(\d+):(\d+)/ );
+  } else {
+    print Dumper($text);
   }
 
   if($hour >= 24) {
