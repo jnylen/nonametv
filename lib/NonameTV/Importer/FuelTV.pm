@@ -15,21 +15,11 @@ Features:
 use utf8;
 
 use DateTime;
-use Spreadsheet::ParseExcel;
-use Spreadsheet::Read;
-
-use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
-use Spreadsheet::Read;
-
-use Text::Iconv;
-my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
-
 
 use Data::Dumper;
 use File::Temp qw/tempfile/;
 
-use NonameTV qw/norm normUtf8 AddCategory/;
+use NonameTV qw/norm ParseExcel formattedCell AddCategory/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 
@@ -65,26 +55,9 @@ sub ImportContentFile {
 
   if( $file =~ /\.xls|.xlsx$/i ){
     $self->ImportXLS( $file, $chd );
-  }elsif( $file =~ /\.xml$/i ){
-    $self->ImportXML( $file, $chd );
   }
 
-
   return;
-}
-
-sub ImportXML {
-	my $self = shift;
-  my( $file, $chd ) = @_;
-  my $dsh = $self->{datastorehelper};
-  my $ds = $self->{datastore};
-  $self->{fileerror} = 1;
-  
-	# Do something beautiful here later on. 
-	
-	error("From now on you need to convert XML files to XLS files.");
-	
-	return 0;
 }
 
 sub ImportXLS {
@@ -101,45 +74,52 @@ sub ImportXLS {
   # Only process .xls or .xlsx files.
   progress( "FuelTV: $xmltvid: Processing $file" );
 
-	my %columns = ();
-  my $date;
-  my $currdate = "x";
-  my $coldate = 0;
-  my $coltime = 1;
-  my $coltitle = 2;
-  my $colepisode = 5;
-  my $coldesc = 3;
-  my $colseason = 4;
+  my $doc = ParseExcel($file);
 
-my $oBook;
-
-if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
-else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }   #  staro, za .xls
-#elsif ( $file =~ /\.xml$/i ){ $oBook = Spreadsheet::ParseExcel::Workbook->Parse($file); progress( "using .xml" );    }   #  staro, za .xls
-#print Dumper($oBook);
-my $ref = ReadData ($file);
+  if( not defined( $doc ) ) {
+    error( "FuelTV: $file: Failed to parse excel" );
+    return;
+  }
 
   # main loop
-  for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
+    my $oWkS = $doc->sheet($iSheet);
 
-    my $oWkS = $oBook->{Worksheet}[$iSheet];
+    progress( "FuelTV: Processing worksheet: $oWkS->{label}" );
 
-    progress( "FuelTV: Processing worksheet: $oWkS->{Name}" );
+    my $foundcolumns = 0;
+    my %columns = ();
+    my $currdate = "x";
 
-	my $foundcolumns = 0;
-    # browse through rows
-    my $i = 0;
-    for(my $iR = 13 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
-    $i++;
+    # Rows
+    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
+      # Columns
+      if( not %columns ){
+        # the column names are stored in the first row
+        # so read them and store their column positions
 
-      my $oWkC;
+        for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
+          # Does the cell exist?
+          if($oWkS->cell($iC, $iR)) {
+            $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Date/i );
+            $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^CET/i );
+            $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Show/i );
+            $columns{'Ep Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Episode Title/i );
+            $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Synopsis/i );
+            $columns{'Ses No'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Season/i );
+            $columns{'Ep No'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Episode/i );
+
+            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /^Date/i ); # Only import if date is found
+          }
+        }
+
+        %columns = () if( $foundcolumns eq 0 );
+        next;
+      }
+
 
       # date
-      $oWkC = $oWkS->{Cells}[$iR][$coldate];
-      next if( ! $oWkC );
-
-	  $date = $oWkC->{Val} if( $oWkC->Value );
-      $date = ParseDate( ExcelFmt('yyyy-mm-dd', $date) );
+      my $date = ParseDate( formattedCell($oWkS, $columns{'Date'}, $iR) );
       next if( ! $date );
 
       if( $date ne $currdate ){
@@ -157,31 +137,12 @@ my $ref = ReadData ($file);
       }
 
       # time
-      $oWkC = $oWkS->{Cells}[$iR][$coltime];
-      next if( ! $oWkC );
-
-
-
-      my $time = 0;  # fix for  12:00AM
-      $time=$oWkC->{Val} if( $oWkC->Value );
-
-	  #Convert Excel Time -> localtime
-      $time = ExcelFmt('hh:mm', $time);
-      $time =~ s/_/:/g; # They fail sometimes
+      my $time = formattedCell($oWkS, $columns{'Time'}, $iR);
+      next if(! $time);
 
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][$coltitle];
-      next if( ! $oWkC );
-      my $title = $oWkC->Value if( $oWkC->Value );
-      if (defined($title)) {
-          $title =~ s/&amp;/&/g;
-          $title =~ s/\(.*\)//g;
-          $title =~ s/\[.*\]//g;
-      }
-
-
-      
+      my $title = formattedCell($oWkS, $columns{'Title'}, $iR);
 
       my $ce = {
         channel_id => $channel_id,
@@ -189,26 +150,21 @@ my $ref = ReadData ($file);
         title => norm($title),
       };
       
-    my( $t, $st ) = ($ce->{title} =~ /(.*)\: (.*)/);
-    if( defined( $st ) )
-    {
-      # This program is part of a series and it has a colon in the title.
-      # Assume that the colon separates the title from the subtitle.
-      $ce->{title} = norm($t);
-      $ce->{subtitle} = norm($st);
-    }
+      my( $t, $st ) = ($ce->{title} =~ /(.*)\: (.*)/);
+      if( defined( $st ) )
+      {
+        # This program is part of a series and it has a colon in the title.
+        # Assume that the colon separates the title from the subtitle.
+        $ce->{title} = norm($t);
+        $ce->{subtitle} = norm($st);
+      }
       
       # Desc (only works on XLS files)
-      	my $field = "L".$i;
-      	my $desc = $ref->[1]{$field};
-      	$ce->{description} = normUtf8($desc) if( $desc and $desc ne "WITHOUT SYNOPSIS" );
-      	$desc = '';
+      $ce->{description} = norm(formattedCell($oWkS, $columns{'Synopsis'}, $iR));
 
-	# Episode
-	$oWkC = $oWkS->{Cells}[$iR][$colepisode];
-	my $episode = $oWkC->Value if( $oWkC );
-	$oWkC = $oWkS->{Cells}[$iR][$colseason];
-	my $season = $oWkC->Value if( $oWkC );
+      # Episode
+      my $episode = formattedCell($oWkS, $columns{'Ep No'}, $iR);
+      my $season = formattedCell($oWkS, $columns{'Ses No'}, $iR);
       
       # Try to extract episode-information from the description.
 			if(($season) and ($season ne "")) {
@@ -223,7 +179,7 @@ my $ref = ReadData ($file);
 				}
 			}
       
-	  progress("FuelTV: $time - $title") if $title;
+	    progress("FuelTV: $time - $title") if $title;
       $dsh->AddProgramme( $ce ) if $title;
     }
 
