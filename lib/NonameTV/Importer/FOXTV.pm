@@ -16,7 +16,6 @@ use utf8;
 use DateTime;
 use Data::Dumper;
 use Archive::Zip qw/:ERROR_CODES/;
-use XML::LibXML;
 
 use NonameTV qw/norm ParseExcel formattedCell AddCategory AddCountry/;
 use NonameTV::DataStore::Helper;
