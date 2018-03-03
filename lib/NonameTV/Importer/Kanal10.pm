@@ -93,7 +93,6 @@ sub ImportXLS {
     my %columns = ();
 
     # Rows
-    #print Dumper($oWkS);
     for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
         # Columns
         if( not %columns ){
