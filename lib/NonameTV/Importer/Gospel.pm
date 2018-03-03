@@ -15,21 +15,11 @@ Features:
 use utf8;
 
 use DateTime;
-use Spreadsheet::ParseExcel;
-use Spreadsheet::Read;
-
-use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
-use Spreadsheet::Read;
-
-use Text::Iconv;
-my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
-
 
 use Data::Dumper;
 use File::Temp qw/tempfile/;
 
-use NonameTV qw/norm normUtf8 AddCategory/;
+use NonameTV qw/norm ParseExcel formattedCell MonthNumber AddCategory/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 
@@ -79,46 +69,38 @@ sub ImportXLS {
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
 
-  # Only process .xls or .xlsx files.
-  progress( "Gospel: $xmltvid: Processing $file" );
+  # Process
+  progress( "Gospel: $chd->{xmltvid}: Processing $file" );
 
-	my %columns = ();
-  my $date;
-  my $currdate = "x";
-  my $coldate = 0;
-  my $coltime = 1;
-  my $coltitle = 2;
-  my $coldesc = 4;
+  my $doc = ParseExcel($file);
 
-my $oBook;
-
-if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
-else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }   #  staro, za .xls
-#elsif ( $file =~ /\.xml$/i ){ $oBook = Spreadsheet::ParseExcel::Workbook->Parse($file); progress( "using .xml" );    }   #  staro, za .xls
-#print Dumper($oBook);
-my $ref = ReadData ($file);
+  if( not defined( $doc ) ) {
+    error( "Gospel: $file: Failed to parse excel" );
+    return;
+  }
 
   # main loop
-  for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
+    my $oWkS = $doc->sheet($iSheet);
 
-    my $oWkS = $oBook->{Worksheet}[$iSheet];
+    progress( "Gospel: Processing worksheet: $oWkS->{label}" );
 
-    progress( "Gospel: Processing worksheet: $oWkS->{Name}" );
+	  my $foundcolumns = 0;
+    my %columns = ();
+    my $currdate = "x";
 
-	my $foundcolumns = 0;
-    # browse through rows
-    my $i = 0;
-    for(my $iR = 7 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
-    $i++;
+    # Columns
+    $columns{'Date'} = 1;
+    $columns{'Time'} = 2;
+    $columns{'Title'} = 4;
+    $columns{'Synopsis'} = 5;
+    $columns{'Genre'} = 6;
 
-      my $oWkC;
+    # Rows
+    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
 
       # date
-      $oWkC = $oWkS->{Cells}[$iR][0];
-      next if( ! $oWkC );
-
-	  $date = $oWkC->{Val} if( $oWkC->Value );
-      $date = ParseDate( ExcelFmt('yyyy-mm-dd', $date) );
+      my $date = ParseDate(formattedCell($oWkS, $columns{'Date'}, $iR), $file);
       next if( ! $date );
 
       if( $date ne $currdate ){
@@ -136,31 +118,13 @@ my $ref = ReadData ($file);
       }
 
       # time
-      $oWkC = $oWkS->{Cells}[$iR][1];
-      next if( ! $oWkC );
-
-
-
-      my $time = 0;  # fix for  12:00AM
-      $time=$oWkC->{Val} if( $oWkC->Value );
-
-	  #Convert Excel Time -> localtime
-      $time = ExcelFmt('hh:mm', $time);
-      $time =~ s/_/:/g; # They fail sometimes
-
+      my $time = formattedCell($oWkS, $columns{'Time'}, $iR);
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][3];
-      next if( ! $oWkC );
-      my $title = $oWkC->Value if( $oWkC->Value );
-      $title =~ s/&amp;/&/g;
-      $title =~ s/\(.*\)//g;
-      $title =~ s/\[.*\]//g;
+      my $title = formattedCell($oWkS, $columns{'Title'}, $iR);
 
       # desc
-      $oWkC = $oWkS->{Cells}[$iR][4];
-      next if( ! $oWkC );
-      my $desc = $oWkC->Value if( $oWkC->Value );
+      my $desc = formattedCell($oWkS, $columns{'Synopsis'}, $iR);
 
       my $ce = {
         channel_id => $channel_id,
@@ -170,7 +134,7 @@ my $ref = ReadData ($file);
       };
 
 
-	  progress("Gospel: $time - $title") if $title;
+	    progress("Gospel: $time - $title") if $title;
       $dsh->AddProgramme( $ce ) if $title;
     }
 
@@ -185,9 +149,9 @@ sub ParseDate
 {
   my ( $dinfo ) = @_;
 
-#  print Dumper($dinfo);
+  #print Dumper($dinfo);
 
-  my( $month, $day, $year );
+  my( $month, $day, $year, $monthname );
 #      progress("Mdatum $dinfo");
   if( $dinfo =~ /^\d{4}-\d{2}-\d{2}$/ ){ # format   '2010-04-22'
     ( $year, $month, $day ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
@@ -197,6 +161,9 @@ sub ParseDate
     ( $month, $day, $year ) = ( $dinfo =~ /^(\d+)-(\d+)-(\d+)$/ );
   } elsif( $dinfo =~ /^\d{1,2}\/\d{1,2}\/\d{2}$/ ){ # format '10-18-11' or '1-9-11'
     ( $month, $day, $year ) = ( $dinfo =~ /^(\d+)\/(\d+)\/(\d+)$/ );
+  } elsif( $dinfo =~ /^(\d+)-([[:alpha:]]+)-(\d+)$/ ){ # format '11-Jan-2018'
+    ( $day, $monthname, $year ) = ( $dinfo =~ /^(\d+)-([[:alpha:]]+)-(\d+)$/ );
+    $month = MonthNumber($monthname, "en");
   }
 
   return undef if( ! $year );
