@@ -15,21 +15,13 @@ Features:
 use utf8;
 
 use DateTime;
-use Spreadsheet::ParseExcel;
-use Spreadsheet::Read;
+
 use Try::Tiny;
-
-use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
-
-use Text::Iconv;
-my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
-
 
 use Data::Dumper;
 use File::Temp qw/tempfile/;
 
-use NonameTV qw/norm normUtf8 AddCategory MonthNumber/;
+use NonameTV qw/norm ParseExcel formattedCell AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 
@@ -44,7 +36,7 @@ sub new {
   bless ($self, $class);
 
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/London" );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "UTC" );
   $self->{datastorehelper} = $dsh;
 
   #$self->{datastore}->{augment} = 1;
@@ -67,22 +59,7 @@ sub ImportContentFile {
     $self->ImportXLS( $file, $chd );
   }
 
-
   return;
-}
-
-sub ImportXML {
-	my $self = shift;
-  my( $file, $chd ) = @_;
-  my $dsh = $self->{datastorehelper};
-  my $ds = $self->{datastore};
-  $self->{fileerror} = 1;
-
-	# Do something beautiful here later on.
-
-	error("From now on you need to convert XML files to XLS files.");
-
-	return 0;
 }
 
 sub ImportXLS {
@@ -96,46 +73,57 @@ sub ImportXLS {
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
 
-  # Only process .xls or .xlsx files.
-  progress( "Ginx: $xmltvid: Processing $file" );
+  # Process
+  progress( "Ginx: $chd->{xmltvid}: Processing $file" );
 
-	my %columns = ();
-  my $date;
-  my $currdate = "x";
-  my $coldate = 0;
-  my $coltime = 1;
-  my $coltitle = 4;
-  my $colepisode = 5;
-  my $coldesc = 7;
+  my $doc = ParseExcel($file);
 
-my $oBook;
-
-if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
-else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
-
-#my $ref = ReadData ($file);
+  if( not defined( $doc ) ) {
+    error( "Ginx: $file: Failed to parse excel" );
+    return;
+  }
 
   # main loop
-  for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
+    my $oWkS = $doc->sheet($iSheet);
 
-    my $oWkS = $oBook->{Worksheet}[$iSheet];
+    progress( "Ginx: Processing worksheet: $oWkS->{label}" );
 
-    progress( "Ginx: Processing worksheet: $oWkS->{Name}" );
+	  my $foundcolumns = 0;
+    my %columns = ();
+    my $currdate = "x";
 
-	my $foundcolumns = 0;
-    # browse through rows
-    my $i = 1;
-    for(my $iR = 1 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
-    $i++;
+    # Rows
+    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
 
-      my $oWkC;
+      # Columns
+      if( not %columns ){
+        # the column names are stored in the first row
+        # so read them and store their column positions
+
+        for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
+          # Does the cell exist?
+          if($oWkS->cell($iC, $iR)) {
+            $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Date/i );
+            $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Start Time \(UTC\)/i );
+            $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Program Title/i );
+            $columns{'Ep No'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Series/i );
+            $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Comment/i );
+
+            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /^Date/i ); # Only import if date is found
+          }
+        }
+
+        %columns = () if( $foundcolumns eq 0 );
+        next;
+      }
 
       # date
-      $oWkC = $oWkS->{Cells}[$iR][$coldate];
-      next if( ! $oWkC );
+      my $date = undef;
+      my $date2 = formattedCell($oWkS, $columns{'Date'}, $iR);
 
       try {
-        $date = ParseDate( $oWkC->Value );
+        $date = ParseDate( $date2 );
         next if( ! $date );
       }
       catch {
@@ -160,26 +148,14 @@ else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
       }
 
       # time
-      $oWkC = $oWkS->{Cells}[$iR][$coltime];
-      next if( ! $oWkC );
-
-
-
-      my $time = 0;  # fix for  12:00AM
-      $time=$oWkC->{Val} if( $oWkC->Value );
-
-	  #Convert Excel Time -> localtime
-      $time = ExcelFmt('hh:mm', $time);
-      $time =~ s/_/:/g; # They fail sometimes
+      my $time = formattedCell($oWkS, $columns{'Time'}, $iR);
 
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][$coltitle];
-      next if( ! $oWkC );
-      my $title = $oWkC->Value if( $oWkC->Value );
+      my $title = formattedCell($oWkS, $columns{'Title'}, $iR);
 
-      $oWkC = $oWkS->{Cells}[$iR][$coldesc];
-      my $desc = $oWkC->Value if( $oWkC );
+      # Desc
+      my $desc = formattedCell($oWkS, $columns{'Synopsis'}, $iR);
 
 
       my $ce = {
@@ -189,31 +165,30 @@ else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
         description => norm($desc),
       };
 
-	  # Episode
-	  $oWkC = $oWkS->{Cells}[$iR][$colepisode];
-	  my $episode = $oWkC->Value if( $oWkC );
+      # Episode
+      my $episode = formattedCell($oWkS, $columns{'Ep No'}, $iR);
 
-      # Try to extract episode-information from the description.
-		if(($episode) and ($episode ne ""))
-		{
-			$ce->{episode} = sprintf( ". %d .", $episode-1 );
-		}
+        # Try to extract episode-information from the description.
+      if(($episode) and ($episode ne ""))
+      {
+        $ce->{episode} = sprintf( ". %d .", $episode-1 );
+      }
 
-		if( defined $ce->{episode} ) {
-			$ce->{program_type} = 'series';
-		}
+      if( defined $ce->{episode} ) {
+        $ce->{program_type} = 'series';
+      }
 
-		 my( $t, $st ) = ($ce->{title} =~ /(.*)\: (.*)/);
-         if( defined( $st ) )
-         {
-              # This program is part of a series and it has a colon in the title.
-              # Assume that the colon separates the title from the subtitle.
-              $ce->{title} = $t;
-              $title = $t;
-              $ce->{subtitle} = $st;
-         }
+		  my( $t, $st ) = ($ce->{title} =~ /(.*)\: (.*)/);
+      if( defined( $st ) )
+      {
+        # This program is part of a series and it has a colon in the title.
+        # Assume that the colon separates the title from the subtitle.
+        $ce->{title} = $t;
+        $title = $t;
+        $ce->{subtitle} = $st;
+      }
 
-	  progress("Ginx: $time - $title") if $title;
+	    progress("Ginx: $time - $title") if $title;
       $dsh->AddProgramme( $ce ) if $title;
     }
 
@@ -227,8 +202,6 @@ else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
 sub ParseDate
 {
   my ( $dinfo ) = @_;
-
-  $dinfo = ExcelFmt('yyyy-mm-dd', $dinfo);
 
   my( $day, $monthname, $month, $year );
 
