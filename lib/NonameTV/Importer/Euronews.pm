@@ -15,21 +15,10 @@ Features:
 use utf8;
 
 use DateTime;
-use Spreadsheet::ParseExcel;
-use Spreadsheet::Read;
-
-use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
-use Spreadsheet::Read;
-
-use Text::Iconv;
-my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
-
-
 use Data::Dumper;
 use File::Temp qw/tempfile/;
 
-use NonameTV qw/norm normUtf8 AddCategory/;
+use NonameTV qw/norm ParseExcel formattedCell AddCategory/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 
@@ -44,7 +33,7 @@ sub new {
   bless ($self, $class);
 
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "CET" );
   $self->{datastorehelper} = $dsh;
 
   $self->{datastore}->{augment} = 1;
@@ -86,44 +75,50 @@ sub ImportXLS {
 
 	my %columns = ();
   my $date;
-  my $currdate = "x";
-  my $coldate = 0;
-  my $coltime = 1;
-  my $coltitle = 2;
-  my $coldesc = 4;
-  my $colgenre = 6;
-  my $colpremiere = 7;
 
-my $oBook;
+  my $doc = ParseExcel($file);
 
-if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
-else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }   #  staro, za .xls
-#elsif ( $file =~ /\.xml$/i ){ $oBook = Spreadsheet::ParseExcel::Workbook->Parse($file); progress( "using .xml" );    }   #  staro, za .xls
-#print Dumper($oBook);
-my $ref = ReadData ($file);
+  if( not defined( $doc ) ) {
+    error( "Euronews: $file: Failed to parse excel" );
+    return;
+  }
 
   # main loop
-  for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
-
-    my $oWkS = $oBook->{Worksheet}[$iSheet];
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
+    my $oWkS = $doc->sheet($iSheet);
 
     progress( "Euronews: Processing worksheet: $oWkS->{Name}" );
 
-	my $foundcolumns = 0;
+	  my $foundcolumns = 0;
+    my $currdate = "x";
+
     # browse through rows
-    my $i = 0;
-    for(my $iR = $oWkS->{MinRow} ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
-    $i++;
+    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
+      # Columns
+      if( not %columns ){
+        # the column names are stored in the first row
+        # so read them and store their column positions
 
-      my $oWkC;
+        for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
+          # Does the cell exist?
+          if($oWkS->cell($iC, $iR)) {
+            $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Programme Title/i );
+            $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Date/i );
+            $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Start Time/i );
+            $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^EPG Synopsis/i );
+            $columns{'Genre'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Theme/i );
 
-      ##print Dumper($oWkS->{Cells}[$iR]);
+            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /^Date/i ); # Only import if date is found
+          }
+        }
+
+        %columns = () if( $foundcolumns eq 0 );
+        next;
+      }
+
 
       # date
-      $oWkC = $oWkS->{Cells}[$iR][$coldate];
-      next if( ! $oWkC );
-
-      $date = ParseDate( $oWkC->Value );
+      $date = ParseDate( formattedCell($oWkS, $columns{'Date'}, $iR) );
       next if( ! $date );
 
       if( $date ne $currdate ){
@@ -141,21 +136,10 @@ my $ref = ReadData ($file);
       }
 
       # time
-      $oWkC = $oWkS->{Cells}[$iR][$coltime];
-      next if( ! $oWkC );
-
-
-
-      my $time = 0;  # fix for  12:00AM
-      $time=$oWkC->{Val} if( $oWkC->Value );
-
-	  #Convert Excel Time -> localtime
-      $time = ExcelFmt('hh:mm', $time);
+      my $time = formattedCell($oWkS, $columns{'Time'}, $iR);
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][$coltitle];
-      next if( ! $oWkC );
-      my $title = $oWkC->Value if( $oWkC->Value );
+      my $title = formattedCell($oWkS, $columns{'Title'}, $iR);
 
 
       my $ce = {
@@ -164,38 +148,16 @@ my $ref = ReadData ($file);
         title => norm($title),
       };
 
-      # Desc (only works on XLS files)
-      #	my $field = "L".$i;
-      #	my $desc = $ref->[1]{$field};
-      #	$ce->{description} = normUtf8($desc) if( $desc );
-      #	$desc = '';
+      $ce->{description} = formattedCell($oWkS, $columns{'Synopsis'}, $iR);
 
-      $oWkC = $oWkS->{Cells}[$iR][$coldesc];
-      $ce->{description} = $oWkC->Value if( $oWkC->Value );
-
-      # premiere
-      $oWkC = $oWkS->{Cells}[$iR][$colpremiere];
-      next if( ! $oWkC );
-      my $premiere = $oWkC->Value if( $oWkC->Value );
-      if( $premiere eq "yes" )
-      {
-        $ce->{new} = "1";
-      }
-      else
-      {
-        $ce->{new} = "0";
+      # Genre
+      my $genre = formattedCell($oWkS, $columns{'Genre'}, $iR);
+      if( $genre and $genre ne "" ) {
+        my($program_type, $category ) = $ds->LookupCat( 'Euronews', $genre );
+        AddCategory( $ce, $program_type, $category );
       }
 
-
-		# Genre
-		$oWkC = $oWkS->{Cells}[$iR][$colgenre];
-		if( $oWkC and $oWkC->Value ne "" ) {
-	      	my $genre = $oWkC->Value;
-			my($program_type, $category ) = $ds->LookupCat( 'Euronews', $genre );
-			AddCategory( $ce, $program_type, $category );
-		}
-
-	  progress("Euronews: $time - $title") if $title;
+	    progress("Euronews: $time - $title") if $title;
       $dsh->AddProgramme( $ce ) if $title;
     }
 

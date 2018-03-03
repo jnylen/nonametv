@@ -267,7 +267,7 @@ sub guess_channel
  }
 
  if( $dir =~ /Euronews/ and $filename =~ /\.(xls|xlsx)/i ) {
-    return "euronews.com";
+    return "euronews.com" if $filename =~ /cet/i;
  }
 
  if( $dir =~ /MTV/ ) {
