@@ -489,7 +489,7 @@ sub guess_channel
     return "rictv.de" if $filename =~ /RiC/i;
  }
 
- if( $dir =~ /Matkanalen/ and $filename =~ /\.xls$/i ) {
+ if( $dir =~ /Matkanalen/ and $filename =~ /\.(xls|xlsx)$/i ) {
     return "matkanalen.tv";
  }
 

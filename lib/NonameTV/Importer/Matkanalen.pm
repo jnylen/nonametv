@@ -14,10 +14,8 @@ Features:
 use utf8;
 
 use DateTime;
-use Spreadsheet::ParseExcel;
-#use Data::Dumper;
 
-use NonameTV qw/norm AddCategory MonthNumber/;
+use NonameTV qw/norm ParseExcel formattedCell AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 use NonameTV::Config qw/ReadConfig/;
@@ -46,7 +44,7 @@ sub ImportContentFile {
 
   $self->{fileerror} = 0;
 
-  if( $file =~ /\.xls$/i ){
+  if( $file =~ /\.(xls|xlsx)$/i ){
     $self->ImportFlatXLS( $file, $chd );
   } else {
     error( "Matkanalen: Unknown file format: $file" );
@@ -62,38 +60,48 @@ sub ImportFlatXLS
 
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
-
-  my %columns = ();
-  my $date;
   my $currdate = "x";
 
-  progress( "Matkanalen: Processing flat XLS $file" );
+  # Process
+  progress( "Matkanalen: $chd->{xmltvid}: Processing $file" );
 
-  my $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );
-  my($oWkS, $oWkC);
-  my $foundcolumns = 0;
+  my $doc = ParseExcel($file);
+
+  if( not defined( $doc ) ) {
+    error( "Matkanalen: $file: Failed to parse excel" );
+    return;
+  }
+
 
   # main loop
-  foreach my $oWkS (@{$oBook->{Worksheet}}) {
-    for(my $iR = 0 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
+    my $oWkS = $doc->sheet($iSheet);
+    progress( "Matkanalen: Processing worksheet: $oWkS->{label}" );
+
+    my $foundcolumns = 0;
+    my %columns = ();
+
+    # Rows
+    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
       if( not %columns ){
         # the column names are stored in the first row
         # so read them and store their column positions
         # for further findvalue() calls
 
-        for(my $iC = $oWkS->{MinCol} ; defined $oWkS->{MaxCol} && $iC <= $oWkS->{MaxCol} ; $iC++) {
-          if( $oWkS->{Cells}[$iR][$iC] ){
-            $columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programtittel/ );
-            $columns{'Start'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Tid/ );
-            $columns{'Stop'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Slutt/ );
-            $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Dato/ );
-            $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Oppsummering/ );
-            $columns{'EpisodeTitle'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episodetittel/ );
-            $columns{'Season'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Sesongnummer/ );
-            $columns{'Episode'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Episodenummer/ );
-            $columns{'Image'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Link til episodebilde/ );
+        for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
+          # Does the cell exist?
+          if($oWkS->cell($iC, $iR)) {
+            $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /Programtittel/ );
+            $columns{'Start'} = $iC if( $oWkS->cell($iC, $iR) =~ /Tid/ );
+            $columns{'Stop'} = $iC if( $oWkS->cell($iC, $iR) =~ /Slutt/ );
+            $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /Dato/ );
+            $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /Oppsummering/ );
+            $columns{'EpisodeTitle'} = $iC if( $oWkS->cell($iC, $iR) =~ /Episodetittel/ );
+            $columns{'Season'} = $iC if( $oWkS->cell($iC, $iR) =~ /Sesongnummer/ );
+            $columns{'Episode'} = $iC if( $oWkS->cell($iC, $iR) =~ /Episodenummer/ );
+            $columns{'Image'} = $iC if( $oWkS->cell($iC, $iR) =~ /Link til episodebilde/ );
 
-            $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /Programtittel/ ); # Only import if season number is found
+            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /Programtittel/ ); # Only import if season number is found
           }
         }
         %columns = () if( $foundcolumns eq 0 );
@@ -102,8 +110,7 @@ sub ImportFlatXLS
       }
 
       # date (column 1)
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Date'}];
-	    $date = ParseDate( $oWkC->Value );
+      my $date = ParseDate(formattedCell($oWkS, $columns{'Date'}, $iR), $file);
       next if(!$date);
 
   	  if($date ne $currdate ) {
@@ -122,22 +129,15 @@ sub ImportFlatXLS
       }
 
       # time (column 1)
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Start'}];
-      next if( ! $oWkC );
-      my $start = ParseTime( $oWkC->Value );
+      my $start = ParseTime(formattedCell($oWkS, $columns{'Start'}, $iR));
       next if( ! $start );
 
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Stop'}];
-      next if( ! $oWkC );
-      my $stop = ParseTime( $oWkC->Value );
+      my $stop = ParseTime(formattedCell($oWkS, $columns{'Stop'}, $iR));
       next if( ! $stop );
 
       # program_title (column 4)
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
-      my $title = norm($oWkC->Value);
-
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Synopsis'}];
-      my $desc = norm($oWkC->Value) if( $oWkC );
+      my $title = norm(formattedCell($oWkS, $columns{'Title'}, $iR));
+      my $desc = norm(formattedCell($oWkS, $columns{'Synopsis'}, $iR));
 
       my $ce = {
         channel_id   => $chd->{id},
@@ -147,11 +147,8 @@ sub ImportFlatXLS
       };
 
       ## Episode
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Episode'}];
-      my $episode = $oWkC->Value if( $oWkC );
-
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Season'}];
-      my $season = $oWkC->Value if( $oWkC );
+      my $episode = formattedCell($oWkS, $columns{'Episode'}, $iR);
+      my $season = formattedCell($oWkS, $columns{'Season'}, $iR);
 
       if(defined($episode) and $episode ne "" and $episode > 0) {
         $ce->{episode} = ". " . ($episode-1) . " ." if $episode ne "";
@@ -161,8 +158,7 @@ sub ImportFlatXLS
         $ce->{episode} = $season-1 . $ce->{episode};
       }
 
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'EpisodeTitle'}];
-      my $subtitle = $oWkC->Value if( $oWkC );
+      my $subtitle = norm(formattedCell($oWkS, $columns{'EpisodeTitle'}, $iR));
       if(defined($subtitle) and $subtitle ne "") {
         $ce->{subtitle} = norm($subtitle);
       }
