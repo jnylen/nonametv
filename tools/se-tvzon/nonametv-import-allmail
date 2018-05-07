@@ -12,7 +12,6 @@ tools/nonametv-import NatGeoFI $1 $2 $3
 tools/nonametv-import TravelChannel $1 $2 $3
 tools/nonametv-import God $1 $2 $3
 tools/nonametv-import Gospel $1 $2 $3
-#tools/nonametv-import TVChile $1 $2 $3
 tools/nonametv-import Svt $1 $2 $3
 tools/nonametv-import Venetsia $1 $2 $3
 tools/nonametv-import BBCWW $1 $2 $3
@@ -65,5 +64,4 @@ tools/nonametv-import S1CH $1 $2 $3
 tools/nonametv-import ERR $1 $2 $3
 tools/nonametv-import RTVE $1 $2 $3
 tools/nonametv-import Welt $1 $2 $3
-tools/nonametv-import KBSWorld $1 $2 $3
 tools/nonametv-import MediasetIT $1 $2 $3

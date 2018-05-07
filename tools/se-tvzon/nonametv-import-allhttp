@@ -68,6 +68,7 @@ $NONAMETV MTGRadio $1 $2 $3
 $NONAMETV Fjorton $1 $2 $3
 $NONAMETV TV5Monde $1 $2 $3
 $NONAMETV Kanal2 $1 $2 $3
+$NONAMETV KBSWorld $1 $2 $3
 
 # Download files
 wget -O /content/channels/tv_grab/ok54.xml http://epg.ok-rlp.de/xmltv/trier.xml

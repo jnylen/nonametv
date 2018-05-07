@@ -17,14 +17,14 @@ use DateTime;
 use Data::Dumper;
 use Archive::Zip qw/:ERROR_CODES/;
 
-use NonameTV qw/norm ParseExcel formattedCell AddCategory AddCountry/;
+use NonameTV qw/norm ParseXml AddCategory AddCountry/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error d p w f/;
 use NonameTV::Config qw/ReadConfig/;
 
-use NonameTV::Importer::BaseFile;
+use NonameTV::Importer::BaseWeekly;
 
-use base 'NonameTV::Importer::BaseFile';
+use base 'NonameTV::Importer::BaseWeekly';
 
 sub new {
   my $proto = shift;
@@ -32,7 +32,7 @@ sub new {
   my $self  = $class->SUPER::new( @_ );
   bless ($self, $class);
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/London" );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "UTC" );
   $self->{datastorehelper} = $dsh;
 
   $self->{datastore}->{augment} = 1;
@@ -40,157 +40,179 @@ sub new {
   return $self;
 }
 
-sub ImportContentFile {
-  my $self = shift;
-  my( $file, $chd ) = @_;
+sub first_day_of_week
+{
+  my ($year, $week) = @_;
 
-  $self->{fileerror} = 0;
-  my $chanfileid = $chd->{grabber_info};
-
-  if( $file =~ /\.(xls|xlsx)$/i ) {
-    $self->ImportXLS( $file, $chd );
-  } else {
-    error( "KBSWorld: Unknown file format: $file" );
-  }
-
-  return;
+  # Week 1 is defined as the one containing January 4:
+  DateTime
+    ->new( year => $year, month => 1, day => 4, hour => 00, minute => 00, time_zone => 'UTC' )
+    ->add( weeks => ($week - 1) )
+    ->truncate( to => 'week' );
 }
 
-sub ImportXLS {
+sub last_day_of_week
+{
+  my ($year, $week) = @_;
+
+  # Week 1 is defined as the one containing January 4:
+  DateTime
+    ->new( year => $year, month => 1, day => 4, hour => 00, minute => 00, time_zone => 'UTC' )
+    ->add( weeks => $week )
+    ->truncate( to => 'week' )
+    ->subtract( days => 1 );
+}
+
+
+sub Object2Url {
   my $self = shift;
-  my( $file, $chd ) = @_;
+  my( $batch_id, $data ) = @_;
 
-  $self->{fileerror} = 0;
+  my( $year, $week ) = ( $batch_id =~ /(\d+)-(\d+)$/ );
 
-  my $xmltvid = $chd->{xmltvid};
-  my $channel_id = $chd->{id};
-  my $dsh = $self->{datastorehelper};
-  my $ds = $self->{datastore};
+  my $datefirst = first_day_of_week( $year, $week );
+  my $datelast = last_day_of_week( $year, $week );
 
-  # Only process .xls or .xlsx files.
-  progress( "KBSWorld: $xmltvid: Processing $file" );
-  my $date;
-  my $currdate = "x";
-  my %columns = ();
+  my $url = sprintf("http://kbsworld.kbs.co.kr/schedule/down_schedule_xml.php?down_time_add=-9&wlang=e&start_date=%s&end_date=%s", $datefirst->ymd("-"), $datelast->ymd("-"));
 
-  my $doc = ParseExcel($file);
+ progress("Fetching $url...");
 
-  if( not defined( $doc ) ) {
-    error( "KBSWorld: $file: Failed to parse excel" );
-    return;
+  return( $url, undef );
+}
+
+sub ContentExtension {
+  return 'xml';
+}
+
+sub FilteredExtension {
+  return 'xml';
+}
+
+sub FilterContent {
+  my $self = shift;
+  my( $cref, $chd ) = @_;
+
+  # Clean it up
+  $$cref =~ s/\t+//gi;
+  $$cref =~ s/\n//gi;
+  $$cref =~ s/<style>(.*)<\/style>//gi;
+  $$cref =~ s/<colgroup>(.*)<\/colgroup>//gi;
+  $$cref =~ s/<thead>(.*)<\/thead>//gi;
+  $$cref =~ s/<\/body>//gi;
+  $$cref =~ s/<\/html>//gi;
+  $$cref =~ s/<table border="1" cellspacing="0" class="sch_table">/<table>/g;
+
+  $$cref =~ s/<br style='(.*?)'>/\n/g;
+  $$cref =~ s/&nbsp;//gi;
+  $$cref =~ s/&#39;/'/g;
+  $$cref =~ s/&#65533;//g;
+  $$cref =~ s/ & / &amp; /g;
+  my $data = '<?xml version="1.0" encoding="utf-8"?>';
+  $data .= $$cref;
+
+  my $doc = ParseXml( \$data );
+
+  if( not defined $doc ) {
+    return (undef, "ParseXml failed" );
   }
 
-  # main loop
-  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
-    my $oWkS = $doc->sheet($iSheet);
-    progress( "KBSWorld: Processing worksheet: $oWkS->{label}" );
+  # Find all "Schedule"-entries.
+  my $ns = $doc->find( "//tbody/tr" );
 
-    my $foundcolumns = 0;
+  if( $ns->size() == 0 ) {
+    return (undef, "No data found" );
+  }
 
-    # go through the programs
-    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
-      if( not %columns ){
-        # the column names are stored in the first row
-        # so read them and store their column positions
-        # for further findvalue() calls
+  my $str = $doc->toString( 1 );
+  return( \$str, undef );
+}
 
-        for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
-          if( $oWkS->cell($iC, $iR) ){
-            $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Date/ );
-            $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Start time/i );
-            $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Title/ );
-            $columns{'SeaNo'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Season no/ );
-            $columns{'Genre'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Genre/ );
-            $columns{'EpiNo'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Episode/ );
-            $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Synop/ );
+sub ImportContent {
+  my $self = shift;
+  my( $batch_id, $cref, $chd ) = @_;
 
+  my $ds = $self->{datastore};
+  my $dsh = $self->{datastorehelper};
 
-            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /Date/ );
-          }
-        }
+  my $doc = ParseXml( \$cref );
+  if( not defined $doc ) {
+    return (undef, "ParseXml failed" );
+  }
 
-        %columns = () if( $foundcolumns eq 0 );
+  # Find all "Schedule"-entries.
+  my $ns = $doc->find( "//tbody/tr" );
 
-        next;
-      }
+  if( $ns->size() == 0 ) {
+    return (undef, "No data found" );
+  }
 
-      # date - column 0 ('Date')
-      $date = ParseDate(formattedCell($oWkS, $columns{'Date'}, $iR));
-      next if( ! $date );
-
-	  # Startdate
-      if( $date ne $currdate ) {
-      	if( $currdate ne "x" ) {
-			$dsh->EndBatch( 1 );
-        }
-
-      	my $batchid = $chd->{xmltvid} . "_" . $date;
-        $dsh->StartBatch( $batchid , $chd->{id} );
-        progress("KBSWorld: $chd->{xmltvid}: Date is $date");
-        $dsh->StartDate( $date , "00:00" );
-        $currdate = $date;
-      }
-
-      # time
-      my $start = formattedCell($oWkS, $columns{'Time'}, $iR);
-      next if( !$start );
+  my $currdate = "x";
 
 
-      # title
-      my $title = norm(formattedCell($oWkS, $columns{'Title'}, $iR));
-      next if( !$title );
+  foreach my $p ($ns->get_nodelist)
+  {
+    # day
+    my $dayte = ParseDate($p->findvalue( 'td[1]' ));
+    if( $dayte ne $currdate ){
+        progress("Date is ".$dayte);
 
-      my $desc = norm(formattedCell($oWkS, $columns{'Synopsis'}, $iR));
-      
-      my $ce = {
-          channel_id => $chd->{id},
-          title => norm($title),
-          start_time => $start,
-          description => norm($desc)
-      };
-
-      my $se_num = norm(formattedCell($oWkS, $columns{'SeaNo'}, $iR));
-      my $ep_num = norm(formattedCell($oWkS, $columns{'EpiNo'}, $iR));
-
-      # Episode info in xmltv-format
-      if( (defined($ep_num) and defined($se_num)) and ($ep_num ne "" and $ep_num ne "0") and ($se_num ne "" and $se_num ne "0") )
-      {
-          $ce->{episode} = sprintf( "%d . %d .", $se_num-1, $ep_num-1 );
-      }
-      elsif( defined($ep_num) and $ep_num ne "" and $ep_num ne "0" )
-      {
-          $ce->{episode} = sprintf( ". %d .", $ep_num-1 );
-      }
-
-      # Genre
-      my $genre = norm(formattedCell($oWkS, $columns{'Genre'}, $iR));
-      if(defined($genre) and $genre ne "") {
-          my ( $program_type, $category ) = $self->{datastore}->LookupCat( "KBSWorld", $genre );
-        AddCategory( $ce, $program_type, $category );
-      }
-
-      # Live
-      if($title =~ /\[LIVE\]/i) {
-          $ce->{live} = 1;
-          $ce->{title} =~ s/\[LIVE\]//i;
-          $ce->{title} = norm($ce->{title});
-      }
-
-      # Remove Season <num> from title
-      if($title =~ /Season (\d+)$/i) {
-          $ce->{title} =~ s/Season (\d+)$//i;
-          $ce->{title} = norm($ce->{title});
-      }
-
-
-      progress( "KBSWorld: $chd->{xmltvid}: $start - $ce->{title}" );
-      $dsh->AddProgramme( $ce );
+        $dsh->StartDate( $dayte , "00:00" );
+        $currdate = $dayte;
     }
 
-    $dsh->EndBatch( 1 );
+    my $start = $p->findvalue( 'td[2]' );
+    my $title = $p->findvalue( 'td[4]' );
+    my $season = $p->findvalue( 'td[5]' );
+    my $genre = $p->findvalue( 'td[6]' );
+    my $subgenre = $p->findvalue( 'td[7]' );
+    my $episode = $p->findvalue( 'td[8]' );
+    my $synopsis = $p->findvalue( 'td[9]' );
 
+    my $ce = {
+        title 	  => norm($title),
+        channel_id  => $chd->{id},
+        description => norm($synopsis),
+        start_time  => $start,
+    };
+
+    # Season Episode
+    if(($season) and ($episode)) {
+  		$ce->{episode} = sprintf( "%d . %d . ", $season-1, $episode-1 );
+  	} elsif((!$season) and ($episode)) {
+  		 $ce->{episode} = sprintf( " . %d . ", $episode-1 );
+  	}
+
+    # Genre
+    if(defined($genre) and $genre ne "") {
+      my ( $program_type, $category ) = $self->{datastore}->LookupCat( "KBSWorld", $genre );
+      AddCategory( $ce, $program_type, $category );
+    }
+
+    # Subgenre
+    if(defined($subgenre) and $subgenre ne "") {
+      my ( $program_type2, $category2 ) = $self->{datastore}->LookupCat( "KBSWorld", $subgenre );
+      AddCategory( $ce, $program_type2, $category2 );
+    }
+
+    # Live
+    if($title =~ /\[LIVE\]/i) {
+      $ce->{live} = 1;
+      $ce->{title} =~ s/\[LIVE\]//i;
+      $ce->{title} = norm($ce->{title});
+    }
+
+    # Remove Season <num> from title
+    if($title =~ /Season (\d+)$/i) {
+      $ce->{title} =~ s/Season (\d+)$//i;
+      $ce->{title} = norm($ce->{title});
+    }
+
+    $dsh->AddProgramme( $ce );
+
+    progress("KBSWorld: $chd->{xmltvid}: $start - $title");
   }
 
+  return 1;
 }
 
 sub ParseDate {
