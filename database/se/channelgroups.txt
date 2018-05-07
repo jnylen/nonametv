@@ -1,0 +1,15 @@
+Austria,"Austria TV/Radio channels",6,display_name,0
+Denmark,"Denmark TV/Radio channels",4,display_name,0
+DEV,"Test channels for development",255,display_name,1
+Estonia,"Estonia TV/Radio channels",9,display_name,0
+Finland,"Finland TV/Radio channels",10,display_name,0
+Germany,"Germany TV/Radio channels",2,display_name,0
+Hungary,"Hungary TV/Radio channels",13,display_name,0
+Latvia,"Latvia TV/Radio channels",11,display_name,0
+Lithuania,"Lithuania TV/Radio channels",12,display_name,0
+Norway,"Norway TV/Radio channels",3,display_name,0
+Poland,"Poland TV/Radio channels",8,display_name,0
+RADIO,Radiostations,100,display_name,0
+Sweden,"Sweden TV/Radio channels",5,display_name,0
+Switzerland,"Switzerland TV/Radio channels",7,display_name,0
+TV,"TV Channels",1,display_name,0
