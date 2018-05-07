@@ -78,6 +78,7 @@ sub AddFile #( $xmltvid, $filename, $cref )
   
   use bytes; # Wide character fix
   my $newmd5 = md5_hex( $$cref . "" ); # Wide character fix
+  #print $$cref;
   if( not defined( $oldmd5 ) ) {
     my $fullname = "$dir/$filename";
     open( OUT, "> $fullname" ) or die "Failed to write to $fullname";
@@ -97,11 +98,11 @@ sub AddFile #( $xmltvid, $filename, $cref )
     my $nextmd5;
     my $nextfilename;
 
-    for( my $c=1; $c<100; $c++ ) {
+    for( my $c=1; $c<200; $c++ ) {
       $nextfilename = "$base-$c$ext";
       ( $nextmd5 ) = $self->GetFileMeta( $xmltvid, $nextfilename );
       if( (not defined( $nextmd5 )) or ($nextmd5 eq $newmd5) ) {
-	last;
+	      last;
       }
     }
 
@@ -115,7 +116,7 @@ sub AddFile #( $xmltvid, $filename, $cref )
     }
   }
   else {
-#    print "Duplicate file skipped.\n";
+    print "Duplicate file skipped.\n";
   }
 }
 
