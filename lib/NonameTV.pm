@@ -41,6 +41,7 @@ BEGIN {
                       ParseDescCatDan
                       ParseDescCatSwe FixProgrammeData
     		              ParseXml ParseXmltv ParseJson
+                      ParseXmlFile
                       ParseExcel formattedCell
                       MonthNumber DayNumber
                       CompareArrays
@@ -817,6 +818,37 @@ sub ParseXml {
 
 =pod
 
+my $doc = ParseXmlFile( $strref );
+
+Parse an xml-file into an XML::LibXML document. Takes a reference to a
+string as the only reference.
+
+=cut
+
+my $xml2;
+
+sub ParseXmlFile {
+  my( $file ) = @_;
+
+  if( not defined $xml ) {
+    $xml2 = XML::LibXML->new;
+    $xml2->load_ext_dtd(0);
+  }
+
+  my $doc;
+  eval {
+    $doc = $xml2->parse_file($file);
+  };
+  if( $@ )   {
+    w "Failed to parse xml: $@";
+    return undef;
+  }
+
+  return $doc;
+}
+
+=pod
+
 my $doc = ParseJson( $strref );
 
 Parse an json-string
@@ -1234,6 +1266,15 @@ sub MonthNumber {
     @months_2 = qw/januari februari mars april maj juni juli augusti september oktober november december/;
     @months_3 = qw/jan feb mar apr maj jun jul aug sept okt nov dec/;
     @months_4 = qw/tammikuu helmikuu maaliskuu huhtikuu toukokuu kesäkuu heinäkuu elokuu syyskuu lokakuu marraskuu joulukuu/;
+    @months_5 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
+    @months_6 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
+    @months_7 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
+    @months_8 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
+  } elsif( $lang =~ /^es$/ ){
+    @months_1 = qw/jan feb mar apr maj jun jul aug sep okt nov dec/;
+    @months_2 = qw/enero febrero marzo abril mayo junio julio agosto septiembre octubre noviembre diciembre/;
+    @months_3 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
+    @months_4 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_5 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_6 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
     @months_7 = qw/1 2 3 4 5 6 7 8 9 10 11 12/;
