@@ -3,7 +3,7 @@ CREATE TABLE `batches` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL DEFAULT '',
   `last_update` int(11) NOT NULL DEFAULT 0,
-  `message` text DEFAULT NULL,
+  `message` longtext DEFAULT NULL,
   `abort_message` text DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `name` (`name`)
@@ -43,13 +43,14 @@ DROP TABLE IF EXISTS `files`;
 CREATE TABLE `files` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `channelid` int(11) NOT NULL DEFAULT 0,
-  `filename` varchar(80) NOT NULL DEFAULT '',
+  `filename` varchar(250) NOT NULL DEFAULT '',
   `successful` tinyint(1) DEFAULT NULL,
-  `message` text DEFAULT NULL,
+  `message` longtext DEFAULT NULL,
   `earliestdate` datetime DEFAULT NULL,
   `latestdate` datetime DEFAULT NULL,
   `md5sum` varchar(33) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq-filename-cid` (`filename`,`channelid`),
   KEY `channelid` (`channelid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -61,7 +62,7 @@ CREATE TABLE `programs` (
   `end_time` datetime DEFAULT '0000-00-00 00:00:00',
   `schedule_id` varchar(100) DEFAULT NULL,
   `title_id` varchar(100) DEFAULT NULL,
-  `title` varchar(100) NOT NULL DEFAULT '',
+  `title` varchar(200) NOT NULL DEFAULT '',
   `title_lang` varchar(5) DEFAULT NULL,
   `subtitle` mediumtext DEFAULT NULL,
   `subtitle_lang` varchar(5) DEFAULT NULL,

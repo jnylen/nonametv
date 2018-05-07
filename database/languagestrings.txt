@@ -68,6 +68,7 @@ exporter-xmltv,episode_number,Folge,de
 exporter-xmltv,episode_number,Episode,ee
 exporter-xmltv,episode_number,Episode,en
 exporter-xmltv,episode_number,Episodio,es
+exporter-xmltv,episode_number,Episode,et
 exporter-xmltv,episode_number,Osa,fi
 exporter-xmltv,episode_number,"Épisode",fr
 exporter-xmltv,episode_number,epizoda,hr
@@ -87,6 +88,7 @@ exporter-xmltv,episode_part,Teil,de
 exporter-xmltv,episode_part,part,ee
 exporter-xmltv,episode_part,part,en
 exporter-xmltv,episode_part,parte,es
+exporter-xmltv,episode_part,part,et
 exporter-xmltv,episode_part,partie,fr
 exporter-xmltv,episode_part,dio,hr
 exporter-xmltv,episode_part,part,hu
@@ -105,6 +107,7 @@ exporter-xmltv,episode_season,Staffel,de
 exporter-xmltv,episode_season,season,ee
 exporter-xmltv,episode_season,season,en
 exporter-xmltv,episode_season,temporada,es
+exporter-xmltv,episode_season,season,et
 exporter-xmltv,episode_season,kausi,fi
 exporter-xmltv,episode_season,saison,fr
 exporter-xmltv,episode_season,sezona,hr
@@ -125,6 +128,7 @@ exporter-xmltv,of,von,de
 exporter-xmltv,of,of,ee
 exporter-xmltv,of,of,en
 exporter-xmltv,of,de,es
+exporter-xmltv,of,of,et
 exporter-xmltv,of,jonka,fi
 exporter-xmltv,of,par,fr
 exporter-xmltv,of,od,hr
@@ -141,6 +145,7 @@ exporter-xmltv,of,od,sl
 exporter-xmltv,of,av,sv
 exporter-xmltv2,episode_number,episode,ee
 exporter-xmltv2,episode_number,episode,en
+exporter-xmltv2,episode_number,episode,et
 exporter-xmltv2,episode_number,epizoda,hr
 exporter-xmltv2,episode_number,episode,hu
 exporter-xmltv2,episode_number,episode,lt
@@ -149,6 +154,7 @@ exporter-xmltv2,episode_number,episode,pl
 exporter-xmltv2,episode_number,Del,sv
 exporter-xmltv2,episode_part,part,ee
 exporter-xmltv2,episode_part,part,en
+exporter-xmltv2,episode_part,part,et
 exporter-xmltv2,episode_part,dio,hr
 exporter-xmltv2,episode_part,part,hu
 exporter-xmltv2,episode_part,part,lt
@@ -157,6 +163,7 @@ exporter-xmltv2,episode_part,part,pl
 exporter-xmltv2,episode_part,Part,sv
 exporter-xmltv2,episode_season,season,ee
 exporter-xmltv2,episode_season,season,en
+exporter-xmltv2,episode_season,season,et
 exporter-xmltv2,episode_season,sezona,hr
 exporter-xmltv2,episode_season,season,hu
 exporter-xmltv2,episode_season,season,lt
@@ -165,6 +172,7 @@ exporter-xmltv2,episode_season,season,pl
 exporter-xmltv2,episode_season,"sÃ¤song",sv
 exporter-xmltv2,of,of,ee
 exporter-xmltv2,of,of,en
+exporter-xmltv2,of,of,et
 exporter-xmltv2,of,od,hr
 exporter-xmltv2,of,of,hu
 exporter-xmltv2,of,of,lt
