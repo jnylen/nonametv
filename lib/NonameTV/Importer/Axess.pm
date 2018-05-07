@@ -22,316 +22,345 @@ use NonameTV::Importer::BaseDaily;
 use base 'NonameTV::Importer::BaseDaily';
 
 sub new {
-  my $proto = shift;
-  my $class = ref($proto) || $proto;
-  my $self  = $class->SUPER::new( @_ );
-  bless ($self, $class);
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
+    my $self  = $class->SUPER::new(@_);
+    bless( $self, $class );
 
-  defined( $self->{UrlRoot} ) or die "You must specify UrlRoot";
-  defined( $self->{LoginUrl} ) or die "You must specify LoginUrl";
-  defined( $self->{Username} ) or die "You must specify Username";
-  defined( $self->{Password} ) or die "You must specify Password";
+    defined( $self->{UrlRoot} )  or die "You must specify UrlRoot";
+    defined( $self->{LoginUrl} ) or die "You must specify LoginUrl";
+    defined( $self->{Username} ) or die "You must specify Username";
+    defined( $self->{Password} ) or die "You must specify Password";
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/Stockholm" );
-  $self->{datastorehelper} = $dsh;
+    my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore},
+        "Europe/Stockholm" );
+    $self->{datastorehelper} = $dsh;
 
-  $self->{datastore}->{SILENCE_END_START_OVERLAP} = 1;
+    $self->{datastore}->{SILENCE_END_START_OVERLAP} = 1;
 
-  # use augment
-  $self->{datastore}->{augment} = 1;
+    # use augment
+    $self->{datastore}->{augment} = 1;
 
-  return $self;
+    return $self;
 }
 
 sub InitiateDownload {
-  my $self = shift;
+    my $self = shift;
 
-  my $mech = $self->{cc}->UserAgent();
+    my $mech = $self->{cc}->UserAgent();
 
-  $mech->get($self->{LoginUrl});
+    $mech->get( $self->{LoginUrl} );
 
-  $mech->submit_form(
-      with_fields => {
-	'ctl00$body$loginControl$UserName' => $self->{Username},
-	'ctl00$body$loginControl$Password' => $self->{Password},
-      },
-      button => 'ctl00$body$loginControl$LoginButton',
-  );
+    $mech->submit_form(
+        with_fields => {
+            'ctl00$body$loginControl$UserName' => $self->{Username},
+            'ctl00$body$loginControl$Password' => $self->{Password},
+        },
+        button => 'ctl00$body$loginControl$LoginButton',
+    );
 
-  if( $mech->content =~ /<TTSTVR/ ) {
-    return undef;
-  }
-  else {
-    return "Login failed";
-  }
+    if ( $mech->content =~ /<TTSTVR/ ) {
+        return undef;
+    }
+    else {
+        return "Login failed";
+    }
 }
 
 sub Object2Url {
-  my $self = shift;
-  my( $objectname, $chd ) = @_;
+    my $self = shift;
+    my ( $objectname, $chd ) = @_;
 
-  my( $date ) = ( $objectname =~ /_(.*)$/ );
+    my ($date) = ( $objectname =~ /_(.*)$/ );
 
-  my $url = $self->{UrlRoot} . $date;
+    my $url = $self->{UrlRoot} . $date;
 
-  # Only one url to look at and no error
-  return ([$url], undef);
+    # Only one url to look at and no error
+    return ( [$url], undef );
 }
 
 sub FilterContent {
-  my $self = shift;
-  my( $cref, $chd ) = @_;
+    my $self = shift;
+    my ( $cref, $chd ) = @_;
 
-  if( $$cref eq "" ) {
-    return (undef, "No data found." );
-  }
+    if ( $$cref eq "" ) {
+        return ( undef, "No data found." );
+    }
 
-  if( $$cref !~ /^\s*<\?xml/ ) {
-    # This happens when we try to fetch data for yesterday.
-    return (undef, "Data is not xml.");
-  }
+    if ( $$cref !~ /^\s*<\?xml/ ) {
 
-  my $doc = ParseXml( $cref );
+        # This happens when we try to fetch data for yesterday.
+        return ( undef, "Data is not xml." );
+    }
 
-  if( not defined $doc ) {
-    return (undef, "ParseXml failed" );
-  }
+    my $doc = ParseXml($cref);
 
-  my $xp = XML::LibXML::XPathContext->new($doc);
+    if ( not defined $doc ) {
+        return ( undef, "ParseXml failed" );
+    }
 
-  # Create namespace
-  # http://perl-xml.sourceforge.net/faq/#namespaces_xpath
-  $xp->registerNs(tt => 'http://www.ttspektra.se' );
+    my $xp = XML::LibXML::XPathContext->new($doc);
 
-  # Remove all OtherBroadcast since they change
-  # each time the data for today is downloaded.
-  my $ns = $xp->find( "//tt:OtherBroadcast" );
+    # Create namespace
+    # http://perl-xml.sourceforge.net/faq/#namespaces_xpath
+    $xp->registerNs( tt => 'http://www.ttspektra.se' );
 
-  foreach my $n ($ns->get_nodelist) {
-    $n->unbindNode();
-  }
+    # Remove all OtherBroadcast since they change
+    # each time the data for today is downloaded.
+    my $ns = $xp->find("//tt:OtherBroadcast");
 
-  my $str = $doc->toString( 1 );
+    foreach my $n ( $ns->get_nodelist ) {
+        $n->unbindNode();
+    }
 
-  return( \$str, undef );
+    my $str = $doc->toString(1);
+
+    return ( \$str, undef );
 }
 
 sub ContentExtension {
-  return 'xml';
+    return 'xml';
 }
 
 sub FilteredExtension {
-  return 'xml';
+    return 'xml';
 }
 
 sub ImportContent {
-  my $self = shift;
+    my $self = shift;
 
-  my( $batch_id, $cref, $chd ) = @_;
+    my ( $batch_id, $cref, $chd ) = @_;
 
-  my $ds = $self->{datastore};
-  my $dsh = $self->{datastorehelper};
+    my $ds  = $self->{datastore};
+    my $dsh = $self->{datastorehelper};
 
-  my $doc = ParseXml( $cref );
-  my $xp = XML::LibXML::XPathContext->new($doc);
+    my $doc = ParseXml($cref);
+    my $xp  = XML::LibXML::XPathContext->new($doc);
 
-  # Create namespace
-  # http://perl-xml.sourceforge.net/faq/#namespaces_xpath
-  $xp->registerNs(tt => 'http://www.ttspektra.se' );
+    # Create namespace
+    # http://perl-xml.sourceforge.net/faq/#namespaces_xpath
+    $xp->registerNs( tt => 'http://www.ttspektra.se' );
 
-  my $ns = $xp->find( "//tt:TVRProgramBroadcast" );
+    my $ns = $xp->find("//tt:TVRProgramBroadcast");
 
-  if( $ns->size() == 0 ) {
-    error( "$batch_id: No data found" );
-    return 0;
-  }
-
-  my( $date ) = ($batch_id =~ /_(.*)$/);
-  $dsh->StartDate( $date, "00:00" );
-
-  foreach my $pb ($ns->get_nodelist)
-  {
-    my $start = ParseDateTime($xp->findvalue(
-      'tt:TVRBroadcast/tt:BroadcastDateTime/tt:StartDateTime', $pb ));
-    my $end = ParseDateTime($xp->findvalue(
-      'tt:TVRBroadcast/tt:BroadcastDateTime/tt:EndDateTime', $pb ));
-    my $url = $xp->findvalue(
-      'tt:TVRBroadcast/tt:BroadcastInformation/tt:WebPage/@URL', $pb );
-    my $title = normLatin1( $xp->findvalue( 'tt:TVRProgram/tt:Title', $pb ) );
-    my $subtitle = normLatin1(
-      $xp->findvalue( 'tt:TVRProgram/tt:VersionableInfo/tt:Version/tt:EpisodeTitle', $pb ) );
-
-    if( $title eq $subtitle ) {
-      my( $title2, $subtitle2 ) = ( $title =~ /(.*?) - (.*)/ );
-      if( defined( $subtitle2 ) ) {
-        $title = $title2;
-        $subtitle = $subtitle2;
-      }
-      else {
-        $subtitle = "";
-      }
+    if ( $ns->size() == 0 ) {
+        error("$batch_id: No data found");
+        return 0;
     }
 
-    my $intro = $xp->findvalue( 'tt:TVRProgram/tt:Intro', $pb );
-    my $description = $xp->findvalue(
-      'tt:TVRProgram/tt:Description/tt:TextDesc', $pb );
-    my $episodenum = $xp->findvalue( 'tt:TVRProgram/tt:EpisodeNumber', $pb );
+    my ($date) = ( $batch_id =~ /_(.*)$/ );
+    $dsh->StartDate( $date, "00:00" );
 
-    # Del 3 av 13 in description - of_episod is not in use at the moment
-	  my ( $ep_nr, $eps );
-    ( $ep_nr, $eps ) = ($description =~ /Del\s+(\d+)\s+av\s+(\d+)/ );
-    ( $ep_nr, $eps ) = ($subtitle =~ /Del\s+(\d+)\s+av\s+(\d+)/ ) if defined $subtitle and not defined $ep_nr;
+    foreach my $pb ( $ns->get_nodelist ) {
+        my $start = ParseDateTime(
+            $xp->findvalue(
+                'tt:TVRBroadcast/tt:BroadcastDateTime/tt:StartDateTime', $pb
+            )
+        );
+        my $end = ParseDateTime(
+            $xp->findvalue(
+                'tt:TVRBroadcast/tt:BroadcastDateTime/tt:EndDateTime', $pb
+            )
+        );
+        my $url = $xp->findvalue(
+            'tt:TVRBroadcast/tt:BroadcastInformation/tt:WebPage/@URL', $pb );
+        my $title =
+          normLatin1( $xp->findvalue( 'tt:TVRProgram/tt:Title', $pb ) );
+        my $subtitle = normLatin1(
+            $xp->findvalue(
+                'tt:TVRProgram/tt:VersionableInfo/tt:Version/tt:EpisodeTitle',
+                $pb
+            )
+        );
 
-    $description =~ s/Del\s+(\d+)\s+av\s+(\d+)\.//i if defined $description;
-    $subtitle    =~ s/Del\s+(\d+)\s+av\s+(\d+)//i if defined $subtitle;
-    $subtitle    =~ s/Del\s+(\d+)//i if defined $subtitle;
-    $description =~ s/&ndash;/–/;
+        if ( $title eq $subtitle ) {
+            my ( $title2, $subtitle2 ) = ( $title =~ /(.*?) - (.*)/ );
+            if ( defined($subtitle2) ) {
+                $title    = $title2;
+                $subtitle = $subtitle2;
+            }
+            else {
+                $subtitle = "";
+            }
+        }
 
-    my $ce = {
-      channel_id  => $chd->{id},
-      start_time  => $start->hms(":"),
-      title       => normLatin1( $title ),
-      description => normLatin1( "$intro $description" ),
-      url         => $url,
-    };
+        my $intro = $xp->findvalue( 'tt:TVRProgram/tt:Intro', $pb );
+        my $description =
+          $xp->findvalue( 'tt:TVRProgram/tt:Description/tt:TextDesc', $pb );
+        my $episodenum =
+          $xp->findvalue( 'tt:TVRProgram/tt:EpisodeNumber', $pb );
 
-    # Extra
-    my $extra = {};
-    $extra->{descriptions} = [];
-    $extra->{qualifiers} = [];
-    $extra->{images} = [];
+        # Del 3 av 13 in description - of_episod is not in use at the moment
+        my ( $ep_nr, $eps );
+        ( $ep_nr, $eps ) = ( $description =~ /Del\s+(\d+)\s+av\s+(\d+)/ );
+        ( $ep_nr, $eps ) = ( $subtitle =~ /Del\s+(\d+)\s+av\s+(\d+)/ )
+          if defined $subtitle and not defined $ep_nr;
 
-	  my ( $program_type, $category ) = ParseDescCatSwe( $ce->{description} );
-  	AddCategory( $ce, $program_type, $category );
+        $description =~ s/Del\s+(\d+)\s+av\s+(\d+)\.//i if defined $description;
+        $subtitle =~ s/Del\s+(\d+)\s+av\s+(\d+)//i      if defined $subtitle;
+        $subtitle =~ s/Del\s+(\d+)//i                   if defined $subtitle;
+        $description =~ s/&ndash;/–/;
 
-    if( my( $dumperino, $dumptag, $year ) = ($description =~ /(Produktions.r|Produktion.r|Inspelat)(:|)\s+(\d\d\d\d)\./) )
-    {
-      $ce->{description} =~ s/(Produktions.r|Produktion.r|Inspelat)(:|)\s+(\d\d\d\d)\.//i;
-      $ce->{production_date} = "$year-01-01";
+        my $ce = {
+            channel_id  => $chd->{id},
+            start_time  => $start->hms(":"),
+            title       => normLatin1($title),
+            description => normLatin1("$intro $description"),
+            url         => $url,
+        };
+
+        # Extra
+        my $extra = {};
+        $extra->{descriptions} = [];
+        $extra->{qualifiers}   = [];
+        $extra->{images}       = [];
+
+        my ( $program_type, $category ) = ParseDescCatSwe( $ce->{description} );
+        AddCategory( $ce, $program_type, $category );
+
+        if (
+            my ( $dumperino, $dumptag, $year ) = (
+                $description =~
+                  /(Produktions.r|Produktion.r|Inspelat)(:|)\s+(\d\d\d\d)\./
+            )
+          )
+        {
+            $ce->{description} =~
+              s/(Produktions.r|Produktion.r|Inspelat)(:|)\s+(\d\d\d\d)\.//i;
+            $ce->{production_date} = "$year-01-01";
+        }
+
+        # original title
+        if ( my ( $dumperino2, $orgtitle ) =
+            ( $description =~ /(Originaltitel|Originatitel):\s+(.*?)\./ ) )
+        {
+            $ce->{description} =~ s/(Originaltitel|Originatitel):\s+(.*?)\.//i;
+            $ce->{original_title} = normLatin1($orgtitle);
+        }
+
+        if ( $end ne "" ) {
+            $ce->{end_time} = $end->hms(":");
+        }
+
+        if ( $subtitle ne "" ) {
+            $ce->{subtitle} = normLatin1($subtitle);
+            $ce->{subtitle} =~ s/^\-//;
+            $ce->{subtitle} =~ s/^://;
+            $ce->{subtitle} = normLatin1( $ce->{subtitle} );
+        }
+
+        if ( $episodenum ne "" ) {
+            $ce->{episode} = " . " . ( $episodenum - 1 ) . " . ";
+        }
+
+        if ( defined($ep_nr) ) {
+            $ce->{episode} = sprintf( " . %d/%d . ", $ep_nr - 1, $eps );
+        }
+
+        if ( my ($actors) = ( $ce->{description} =~ /I rollerna:\s*(.*?)\./i ) )
+        {
+            $ce->{actors} = parse_person_list($actors);
+            $ce->{description} =~ s/I rollerna:\s*(.*?)\.//i;
+        }
+
+        if ( my ($directors) =
+            ( $ce->{description} =~ /Regiss.r:\s*(.*?)\./i ) )
+        {
+            $ce->{directors} = parse_person_list($directors);
+            $ce->{description} =~ s/Regiss.r:\s*(.*?)\.//i;
+        }
+
+        if ( my ($producers) =
+            ( $ce->{description} =~ /Producenter:\s*(.*?)\./i ) )
+        {
+            $ce->{producers} = parse_person_list($producers);
+            $ce->{description} =~ s/Producenter:\s*(.*?)\.//i;
+        }
+
+        if ( my ($writers) = ( $ce->{description} =~ /Manus:\s*(.*?)\./i ) ) {
+            $ce->{writers} = parse_person_list($writers);
+            $ce->{description} =~ s/Manus:\s*(.*?)\.//i;
+        }
+
+        $ce->{description} = normLatin1( $ce->{description} )
+          if defined $ce->{description};
+
+        # Image
+        if ( defined($url) and $url ne "" ) {
+            my ($program_id) = ( $url =~ /(\d+)$/ );
+            push @{ $extra->{images} },
+              {
+                url => "http://www.axess.se/public/upload/images/tv_programs/"
+                  . $program_id . ".jpg",
+                source => "Axess"
+              };
+        }
+
+        $ce->{extra} = $extra;
+
+        $dsh->AddProgramme($ce);
     }
 
-    # original title
-    if( my( $dumperino2, $orgtitle ) = ($description =~ /(Originaltitel|Originatitel):\s+(.*?)\./) )
-    {
-        $ce->{description} =~ s/(Originaltitel|Originatitel):\s+(.*?)\.//i;
-        $ce->{original_title} = normLatin1($orgtitle);
-    }
-
-    if( $end ne "" ) {
-	    $ce->{end_time} = $end->hms(":");
-    }
-
-    if( $subtitle ne "" ) {
-      $ce->{subtitle} = normLatin1( $subtitle );
-      $ce->{subtitle} =~ s/^\-//;
-      $ce->{subtitle} =~ s/^://;
-      $ce->{subtitle} = normLatin1( $ce->{subtitle} );
-    }
-
-    if( $episodenum ne "" ) {
-      $ce->{episode} = " . " . ($episodenum-1) . " . ";
-    }
-
-
-    if( defined($ep_nr) ) {
-      $ce->{episode} = sprintf( " . %d/%d . ", $ep_nr-1, $eps );
-    }
-
-    if( my( $actors ) = ($ce->{description} =~ /I rollerna:\s*(.*?)\./i ) )
-    {
-      	$ce->{actors} = parse_person_list( $actors );
-      	$ce->{description} =~ s/I rollerna:\s*(.*?)\.//i;
-    }
-
-    if( my( $directors ) = ($ce->{description} =~ /Regiss.r:\s*(.*?)\./i ) )
-    {
-      	$ce->{directors} = parse_person_list( $directors );
-      	$ce->{description} =~ s/Regiss.r:\s*(.*?)\.//i;
-    }
-
-    if( my( $producers ) = ($ce->{description} =~ /Producenter:\s*(.*?)\./i ) )
-    {
-      	$ce->{producers} = parse_person_list( $producers );
-      	$ce->{description} =~ s/Producenter:\s*(.*?)\.//i;
-    }
-
-    if( my( $writers ) = ($ce->{description} =~ /Manus:\s*(.*?)\./i ) )
-    {
-      	$ce->{writers} = parse_person_list( $writers );
-      	$ce->{description} =~ s/Manus:\s*(.*?)\.//i;
-    }
-
-    $ce->{description} = normLatin1($ce->{description}) if defined $ce->{description};
-
-    # Image
-    if(defined($url) and $url ne "") {
-      my ($program_id) = ($url =~ /(\d+)$/);
-      push @{$extra->{images}}, { url => "http://www.axess.se/public/upload/images/tv_programs/" . $program_id . ".jpg", source => "Axess" };
-    }
-
-    $ce->{extra} = $extra;
-
-    $dsh->AddProgramme( $ce );
-  }
-
-  return 1;
+    return 1;
 }
 
 sub ParseDateTime {
-  my( $str ) = @_;
+    my ($str) = @_;
 
-  my( $year, $month, $day, $hour, $minute, $second ) = ($str =~ /
+    my ( $year, $month, $day, $hour, $minute, $second ) = (
+        $str =~ /
     ^(\d{4})-(\d{2})-(\d{2})T
-     (\d{2}):(\d{2}):(\d{2})$/x );
+     (\d{2}):(\d{2}):(\d{2})$/x
+    );
 
-  my $dt;
-  eval {
-    $dt = DateTime->new(
-    year => $year,
-    month => $month,
-    day => $day,
-    hour => $hour,
-    minute => $minute,
-    time_zone => 'Europe/Stockholm' );
-  };
+    my $dt;
+    eval {
+        $dt = DateTime->new(
+            year      => $year,
+            month     => $month,
+            day       => $day,
+            hour      => $hour,
+            minute    => $minute,
+            time_zone => 'Europe/Stockholm'
+        );
+    };
 
-  error( "$@" ) if $@;
+    error("$@") if $@;
 
-  return undef if not defined $dt;
+    return undef if not defined $dt;
 
-  if( $second > 0 ) {
-    $dt->add( minutes => 1 );
-  }
+    if ( $second > 0 ) {
+        $dt->add( minutes => 1 );
+    }
 
-  #$dt->set_time_zone( 'UTC' );
+    #$dt->set_time_zone( 'UTC' );
 
-  return $dt
+    return $dt;
 }
 
-sub parse_person_list
-{
-  my( $str ) = @_;
+sub parse_person_list {
+    my ($str) = @_;
 
-  # Remove all variants of m.fl.
-  $str =~ s/\s*m[\. ]*fl\.*\b//;
+    # Remove all variants of m.fl.
+    $str =~ s/\s*m[\. ]*fl\.*\b//;
 
-  # Remove trailing '.'
-  $str =~ s/\.$//;
+    # Remove trailing '.'
+    $str =~ s/\.$//;
 
-  $str =~ s/\boch\b/,/;
-  $str =~ s/\bsamt\b/,/;
+    $str =~ s/\boch\b/,/;
+    $str =~ s/\bsamt\b/,/;
 
-  my @persons = split( /\s*,\s*/, $str );
-  foreach (@persons)
-  {
-    # The character name is sometimes given . Remove it.
-    # The Cast-entry is sometimes cutoff, which means that the
-    # character name might be missing a trailing ).
-    s/\s*\(.*$//;
-    s/.*\s+-\s+//;
-    s/^\.$//;
-  }
+    my @persons = split( /\s*,\s*/, $str );
+    foreach (@persons) {
 
-  return join( ";", grep( /\S/, @persons ) );
+        # The character name is sometimes given . Remove it.
+        # The Cast-entry is sometimes cutoff, which means that the
+        # character name might be missing a trailing ).
+        s/\s*\(.*$//;
+        s/.*\s+-\s+//;
+        s/^\.$//;
+    }
+
+    return join( ";", grep( /\S/, @persons ) );
 }
 1;

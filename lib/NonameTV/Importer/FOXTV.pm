@@ -108,12 +108,14 @@ sub ImportXLS {
             $columns{'ORGTitle'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Original Program Title$/ );
 
             $columns{'Ser No'} = $iC if( $oWkS->cell($iC, $iR) =~ /Season Number/ );
-            $columns{'Ser Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /Season Synopsis/ );
+            $columns{'Ser Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Season Synopsis/i );
+            $columns{'Ser SynopsisORG'} = $iC if( $oWkS->cell($iC, $iR) =~ /Original Season Synopsis/ );
 
             $columns{'Ep No'} = $iC if( $oWkS->cell($iC, $iR) =~ /Episode Number/ );
             $columns{'Ep Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Episode Title/ );
             $columns{'Ep TitleORG'} = $iC if( $oWkS->cell($iC, $iR) =~ /Original Episode Title/ );
-            $columns{'Ep Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /Episode Synopsis/ );
+            $columns{'Ep Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Episode Synopsis/i );
+            $columns{'Ep SynopsisORG'} = $iC if( $oWkS->cell($iC, $iR) =~ /Original Episode Synopsis/ );
             $columns{'Eps'} = $iC if( $oWkS->cell($iC, $iR) =~ /Number of episodes in the Season/ );
 
             $columns{'Genre'} = $iC if( $oWkS->cell($iC, $iR) =~ /Longline/ );
@@ -182,11 +184,13 @@ sub ImportXLS {
       my $genre    = norm(formattedCell($oWkS, $columns{'Genre'}, $iR) ) if defined(formattedCell($oWkS, $columns{'Genre'}, $iR));
       my $prodcountry = norm(formattedCell($oWkS, $columns{'Country'}, $iR) ) if defined(formattedCell($oWkS, $columns{'Country'}, $iR));
       my $actors      = formattedCell($oWkS, $columns{'Actors'}, $iR) if defined(formattedCell($oWkS, $columns{'Actors'}, $iR));
+      $actors =~ s/^, //g;
       $actors =~ s/, /;/g;
       $actors =~ s/-$//g;
       $actors =~ s/;$//g;
       $actors =~ s/,$//g;
       my $directors = formattedCell($oWkS, $columns{'Directors'}, $iR) if defined(formattedCell($oWkS, $columns{'Directors'}, $iR));
+      $directors =~ s/^, //g;
       $directors =~ s/, /;/g;
       $directors =~ s/-$//g;
       $directors =~ s/;$//g;
@@ -226,19 +230,19 @@ sub ImportXLS {
       $ce->{subtitle} = norm($subtitle) if defined($subtitle) and $subtitle ne "" and $subtitle ne "null";
 
       # Episode info in xmltv-format
-      if( (defined($ep_num) and defined($se_num) and defined($of_num)) and ($ep_num ne "\x{2d}" and $ep_num ne "") and ( $of_num ne "\x{2d}" and $of_num ne "") and ( $se_num ne "\x{2d}" and $se_num ne "") )
+      if( (defined($ep_num) and defined($se_num) and defined($of_num)) and ($ep_num ne "\x{2d}" and $ep_num ne "" and $ep_num ne "0") and ( $of_num ne "\x{2d}" and $of_num ne "" and $of_num ne "0") and ( $se_num ne "\x{2d}" and $se_num ne "" and $se_num ne "0") )
       {
           $ce->{episode} = sprintf( "%d . %d/%d .", $se_num-1, $ep_num-1, $of_num );
       }
-      elsif( (defined($ep_num) and defined($of_num)) and ($ep_num ne "\x{2d}" and $ep_num ne "") and ( $of_num ne "\x{2d}" and $of_num ne "") )
+      elsif( (defined($ep_num) and defined($of_num)) and ($ep_num ne "\x{2d}" and $ep_num ne "" and $ep_num ne "0") and ( $of_num ne "\x{2d}" and $of_num ne "" and $of_num ne "0") )
       {
           $ce->{episode} = sprintf( ". %d/%d .", $ep_num-1, $of_num );
       }
-      elsif( (defined($ep_num) and defined($se_num)) and ($ep_num ne "\x{2d}" and $ep_num ne "") and ( $se_num ne "\x{2d}" and $se_num ne "") )
+      elsif( (defined($ep_num) and defined($se_num)) and ($ep_num ne "\x{2d}" and $ep_num ne "" and $ep_num ne "0") and ( $se_num ne "\x{2d}" and $se_num ne "" and $se_num ne "0") )
       {
           $ce->{episode} = sprintf( "%d . %d .", $se_num-1, $ep_num-1 );
       }
-      elsif( defined($ep_num) and $ep_num ne "\x{2d}" and $ep_num ne "" )
+      elsif( defined($ep_num) and $ep_num ne "\x{2d}" and $ep_num ne "" and $ep_num ne "0" )
       {
           $ce->{episode} = sprintf( ". %d .", $ep_num-1 );
       }

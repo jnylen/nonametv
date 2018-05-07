@@ -85,6 +85,7 @@ sub ImportContent
       $dt    = $self->create_dt($xpc->findvalue( 'pubDate' ));
     }
     catch { print("error: $_"); next; };
+    next if(!defined($dt));
 
     my $duration  = $xpc->findvalue( 'tv2r:varighed' );
     my $title     = $xpc->findvalue( 'title' );

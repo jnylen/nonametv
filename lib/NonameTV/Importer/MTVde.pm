@@ -126,6 +126,9 @@ sub ImportContent( $$$ ) {
     }
     catch { print("error: $_"); next; };
 
+    next if(!defined($ce->{start_time}));
+    next if(!defined($ce->{end_time}));
+
 
     $ce->{title} = norm($xpc->findvalue( 's:titel/@termintitel' ));
 
@@ -205,7 +208,7 @@ sub ImportContent( $$$ ) {
     if($chd->{xmltvid} eq "paramountchannel.se" and $ce->{title} =~ /^Coming Up$/i) { next; }
 
     # remove unused subtitle
-    if($ce->{subtitle} =~ /^(Seizoen|S..son|Sesong|Sezon) (\d+) (Aflevering|Episode|Odcinek) (\d+)$/i) {
+    if(defined($ce->{subtitle}) and $ce->{subtitle} =~ /^(Seizoen|S.son|Sesong|Sezon|S.song) (\d+) (Aflevering|Episode|Odcinek|Avsnitt) (\d+)$/i) {
       $ce->{subtitle} = undef;
     }
 

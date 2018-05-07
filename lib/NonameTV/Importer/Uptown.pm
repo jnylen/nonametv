@@ -17,18 +17,9 @@ use utf8;
 use POSIX;
 use DateTime;
 use XML::LibXML;
-use Spreadsheet::ParseExcel;
 use Data::Dumper;
-use Spreadsheet::Read;
 
-use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
-use Spreadsheet::Read;
-
-use Text::Iconv;
-my $converter = Text::Iconv -> new ("utf-8", "latin1");
-
-use NonameTV qw/norm MonthNumber/;
+use NonameTV qw/norm ParseExcel formattedCell MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 use NonameTV::Config qw/ReadConfig/;
@@ -83,35 +74,52 @@ sub ImportXLS
   my $currdate = "x";
   my $oBook;
 
-  progress( "Uptown: $chd->{xmltvid}: Processing $file" );
-  if ( $file =~ /\.(xlsx|xlsm)$/i ){ $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
-  else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
-  #my $ref = ReadData ($file);
+  my $doc = ParseExcel($file);
 
-  # fields
-  my $num_date = 9;
-  my $num_time = 10;
-  my $num_title = 2;
-  my $num_subtitle = 1;
-  my $num_prodyear = 6;
+  if( not defined( $doc ) ) {
+    error( "FOXTV: $file: Failed to parse excel" );
+    return;
+  }
+
+  progress( "Uptown: $chd->{xmltvid}: Processing $file" );
 
   # main loop
-  #for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
-  foreach my $oWkS (@{$oBook->{Worksheet}}) {
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
+    my $oWkS = $doc->sheet($iSheet);
 
-    #my $oWkS = $oBook->{Worksheet}[$iSheet];
-    progress( "Uptown: $chd->{xmltvid}: Processing worksheet: $oWkS->{Name}" );
+    progress( "Uptown: $chd->{xmltvid}: Processing worksheet: $oWkS->{label}" );
+
+    my $foundcolumns = 0;
 
     # browse through rows
-    my $i = 3;
-    for(my $iR = 3 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
-      $i++;
+    for(my $iR = 2 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
+
+      if( not %columns ){
+        # the column names are stored in the first row
+        # so read them and store their column positions
+        # for further findvalue() calls
+
+        for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
+          if( $oWkS->cell($iC, $iR) ){
+            $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Dato\:/ );
+
+            $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Start tid\:/ );
+
+            $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Program\:/ );
+            $columns{'SubTitle'} = $iC if( $oWkS->cell($iC, $iR) =~ /^V.rk\:/ );
+            $columns{'Year'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Optagelse\:/ );
+
+            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /Dato\:/ );
+          }
+        }
+
+        %columns = () if( $foundcolumns eq 0 );
+
+        next;
+      }
 
       # date - column 0 ('Date')
-      my $oWkC = $oWkS->{Cells}[$iR][$num_date];
-      next if( ! $oWkC );
-      next if( ! $oWkC->Value );
-      $date = ParseDate( $oWkC->Value );
+      $date = ParseDate( formattedCell($oWkS, $columns{'Date'}, $iR) );
       next if( ! $date );
 
       # Startdate
@@ -130,24 +138,18 @@ sub ImportXLS
       }
 
       # time
-      $oWkC = $oWkS->{Cells}[$iR][$num_time];
-      next if( ! $oWkC );
-      my $time = 0;  # fix for  12:00AM
-      $time=$oWkC->{Val} if( $oWkC->Value );
-      $time = ExcelFmt('hh:mm', $time);
+      my $time = formattedCell($oWkS, $columns{'Time'}, $iR);
+      next if(!$time);
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][$num_title];
-      next if( ! $oWkC );
-      my $title = $oWkC->{Val} if( $oWkC->{Val} );
-      $title =~ s/’/'/;
+      my $title = formattedCell($oWkS, $columns{'Title'}, $iR);
+      next if(!$title);
 
       # subtitle
-      $oWkC = $oWkS->{Cells}[$iR][$num_subtitle];
-      my $subtitle = $oWkC->{Val} if( $oWkC->{Val} );
+      my $subtitle = formattedCell($oWkS, $columns{'SubTitle'}, $iR);
 
       # Extra
-      my $year = $oWkS->{Cells}[$iR][$num_prodyear]->Value if $oWkS->{Cells}[$iR][$num_prodyear];
+      my $year = formattedCell($oWkS, $columns{'Year'}, $iR) if formattedCell($oWkS, $columns{'Year'}, $iR);
 
       my $ce = {
         channel_id => $chd->{channel_id},

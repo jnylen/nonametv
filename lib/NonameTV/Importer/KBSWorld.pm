@@ -5,24 +5,26 @@ use warnings;
 
 =pod
 
-Importer for data from KBS World (http://kbsworld.kbs.co.kr/).
-One file per week downloaded from their site.
+Import data from KBS World
 
-Format is "Excel". It's mostly just XLSX so it's XML.
+Channels: KBS World TV
 
 =cut
 
-use Data::Dumper;
+use utf8;
+
 use DateTime;
-use XML::LibXML;
-use HTML::Laundry;
+use Data::Dumper;
+use Archive::Zip qw/:ERROR_CODES/;
 
-use NonameTV qw/AddCategory MyPost norm normUtf8 ParseXml/;
-use NonameTV::Importer::BaseWeekly;
-use NonameTV::Log qw/d progress w error f/;
+use NonameTV qw/norm ParseExcel formattedCell AddCategory AddCountry/;
 use NonameTV::DataStore::Helper;
+use NonameTV::Log qw/progress error d p w f/;
+use NonameTV::Config qw/ReadConfig/;
 
-use base 'NonameTV::Importer::BaseWeekly';
+use NonameTV::Importer::BaseFile;
+
+use base 'NonameTV::Importer::BaseFile';
 
 sub new {
   my $proto = shift;
@@ -30,192 +32,189 @@ sub new {
   my $self  = $class->SUPER::new( @_ );
   bless ($self, $class);
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Asia/Seoul"  );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "Europe/London" );
   $self->{datastorehelper} = $dsh;
 
-  # Use augmenter, and get teh fabulous shit
   $self->{datastore}->{augment} = 1;
 
   return $self;
 }
 
-sub first_day_of_week
-{
-  my ($year, $week) = @_;
-
-  # Week 1 is defined as the one containing January 4:
-  DateTime
-    ->new( year => $year, month => 1, day => 4 )
-    ->add( weeks => ($week - 1) )
-    ->truncate( to => 'week' );
-} # end first_day_of_week
-
-sub FetchDataFromSite {
+sub ImportContentFile {
   my $self = shift;
-  my( $objectname, $chd ) = @_;
+  my( $file, $chd ) = @_;
 
-  my( $year, $week ) = ( $objectname =~ /(\d+)-(\d+)$/ );
+  $self->{fileerror} = 0;
+  my $chanfileid = $chd->{grabber_info};
 
-  my $datefirst = first_day_of_week( $year, $week )->add( days => 0 )->ymd('-'); # monday
-  my $datelast  = first_day_of_week( $year, $week )->add( days => 6 )->ymd('-'); # sunday
+  if( $file =~ /\.(xls|xlsx)$/i ) {
+    $self->ImportXLS( $file, $chd );
+  } else {
+    error( "KBSWorld: Unknown file format: $file" );
+  }
 
-  my ( $content, $code ) = MyPost( "http://211.233.93.86/schedule/down_schedule_.php", { 'wlang' => 'e', 'down_time_add' => '0', 'start_date' => $datefirst, 'end_date' => $datelast } );
-
-  open(my $fh, '>', '/home/jnylen/content/contentcache/KBSWorld/notcleaned.html');
-  print $fh $content;
-  close $fh;
-
-  my $l = HTML::Laundry->new();
-  $l->add_acceptable_element(['tr', 'td', 'table', 'tbody'], { empty => 1 });
-  $content =  $l->clean( $content );
-
-  open($fh, '>', '/home/jnylen/content/contentcache/KBSWorld/cleaned.html');
-  print $fh $content;
-  close $fh;
-
-  return ($content, undef);
+  return;
 }
 
-sub ImportContent {
+sub ImportXLS {
   my $self = shift;
+  my( $file, $chd ) = @_;
 
-  my( $batch_id, $cref, $chd ) = @_;
-  my $ds = $self->{datastore};
+  $self->{fileerror} = 0;
+
+  my $xmltvid = $chd->{xmltvid};
+  my $channel_id = $chd->{id};
   my $dsh = $self->{datastorehelper};
+  my $ds = $self->{datastore};
 
-  # Clean it up
-  $$cref =~ s/<style>(.*)<\/style>//gi;
-  $$cref =~ s/<col width="(.*?)">//g;
-  $$cref =~ s/<br style='(.*?)'>/\n/g;
-  $$cref =~ s/&nbsp;//gi;
-  $$cref =~ s/&#39;/'/g;
-  $$cref =~ s/&#65533;//g;
-  $$cref =~ s/ & / &amp; /g;
-  $$cref =~ s/<The Return of Superman>/The Return of Superman/gi;
-  $$cref =~ s/<The Human Condition - Urban Farmer>/The Human Condition - Urban Farmer/gi;
-  $$cref =~ s/<The Wonders of Korea>/The Wonders of Korea/gi;
-  $$cref =~ s/<2015 K-POP WORLD FESTIVAL IN CHANGWON>/2015 K-POP WORLD FESTIVAL IN CHANGWON/gi;
+  # Only process .xls or .xlsx files.
+  progress( "KBSWorld: $xmltvid: Processing $file" );
+  my $date;
+  my $currdate = "x";
+  my %columns = ();
 
-  my $data = '<?xml version="1.0" encoding="utf-8"?>';
-  $data .= $$cref;
-
-  #open (MYFILE, '>>data.xml'); print MYFILE $data; close (MYFILE);
-
-  my $doc;
-  my $xml = XML::LibXML->new;
-  eval { $doc = $xml->parse_string($data); };
+  my $doc = ParseExcel($file);
 
   if( not defined( $doc ) ) {
-    f "Not well-formed xml";
-    return 0;
+    error( "KBSWorld: $file: Failed to parse excel" );
+    return;
   }
 
-  my $ns = $doc->find( "//tbody/tr" );
+  # main loop
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
+    my $oWkS = $doc->sheet($iSheet);
+    progress( "KBSWorld: Processing worksheet: $oWkS->{label}" );
 
-  if( $ns->size() == 0 ) {
-    f "No Rows found";
-    return 0;
-  }
+    my $foundcolumns = 0;
 
-  my $currdate = "x";
+    # go through the programs
+    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
+      if( not %columns ){
+        # the column names are stored in the first row
+        # so read them and store their column positions
+        # for further findvalue() calls
 
-  # Programmes
-  foreach my $row ($ns->get_nodelist) {
+        for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
+          if( $oWkS->cell($iC, $iR) ){
+            $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Date/ );
+            $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Start time/i );
+            $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Title/ );
+            $columns{'SeaNo'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Season no/ );
+            $columns{'Genre'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Genre/ );
+            $columns{'EpiNo'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Episode/ );
+            $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Synop/ );
 
 
-    my $date = $self->ParseDate(norm( $row->findvalue( "td[0]" ) ));
-    my $time = norm( $row->findvalue( "td[1]" ) );
-    my $duration = norm( $row->findvalue( "td[2]" ) );
-    my $title = norm( $row->findvalue( "td[3]" ) );
-    my $genre = norm( $row->findvalue( "td[5]" ) );
-    my $episode = norm( $row->findvalue( "td[7]" ) );
-    my $desc = norm( $row->findvalue( "td[8]" ) );
+            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /Date/ );
+          }
+        }
 
-    if($date ne $currdate ) {
-        $dsh->StartDate( $date , "06:00" );
+        %columns = () if( $foundcolumns eq 0 );
+
+        next;
+      }
+
+      # date - column 0 ('Date')
+      $date = ParseDate(formattedCell($oWkS, $columns{'Date'}, $iR));
+      next if( ! $date );
+
+	  # Startdate
+      if( $date ne $currdate ) {
+      	if( $currdate ne "x" ) {
+			$dsh->EndBatch( 1 );
+        }
+
+      	my $batchid = $chd->{xmltvid} . "_" . $date;
+        $dsh->StartBatch( $batchid , $chd->{id} );
+        progress("KBSWorld: $chd->{xmltvid}: Date is $date");
+        $dsh->StartDate( $date , "00:00" );
         $currdate = $date;
+      }
 
-        progress("KBSWorld: Date is: $date");
+      # time
+      my $start = formattedCell($oWkS, $columns{'Time'}, $iR);
+      next if( !$start );
+
+
+      # title
+      my $title = norm(formattedCell($oWkS, $columns{'Title'}, $iR));
+      next if( !$title );
+
+      my $desc = norm(formattedCell($oWkS, $columns{'Synopsis'}, $iR));
+      
+      my $ce = {
+          channel_id => $chd->{id},
+          title => norm($title),
+          start_time => $start,
+          description => norm($desc)
+      };
+
+      my $se_num = norm(formattedCell($oWkS, $columns{'SeaNo'}, $iR));
+      my $ep_num = norm(formattedCell($oWkS, $columns{'EpiNo'}, $iR));
+
+      # Episode info in xmltv-format
+      if( (defined($ep_num) and defined($se_num)) and ($ep_num ne "" and $ep_num ne "0") and ($se_num ne "" and $se_num ne "0") )
+      {
+          $ce->{episode} = sprintf( "%d . %d .", $se_num-1, $ep_num-1 );
+      }
+      elsif( defined($ep_num) and $ep_num ne "" and $ep_num ne "0" )
+      {
+          $ce->{episode} = sprintf( ". %d .", $ep_num-1 );
+      }
+
+      # Genre
+      my $genre = norm(formattedCell($oWkS, $columns{'Genre'}, $iR));
+      if(defined($genre) and $genre ne "") {
+          my ( $program_type, $category ) = $self->{datastore}->LookupCat( "KBSWorld", $genre );
+        AddCategory( $ce, $program_type, $category );
+      }
+
+      # Live
+      if($title =~ /\[LIVE\]/i) {
+          $ce->{live} = 1;
+          $ce->{title} =~ s/\[LIVE\]//i;
+          $ce->{title} = norm($ce->{title});
+      }
+
+      # Remove Season <num> from title
+      if($title =~ /Season (\d+)$/i) {
+          $ce->{title} =~ s/Season (\d+)$//i;
+          $ce->{title} = norm($ce->{title});
+      }
+
+
+      progress( "KBSWorld: $chd->{xmltvid}: $start - $ce->{title}" );
+      $dsh->AddProgramme( $ce );
     }
 
-    my $ce = {
-      channel_id => $chd->{id},
-      title => norm($title),
-      start_time => $time,
-      description => norm($desc),
-    };
-
-    # Reason to defaulting to season 1 is that korean dramas 99% of all cases
-    # only have 1 season. Variety shows goes by the prodnumber so hits up to episode 570.
-
-    my $season = 1;
-
-    # Try to fetch the season from the title
-    if($title =~ /Season (\d+)/i and $title ne "Let's Go! Dream Team Season 2") {
-        ($season) = ($title =~ /Season (\d+)/i);
-        $ce->{title} =~ s/Season (\d+)//i;
-        $ce->{title} = norm($ce->{title});
-        $ce->{title} =~ s/-$//;
-        $ce->{title} = norm($ce->{title});
-    }
-
-    if( $episode ne "" )
-    {
-      $ce->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 );
-    }
-
-    # LIVE?
-    if($title =~ /\[LIVE\]/i) {
-        $ce->{title} =~ s/\[LIVE\]//i;
-        $ce->{title} = norm($ce->{title});
-
-        $ce->{live} = "1";
-    } else {
-        $ce->{live} = "0";
-    }
-
-    progress( "KBSWorld: $chd->{xmltvid}: $time - $ce->{title}" );
-    $dsh->AddProgramme( $ce );
+    $dsh->EndBatch( 1 );
 
   }
 
-  #$dsh->EndBatch( 1 );
-
-  return 1;
 }
 
 sub ParseDate {
   my( $text ) = @_;
 
-  return undef if( ! $text );
-print "ParseDate >$text<\n";
+  my( $month, $day, $year );
 
-  my( $day , $month , $year, $monthname );
+  if( $text =~ /^\d+-\d+-\d+$/ ) { # format '2011-07-01'
+    ( $year, $month, $day ) = ( $text =~ /^(\d+)-(\d+)-(\d+)$/ );
+  } elsif( $text =~ /^\d+\/\d+\/\d\d\d\d$/ ) { # format '01/11/2008'
+    ( $day, $month, $year ) = ( $text =~ /^(\d+)\/(\d+)\/(\d\d\d\d)$/ );
+  } elsif( $text =~ /^(\d\d\d\d)(\d\d)(\d\d)$/ ) { # format '20180326'
+    $year = $1;
+    $month = $2;
+    $day = $3;
+  }
 
-  if( $text =~ /^\d\d\/\d\d\/\d\d$/ ){
-    ( $day , $month , $year ) = ( $text =~ /^(\d\d)\/(\d\d)\/(\d\d)$/ );
-  } elsif( $text =~ /^(\d+)-(\S+)-(\d+)$/ ){ # Format: "30-Nov-10"
-    ( $day , $monthname , $year ) = ( $text =~ /^(\d+)-(\S+)-(\d+)$/ );
-    $month = MonthNumber( $monthname, "en" );
-  } elsif( $text =~ /^\d\d\d\d\d\d\d\d$/ ) {
-    ( $year, $month, $day ) = ( $text =~ /^(\d\d\d\d)(\d\d)(\d\d)$/ );
-  } else {
+  if(not defined($year)) {
     return undef;
   }
 
-  $year += 2000 if $year lt 100;
+  $year += 2000 if $year < 100;
 
-  my $date = DateTime->new( year   => $year,
-                            month  => $month,
-                            day    => $day,
-                            hour   => 0,
-                            minute => 0,
-                            second => 0,
-                            nanosecond => 0,
-                            time_zone => 'Europe/Paris',
-  );
-
-  return $date->ymd("-");
+  return sprintf( '%d-%02d-%02d', $year, $month, $day );
 }
 
 1;

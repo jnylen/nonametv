@@ -16,12 +16,6 @@ Features:
 use utf8;
 
 use DateTime;
-use Spreadsheet::ParseExcel;
-use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
-
-use Text::Iconv;
-my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
 
 use Data::Dumper;
 use File::Temp qw/tempfile/;
@@ -29,7 +23,7 @@ use File::Temp qw/tempfile/;
 use CAM::PDF;
 
 
-use NonameTV qw/norm AddCategory MonthNumber/;
+use NonameTV qw/norm ParseExcel formattedCell AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 
@@ -44,7 +38,7 @@ sub new {
   bless ($self, $class);
 
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "UTC" );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "CET" );
   $self->{datastorehelper} = $dsh;
 
   return $self;
@@ -61,11 +55,6 @@ sub ImportContentFile {
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
 
-#return if( $file !~ /Blue Hustler listings - November 2008 in CET\.xls/ );
-
-
-if( $file =~ /\.pdf$/i ) {return $self->ImportPDF( $file, $channel_id, $xmltvid );}
-
   # Only process .xls files.
   return if( $file !~ /\.xls|.xlsx$/i );
   progress( "Hustler: $xmltvid: Processing $file" );
@@ -75,65 +64,70 @@ if( $file =~ /\.pdf$/i ) {return $self->ImportPDF( $file, $channel_id, $xmltvid 
   my $datecolumn;
   my $date;
   my $currdate = "x";
-  my( $coltime, $coltitle, $colgenre, $colduration ) = undef;
+  my( $coltime, $coltitle, $colgenre, $colduration, $coldesc, $colcast, $colprodyear ) = undef;
 
-  my $oBook;
-  if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
-  else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }   #  staro, za .xls
+  my $doc = ParseExcel($file);
 
-  #print Dumper($oBook->{SheetCount});
+  if( not defined( $doc ) ) {
+    error( "Hustler: $file: Failed to parse excel" );
+    return;
+  }
 
   # main loop
-  for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
-
-    my $oWkS = $oBook->{Worksheet}[$iSheet];
-
-    progress( "Hustler: $chd->{xmltvid}: Processing worksheet: $oWkS->{Name}" );
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
+    my $oWkS = $doc->sheet($iSheet);
+    progress( "Hustler: Processing worksheet: $oWkS->{label}" );
 
     # determine which column has the
     # information about the date
-    for(my $iR = $oWkS->{MinRow} ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
 
       if( not $datecolumn ){
-        for(my $iC = $oWkS->{MinCol} ; defined $oWkS->{MaxCol} && $iC <= $oWkS->{MaxCol} ; $iC++) {
+        for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
 
-          next if( not $oWkS->{Cells}[$iR][$iC] );
+          next if( not $oWkS->cell($iC, $iR) );
 
-          if( isDate( $oWkS->{Cells}[$iR][$iC]->Value ) ){
+          if( isDate( formattedCell($oWkS, $iC, $iR) ) ){
             $datecolumn = $iC;
             last;
           }
         }
       }
     }
+
     progress( "Hustler: $chd->{xmltvid}: Found date information in column $datecolumn" );
 
     # determine which column contains
     # which information
-    for(my $iR = $oWkS->{MinRow} ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
 
-      if( not defined $coltime and not defined $coltitle and not defined $colduration ){
+      for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
 
-        for(my $iC = $oWkS->{MinCol} ; defined $oWkS->{MaxCol} && $iC <= $oWkS->{MaxCol} ; $iC++) {
-
-          next if( not $oWkS->{Cells}[$iR][$iC] );
-
-          my $coltimerino;
-
-          if($file =~ /\.xlsx$/i) {
-            $coltimerino = $oWkS->{Cells}[$iR][$iC]->{Val};
-          } else {
-            $coltimerino = $oWkS->{Cells}[$iR][$iC]->Value;
+        if($oWkS->cell($iC, $iR)) {
+          if( not $coltime and isTime( formattedCell($oWkS, $iC, $iR) ) ){
+            $coltime = $iC;
+          } elsif( not $colgenre and isGenre( formattedCell($oWkS, $iC, $iR) ) ){
+            $colgenre = $iC;
+          } elsif( not $colduration and isDuration( formattedCell($oWkS, $iC, $iR) ) ){
+            $colduration = $iC;
+          } elsif( not $coltitle and isText( formattedCell($oWkS, $iC, $iR) ) ){
+            $coltitle = $iC;
+          } 
+            
+          if( not $coldesc and $oWkS->cell($iC, $iR) =~ /^Synopsis$/i ){
+             $coldesc = $iC;
           }
 
-          if( not $coltime and isTime( $coltimerino ) ){
-            $coltime = $iC;
-          } elsif( not $colgenre and isGenre( $oWkS->{Cells}[$iR][$iC]->Value ) ){
-            $colgenre = $iC;
-          } elsif( not $colduration and isDuration( $oWkS->{Cells}[$iR][$iC]->Value ) ){
-            $colduration = $iC;
-          } elsif( not $coltitle and isText( $oWkS->{Cells}[$iR][$iC]->Value ) ){
-            $coltitle = $iC;
+          if( not $colcast and $oWkS->cell($iC, $iR) =~ /^Cast$/i ){
+             $colcast = $iC;
+          }
+
+          if( not $colprodyear and $oWkS->cell($iC, $iR) =~ /^Year of production$/i ){
+             $colprodyear = $iC;
+          }
+
+          if( not $colprodyear and $oWkS->cell($iC, $iR) =~ /^Production Year$/i ){
+             $colprodyear = $iC;
           }
         }
       }
@@ -152,15 +146,11 @@ if( $file =~ /\.pdf$/i ) {return $self->ImportPDF( $file, $channel_id, $xmltvid 
     # browse through rows
     # schedules are starting after that
     # valid schedule row must have date, time and title set
-    for(my $iR = $oWkS->{MinRow} ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
 
-      my $oWkC;
+      if( isDate( formattedCell($oWkS, $datecolumn, $iR) ) ){
 
-      $oWkC = $oWkS->{Cells}[$iR][$datecolumn];
-      next if( ! $oWkC );
-      if( isDate( $oWkC->Value ) ){
-
-        $date = ParseDate( $oWkS->{Cells}[$iR][$datecolumn]->Value );
+        $date = ParseDate( formattedCell($oWkS, $datecolumn, $iR) );
 
         if( $date ne $currdate ){
 
@@ -180,26 +170,12 @@ if( $file =~ /\.pdf$/i ) {return $self->ImportPDF( $file, $channel_id, $xmltvid 
       }
 
       # time - column $coltime
-      $oWkC = $oWkS->{Cells}[$iR][$coltime];
-      next if( ! $oWkC );
-
-      if($oWkC->Value eq "") { next; }
-
-      my $time;
-      if($file =~ /\.xlsx$/i) {
-        $oWkC = $oWkS->{Cells}[$iR][0];
-        $time = ExcelFmt('hh:mm', $oWkC->{Val} ) if( $oWkC->Value );
-      } else {
-        $time = ParseTime( $oWkC->Value ) if( $oWkC->Value );
-      }
-
-
+      if(formattedCell($oWkS, $coltime, $iR) eq "") { next; }
+      my $time = ParseTime( formattedCell($oWkS, $coltime, $iR) );
       next if( ! $time );
 
       # title - column $coltitle
-      $oWkC = $oWkS->{Cells}[$iR][$coltitle];
-      next if( ! $oWkC );
-      my $title = $oWkC->Value if( $oWkC->Value );
+      my $title = norm(formattedCell($oWkS, $coltitle, $iR)) if( formattedCell($oWkS, $coltitle, $iR) );
       next if( ! $title );
 
       $title =~ s/PREMIERE -//g if $title;
@@ -211,16 +187,13 @@ if( $file =~ /\.pdf$/i ) {return $self->ImportPDF( $file, $channel_id, $xmltvid 
       # duration - column $colduration
       my $duration;
       if( $colduration ){
-        $oWkC = $oWkS->{Cells}[$iR][$colduration];
-        next if( ! $oWkC );
-        $duration = $oWkC->Value if( $oWkC->Value );
+        $duration = formattedCell($oWkS, $colduration, $iR) if( formattedCell($oWkS, $colduration, $iR) );
       }
 
       # genre - column $colgenre
       my $genre;
       if( $colgenre ){
-        $oWkC = $oWkS->{Cells}[$iR][$colgenre];
-        $genre = $oWkC->Value if( $oWkC->Value );
+        $genre = formattedCell($oWkS, $colgenre, $iR) if( formattedCell($oWkS, $colgenre, $iR) );
       }
 
       progress("Hustler: $xmltvid: $time - $title");
@@ -232,6 +205,30 @@ if( $file =~ /\.pdf$/i ) {return $self->ImportPDF( $file, $channel_id, $xmltvid 
         title => norm($title),
         rating => 18,
       };
+
+      # Desc
+      if( $coldesc ){
+        my $desc = formattedCell($oWkS, $coldesc, $iR) if( formattedCell($oWkS, $coldesc, $iR) );
+        $ce->{description} = norm($desc);
+      }
+
+      # Prod year
+      if( $colprodyear ) {
+        my $year = formattedCell($oWkS, $colprodyear, $iR) if( formattedCell($oWkS, $colprodyear, $iR) );
+        if(defined $year and $year =~ /(\d\d\d\d)/ )
+        {
+            $ce->{production_date} = "$1-01-01";
+        }
+      }
+
+      # Cast
+      if( $colcast ) {
+        my $cast = formattedCell($oWkS, $colcast, $iR) if( formattedCell($oWkS, $colcast, $iR) );
+        if(defined $cast and $cast !~ /Various/i )
+        {
+          $ce->{actors} = join(";", split(", ", $cast));
+        }
+      }
 
 
       if( $genre ){
@@ -251,98 +248,40 @@ if( $file =~ /\.pdf$/i ) {return $self->ImportPDF( $file, $channel_id, $xmltvid 
   return;
 }
 
-sub ImportPDF{
-  my $self = shift;
-  my( $file, $channel_id, $xmltvid ) = @_;
+sub ParseDate
+{
+  my ( $dinfo ) = @_;
 
-  my $dsh = $self->{datastorehelper};
-  my $ds = $self->{datastore};
+  my( $dayname, $day, $monthname, $year );
 
-  # Only process .pdf files.
-  return if $file !~  /\.pdf$/i;
+  # the format is 'Monday, 1 July 2008'
+  if( $dinfo =~ /^\S+\,\s*\d+\s+\S+\s+\d+$/ ){
+    ( $dayname, $day, $monthname, $year ) = ( $dinfo =~ /^(\S+)\,\s*(\d+)\s+(\S+)\s+(\d+)$/ );
+  } elsif( $dinfo =~ /^\S+\s+\d+\s+\S+\s+\d+$/ ){
+    ( $dayname, $day, $monthname, $year ) = ( $dinfo =~ /^(\S+)\s+(\d+)\s+(\S+)\s+(\d+)$/ );
+  }
 
-  my $batch_id;
-  my $date;
-  my $currdate = "x";
+  return undef if( ! $year );
 
-  progress( "Daring: $xmltvid: Processing $file" );
+  $year += 2000 if $year < 100;
 
-  my $doc = CAM::PDF->new($file) || die "$CAM::PDF::errstr\n";
-  my $str;
-  my $time;
-  my $title;
-  my $genre;
+  my $month = MonthNumber( $monthname , "en" );
 
-  foreach my $p ($doc->rangeToArray(1,$doc->numPages(),'1-end'))
-      {
-      $str = $str . $doc->getPageText($p);
-      }
-
- CAM::PDF->asciify(\$str);  #print "stra: $str";
-
-  # filtering
-  $str =~ s/\n+/\n/g;
-  $str =~ s/PREMIER.{0,3}\n/PREMIERE-/g;
-  $str =~ s/\nDaring.TV\nListing.*\n.Times shown are in CET.\n/\n/g;
-
-  my @lines = split("\n", $str);
-
-  foreach my $line (@lines) {
-
-   # if( ($line eq "") || ($line eq "Daring!TV") || ($line eq "Listings for July      2012")  || ($line eq "(Times shown are in CET)") ){next;}
-
-      if( isDate( $line ) ){
-        $date = ParseDate( $line ); #print "date: $date \n";
-        if( $date ne $currdate ){
-          progress("Hustler: Date is $date");
-
-          if( $currdate ne "x" ) {
-            $dsh->EndBatch( 1 );
-          }
-
-          my $batch_id = $xmltvid . "_" . $date;
-          $dsh->StartBatch( $batch_id , $channel_id );
-          $dsh->StartDate( $date , "05:00" );
-          $currdate = $date;
-        }
-        next;
-      }
-
-      if( isTime( $line ) ){
-        $time = ParseTime( $line ); #print "vreme: $time ";
-        next;
-      }
-
-      if( not isDuration( $line ) and not isTime( $line ) and not isDate( $line ) ){
-        $title = $line; #print ": $title \n";
-        next;
-      }
-
-        progress("Hustler: $xmltvid: $time - $title");
-
-      if( isDuration( $line ) ){
-        my $duration = $line; #print "trajanje: $duration ";
-       my $ce = {
-        channel_id => $channel_id,
-        start_time => $time,
-        title => norm($title),
-        rating => 18,
-       };
-
-      if( $genre ){
-        my($program_type, $category ) = $ds->LookupCat( 'Hustler', $genre );
-        AddCategory( $ce, $program_type, $category );
-      } else {AddCategory( $ce, "movie", "adult" );}
-
-      $dsh->AddProgramme( $ce );
-        next;
-      }
-   }
-
-  return;
+  return sprintf( "%04d-%02d-%02d", $year, $month, $day );
 }
 
+sub ParseTime
+{
+  my ( $tinfo ) = @_;
 
+  my( $hour, $minute ) = ( $tinfo =~ /^(\d+)\:(\d+)$/ );
+
+  if(!$hour) { return; }
+
+  $hour = 0 if( $hour eq 24 );
+
+  return sprintf( "%02d:%02d", $hour, $minute );
+}
 
 sub isDate
 {
@@ -368,8 +307,6 @@ sub isTime
   if( $text =~ /^\d+\:\d+$/ ){
     return 1;
   } else {
-    $text = ExcelFmt('hh:mm', $text);
-
     if( $text =~ /^\d+\:\d+$/ ){
         return 1;
     }
@@ -414,40 +351,6 @@ sub isDuration
   return 0;
 }
 
-sub ParseDate
-{
-  my ( $dinfo ) = @_;
-
-  my( $dayname, $day, $monthname, $year );
-
-  # the format is 'Monday, 1 July 2008'
-  if( $dinfo =~ /^\S+\,\s*\d+\s+\S+\s+\d+$/ ){
-    ( $dayname, $day, $monthname, $year ) = ( $dinfo =~ /^(\S+)\,\s*(\d+)\s+(\S+)\s+(\d+)$/ );
-  } elsif( $dinfo =~ /^\S+\s+\d+\s+\S+\s+\d+$/ ){
-    ( $dayname, $day, $monthname, $year ) = ( $dinfo =~ /^(\S+)\s+(\d+)\s+(\S+)\s+(\d+)$/ );
-  }
-
-  return undef if( ! $year );
-
-  $year += 2000 if $year < 100;
-
-  my $month = MonthNumber( $monthname , "en" );
-
-  return sprintf( "%04d-%02d-%02d", $year, $month, $day );
-}
-
-sub ParseTime
-{
-  my ( $tinfo ) = @_;
-
-  my( $hour, $minute ) = ( $tinfo =~ /^(\d+)\:(\d+)$/ );
-
-  if(!$hour) { return; }
-
-  $hour = 0 if( $hour eq 24 );
-
-  return sprintf( "%02d:%02d", $hour, $minute );
-}
 
 1;
 

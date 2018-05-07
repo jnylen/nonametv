@@ -143,6 +143,7 @@ sub ImportContent
       $start = $self->create_dt( $sc->findvalue( './date' ) . " " . $sc->findvalue( './time' ) );
     }
     catch { print("error: $_"); next; };
+    next if(!defined($start));
 
     if( not defined $start )
     {

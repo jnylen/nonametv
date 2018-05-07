@@ -138,6 +138,7 @@ sub ImportContent
     try {
       $start = $self->create_dt( $sc->findvalue( './@CalendarDate' ) );
     } catch { print("error: $_\n"); next; };
+    next if(!defined($start));
 
     if(!defined($start) )
     {

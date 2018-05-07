@@ -67,7 +67,7 @@ sub ImportContent
 
   if( $eis->size() == 0 ) {
       error( "Clipsource: No Events found" ) ;
-      return;
+      return 0;
   }
 
   my $i = 0;
@@ -94,7 +94,7 @@ sub ImportContent
 
   if( $mis->size() == 0 ) {
       error( "Clipsource: No Materials found" ) ;
-      return;
+      #return;
   }
 
   foreach my $mi ($mis->get_nodelist) {
@@ -136,7 +136,7 @@ sub ImportContent
 
   if( $rows->size() == 0 ) {
       error( "Clipsource: No Rows found" ) ;
-      return;
+      return 0;
   }
 
   # Start date
@@ -168,9 +168,15 @@ sub ImportContent
     # content
     my $desc   = $xpc->findvalue( 'descriptionList/description[@type="content"]' );
 
-    my $title        = $xpc->findvalue( 'genericTitleList/title[@type="content"][1]' );
+    my $title        = $xpc->findvalue( 'genericTitleList/title[@type="series"][1]' );
+    $title         ||= $xpc->findvalue( 'genericTitleList/title[@type="content"][1]' );
+    $title         ||= $xpc->findvalue( 'titleList/title[@type="series"][1]' );
     $title         ||= $xpc->findvalue( 'titleList/title[@type="content"][1]' );
     my $titles       = $xpc->findnodes( 'titleList/title' );
+
+    if($title =~ /^S.ndningsuppeh.ll$/i) {
+      $title = "end-of-transmission";
+    }
 
     # extra
     my $season       = $xpc->findvalue( 'seasonNumber' );

@@ -230,8 +230,8 @@ sub ImportContent {
                         $realtitle =~ s/"$//;
                     }
 
-                    $ce->{original_title} = norm($realtitle) if norm($realtitle) ne $ce->{title};
-                    $ce->{original_subtitle} = norm($realsubtitle) if !defined($ce->{program_type}) or (defined($ce->{program_type}) and $ce->{program_type} ne "movie");
+                    #$ce->{original_title} = norm($realtitle) if norm($realtitle) ne $ce->{title};
+                    #$ce->{original_subtitle} = norm($realsubtitle) if !defined($ce->{program_type}) or (defined($ce->{program_type}) and $ce->{program_type} ne "movie");
                 } else {
                 #    $ce->{original_title} = norm($subtitles) if norm($subtitles) ne $ce->{title};
                 }

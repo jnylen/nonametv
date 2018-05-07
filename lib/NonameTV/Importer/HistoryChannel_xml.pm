@@ -108,6 +108,8 @@ sub ImportXML
         $end = $self->create_dt( $row->findvalue( './/BROADCAST_END_TIME' ) );
       }
       catch { print("error: $_"); next; };
+      next if(!defined($start));
+      next if(!defined($end));
 
 
 

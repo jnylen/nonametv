@@ -182,7 +182,8 @@ sub ImportContent
         $stop2 = $self->create_dt( $end );
       }
       catch { print("error: $_"); next; };
-
+      next if(!defined($start2));
+      next if(!defined($stop2));
 
       my $title_original = $sc->findvalue( './originaltitle' );
   	  my $title_programme = $sc->findvalue( './title' );

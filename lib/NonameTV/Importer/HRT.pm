@@ -17,7 +17,7 @@ use DateTime;
 use XML::LibXML;
 use Encode qw/encode decode/;
 
-use NonameTV qw/norm normUtf8 ParseXml AddCategory/;
+use NonameTV qw/norm ParseXml AddCategory/;
 use NonameTV::Log qw/progress error/;
 
 use NonameTV::Importer::BaseOne;
@@ -159,9 +159,9 @@ sub ImportContent
 
     my $ce = {
       channel_id   => $chd->{id},
-      title        => normUtf8($title) || normUtf8($org_title),
-      subtitle     => normUtf8($subtitle),
-      description  => normUtf8($desc),
+      title        => norm($title) || norm($org_title),
+      subtitle     => norm($subtitle),
+      description  => norm($desc),
       start_time   => $start->ymd("-") . " " . $start->hms(":"),
       end_time     => $end->ymd("-") . " " . $end->hms(":"),
       #aspect       => $sixteen_nine ? "16:9" : "4:3",

@@ -149,6 +149,7 @@ sub ImportXML
       $start = $self->create_dt( $row->findvalue( './/broadcastDate' ), $timezone );
     }
     catch { print("error: $_"); next; };
+    next if(!defined($start));
 
     my $date = $start->ymd("-");
 

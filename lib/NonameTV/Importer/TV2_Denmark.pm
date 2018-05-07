@@ -114,6 +114,8 @@ sub ImportContent
     }
     catch { print("error: $_"); next; };
 
+    next if(!defined($start));
+
   	my $date  = $start->ymd("-");
     my $title = $pgm->findvalue( 'title' );
     $title =~ s/\((\d+):(\d+)\)//g if $title;

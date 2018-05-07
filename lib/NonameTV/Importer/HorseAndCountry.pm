@@ -17,9 +17,14 @@ use XML::LibXML;
 use IO::Scalar;
 use Data::Dumper;
 
-use NonameTV qw/norm ParseXml AddCategory MonthNumber/;
+use File::Temp qw/tempfile/;
+use File::Slurp qw/write_file read_file/;
+
+use Archive::Zip qw/:ERROR_CODES/;
+
+use NonameTV qw/norm AddCategory MonthNumber/;
 use NonameTV::DataStore::Helper;
-use NonameTV::Log qw/progress error/;
+use NonameTV::Log qw/progress error p d f/;
 use NonameTV::Config qw/ReadConfig/;
 
 use NonameTV::Importer::BaseFile;
@@ -46,6 +51,50 @@ sub new {
 }
 
 sub ImportContentFile {
+  my $self = shift;
+  my( $file, $chd ) = @_;
+
+  if( $file =~ /\.xml$/i ) {
+    $self->ImportExcel( $file, $chd );
+  } elsif( $file =~ /\.zip$/i ) {
+    my $zip = Archive::Zip->new();
+    if( $zip->read( $file ) != AZ_OK ) {
+      f "Failed to read zip.";
+      return 0;
+    }
+
+    my @filess;
+
+    my @members = $zip->members();
+    foreach my $member (@members) {
+      push( @filess, $member->{fileName} ) if $member->{fileName} !~ /MACOSX/i and $member->{fileName} =~ /\.xml$/i;
+    }
+
+    foreach my $fileno(@filess) {
+      d "Using file $fileno";
+
+      my $filename = '/tmp/'.$fileno;
+      if (-e $filename) {
+        unlink $filename; # remove file
+      }
+
+      my $content = $zip->contents( $fileno );
+
+      my $myfile = undef;
+      open($myfile, ">", $filename);
+      print $myfile $content;
+      close ($myfile);
+
+      $self->ImportXML( $filename, $chd ) if($filename =~ /\.xml$/i);
+      unlink $filename; # remove file
+    }
+  } else {
+
+  }
+
+}
+
+sub ImportXML {
   my $self = shift;
   my( $file, $chd ) = @_;
 
@@ -89,8 +138,8 @@ sub ImportContentFile {
     my $pid = $pi->findvalue( './@programId' );
 
     my $p = {
-      title          => norm($pi->findvalue( './/BasicDescription//Title[1]' )),
-      subtitle       => norm($pi->findvalue( './/BasicDescription//Title[2]' )),
+      title          => norm($pi->findvalue( './/BasicDescription//Title[@type="main"]' )),
+      subtitle       => norm($pi->findvalue( './/BasicDescription//Title[@type="EpisodeTitle"]' )),
       episode_number => norm($pi->findvalue( './/BasicDescription//EpisodeNumber' )),
       synopsis       => norm($pi->findvalue( './/BasicDescription//Synopsis' )),
       season_number  => norm($pi->findvalue( './/BasicDescription//SeasonNumber' )),
@@ -172,7 +221,7 @@ sub ParseDateTime {
   my( $str ) = @_;
 
   my( $year, $month, $day, $hour, $minute, $second ) =
-      ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)/ );
+      ($str =~ /^(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)/ );
 
   my $dt = DateTime->new(
     year => $year,

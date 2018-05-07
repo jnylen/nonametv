@@ -196,11 +196,7 @@ sub ImportFlatXLS
       }
 
       # date - column 'TX Time'
-<<<<<<< HEAD
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'TX Time CET'}];
-=======
       $oWkC = $oWkS->{Cells}[$iR][$columns{'Time (UTC/GMT +1 Hour)'}]; #edit
->>>>>>> 3cf4384bed905fccf42e06bf9b6b94b8da0dc545
       next if( ! $oWkC );
       next if( ! $oWkC->Value );
       $time = ParseTime($oWkC->Value);

@@ -67,6 +67,11 @@ sub ImportContent {
         $e->{stop_dt}->hms(':');
     delete $e->{stop_dt};
     $e->{channel_id} = $chd->{id};
+
+    # prev shown
+    if(defined($e->{previously_shown})) {
+    	$e->{previously_shown} = undef;
+    }
     
     $ds->AddProgrammeRaw( $e );
   }
