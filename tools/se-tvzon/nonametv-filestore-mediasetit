@@ -1,0 +1,102 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use DateTime;
+use File::Util;
+use File::Copy qw/copy move/;
+use File::Basename;
+use File::Path qw/make_path/;
+use Data::Dumper;
+
+use NonameTV;
+use NonameTV::DataStore;
+use NonameTV::Config qw/ReadConfig/;
+use NonameTV::Log qw/progress error d p w f/;
+
+use Getopt::Long;
+
+my $opt = { 'verbose' => 0 };
+
+my $res = GetOptions( $opt, qw/verbose/ );
+
+NonameTV::Log::SetVerbosity( $opt->{verbose} );
+
+# Read configuration
+my $conf = ReadConfig();
+my $ds = NonameTV::DataStore->new( $conf->{DataStore} );
+my $filestore = $conf->{FileStore};
+
+# Channels
+my %channel_data;
+# Free
+$channel_data{ "C5" } = "canale5.mediaset.it";
+$channel_data{ "I1" } = "italia1.mediaset.it";
+$channel_data{ "R4" } = "retequattro.mediaset.it";
+$channel_data{ "KI" } = "iris.mediaset.it";
+$channel_data{ "KA" } = "la5.mediaset.it";
+$channel_data{ "KQ" } = "extra.mediaset.it";
+$channel_data{ "I2" } = "italia2.mediaset.it";
+$channel_data{ "LT" } = "topcrime.mediaset.it";
+$channel_data{ "LB" } = "20.mediaset.it";
+
+#Pay
+$channel_data{ "KJ" } = "joi.mediaset.it";
+$channel_data{ "KD" } = "premiumstories.mediaset.it";
+$channel_data{ "KS" } = "premiumactionhd.mediaset.it";
+$channel_data{ "LR" } = "premiumcrimehd.mediaset.it";
+$channel_data{ "KE" } = "premiumcinemahd.mediaset.it";
+$channel_data{ "LM" } = "premiumcinema2hd.mediaset.it";
+$channel_data{ "KG" } = "premiumcinemaenergyhd.mediaset.it";
+$channel_data{ "LC" } = "premiumcinemacomedy.mediaset.it";
+$channel_data{ "KO" } = "premiumcinemaemotion.mediaset.it";
+$channel_data{ "LV" } = "premiumsport.mediaset.it";
+$channel_data{ "KC" } = "premiumsport2.mediaset.it";
+$channel_data{ "K1" } = "premiumcalcio1.mediaset.it";
+$channel_data{ "K2" } = "premiumcalcio2.mediaset.it"; 
+#$channel_data{ "K3" } = "premiumcalcio3.mediaset.it";
+#$channel_data{ "K4" } = "premiumcalcio4.mediaset.it";
+#$channel_data{ "K5" } = "premiumcalcio5.mediaset.it";
+#$channel_data{ "K6" } = "premiumcalcio6.mediaset.it";
+#$channel_data{ "K7" } = "premiumcalcio7.mediaset.it";
+
+# Non mediaset
+$channel_data{ "EE" } = "eurosport.it";
+$channel_data{ "EF" } = "eurosport2.eurosport.it";
+$channel_data{ "EH" } = "investigation.discovery.it";
+$channel_data{ "KR" } = "studiouniversal.it";
+
+# list files inside of the channel directory and check when they have been touched
+opendir(DIR, "/content/ftp/mediasetit/");
+
+foreach my $cff (readdir(DIR))
+{
+  if($cff =~ /^\./) { next; }
+  my ( $id, $weekstart, $weekend ) = split(/_/, $cff);
+  my $new_id = $id;
+  $new_id =~ s/^LOC//i;
+  my $new_filename = $cff;
+  $new_filename =~ s/\.txt$/\.xml/i;
+
+  my $cftype = join(',', File::Util->file_type( "/content/ftp/mediasetit/$cff" ) );
+
+  if( $cff !~ /\.(xml|txt)$/i ){
+      #progress( "File $cff isn't a xml file - skipping" );
+      next;
+  }
+
+  if( not exists( $channel_data{$new_id} ) )
+  {
+    print "Files with name $new_id hasnt been specified as a channel.\n";
+  } else {
+    make_path(dirname("$filestore/$channel_data{$new_id}/$new_filename"));
+    move( "/content/ftp/mediasetit/$cff", "$filestore/$channel_data{$new_id}/$new_filename" );
+    print "$cff moved to $channel_data{$new_id} with new filename: $new_filename\n";
+  }
+
+}
+
+exit;

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-use warnings;
+#use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
@@ -9,6 +9,7 @@ use lib "$FindBin::Bin/../../lib";
 use Mail::Box;
 use Mail::Box::Manager;
 use MIME::Base64;
+use MIME::QuotedPrint;
 
 use File::Temp qw/tempdir/;
 use File::Copy qw/move copy/;
@@ -58,28 +59,26 @@ EOHELP
 
 my $ds = CreateDataStore();
 
-my $root = "/content/maildir/.Projects/";
+my $root = "/content/maildir/filtered/";
 my @folders = qw(
-     NonameTV-Data.KinoPolska
-     NonameTV-Data.GlobalListings
-		 NonameTV-Data.France24
-		 NonameTV-Data.CNBC
-		 NonameTV-Data.FuelTV
-		 NonameTV-Data.LuxeTV
-		 NonameTV-Data.GodTV
-		 NonameTV-Data.Kanal10
-		 NonameTV-Data.Bloomberg
-		 NonameTV-Data.Motors
-		 NonameTV-Data.LifestyleTV
-		 NonameTV-Data.Gmail
-		 NonameTV-Data.Playboy
-		 NonameTV-Data.Hustler
-		 NonameTV-Data.YaS
-     NonameTV-Data.Fatstone
-     NonameTV-Data.Disney
-     NonameTV-Data.Uptown
-     NonameTV-Data.Trace
-     NonameTV-Data.Nova
+     KinoPolska
+     GlobalListings
+		 France24
+		 CNBC
+		 FuelTV
+		 LuxeTV
+		 GodTV
+		 Kanal10
+		 Bloomberg
+		 Motors
+		 LifestyleTV
+		 Gmail
+		 Hustler
+		 YaS
+     Fatstone
+     Disney
+     Trace
+     Nova
 		 );
 # Flag messages AFTER they have been processed. Then I normally
 # only have to move the message to the correct folder.
@@ -91,14 +90,12 @@ my $mgr = Mail::Box::Manager->new;
 StartLogSection( "nonametv-parse-maildir", 0 );
 
 foreach my $dir (@folders) {
-  my $folder = $mgr->open( "$root.$dir",
+  my $folder = $mgr->open( "$root$dir",
                            create => 1,
                            access => 'rw',
                            extract => 'ALWAYS' );
 
-  my $dir_pretty = $dir;
-  $dir_pretty =~ s/NonameTV-Data\.//i;
-  p "Running through $dir_pretty";
+  p "Running through $dir";
   my $now = localtime;
 
   foreach my $message ($folder->messages) {
@@ -109,10 +106,9 @@ foreach my $dir (@folders) {
     }
 
     # Flag for delete
-    if($message->label( 'flagged' ) and $dir !~ /Uptown/i) {
+    if($message->label( 'flagged' )) {
       next; # Skip
     }
-    #next unless $message->isMultipart;
 
     # Use Encode::MIME::Header
     my $subject = decode( 'MIME-Header', $message->get( 'Subject' ) ) || '';
@@ -183,10 +179,13 @@ sub process_parts
     my ($content);
 
     # Channels you only want it decoded, not fucked up
-    if($name =~ /\.xml$/i or $channel eq "international.rt.com" or $channel eq "russia.rt.com") {
-        $content = decode_base64($part->body);
+    if($part->body->transferEncoding eq "base64") {
+      $content = decode_base64($part->body);
+    } elsif($part->body->transferEncoding eq "quoted-printable") {
+      $content = decode_qp($part->body);
     } else {
-        $content = $part->decoded->string;
+      print Dumper($part->body->transferEncoding);
+      $content = $part->decoded->string;
     }
 
 
@@ -322,11 +321,12 @@ sub guess_channel
     # Sky News
     return "international.skynews.com" if $filename =~ /^SKYNI/i and $filename =~ /\.txt$/i;
     return "international.skynews.com" if $filename =~ /^SKYH/i and $filename =~ /\.txt$/i;
+    return "international.skynews.com" if $filename =~ /SKH/i and $filename =~ /\.txt$/i;
     return "international.skynews.com" if $subject =~ /^Sky News International/i and $filename =~ /\.txt$/i;
 
     # horseandcountry
-    return "horseandcountry.tv" if $filename =~ /^H.C SWE/i and $filename =~ /\.xml/i;
-    return "horseandcountry.tv" if $filename =~ /^H.C SWE/i and $filename =~ /\.zip/i;
+    return "horseandcountry.tv" if $filename =~ /^H.C/i and $filename =~ /\.xml/i;
+    return "horseandcountry.tv" if $filename =~ /^H.C/i and $filename =~ /\.zip/i;
 
     # Poland
     return "crimeandinvestigation.pl"   if $filename =~ /^CI\.Polsat/i and $filename =~ /\.xml$/i;
@@ -335,7 +335,7 @@ sub guess_channel
     return "historytv.pl"               if ($filename =~ /^history\.pol/i or $filename =~ /^history\.eur\.pol/i or $filename =~ /^history\.eu\.pol/i) and $filename =~ /\.xml$/i;
     return "historytv.pl"               if ($filename =~ /^history/i and $filename =~ /polish/i) and $filename =~ /\.xml$/i;
     return "lifetimetv.pl"              if ($filename =~ /^lifetime\s+poland/i or $filename =~ /^lifetime\.pol/i or $filename =~ /^life\.pol/i) and $filename =~ /\.xml$/i;
-    return "lifetimetv.pl"              if ($filename =~ /^lifetime/i and $subject =~ /poland/i) and $filename =~ /\.xml$/i;
+    return "lifetimetv.pl"              if ($filename =~ /^www_lifetime/i and $subject =~ /poland/i) and $filename =~ /\.xml$/i;
     return "natgeo.pl"                  if $filename =~ /^NGpol/i and $filename =~ /\.doc$/i;
     return "wild.natgeo.pl"             if $filename =~ /^NGWPol/i and $filename =~ /\.doc$/i;
     return "wild.natgeo.pl"             if $filename =~ /^NGW\(CEE\)Pol/i and $filename =~ /\.doc$/i;
@@ -391,18 +391,11 @@ sub guess_channel
      }
  }
 
- if( $dir =~ /Playboy/ ) {
-     return "europe.playboytv.com" if $filename =~ /^playboy/i and $filename =~ /\.doc$/i;
-     return "adultchannel.co.uk" if $filename =~ /^the\s*adult/i and $filename =~ /\.doc$/i;
-     return "brazzerstveurope.com" if $filename =~ /^brazzers/i and $filename =~ /\.doc$/i;
-     return "europe.realitykings.com" if $filename =~ /^rktv/i and $filename =~ /\.doc$/i;
- }
-
  if( $dir =~ /Hustler/ and $filename =~ /\.(xls|xlsx)$/i ) {
-     return "europe.bluehustler.com" if $filename =~ /^blue.*gmt.*\b/i;
-     return "europe.hustlertv.com" if $filename =~ /^hustler.*gmt.*\b/i;
-     return "europe.daringtv.com" if $filename =~ /^daring.*gmt.*\b/i;
-     return "europe.daringtv.com" if $filename =~ /^private.*gmt.*\b/i;
+     return "europe.bluehustler.com" if $filename =~ /^blue.*cet.*\b/i;
+     return "europe.hustlertv.com" if $filename =~ /^hustler.*cet.*\b/i;
+     return "europe.daringtv.com" if $filename =~ /^daring.*cet.*\b/i;
+     return "europe.daringtv.com" if $filename =~ /^private.*cet.*\b/i;
  }
 
  if( $dir =~ /YaS/ and $filename =~ /\.(xlsx|xls)$/i ) {
@@ -449,10 +442,6 @@ sub guess_channel
     return "oppnakanalengoteborg.se";
  }
 
- if( $dir =~ /Uptown/ and $filename =~ /\.xls$/i ) {
-     return "classic.uptown.dk" if $filename =~ /classic/i;
- }
-
  if ( $dir =~ /KinoPolska/ and $filename =~ /\.(xlsx|xlsm)$/i ) {
     return "kinopolska.pl" if $filename =~ /Kino Polska/i and $filename !~ /International/i;
     return "kinopolska.pl" if $filename =~ /\s+KP\s+/i and $filename !~ /INT/i;
@@ -497,7 +486,7 @@ sub guess_channel
 
  # Not added
  if($filename =~ /\.(xml|xls|xlsx|txt|doc|rtf|docx)/i) {
-  print("Not added: dir: $dir -> from: $from -> subject: $subject -> file: $filename\n");
+ # print("Not added: dir: $dir -> from: $from -> subject: $subject -> file: $filename\n");
  }
 
  return undef;

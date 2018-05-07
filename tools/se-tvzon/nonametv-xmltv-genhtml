@@ -85,7 +85,7 @@ print OUT << "EOHEAD";
   Please remember, these files are for personal usage. Any usage from that will result in your whole ip range being banned.<br/>
   Any support not for personal usage won't happen.
 </p>
-<p>E=Doesn't Exist - X=Exists</p>
+<p>E = Data missing - X = Has data</p>
 <table>
 <thead>
   <tr>
@@ -170,11 +170,14 @@ open OUT, "> $dir/00logos.html.new"
 print OUT << "EOHEAD";
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="http://converter.xmltv.se/css/modern.css"/>
+<link rel="stylesheet" type="text/css" href="http://xmltv.se/css/modern.css"/>
 <script language="JavaScript">
 function changeBg(col)
 {
-  document.bgColor = col;
+  elements = document.getElementsByClassName("logo");
+  for (var i = 0; i < elements.length; i++) {
+    elements[i].style.backgroundColor = col;
+  }
 }
 
 </script>
@@ -190,17 +193,20 @@ function changeBg(col)
 <a href="javascript:changeBg('#0000dd')">Dark blue</a>
 </p>
 <table>
-
+<table>
+<thead>
+  <tr>
+    <th>Channel</th>
+    <th>Logo</th>
+  </tr>
 EOHEAD
 
 foreach my $channel (sort keys %channels)
 {
   print OUT << "EOREC";
 <tr>
-  <td>$channel</td>
-  <td><img src="http://chanlogos.xmltv.se/$channel.png"></td>
-  <td><img src="http://chanlogos.xmltv.se/44x44/$channel.png"></td>
-  <td><img src="http://chanlogos.xmltv.se/16x16/$channel.png"></td>
+  <th scope='row'>$channel</th>
+  <td class="logo"><img src="http://chanlogos.xmltv.se/$channel.png"></td>
 </tr>
 
 EOREC

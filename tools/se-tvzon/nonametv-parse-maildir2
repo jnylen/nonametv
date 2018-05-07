@@ -9,6 +9,7 @@ use lib "$FindBin::Bin/../../lib";
 use Mail::Box;
 use Mail::Box::Manager;
 use MIME::Base64;
+use MIME::QuotedPrint;
 
 use File::Temp qw/tempdir/;
 use File::Copy qw/move copy/;
@@ -58,33 +59,32 @@ EOHELP
 
 my $ds = CreateDataStore();
 
-my $root = "/content/maildir/.Projects/";
+my $root = "/content/maildir/filtered/";
 my @folders = qw(
-            NonameTV-Data.DWDE
-            NonameTV-Data.HaC
-            NonameTV-Data.ETVMedia
-            NonameTV-Data.VisjonNorge
-            NonameTV-Data.Turner
-            NonameTV-Data.DMB
-            NonameTV-Data.PPS
-            NonameTV-Data.ServusTV
-            NonameTV-Data.DreiPlus
-            NonameTV-Data.Classica
-            NonameTV-Data.HopeChannel
-            NonameTV-Data.Discovery
-            NonameTV-Data.FightSports
-            NonameTV-Data.YFE
-            NonameTV-Data.Tele5
-            NonameTV-Data.Matkanalen
-            NonameTV-Data.Highview
-            NonameTV-Data.MTV
-            NonameTV-Data.Mezzo
-            NonameTV-Data.EBS
-            NonameTV-Data.Euronews
-            NonameTV-Data.Gospel
-            NonameTV-Data.RTL2
+            DWDE
+            HaC
+            ETVMedia
+            VisjonNorge
+            DMB
+            PPS
+            ServusTV
+            DreiPlus
+            Classica
+            HopeChannel
+            Discovery
+            FightSports
+            YFE
+            Tele5
+            Matkanalen
+            Highview
+            MTV
+            Mezzo
+            EBS
+            Euronews
+            Gospel
+            RTL2
         );
-#
+# Uptown
 # Flag messages AFTER they have been processed. Then I normally
 # only have to move the message to the correct folder.
 
@@ -95,14 +95,12 @@ my $mgr = Mail::Box::Manager->new;
 StartLogSection( "nonametv-parse-maildir", 0 );
 
 foreach my $dir (@folders) {
-  my $folder = $mgr->open( "$root.$dir",
+  my $folder = $mgr->open( "$root$dir",
                            create => 1,
                            access => 'rw',
                            extract => 'ALWAYS' );
 
-  my $dir_pretty = $dir;
-  $dir_pretty =~ s/NonameTV-Data\.//i;
-  p "Running through $dir_pretty";
+  p "Running through $dir";
   my $now = localtime;
 
   foreach my $message ($folder->messages) {
@@ -187,10 +185,13 @@ sub process_parts
     my ($content);
 
     # Channels you only want it decoded, not fucked up
-    if($name =~ /\.xml$/i) {
-        $content = decode_base64($part->body);
+    if($part->body->transferEncoding eq "base64") {
+      $content = decode_base64($part->body);
+    } elsif($part->body->transferEncoding eq "quoted-printable") {
+      $content = decode_qp($part->body);
     } else {
-        $content = $part->decoded->string;
+      print Dumper($part->body->transferEncoding);
+      $content = $part->decoded->string;
     }
 
 
@@ -205,66 +206,6 @@ sub guess_channel
 {
   my( $dir, $from, $subject, $filename, $type, $size ) = @_;
   #print Dumper($dir, $from, $subject, $filename, $type, $size);
-
- if( $dir =~ /Turner/ ) {
-   # Tivo took it over
-   if($filename =~ /Boomerang_Nordic/i and $filename =~ /XML/i) {
-     return "boomerangtv.eu"    if $filename =~ /_ENG_/i;
-     return "boomerangtv.se"    if $filename =~ /_SWE_/i;
-     return "boomerangtv.no"    if $filename =~ /_NOR_/i;
-     return "boomerangtv.dk"    if $filename =~ /_DAN_/i;
-   }
-
-   if($filename =~ /Cartoon_Network_Nordic/i and $filename =~ /XML/i) {
-     return "cartoonnetwork.com" if $filename =~ /_ENG_/i;
-     return "cartoonnetwork.se" if $filename =~ /_SWE_/i;
-     return "cartoonnetwork.no" if $filename =~ /_NOR_/i;
-     return "cartoonnetwork.dk" if $filename =~ /_DAN_/i;
-   }
-
-   if($filename =~ /Cartoon_Network(s|d|)_DUTCH/i and $filename =~ /XML/i) {
-     #return "cartoonnetwork.nl" if $filename =~ /_DUT_/i;
-   }
-
-   if($filename =~ /CNNi/i and $filename =~ /XML/i) {
-     return "cnn.com" if $filename =~ /_ENG_/i;
-   }
-
-   # Germany
-   if($filename =~ /XML/i and $filename =~ /_GER_/i) {
-     return "boomerangtv.de" if $filename =~ /Boomerang_Germany_HD/i;
-     return "cartoonnetwork.de" if $filename =~ /Cartoon_Network_Germany_HD/i;
-     return "hd.tnt-glitz.tv" if $filename =~ /TNT_Comedy_Germany_HD/i;
-     return "tnt-serie.de" if $filename =~ /TNT_Serie_Germany_HD/i;
-     return "tnt-film.de" if $filename =~ /TNT_Film_Germany_HD/i;
-   }
-
-   # Poland
-   if($filename =~ /XML/i and $filename =~ /_POL_/i) {
-     return "cartoonnetwork.pl" if $filename =~ /Cartoon_Network_Poland/i;
-     return "tnt-tv.pl" if $filename =~ /TNT_HD_Poland\s+and(\s+|)Romania/i;
-   }
-
-  # XLS Nordic
-  if( $filename =~ /\.(xls|xlsx|xlsm)$/i ) {
-    return "tnt-tv.se" if $filename =~ /^TNT/i and $filename =~ /Sweden/i;
-	  return "tnt-tv.dk" if $filename =~ /^TNT/i and $filename =~ /Danmark/i;
-    return "tnt-tv.dk" if $filename =~ /^TNT/i and $filename =~ /Denmark/i;
-	  return "tnt-tv.no" if $filename =~ /^TNT/i and $filename =~ /Norway/i;
-    return "tnt-tv.dk" if $filename =~ /^TNT/i and $filename =~ /DAN/i;
-    return "tnt-tv.dk" if $filename =~ /^TNT/i and $filename =~ /DEN/i;
-    return "tnt-tv.se" if $filename =~ /^TNT/i and $filename =~ /SWE/i;
-    return "tnt-tv.no" if $filename =~ /^TNT/i and $filename =~ /NOR/i;
-
-    # Subject title
-    if( $subject =~ /TNT NORDIC/i ) {
-      return "tnt-tv.dk" if $filename =~ /DAN/i;
-      return "tnt-tv.dk" if $filename =~ /DEN/i;
-      return "tnt-tv.se" if $filename =~ /SWE/i;
-      return "tnt-tv.no" if $filename =~ /NOR/i;
-    }
-  }
- }
 
  if( $dir =~ /Euronews/ and $filename =~ /\.(xls|xlsx)/i ) {
     return "euronews.com" if $filename =~ /cet/i;
@@ -402,7 +343,7 @@ sub guess_channel
  }
 
  if( $dir =~ /HaC/ and $filename =~ /\.xml$/i ) {
-     return "horseandcountry.tv";
+     #return "horseandcountry.tv";
  }
 
  if( $dir =~ /FightSports/ and $filename =~ /\.xls/i ) {
@@ -413,7 +354,7 @@ sub guess_channel
  if( $dir =~ /ETVMedia/ ) {
     # Channel 1 Russia
     if( $filename =~ /\.rtf$/i ) {
-       return "1tvrus.com";
+    #   return "1tvrus.com";
     }
 
     # TBN
@@ -441,7 +382,6 @@ sub guess_channel
     # ITV
     if($filename =~ /\.xml$/i) {
         return "familytv.de" if $filename =~ /^FamilyTV_/i;
-    #    return "dasneue.tv" if $filename =~ /^DasNeueTV_/i;
         return "blizztv.de" if $filename =~ /^Blizz_/i;
     }
  }
@@ -495,6 +435,23 @@ sub guess_channel
 
  if( $dir =~ /Highview/ ) {
     return "planet-tv.de" if $filename =~ /planet/i and $filename =~ /\.xml$/i;
+ }
+
+ if( $dir =~ /Uptown/ and $filename =~ /\.xls$/i ) {
+     return "classic.uptown.dk" if $filename =~ /classic/i;
+ }
+
+ if( $dir =~ /RTVE/ ) {
+   return "canal24h.rtve.es" if $subject =~ /canal 24 horas/i and $filename =~ /\.html$/i;
+   return "clan.rtve.es" if $subject =~ /clan tve/i and $filename =~ /\.html$/i;
+   return "asia.tve.es" if $filename =~ /^ASI/i and $filename =~ /\.xml$/i;
+   return "europa.tve.es" if $filename =~ /^INT/i and $filename =~ /\.xml$/i;
+ }
+
+ if( $dir =~ /ERR/ and $filename =~ /\.xml$/i ) {
+   return "etv1.err.ee" if $filename =~ /etv1/i;
+   return "etv2.err.ee" if $filename =~ /etv2/i;
+   return "etvplus.err.ee" if $filename =~ /etv\+/i;
  }
 
   return undef;

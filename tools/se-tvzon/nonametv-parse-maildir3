@@ -1,0 +1,250 @@
+#!/usr/bin/perl -w
+
+use strict;
+#use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../../lib";
+
+use Mail::Box;
+use Mail::Box::Manager;
+use MIME::Base64;
+use MIME::QuotedPrint;
+
+use File::Temp qw/tempdir/;
+use File::Copy qw/move copy/;
+use File::Basename;
+
+use Getopt::Long;
+use Digest::MD5;
+use Data::Dumper;
+
+use Time::Piece;
+
+use Encode qw/decode/;
+
+use NonameTV;
+use NonameTV::DataStore;
+use NonameTV::Factory qw/CreateFileStore CreateDataStore/;
+use NonameTV::Log qw/d p w f SetVerbosity StartLogSection EndLogSection/;
+
+my $opt = { manual => 0,
+            test => 0,
+	    verbose => 0,
+	    quiet => 0,
+            };
+
+my $res = GetOptions( $opt, qw/manual test verbose/ );
+
+$opt->{verbose} = 1 if $opt->{manual};
+
+SetVerbosity( $opt->{verbose}, $opt->{quiet} );
+
+if( not $res ) {
+  print << 'EOHELP';
+ [--manual] [--test] [--verbose]
+
+Extract files from mails in a maildir and store them using
+NonameTV::FileStore.
+
+  --manual  Ask the user which Importer to use if the information
+            cannot be derived from the message.
+
+  --test    Run the importer in test-mode.
+
+EOHELP
+
+  exit 1;
+}
+
+my $ds = CreateDataStore();
+
+my $root = "/content/maildir/filtered/";
+my @folders = qw(
+            Uptown
+            ERR
+            RTVE
+            Welt
+            KBS
+            Playboy
+		 );
+
+# Flag messages AFTER they have been processed. Then I normally
+# only have to move the message to the correct folder.
+
+my $tmpdir = tempdir( CLEANUP => 1 );
+
+my $mgr = Mail::Box::Manager->new;
+
+StartLogSection( "nonametv-parse-maildir", 0 );
+
+foreach my $dir (@folders) {
+  my $folder = $mgr->open( "$root$dir",
+                           create => 1,
+                           access => 'rw',
+                           extract => 'ALWAYS' );
+
+  p "Running through $dir";
+  my $now = localtime;
+
+  foreach my $message ($folder->messages) {
+    my $before = localtime($message->timestamp);
+    if(($now - $before)->days > 110) {
+      $message->delete;
+      next;
+    }
+
+    # Flag for delete
+    if($message->label( 'flagged' )) {
+      next; # Skip
+    }
+
+    # Use Encode::MIME::Header
+    my $subject = decode( 'MIME-Header', $message->get( 'Subject' ) ) || '';
+    my $from = $message->get( 'From' );
+
+    if( process_parts( $message, $dir, $from, $subject ) ) {
+      $message->label( 'flagged' => 1 );
+      d "Processing succeeded.";
+    }
+    else {
+      d "Processing failed.";
+    }
+  }
+
+  # Close it
+  $folder->close;
+}
+
+$mgr->closeAllFolders;
+
+EndLogSection( "nonametv-parse-maildir" );
+
+sub process_parts
+{
+  my( $part, $dir, $from, $subject ) = @_;
+
+  my $type = $part->get('Content-Type');
+#  return 0 if $type eq "text/plain";
+
+  if($part->isMultipart)
+  {
+    my $count = 0;
+    foreach my $child ($part->parts)
+    {
+      $count += process_parts( $child, $dir, $from, $subject );
+    }
+    return $count;
+  }
+  else
+  {
+    my $disp = $part->body->disposition;
+    my $name = decode( 'MIME-Header',
+		       $part->body->dispositionFilename ) || 'noname';
+    my $size = $part->body->size;
+
+    my $channel = guess_channel( $dir, $from, $subject, $name, $type, $size );
+
+    if( (not defined $channel) and $opt->{manual} )
+    {
+      print "$name ($size bytes): ";
+      $channel = <STDIN>;
+      $channel =~ tr/\n\r //d;
+      $channel = undef if $channel eq "";
+    }
+
+    if( not defined $channel ) {
+      d "$name skipped.";
+      return 0;
+    }
+
+    my $chd = $ds->sa->Lookup( 'channels', {xmltvid => $channel} );
+
+    die "Unknown channel $channel" if not defined $chd;
+
+    p "Adding file $name for $channel";
+
+    my $fs = GetFileStore( $chd->{grabber} );
+    my ($content);
+
+    # Channels you only want it decoded, not fucked up
+    if($part->body->transferEncoding eq "base64") {
+      $content = decode_base64($part->body);
+    } elsif($part->body->transferEncoding eq "quoted-printable") {
+      $content = decode_qp($part->body);
+    } else {
+      print Dumper($part->body->transferEncoding);
+      $content = $part->decoded->string;
+    }
+
+    $fs->AddFile( $channel, $name, \$content );
+  }
+
+  return $opt->{test} ? 0 : 1;
+}
+
+sub guess_channel
+{
+    my( $dir, $from, $subject, $filename, $type, $size ) = @_;
+
+    if( $dir =~ /RTVE/ ) {
+        return "canal24h.rtve.es" if $subject =~ /canal 24 horas/i and $filename =~ /\.html$/i;
+        return "clan.rtve.es" if $subject =~ /clan tve/i and $filename =~ /\.html$/i;
+        return "asia.tve.es" if $filename =~ /^ASI/i and $filename =~ /\.xml$/i;
+        return "europa.tve.es" if $filename =~ /^INT/i and $filename =~ /\.xml$/i;
+    }
+
+    if( $dir =~ /ERR/ and $filename =~ /\.xml$/i ) {
+        return "etv1.err.ee" if $filename =~ /etv1/i;
+        return "etv2.err.ee" if $filename =~ /etv2/i;
+        return "etvplus.err.ee" if $filename =~ /etv\+/i;
+    }
+
+    if( $dir =~ /Uptown/ and $filename =~ /\.xls$/i ) {
+        return "classic.uptown.dk" if $filename =~ /classic/i;
+    }
+
+    if( $dir =~ /Welt/ and $filename =~ /\.xml$/i ) {
+        return "welt.de" if $filename =~ /^Welt/i;
+        return "n24doku.de" if $filename =~ /^N24Doku/i;
+    }
+
+    if( $dir =~ /KBS/ and $filename =~ /\.(xls|xlsx)$/i ) {
+        return "world.kbs.co.kr";
+    }
+
+    if( $dir =~ /Playboy/ ) {
+        return "europe.playboytv.com" if $filename =~ /^playboy/i and $filename =~ /\.doc$/i;
+        return "europe.playboytv.com" if $filename =~ /^playboy/i and $filename =~ /\.xlsx$/i;
+        return "adultchannel.co.uk" if $filename =~ /^the\s*adult/i and $filename =~ /\.doc$/i;
+        return "brazzerstveurope.com" if $filename =~ /^brazzers/i and $filename =~ /\.doc$/i;
+        return "europe.realitykings.com" if $filename =~ /^rktv/i and $filename =~ /\.doc$/i;
+    }
+
+    # Not added
+    if($filename =~ /\.(xml|xls|xlsx|txt|doc|rtf|docx)/i) {
+     print("Not added: dir: $dir -> from: $from -> subject: $subject -> file: $filename\n");
+    }
+
+    return undef;
+}
+
+my $filestores = {};
+
+sub GetFileStore {
+  my( $importer ) = @_;
+
+  if( not defined $filestores->{$importer} ) {
+    $filestores->{$importer} = CreateFileStore( $importer );
+  }
+
+  return $filestores->{$importer}
+}
+
+sub md5sum {
+  my( $file ) = @_;
+  open(FILE, $file) or die "Can't open '$file': $!";
+  binmode(FILE);
+
+  return Digest::MD5->new->addfile(*FILE)->hexdigest;
+}

@@ -10,10 +10,11 @@ use Mail::Box;
 use Mail::Box::Manager;
 use Time::Piece;
 use Data::Dumper;
+use Try::Tiny;
 
 my $maildir = "/content/maildir/";
-my $infoldername = ".Projects/xmltv-data-in";
-my $targetprefix = ".Projects/.NonameTV-Data.";
+my $infoldername = "xmltv-data-in";
+my $targetprefix = "filtered/";
 
 my $folders;
 
@@ -79,6 +80,9 @@ foreach my $msg ($infolder->messages) {
   elsif( $fromaddr =~ /\@mindgeek.com/i ) {
     MoveMessage( $msg, "Playboy" );
   }
+  elsif( $fromaddr =~ /\@dorcel.tv/i ) {
+    MoveMessage( $msg, "Playboy" );
+  }
   elsif( $fromaddr =~ /\@sapphiremedia.com/i ) {
     MoveMessage( $msg, "Hustler" );
   }
@@ -132,15 +136,6 @@ foreach my $msg ($infolder->messages) {
   }
   elsif( $fromaddr =~ /\@travelchannel.co.uk/i ) {
     MoveMessage( $msg, "TravelChannel" );
-  }
-  elsif( $fromaddr =~ /\@turner.com/i ) {
-    MoveMessage( $msg, "Turner" );
-  }
-  elsif( $fromaddr =~ /\@tivo.com/i ) {
-    MoveMessage( $msg, "Turner" );
-  }
-  elsif( $fromaddr =~ /\@rovicorp.com/i ) {
-    MoveMessage( $msg, "Turner" );
   }
   elsif( $fromaddr =~ /\@mediateket.no/i ) {
     MoveMessage( $msg, "Fatstone" );
@@ -238,6 +233,9 @@ foreach my $msg ($infolder->messages) {
   elsif( $fromaddr =~ /\@classica.de/i ) {
     MoveMessage( $msg, "Classica" );
   }
+  elsif( $fromaddr =~ /\@stingray.com/i ) {
+    MoveMessage( $msg, "Classica" );
+  }
   elsif( $fromaddr =~ /\@stimme-der-hoffnung.de/i ) {
     MoveMessage( $msg, "HopeChannel" );
   }
@@ -289,6 +287,18 @@ foreach my $msg ($infolder->messages) {
   elsif( $fromaddr =~ /\@novatv.hr/i ) {
     MoveMessage( $msg, "Nova" );
   }
+  elsif( $fromaddr =~ /\@rtve.es/i ) {
+    MoveMessage( $msg, "RTVE" );
+  }
+  elsif( $fromaddr =~ /\@err.ee/i ) {
+    MoveMessage( $msg, "ERR" );
+  }
+  elsif( $fromaddr =~ /\@welt.de/i ) {
+    MoveMessage( $msg, "Welt" );
+  }
+  elsif( $fromaddr =~ /\@kbs.co.kr/i ) {
+    MoveMessage( $msg, "KBS" );
+  }
 }
 
 sub MoveMessage {
@@ -300,5 +310,12 @@ sub MoveMessage {
 
   print("Moved a mail to $foldername\n");
 
-  $msg->moveTo( $folders->{$foldername} );
+  try {
+    $msg->moveTo( $folders->{$foldername} );
+  }
+  catch { print("Couldn't add mail due to: $_ "); return; };
+
+  
 }
+
+#$infolder->close;

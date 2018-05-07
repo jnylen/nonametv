@@ -1,8 +1,9 @@
 #!/bin/sh
 
-getmail --rcfile=/home/jnylen/.getmail/getmailrc --getmaildir=/content/maildir/.Projects/xmltv-data-in/
+getmail --rcfile=/home/jnylen/.getmail/getmailrc --getmaildir=/content/maildir/xmltv-data-in/
 
 # Parse it
 /home/jnylen/projects/nonametv/tools/se-tvzon/nonametv-filter-mail --verbose
 /home/jnylen/projects/nonametv/tools/se-tvzon/nonametv-parse-maildir --verbose
 /home/jnylen/projects/nonametv/tools/se-tvzon/nonametv-parse-maildir2 --verbose
+/home/jnylen/projects/nonametv/tools/se-tvzon/nonametv-parse-maildir3 --verbose
