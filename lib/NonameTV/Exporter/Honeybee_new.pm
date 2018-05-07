@@ -645,6 +645,11 @@ sub WriteEntry
     $d->{rerun} = $entry->{rerun};
   }
 
+  if( $entry->{previously_shown} )
+  {
+    $d->{previously_shown} = $entry->{previously_shown};
+  }
+
   $d->{new} = $entry->{new};
 
   $d->{image}->{poster} = $entry->{poster};
