@@ -141,6 +141,7 @@ $data =~ s| xmlns="urn:crystal-reports:schemas:report-detail"||;
         $title =~ s/\(f\)//gi;
         $title =~ s/\(g\)//gi;
         $title =~ s/^L\-//gi;
+        $title =~ s/\///gi;
 
         $title = norm($title);
 
