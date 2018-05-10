@@ -62,7 +62,7 @@ foreach my $cff2 (readdir(DIR))
 
     my $cftype = join(',', File::Util->file_type( "$dir$cff" ) );
 
-    if( $cff !~ /\.(xls|xlsx)$/i ){
+    if( $cff !~ /\.(xls|xlsx)$/i and $cff !~ /archives/i ){
         #progress( "File $cff isn't a xml file - skipping" );
         next;
     }
