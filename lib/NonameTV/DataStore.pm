@@ -535,7 +535,7 @@ sub LookupCat {
   # as equal.
   $org = substr( $org, 0, 44 );
 
-  $self->LoadCategories()
+  $self->LoadCategories($type)
     if not exists( $self->{categories} );
 
   if ( not exists( $self->{categories}->{"$type++$org"} ) ) {
@@ -584,7 +584,7 @@ sub LookupCountry {
   # as equal.
   $org = substr( $org, 0, 44 );
 
-  $self->LoadCountries()
+  $self->LoadCountries($type)
     if not exists( $self->{countries} );
 
   if ( not exists( $self->{countries}->{"$type++$org"} ) ) {
@@ -633,7 +633,7 @@ sub LookupLeague {
   # as equal.
   $org = substr( $org, 0, 44 );
 
-  $self->LoadLeagues()
+  $self->LoadLeagues($type)
     if not exists( $self->{leagues} );
 
   if ( not exists( $self->{leagues}->{"$type++$org"} ) ) {
@@ -718,10 +718,11 @@ sub EndTransaction {
 
 sub LoadCategories {
   my $self = shift;
+  my ( $type ) = @_;
 
   my $d = {};
 
-  my $sth = $self->{sa}->Iterate( 'trans_cat', {} );
+  my $sth = $self->{sa}->Iterate( 'trans_cat', {type => $type} );
   if ( not defined($sth) ) {
     $self->{categories} = {};
     w "No categories found in database.";
@@ -753,10 +754,11 @@ sub AddCategory {
 
 sub LoadCountries {
   my $self = shift;
+  my ( $type ) = @_;
 
   my $d = {};
 
-  my $sth = $self->{sa}->Iterate( 'trans_country', {} );
+  my $sth = $self->{sa}->Iterate( 'trans_country', {type => $type} );
   if ( not defined($sth) ) {
     $self->{countries} = {};
     w "No countries found in database.";
@@ -788,10 +790,11 @@ sub AddCountry {
 
 sub LoadLeagues {
   my $self = shift;
+  my ( $type ) = @_;
 
   my $d = {};
 
-  my $sth = $self->{sa}->Iterate( 'trans_leagues', {} );
+  my $sth = $self->{sa}->Iterate( 'trans_leagues', {type => $type} );
   if ( not defined($sth) ) {
     $self->{leagues} = {};
     w "No leagues found in database.";
