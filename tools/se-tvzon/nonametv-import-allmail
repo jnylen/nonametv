@@ -5,7 +5,6 @@ tools/nonametv-import Discovery $1 $2 $3
 tools/nonametv-import DisneyChannel $1 $2 $3
 tools/nonametv-import DWDE $1 $2 $3
 tools/nonametv-import Kanal10 $1 $2 $3
-tools/nonametv-import Kanal10NO $1 $2 $3
 tools/nonametv-import Motors $1 $2 $3
 tools/nonametv-import Mtve_mail $1 $2 $3
 tools/nonametv-import NatGeoFI $1 $2 $3
@@ -42,7 +41,6 @@ tools/nonametv-import ITVDE $1 $2 $3
 tools/nonametv-import PPS $1 $2 $3
 tools/nonametv-import CarusMedia $1 $2 $3
 tools/nonametv-import FoxTV $1 $2 $3
-tools/nonametv-import NonstopXLS $1 $2 $3
 tools/nonametv-import RussiaToday $1 $2 $3
 tools/nonametv-import SkyNews $1 $2 $3
 tools/nonametv-import DreiPlus $1 $2 $3
