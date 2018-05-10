@@ -11,9 +11,10 @@ use Encode;
 
 use NonameTV::Augmenter;
 use NonameTV::Factory qw/CreateDataStore/;
+NonameTV::Log::SetVerbosity( 2 );
 
 my $ds = CreateDataStore( );
-my $batchid = 'action.film.viasat.se_2015-52';
+my $batchid = 'joi.mediaset.dev_2018-05-09';
 printf( "augmenting %s...\n", $batchid );
 
 my $augmenter = NonameTV::Augmenter->new( $ds );
