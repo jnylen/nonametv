@@ -10,7 +10,7 @@
     </head>
     <body>
       <h1>Available Channels</h1>
-      <p>The following channels are available from xmltv.se:</p>
+      <p>The following channels are available:</p>
       <div id="channels">
         <ul>
         <xsl:apply-templates>
@@ -21,6 +21,6 @@
      </body></html>
   </xsl:template>
   <xsl:template match="channel">
-      <li><xsl:value-of select="display-name/text()"/></li>
+      <li><strong><xsl:value-of select="display-name/text()"/></strong> (<xsl:value-of select="@id"/>)</li>
   </xsl:template>
 </xsl:stylesheet>
