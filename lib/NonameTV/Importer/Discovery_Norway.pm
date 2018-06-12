@@ -82,6 +82,8 @@ sub Object2Url {
 
   my $url = "http://presse.discovery.no/tablaa.xml?channel=" . $chd->{grabber_info} . "&show_type=all&utf8=%E2%9C%93&week=" . $datefirst->ymd("-");
 
+  print("Fetching $url...\n");
+
   return( $url, undef );
 }
 
