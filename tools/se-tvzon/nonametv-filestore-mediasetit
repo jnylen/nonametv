@@ -42,6 +42,7 @@ $channel_data{ "KQ" } = "extra.mediaset.it";
 $channel_data{ "I2" } = "italia2.mediaset.it";
 $channel_data{ "LT" } = "topcrime.mediaset.it";
 $channel_data{ "LB" } = "20.mediaset.it";
+$channel_data{ "FU" } = "focus.mediaset.it";
 
 #Pay
 $channel_data{ "KJ" } = "joi.mediaset.it";
