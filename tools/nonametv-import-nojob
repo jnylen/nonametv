@@ -1,0 +1,74 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use NonameTV::Factory qw/CreateDataStore CreateDataStoreDummy 
+                         CreateImporter InitHttpCache/;
+use NonameTV::Job qw/StartJob EndJob/;
+
+use Getopt::Long;
+
+if( scalar( @ARGV ) == 0 )
+{
+  print << 'EOHELP';
+nonametv-import [test] [Importer] [Importer-options] [Filename]
+
+Import data into the database. [Importer] is the name of an entry under
+the Importers-section in the nonametv configuration.
+
+The keyword "test" means that NonameTV::DataStore::Dummy is used. 
+
+Typical Importer-options include
+
+--verbose
+
+--force-update  Import data even if the data has not changed since the
+                last import.
+
+Some importers import data from files specified on the command-line,
+other importers fetch their data via http.
+
+EOHELP
+
+  exit 1;
+}
+
+my $run_test = 0;
+
+my $imp_name = shift @ARGV;
+if( $imp_name eq "test" ) {
+  $run_test = 1;
+  $imp_name = shift @ARGV;
+}
+
+# Create Datastore
+my $ds;
+
+if( $run_test ) {
+  $ds = CreateDataStoreDummy();
+}
+else {
+  $ds = CreateDataStore();
+}
+
+# Initialize cache
+InitHttpCache();
+
+my $imp = CreateImporter( $imp_name, $ds );
+
+my %opt = %{$imp->{OptionDefaults}};
+my $option_spec = $imp->{OptionSpec};
+
+my $res = GetOptions( \%opt, @{$option_spec} );
+
+my $jobname = $imp_name;
+if( defined( $opt{'short-grab'} ) and $opt{'short-grab'} ) {
+  $jobname .= "-short";
+}
+
+# Run importer
+$imp->Import( \%opt );
