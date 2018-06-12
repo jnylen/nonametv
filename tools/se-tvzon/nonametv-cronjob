@@ -35,8 +35,9 @@ if [ $1x = --skydex ]
 then
   # Run SkyDE specific commands
   ruby sky_importer.rb
+  tools/se-tvzon/nonametv-filestore-skyde
   perl -I lib tools/nonametv-import SkyDE $Q
-
+  
   exit
 fi
 

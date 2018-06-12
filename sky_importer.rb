@@ -36,17 +36,17 @@ a.get('http://info.sky.de/inhalt/de/programm_info_presseexport_start.jsp') do |h
 
   # Safety first - Grab all XML links
   begin
-    xml_files = my_page.links_with(:href => /_xml\.gz/, :text => 'Download')
+    xml_files = my_page.links_with(:href => /_csv\.gz/, :text => 'Download')
 
-    puts "Found #{xml_files.count} XML files"
+    puts "Found #{xml_files.count} CSV files"
 
     xml_files.each do |link|
       # Download files to the folder
-      file_name = Pathname.new(link.href).basename.to_s.gsub(/\.gz$/, ".xml").gsub(/(\d\d)(\d\d)_(\d\d)(\d\d)(\d\d)_xml/, "").gsub(/(\d\d)(\d\d)_xml/, "").gsub("2017", "2018")
+      file_name = Pathname.new(link.href).basename.to_s.gsub(/\.gz$/, ".csv.gz").gsub(/(\d\d)(\d\d)_(\d\d)(\d\d)(\d\d)_csv/, "").gsub(/(\d\d)(\d\d)_csv/, "").gsub("2017", "2018")
 
       # If it exists, check if it differs otherwise just add it already
       if File.exist?('/content/skyde/' + file_name)
-        File.open('/tmp/' + file_name, 'wb'){ |f| f << Zlib::GzipReader.new(StringIO.new(a.get('http://info.sky.de' + link.href).body.to_s)).read }
+        File.open('/tmp/' + file_name, 'wb'){ |f| f << StringIO.new(a.get('http://info.sky.de' + link.href).body.to_s).read }
 
         # Check if it's changed or not
         if !FileUtils.compare_file('/tmp/' + file_name, '/content/skyde/' + file_name)
@@ -59,7 +59,7 @@ a.get('http://info.sky.de/inhalt/de/programm_info_presseexport_start.jsp') do |h
           puts "Not changed #{file_name}"
         end
       else
-        File.open('/content/skyde/' + file_name, 'wb'){ |f| f << Zlib::GzipReader.new(StringIO.new(a.get('http://info.sky.de' + link.href).body.to_s)).read }
+        File.open('/content/skyde/' + file_name, 'wb'){ |f| f << StringIO.new(a.get('http://info.sky.de' + link.href).body.to_s).read }
         puts "Downloaded #{file_name}"
       end
 

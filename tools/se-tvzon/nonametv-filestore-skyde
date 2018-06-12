@@ -1,0 +1,64 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use DateTime;
+use File::Util;
+use File::Copy qw/copy move/;
+use File::Basename;
+use File::Path qw/make_path/;
+use Data::Dumper;
+
+use NonameTV::Config qw/ReadConfig/;
+
+# Read configuration
+my $config = ReadConfig();
+
+# list files inside of the channel directory and check when they have been touched
+opendir(DIR, "/content/skyde/");
+
+foreach my $cff (readdir(DIR))
+{
+    if($cff =~ /^\./) { next; }
+    if($cff !~ /^presse_/) { next; }
+    my ( $dump, $week, $year ) = split(/_/, $cff);
+
+    foreach my $xmltvid (sort keys %{$config->{Importers}->{SkyDE}->{Channels}}) {
+        my $e = $config->{Importers}->{SkyDE}->{Channels}->{$xmltvid};
+        
+        AddFileToChannel($cff, $xmltvid, $e->[1])
+    }
+}
+
+sub AddFileToChannel {
+  my( $filename, $channel, $channel_grabber ) = @_;
+
+  my $data;
+
+  # Header
+  my $headerdata=`zcat < \"/content/skyde/$filename\" |head -n1`;
+  $data = "$headerdata";
+
+  # Data
+  my $datadata = `zgrep '\t$channel_grabber\t' \"/content/skyde/$filename\"`;
+
+  $data .= $datadata;
+
+  my ( $dump, $week, $year ) = split(/_/, $filename);
+  $year =~ s/\.csv\.gz//i;
+
+  my $new_filename = sprintf("%s_%d-%d.csv", $channel, $year, $week);
+
+  open FH, '>', "/content/channels/$channel/$new_filename" or die "Error:$!\n";
+  print FH $data;
+  close FH or die "Error in closing the file ", __FILE__, " $!\n";
+
+  print("Wrote to $new_filename\n");
+
+  return 1;
+}
+
+exit;
