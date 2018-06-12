@@ -67,6 +67,7 @@ my @folders = qw(
             Welt
             KBS
             Playboy
+            AZMedien
 		 );
 
 # Flag messages AFTER they have been processed. Then I normally
@@ -207,6 +208,7 @@ sub guess_channel
     if( $dir =~ /Welt/ and $filename =~ /\.xml$/i ) {
         return "welt.de" if $filename =~ /^Welt/i;
         return "n24doku.de" if $filename =~ /^N24Doku/i;
+        return "n24doku.de" if $filename =~ /^N24\s+Doku/i;
     }
 
     if( $dir =~ /KBS/ and $filename =~ /\.(xls|xlsx)$/i ) {
@@ -219,6 +221,12 @@ sub guess_channel
         return "adultchannel.co.uk" if $filename =~ /^the\s*adult/i and $filename =~ /\.doc$/i;
         return "brazzerstveurope.com" if $filename =~ /^brazzers/i and $filename =~ /\.doc$/i;
         return "europe.realitykings.com" if $filename =~ /^rktv/i and $filename =~ /\.doc$/i;
+    }
+
+    if( $dir =~ /AZMedien/ and $filename =~ /\.xml$/i ) {
+        return "tv24.ch" if $filename =~ /^TV24_/i;
+        return "tv25.ch" if $filename =~ /^TV25_/i;
+
     }
 
     # Not added

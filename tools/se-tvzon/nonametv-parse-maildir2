@@ -326,7 +326,7 @@ sub guess_channel
    	return "gospel.tv";
  }
 
- if( $dir =~ /VisjonNorge/ and $filename =~ /\.xls$/i ) {
+ if( $dir =~ /VisjonNorge/ and $filename =~ /\.(xls|xlsx)$/i ) {
     return "visjonnorge.com" if $filename =~ /epgVN/i;
     return "visionsverige.com" if $filename =~ /visionsverige/i;
  }
