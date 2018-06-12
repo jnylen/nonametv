@@ -4,8 +4,8 @@
 [% USE date %]
 [% USE linkify %]
 <head>
-  <link rel="stylesheet" type="text/css" href="/css/modern.css" />
-  <script type="text/javascript" src="/js/sortable.js"></script>
+  <link rel="stylesheet" type="text/css" href="http://xmltv.se/css/modern.css" />
+  <script type="text/javascript" src="https://kryogenix.org/code/browser/sorttable/sorttable.js"></script>
   <title>Nonametv movies not found at the movie database</title>
 </head>
 <body>
