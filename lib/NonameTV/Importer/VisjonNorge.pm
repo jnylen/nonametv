@@ -14,12 +14,9 @@ use utf8;
 
 use POSIX;
 use DateTime;
-use XML::LibXML;
-use Spreadsheet::ParseExcel;
 use Data::Dumper;
-use Spreadsheet::ParseExcel::Utility qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
 
-use NonameTV qw/norm MonthNumber/;
+use NonameTV qw/norm ParseExcel formattedCell MonthNumber/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 use NonameTV::Config qw/ReadConfig/;
@@ -50,7 +47,7 @@ sub ImportContentFile {
 
   $self->{fileerror} = 0;
 
-  if( $file =~ /\.xls$/i ){
+  if( $file =~ /\.(xls|xlsx)$/i ){
     $self->ImportXLS( $file, $chd );
   } else {
     error( "VisjonNorge: Unknown file format: $file" );
@@ -72,38 +69,42 @@ sub ImportXLS
   my $currdate = "x";
   my $oBook;
 
-  $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );
+  my $doc = ParseExcel($file);
+
+  if( not defined( $doc ) ) {
+    error( "VisjonNorge: $file: Failed to parse excel" );
+    return;
+  }
 
   # main foreach
-  foreach my $oWkS (@{$oBook->{Worksheet}}) {
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
+    my $oWkS = $doc->sheet($iSheet);
+    progress( "VisjonNorge: Processing worksheet: $oWkS->{label}" );
 
-    #my $oWkS = $oBook->{Worksheet}[$iSheet];
-    progress( "VisjonNorge: $chd->{xmltvid}: Processing worksheet: $oWkS->{Name}" );
-
-	my $foundcolumns = 0;
+	  my $foundcolumns = 0;
 
     # browse through rows
-    for(my $iR = 6 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+    for(my $iR = 7 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
 
       if( not %columns ){
         # the column names are stored in the first row
         # so read them and store their column positions
         # for further findvalue() calls
 
-        for(my $iC = $oWkS->{MinCol} ; defined $oWkS->{MaxCol} && $iC <= $oWkS->{MaxCol} ; $iC++) {
-          if( $oWkS->{Cells}[$iR][$iC] ){
-            $columns{$oWkS->{Cells}[$iR][$iC]->Value} = $iC;
+        for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
+          if( $oWkS->cell($iC, $iR) ){
+            $columns{$oWkS->cell($iC, $iR)} = $iC;
 
-			$columns{'Title'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /tittel/ );
-            $columns{'Synopsis'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /lang tekst/ );
+			      $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /tittel/ );
+            $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /lang tekst/ );
 
-            $columns{'Date'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /dato/ );
-            $columns{'StartTime'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /start/ ); # Dont set the time to EET
-            $columns{'EndTime'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /slutt/ );
+            $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /dato/ );
+            $columns{'StartTime'} = $iC if( $oWkS->cell($iC, $iR) =~ /start/ ); # Dont set the time to EET
+            $columns{'EndTime'} = $iC if( $oWkS->cell($iC, $iR) =~ /slutt/ );
 
-            $columns{'extradesc'} = $iC if( $oWkS->{Cells}[$iR][$iC]->Value =~ /kort tekst/ );
+            $columns{'extradesc'} = $iC if( $oWkS->cell($iC, $iR) =~ /kort tekst/ );
 
-            $foundcolumns = 1 if( $oWkS->{Cells}[$iR][$iC]->Value =~ /dato/ );
+            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /dato/ );
           }
         }
 
@@ -113,19 +114,12 @@ sub ImportXLS
       }
 
       # date - column 0 ('Date')
-      my $oWkC = $oWkS->{Cells}[$iR][$columns{'Date'}];
-      next if( ! $oWkC );
-      next if( ! $oWkC->Value );
-      #print Dumper($oWkC);
-      $date = ParseDate( $oWkC->Value );
+      $date = ParseDate( formattedCell($oWkS, $columns{'Date'}, $iR) );
       next if( ! $date );
 
-	  # Startdate
       if( $date ne $currdate ) {
       	if( $currdate ne "x" ) {
-			# save last day if we have it in memory
-		#	FlushDayData( $channel_xmltvid, $dsh , @ces );
-			$dsh->EndBatch( 1 );
+			    $dsh->EndBatch( 1 );
         }
 
       	my $batchid = $chd->{xmltvid} . "_" . $date;
@@ -136,25 +130,22 @@ sub ImportXLS
       }
 
 	  # time
-	  $oWkC = $oWkS->{Cells}[$iR][$columns{'StartTime'}];
-      next if( ! $oWkC );
-      my $time = $oWkC->Value if( $oWkC->Value );
+      my $time = formattedCell($oWkS, $columns{'StartTime'}, $iR);
+      next if(!$time);
       $time =~ s/\./:/;
-      if($time eq "24:00") { $time = "00:00"}
+      #if($time eq "24:00") { $time = "00:00"}
 
       # end time
-	     $oWkC = $oWkS->{Cells}[$iR][$columns{'EndTime'}];
-      my $endtime = $oWkC->Value if( $oWkC->Value );
+      my $endtime = formattedCell($oWkS, $columns{'EndTime'}, $iR);
       $endtime =~ s/\./:/;
-      if($endtime eq "24:00") { $endtime = "00:00"}
+      #if($endtime eq "24:00") { $endtime = "00:00"}
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][$columns{'Title'}];
-      next if( ! $oWkC );
-      my $title = $oWkC->Value if( $oWkC->Value );
+      my $title = formattedCell($oWkS, $columns{'Title'}, $iR);
+      next if(!$title);
 
-	  # extra info
-	  my $desc = $oWkS->{Cells}[$iR][$columns{'Synopsis'}]->Value if $oWkS->{Cells}[$iR][$columns{'Synopsis'}];
+      # extra info
+      my $desc = formattedCell($oWkS, $columns{'Synopsis'}, $iR);
       progress("VisjonNorge: $chd->{xmltvid}: $time - $title");
 
       my $ce = {
@@ -190,6 +181,10 @@ sub ParseDate {
   } elsif( $text =~ /^\d+-\S*-\d+$/ ) { # format '01/11/2008'
     ( $day, $monthname, $year ) = ( $text =~ /^(\d+)-(\S*)-(\d+)$/i );
     $month = MonthNumber( $monthname, 'en' );
+  }
+
+  if(!$day) {
+    return undef;
   }
 
   $year += 2000 if( $year < 100 );
