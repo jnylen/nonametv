@@ -167,6 +167,7 @@ sub ImportXML
     # Extra
     my $genre = $row->findvalue( './/header/genre' );
     my $year = $row->findvalue( './/header/produktionsjahr' );
+    my $length = $row->findvalue( './/header/laenge' );
 
     # Desc
     my $desc = $row->findvalue( 'langInhalt' );
@@ -227,19 +228,19 @@ sub ImportXML
     	my $name = norm( $stab->findvalue('./pname') );
     	$name =~ s/, /;/;
 
-        # Type
-        my $type = norm( $stab->findvalue('./@funktion') );
+      # Type
+      my $type = norm( $stab->findvalue('./@funktion') );
 
-		# Directors
-		if($type eq "Regie") {
-			push @directors, $name;
-			$ce->{program_type} = 'movie';
-		}
+      # Directors
+      if($type eq "Regie") {
+        push @directors, $name;
+        $ce->{program_type} = 'movie' if($length > 75);
+      }
 
-		# Writers
-        if($type eq "Drehbuch") {
-			push @writers, $name;
-		}
+		  # Writers
+      if($type eq "Drehbuch") {
+			  push @writers, $name;
+		  }
     }
 
     if( scalar( @directors ) > 0 )
@@ -254,7 +255,12 @@ sub ImportXML
 
     # Extra data
     $ce->{original_title} = norm($otitle) if $otitle and $otitle ne $stitle;
-    $ce->{original_subtitle} = norm($osubtitle) if $osubtitle and $subtitle ne $osubtitle;
+    if($osubtitle) {
+      $ce->{original_subtitle} = norm($osubtitle) if(!defined($subtitle) or $subtitle ne $osubtitle);
+
+      $ce->{program_type} = 'series';
+    }
+    
 
     # Year
     if( defined( $year ) and ($year =~ /(\d\d\d\d)/) )
