@@ -184,7 +184,7 @@ sub ImportContent {
 
 
     # Descr. and genre
-    my $desc = $b->findvalue( "ptekst1" );
+    my $desc = $b->findvalue( "shortDescription" );
     $desc =~ s/:\|apostrofe\|;/'/g;
 
     # Episode title
