@@ -22,7 +22,6 @@ $NONAMETV EurosportDE $1 $2 $3
 $NONAMETV EurosportFI $1 $2 $3
 $NONAMETV EBS $1 $2 $3
 $NONAMETV Frikanalen $1 $2 $3
-$NONAMETV Infomedia $1 $2 $3
 $NONAMETV HBOHR $1 $2 $3
 $NONAMETV HBOSI $1 $2 $3
 $NONAMETV MTVde $1 $2 $3 # vg media license/foreign channels
@@ -69,6 +68,7 @@ $NONAMETV Fjorton $1 $2 $3
 $NONAMETV TV5Monde $1 $2 $3
 $NONAMETV Kanal2 $1 $2 $3
 $NONAMETV KBSWorld $1 $2 $3
+$NONAMETV RheinmainTV $1 $2 $3
 
 # Download files
 wget -O /content/channels/tv_grab/ok54.xml http://epg.ok-rlp.de/xmltv/trier.xml
@@ -81,10 +81,3 @@ wget -O /content/channels/tv_grab/okneustadt.xml http://epg.ok-rlp.de/xmltv/neus
 wget -O /content/channels/tv_grab/oksp.xml http://epg.ok-rlp.de/xmltv/rodalben.xml
 wget -O /content/channels/tv_grab/worms.xml http://epg.ok-rlp.de/xmltv/worms.xml
 $NONAMETV TVGrabXX $1 $2 $3
-
-## EUROSPORT OS 2018 TEMP
-$NONAMETV EurosportOSSE $1 $2 $3
-$NONAMETV EurosportOSNO $1 $2 $3
-$NONAMETV EurosportOSDK $1 $2 $3
-$NONAMETV EurosportOSDE $1 $2 $3
-$NONAMETV EurosportOSFI $1 $2 $3
