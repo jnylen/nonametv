@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use utf8;
 use Unicode::String;
+use Try::Tiny;
 use Roman;
 
 =pod
@@ -49,6 +50,9 @@ sub ApproveContent {
   if( $$cref eq '<!--error in request: -->' ) {
     return "404 not found";
   }
+  elsif( $$cref =~ /\<error\>/i ) {
+    return "404 not found";
+  }
   elsif( $$cref eq '' ) {
     return "404 not found";
   }
@@ -62,7 +66,7 @@ sub FilterContent {
 
   $$cref =~ s|<message_id>.*</message_id>||;
   $$cref =~ s|<message_timestamp>.*</message_timestamp>||;
-
+  
   return( $cref, undef );
 }
 
@@ -336,7 +340,14 @@ sub ImportContent {
     p($start." $ce->{title}");
     $ce->{extra} = $extra;
 
-    $ds->AddProgramme( $ce );
+    # Sports
+    if($ce->{title} =~ /^(FIFA VM \d\d\d\d)\:/i) {
+      $ce->{program_type} = "sports";
+    }
+
+    #$ds->AddProgramme( $ce );
+    try { $ds->AddProgramme( $ce ); }
+    catch { print("error: $_"); next; };
   }
 
   return 1;
@@ -391,6 +402,8 @@ sub Object2Url {
                      $self->{UrlRoot}, $chd->{grabber_info},
                      $date);
 
+
+  print("Fetching $url\n");
 
   return( $url, undef );
 }
