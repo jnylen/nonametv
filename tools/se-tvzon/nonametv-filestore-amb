@@ -1,0 +1,52 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use DateTime;
+use File::Util;
+use File::Copy qw/copy move/;
+use File::Basename;
+use File::Path qw/make_path/;
+use Data::Dumper;
+
+use NonameTV::Config qw/ReadConfig/;
+
+# Read configuration
+my $config = ReadConfig();
+
+# list files inside of the channel directory and check when they have been touched
+opendir(DIR, "/content/amb/");
+
+foreach my $cff (readdir(DIR))
+{
+    if($cff =~ /^\./) { next; }
+    my ( $dump, $week, $year ) = split(/_/, $cff);
+
+    foreach my $xmltvid (sort keys %{$config->{Importers}->{AMB}->{Channels}}) {
+        my $e = $config->{Importers}->{AMB}->{Channels}->{$xmltvid};
+        
+        AddFileToChannel($cff, $xmltvid, $e->[1])
+    }
+}
+
+sub AddFileToChannel {
+  my( $filename, $channel, $channel_grabber ) = @_;
+
+  my( $grabber_name, $grabber_language ) = split( /:/, $channel_grabber );
+  my( $channel_name, $week, $year, $language ) = split( /\-/, $filename );
+  $language =~ s/\.xml//i;
+
+  # Match?
+  #print Dumper($filename);
+  if($channel_name eq $grabber_name and $language eq $grabber_language) {
+      print("Added $filename to $channel\n");
+      copy("/content/amb/$filename","/content/channels/$channel/$filename");
+  }
+
+  return 1;
+}
+
+exit;
