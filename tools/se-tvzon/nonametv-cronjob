@@ -93,6 +93,8 @@ $d tools/se-tvzon/nonametv-filestore-natgeo $Q
 $d ruby ftv_importer.rb
 $d ruby highview_importer.rb
 $d ruby rtve_importer.rb
+$d ruby amb_importer.rb
+$d tools/se-tvzon/nonametv-filestore-amb $Q
 #$d ruby tv5_importer.rb
 
 # Import everything
