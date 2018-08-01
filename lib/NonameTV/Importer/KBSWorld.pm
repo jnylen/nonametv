@@ -73,7 +73,7 @@ sub Object2Url {
   my $datefirst = first_day_of_week( $year, $week );
   my $datelast = last_day_of_week( $year, $week );
 
-  my $url = sprintf("http://kbsworld.kbs.co.kr/schedule/down_schedule_xml.php?down_time_add=-9&wlang=e&start_date=%s&end_date=%s", $datefirst->ymd("-"), $datelast->ymd("-"));
+  my $url = sprintf("http://kbsworld.kbs.co.kr/schedule/down_schedule_db.php?down_time_add=-9&wlang=e&start_date=%s&end_date=%s", $datefirst->ymd("-"), $datelast->ymd("-"));
 
  progress("Fetching $url...");
 
@@ -162,10 +162,10 @@ sub ImportContent {
 
     my $start = $p->findvalue( 'td[2]' );
     my $title = $p->findvalue( 'td[4]' );
-    my $season = $p->findvalue( 'td[5]' );
+    my $season = norm($p->findvalue( 'td[5]' ));
     my $genre = $p->findvalue( 'td[6]' );
     my $subgenre = $p->findvalue( 'td[7]' );
-    my $episode = $p->findvalue( 'td[8]' );
+    my $episode = norm($p->findvalue( 'td[8]' ));
     my $synopsis = $p->findvalue( 'td[9]' );
 
     my $ce = {
@@ -176,9 +176,9 @@ sub ImportContent {
     };
 
     # Season Episode
-    if(($season) and ($episode)) {
+    if(($season) and $season =~ /(\d+)/ and ($episode) and $episode =~ /(\d+)/) {
   		$ce->{episode} = sprintf( "%d . %d . ", $season-1, $episode-1 );
-  	} elsif((!$season) and ($episode)) {
+  	} elsif((!$season) and ($episode) and $episode =~ /(\d+)/) {
   		 $ce->{episode} = sprintf( " . %d . ", $episode-1 );
   	}
 
