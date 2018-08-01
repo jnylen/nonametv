@@ -226,6 +226,7 @@ sub guess_channel
     if( $dir =~ /AZMedien/ and $filename =~ /\.xml$/i ) {
         return "tv24.ch" if $filename =~ /^TV24_/i;
         return "tv25.ch" if $filename =~ /^TV25_/i;
+        return "s1tv.ch" if $filename =~ /^S1_/i;
 
     }
 
