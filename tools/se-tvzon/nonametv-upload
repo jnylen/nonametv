@@ -14,26 +14,26 @@ tools/se-tvzon/nonametv-xmltv-genhtml $NROOT/staging/xmltv/
 
 $V && echo "Local rsync"
 
-rsync -c --delete -r $NROOT/staging/json_extra/ $NROOT/full/json_extra/
-rsync -c --delete -r $NROOT/staging/json/ $NROOT/full/json/
-rsync -c --delete -r $NROOT/staging/honeybee/ $NROOT/full/honeybee/
-rsync -c --delete -r $NROOT/staging/xmltv/ $NROOT/full/xmltv/
+#rsync -c --delete -r $NROOT/staging/json_extra/ $NROOT/full/json_extra/
+rsync -v -c --delete -r $NROOT/staging/json/ $NROOT/full/json/
+rsync -v -c --delete -r $NROOT/staging/honeybee/ $NROOT/full/honeybee/
+rsync -v -c --delete -r $NROOT/staging/xmltv/ $NROOT/full/xmltv/
 
 # datalist
 tools/se-tvzon/nonametv-xmltv-gendatalist
 tools/se-tvzon/nonametv-json-gendatalist
 
 # upload
-rsync -c --delete -r $NROOT/full/xmltv/datalist.xml.gz $NROOT/full/datalist.xml.gz
+rsync -v -c --delete -r $NROOT/full/xmltv/datalist.xml.gz $NROOT/full/datalist.xml.gz
 #rsync -c --delete -r /content/headers/HEADER_xmltv.txt $NROOT/full/xmltv/HEADER.txt
-rsync -c --delete -r /content/headers/displayfile.html $NROOT/full/xmltv/displayfile.html
-rsync -c --delete -r /content/headers/listing.xsl $NROOT/full/xmltv/listing.xsl
+rsync -v -c --delete -r /content/headers/displayfile.html $NROOT/full/xmltv/displayfile.html
+rsync -v -c --delete -r /content/headers/listing.xsl $NROOT/full/xmltv/listing.xsl
 
 # upload
-rsync -c --delete -r $NROOT/full/xmltv/ /var/www/xmltv/
-rsync -c --delete -r $NROOT/full/json/ /var/www/json/
+rsync -v -c --delete -r $NROOT/full/xmltv/ /var/www/xmltv/
+rsync -v -c --delete -r $NROOT/full/json/ /var/www/json/
 
 $V && echo "honeybee"
 
-rsync -c --delete -r $NROOT/full/honeybee/ honeybee:/xmltv_files/honeybee/
-rsync -c --delete -r $NROOT/full/honeybee_datalist.js.gz honeybee:/xmltv_files/datalist.js.gz
+rsync -v -c --delete -r $NROOT/full/honeybee/ honeybee:/xmltv_files/honeybee/
+rsync -v -c --delete -r $NROOT/full/honeybee_datalist.js.gz honeybee:/xmltv_files/datalist.js.gz
