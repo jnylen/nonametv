@@ -180,6 +180,7 @@ sub ImportContent
 
     # extra
     my $season       = $xpc->findvalue( 'seasonNumber' );
+    
     my $episode      = $xpc->findvalue( 'episodeNumber' );
     my $prodyear     = $xpc->findvalue( 'productionYear' );
 
@@ -199,9 +200,12 @@ sub ImportContent
 
     # Season and episode
     if($season and $episode) {
-      $ce->{episode} = sprintf( "%d . %d .", $season-1, $episode-1 );
+      my( $season2 ) = ($season =~ /(\d+)/i );
+      my( $episode2 ) = ($episode =~ /(\d+)/i );
+      $ce->{episode} = sprintf( "%d . %d .", $season2-1, $episode2-1 );
     } elsif($episode) {
-      $ce->{episode} = sprintf( ". %d .", $episode-1 );
+      my( $episode3 ) = ($episode =~ /(\d+)/i );
+      $ce->{episode} = sprintf( ". %d .", $episode3-1 );
     }
 
     # Prodyear
