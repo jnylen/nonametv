@@ -166,7 +166,10 @@ sub ImportContent
     my $v_format   = $md->{videoFormat};
 
     # content
-    my $desc   = $xpc->findvalue( 'descriptionList/description[@type="content"]' );
+    my $desc    = $xpc->findvalue( 'descriptionList/description[@type="content"][@length="long"][1]' );
+    $desc     ||= $xpc->findvalue( 'descriptionList/description[@type="content"][@length="medium"][1]' );
+    $desc     ||= $xpc->findvalue( 'descriptionList/description[@type="season"][1]' );
+    $desc     ||= $xpc->findvalue( 'descriptionList/description[@type="series"][1]' );
 
     my $title        = $xpc->findvalue( 'genericTitleList/title[@type="series"][1]' );
     $title         ||= $xpc->findvalue( 'genericTitleList/title[@type="content"][1]' );
@@ -191,6 +194,8 @@ sub ImportContent
         end_time     => $end->hms(":"),
         description  => norm($desc),
     };
+
+    #print Dumper($ce);
 
     # extra
     my $extra = {};
@@ -247,6 +252,16 @@ sub ImportContent
     foreach my $genre ($genres->get_nodelist) {
       my ( $program_type, $category ) = $self->{datastore}->LookupCat( "Clipsource", $genre->to_literal );
       AddCategory( $ce, $program_type, $category );
+    }
+
+    # VIAST TYPE
+    my $viasat_type  = $xpc->findvalue( 'customPropertyList/customProperty[@key="category"]/propertyValue' );
+    if(defined($viasat_type)) {
+      if($viasat_type eq "series") {
+        $ce->{program_type} = "series";
+      } elsif($viasat_type eq "sport") {
+        $ce->{program_type} = "sports";
+      }
     }
 
     # Live?
