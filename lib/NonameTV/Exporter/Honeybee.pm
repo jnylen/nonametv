@@ -320,7 +320,7 @@ sub ExportFile {
   my $self = shift;
   my( $chd, $date ) = @_;
 
-  my $section = "Json $chd->{xmltvid}_$date";
+  my $section = "Honeybee $chd->{xmltvid}_$date";
 
   StartLogSection( $section, 0 );
 
