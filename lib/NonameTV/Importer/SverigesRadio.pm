@@ -100,7 +100,7 @@ sub ImportContent {
     # The stop-time for programmes is one day off if the
     # program ends on midnight.
     if( $e->{stop_dt} < $e->{start_dt} ) {
-	$e->{stop_dt}->add( days => 1 );
+	    $e->{stop_dt}->add( days => 1 );
     }
 
     $e->{start_time} = $e->{start_dt}->ymd('-') . " " . 
