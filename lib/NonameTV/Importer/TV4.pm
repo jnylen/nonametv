@@ -106,11 +106,13 @@ sub Object2Url {
 
   my( $date ) = ($objectname =~ /_(.*)/);
 
-  my $url = $self->{UrlRoot} . '?userId='.$self->{ApiKey}
-    . '&startDate=' . $date
+  my $url = $self->{UrlRoot} # . '?userId='.$self->{ApiKey}
+    . '?startDate=' . $date
     . '&endDate=' . $date
     . '&channelId=pi' . $chd->{grabber_info}
     . '&format=xml&programText=LongestPossible';
+
+  progress("Fetching $url...");
 
   return( $url, undef );
 }
