@@ -98,38 +98,84 @@ sub ImportXLS {
 
         for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
           if( $oWkS->cell($iC, $iR) ){
-            $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Date$/ );
+            $columns{'Date'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Date$/i );
 
-            $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Start Time$/ );
+            $columns{'Time'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Start Time$/i );
 
-            $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Program Title$/ );
+            $columns{'Title'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Program Title$/i );
+            $columns{'Title'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Series Name English$/i );
 
-            $columns{'ORGTitle'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Original Title$/ );
-            $columns{'ORGTitle'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Original Program Title$/ );
+            $columns{'ORGTitle'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Original Title$/i );
+            $columns{'ORGTitle'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Original Program Title$/i );
 
-            $columns{'Ser No'} = $iC if( $oWkS->cell($iC, $iR) =~ /Season Number/ );
-            $columns{'Ser Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Season Synopsis/i );
-            $columns{'Ser SynopsisORG'} = $iC if( $oWkS->cell($iC, $iR) =~ /Original Season Synopsis/ );
+            $columns{'Ser No'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Season Number/i );
+            $columns{'Ser Synopsis'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Season Synopsis/i );
+            $columns{'Ser SynopsisORG'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Original Season Synopsis/i );
 
-            $columns{'Ep No'} = $iC if( $oWkS->cell($iC, $iR) =~ /Episode Number/ );
-            $columns{'Ep Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Episode Title/ );
-            $columns{'Ep TitleORG'} = $iC if( $oWkS->cell($iC, $iR) =~ /Original Episode Title/ );
-            $columns{'Ep Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Episode Synopsis/i );
-            $columns{'Ep SynopsisORG'} = $iC if( $oWkS->cell($iC, $iR) =~ /Original Episode Synopsis/ );
-            $columns{'Eps'} = $iC if( $oWkS->cell($iC, $iR) =~ /Number of episodes in the Season/ );
+            $columns{'Ep No'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Episode Number/i );
+            $columns{'Ep TitleORG'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Original Episode Title/i );
+            $columns{'Ep Synopsis'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Episode Synopsis/i );
+            $columns{'Ep Synopsis'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Synopsis English$/i );
+            $columns{'Ep SynopsisORG'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Original Episode Synopsis/i );
+            $columns{'Eps'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Number of episodes in the Season/i );
 
-            $columns{'Genre'} = $iC if( $oWkS->cell($iC, $iR) =~ /Longline/ );
+            $columns{'Genre'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Longline/i );
 
-            $columns{'Country'} = $iC if( $oWkS->cell($iC, $iR) =~ /Production Country/ );
-            $columns{'Year'} = $iC if( $oWkS->cell($iC, $iR) =~ /Year Of Release/ );
-            $columns{'Actors'} = $iC if( $oWkS->cell($iC, $iR) =~ /Actors/ );
-            $columns{'Directors'} = $iC if( $oWkS->cell($iC, $iR) =~ /Director\/s/ );
+            $columns{'Country'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Production Country/i );
+            $columns{'Country'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Country of origin/i );
+            $columns{'Year'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Year Of Release/i );
+            $columns{'Actors'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Actors/i );
+            $columns{'Directors'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Director\/s/i );
 
-            $columns{'HD'} = $iC if( $oWkS->cell($iC, $iR) =~ /High Definition/ );
-            $columns{'169'} = $iC if( $oWkS->cell($iC, $iR) =~ /16:9 Format/ );
-            $columns{'Premiere'} = $iC if( $oWkS->cell($iC, $iR) =~ /Premiere/ );
+            $columns{'HD'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /High Definition/i );
+            $columns{'169'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /16:9 Format/i );
+            $columns{'Premiere'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Premiere/i );
 
-            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /Date/ );
+            if($chd->{xmltvid} eq "natgeo.lt" or $chd->{xmltvid} eq "natgeo.lv") {
+              $columns{'Time'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Baltics Time/i );
+              $columns{'Ep Title'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Episode Title English/i );
+              $foundcolumns = 1 if( norm($oWkS->cell($iC, $iR)) =~ /Baltics Time/i );
+            } elsif($chd->{sched_lang} eq "et") {
+              $columns{'Time'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Baltics Time/i );
+              $columns{'Title'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Series Name/i and norm($oWkS->cell($iC, $iR)) =~ /Estonian/i );
+              $columns{'Ep Title'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Episode Title/i and norm($oWkS->cell($iC, $iR)) =~ /Estonian/i );
+              $columns{'Ep Synopsis'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Synopsis/i and norm($oWkS->cell($iC, $iR)) =~ /Estonian/i );
+              $columns{'Genre'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Genre$/i );
+
+              $foundcolumns = 1 if( norm($oWkS->cell($iC, $iR)) =~ /^Series Name/i and norm($oWkS->cell($iC, $iR)) =~ /Estonian/i );
+            } elsif($chd->{sched_lang} eq "lv") {
+              $columns{'Time'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Baltics Time/i );
+              $columns{'Title'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Series Name/i and norm($oWkS->cell($iC, $iR)) =~ /Latvian/i );
+              $columns{'Ep Title'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Episode Title/i and norm($oWkS->cell($iC, $iR)) =~ /Latvian/i );
+              $columns{'Ep Synopsis'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Synopsis/i and norm($oWkS->cell($iC, $iR)) =~ /Latvian/i );
+              $columns{'Genre'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Genre$/i );
+
+              $foundcolumns = 1 if( norm($oWkS->cell($iC, $iR)) =~ /^Series Name/i and norm($oWkS->cell($iC, $iR)) =~ /Latvian/i );
+            } elsif($chd->{sched_lang} eq "lt") {
+              $columns{'Time'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Baltics Time/i );
+              $columns{'Title'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Series Name/i and norm($oWkS->cell($iC, $iR)) =~ /Lithuanian/i );
+              $columns{'Ep Title'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Episode Title/i and norm($oWkS->cell($iC, $iR)) =~ /Lithuanian/i );
+              $columns{'Ep Synopsis'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Synopsis/i and norm($oWkS->cell($iC, $iR)) =~ /Lithuanian/i );
+              $columns{'Genre'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Genre$/i );
+
+              $foundcolumns = 1 if( norm($oWkS->cell($iC, $iR)) =~ /^Series Name/i and norm($oWkS->cell($iC, $iR)) =~ /Lithuanian/i );
+            } elsif($chd->{sched_lang} eq "sr" or $chd->{sched_lang} eq "hr" or $chd->{sched_lang} eq "sl") {
+              $columns{'Date'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Dates$/i );
+              $columns{'Time'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Time$/i );
+              $columns{'Title'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Local Title$/i );
+              $columns{'ORGTitle'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Original Title Series$/i );
+              $columns{'Ser No'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Season$/i );
+              $columns{'Ep No'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Ep No$/i );
+              $columns{'Ep Synopsis'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Synopsis$/i );
+              $columns{'Year'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Year$/i );
+              $columns{'Genre'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Genre$/i );
+
+              $foundcolumns = 1 if( norm($oWkS->cell($iC, $iR)) =~ /^Local Title$/i );
+            } else {
+              $columns{'Ep Title'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Episode Title/i );
+              $foundcolumns = 1 if( norm($oWkS->cell($iC, $iR)) =~ /Date/ );
+            }
+            
           }
         }
 
@@ -257,6 +303,8 @@ sub ImportXLS {
 
       # Original title
       $title_org =~ s/(Series |Y)(\d+)$//i;
+      $ce->{title} =~ s/$se_num//i if defined $se_num;
+      $ce->{title} = norm($ce->{title});
       $title_org =~ s/$se_num//i if defined $se_num;
       if(defined($title_org) and norm($title_org) =~ /, The$/i)  {
           $title_org =~ s/, The//i;
