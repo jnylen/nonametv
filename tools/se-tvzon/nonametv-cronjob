@@ -137,7 +137,7 @@ $d rsync --delete -r /content/xmltv_compare/ /var/www/html/compare/
 $d tools/se-tvzon/nonametv-mail-lastshow
 
 $h tools/nonametv-export Honeybee --export-channels
-$h tools/nonametv-export Honeybee
+$h tools/nonametv-export Honeybee --force-export
 $h tools/se-tvzon/nonametv-upload
 
 $h rm -f /tmp/nonametv.lock

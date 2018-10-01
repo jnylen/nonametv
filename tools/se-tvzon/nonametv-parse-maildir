@@ -10,6 +10,7 @@ use Mail::Box;
 use Mail::Box::Manager;
 use MIME::Base64;
 use MIME::QuotedPrint;
+use MIME::Decoder;
 
 use File::Temp qw/tempdir/;
 use File::Copy qw/move copy/;
@@ -61,7 +62,6 @@ my $ds = CreateDataStore();
 
 my $root = "/content/maildir/filtered/";
 my @folders = qw(
-     KinoPolska
      GlobalListings
 		 France24
 		 CNBC
@@ -79,6 +79,7 @@ my @folders = qw(
      Disney
      Trace
      Nova
+     KinoPolska
 		 );
 # Flag messages AFTER they have been processed. Then I normally
 # only have to move the message to the correct folder.
@@ -183,6 +184,8 @@ sub process_parts
       $content = decode_base64($part->body);
     } elsif($part->body->transferEncoding eq "quoted-printable") {
       $content = decode_qp($part->body);
+    } elsif($part->body->transferEncoding eq "8bit") {
+      $content = $part->decoded->string;
     } else {
       print Dumper($part->body->transferEncoding);
       $content = $part->decoded->string;
@@ -299,6 +302,15 @@ sub guess_channel
     return "foxtv.se"       if $filename =~ /^fox\s*sweden/i and $filename =~ /\.(xls|xlsx)$/i;
     return "foxtv.no"       if $filename =~ /^fox_norway/i and $filename =~ /\.(xls|xlsx)$/i;
     return "foxtv.se"       if $filename =~ /^fox_sweden/i and $filename =~ /\.(xls|xlsx)$/i;
+    return "foxtv.ee"       if $filename =~ /FOX/i and $filename =~ /Latvia/i and $filename =~ /\.(xls|xlsx)$/i;
+    return "foxtv.ee"       if $filename =~ /FOX/i and $filename =~ /Estonia/i and $filename =~ /\.(xls|xlsx)$/i;
+    return "foxtv.ee"       if $filename =~ /FOX/i and $filename =~ /Est-Lat/i and $filename =~ /\.(xls|xlsx)$/i;
+    return "life.foxtv.ee"  if $filename =~ /FL/i and $filename =~ /Latvia/i and $filename =~ /\.(xls|xlsx)$/i;
+    return "life.foxtv.ee"  if $filename =~ /FL/i and $filename =~ /Estonia/i and $filename =~ /\.(xls|xlsx)$/i;
+    return "natgeo.ee"      if $filename =~ /NGC Estonia/i and $filename =~ /\.(xls|xlsx)$/i;
+    return "natgeo.lt"      if $filename =~ /NGC Lithuania/i and $filename =~ /\.(xls|xlsx)$/i;
+    return "foxtv.lt"       if $filename =~ /FOX/i and $filename =~ /Lithuania/i and $filename =~ /\.(xls|xlsx)$/i;
+    return "life.foxtv.lt"  if $filename =~ /FL/i and $filename =~ /lith/i and $filename =~ /\.(xls|xlsx)$/i;
 
     # H2
     if(($filename =~ /h2\s+europe/i or $filename =~ /h2.eur./i or $filename =~ /h2.eu./i or $filename =~ /h2\-/i) and $filename =~ /\.xml$/i) {
@@ -486,7 +498,7 @@ sub guess_channel
 
  # Not added
  if($filename =~ /\.(xml|xls|xlsx|txt|doc|rtf|docx)/i) {
- # print("Not added: dir: $dir -> from: $from -> subject: $subject -> file: $filename\n");
+  print("Not added: dir: $dir -> from: $from -> subject: $subject -> file: $filename\n");
  }
 
  return undef;
