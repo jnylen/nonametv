@@ -234,7 +234,7 @@ sub parseTimestamp( $ ){
     if( $offset ){
       $offset =~ s|:||;
     } else {
-      $offset = 'Europe/Berlin';
+      $offset = 'UTC';
     }
     my $dt = DateTime->new (
       year      => $year,
