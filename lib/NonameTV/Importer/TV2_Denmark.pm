@@ -200,6 +200,9 @@ sub ImportContent
 
     # Year
   	if( defined( $year ) and ($year =~ /(\d\d\d\d)/) ) {
+      if(!defined($ce->{episode}) and defined($episode) and $episode ne "") {
+        $ce->{episode} = sprintf( "%d . %d .", $1-1, $episode-1 );
+      }
   		$ce->{production_date} = "$1-01-01";
   	}
 
