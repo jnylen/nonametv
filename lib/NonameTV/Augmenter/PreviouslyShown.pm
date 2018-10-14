@@ -118,6 +118,7 @@ sub AugmentProgram( $$$ ){
 		      while( defined( my $ce = $sth->fetchrow_hashref() ) ) {
 		        print("FILM: $ceref->{title} - old: $ceref->{start_time} - prev: $ce->{start_time}\n");
 		        $resultref->{previously_shown} = $ce->{xmltvid}."|".$ce->{start_time};
+						$resultref->{new} = 0;
 		        
 		        
 		        $matchdone=1;
@@ -140,6 +141,7 @@ sub AugmentProgram( $$$ ){
 		      while( defined( my $ce = $sth->fetchrow_hashref() ) ) {
 		        print("$ceref->{title} - old: $ceref->{start_time} - prev: $ce->{start_time}\n");
 		        $resultref->{previously_shown} = $ce->{xmltvid}."|".$ce->{start_time};
+						$resultref->{new} = 0;
 		        
 		        $matchdone=1;
 		      }
@@ -160,6 +162,7 @@ sub AugmentProgram( $$$ ){
 		      while( defined( my $ce = $sth->fetchrow_hashref() ) ) {
 		        print("SUB: $ceref->{title} - old: $ceref->{start_time} - prev: $ce->{start_time}\n");
 		        $resultref->{previously_shown} = $ce->{xmltvid}."|".$ce->{start_time};
+						$resultref->{new} = 0;
 		        
 		        $matchdone=1;
 		      }
@@ -181,6 +184,7 @@ sub AugmentProgram( $$$ ){
 		      while( defined( my $ce = $sth->fetchrow_hashref() ) ) {
 		        print("FILM: $ceref->{title} - old: $ceref->{start_time} - prev: $ce->{start_time}\n");
 		        $resultref->{previously_shown} = $ce->{xmltvid}."|".$ce->{start_time};
+						$resultref->{new} = 0;
 		        
 		        $matchdone=1;
 		      }
@@ -201,6 +205,7 @@ sub AugmentProgram( $$$ ){
 		      while( defined( my $ce = $sth->fetchrow_hashref() ) ) {
 		        print("$ceref->{title} - old: $ceref->{start_time} - prev: $ce->{start_time}\n");
 		        $resultref->{previously_shown} = $ce->{xmltvid}."|".$ce->{start_time};
+						$resultref->{new} = 0;
 		        
 		        $matchdone=1;
 		      }
@@ -219,6 +224,7 @@ sub AugmentProgram( $$$ ){
 		      while( defined( my $ce = $sth->fetchrow_hashref() ) ) {
 		        print("SUB: $ceref->{title} - old: $ceref->{start_time} - prev: $ce->{start_time}\n");
 		        $resultref->{previously_shown} = $ce->{xmltvid}."|".$ce->{start_time};
+						$resultref->{new} = 0;
 		        
 		        $matchdone=1;
 		      }
