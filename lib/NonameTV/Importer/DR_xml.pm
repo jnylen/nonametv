@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use utf8;
 use Unicode::String;
-use Try::Tiny;
 use Roman;
 
 =pod
@@ -66,7 +65,7 @@ sub FilterContent {
 
   $$cref =~ s|<message_id>.*</message_id>||;
   $$cref =~ s|<message_timestamp>.*</message_timestamp>||;
-  
+
   return( $cref, undef );
 }
 
@@ -179,14 +178,6 @@ sub ImportContent {
       push @{$extra->{qualifiers}}, "smallscreen";
     }
 
-
-    my $live = $b->findvalue( 'pro_publish[1]/ppu_islive' );
-    if( $live eq "TRUE" ) {
-      $ce->{live} = "1";
-      push @{$extra->{qualifiers}}, "live";
-    } else {
-      $ce->{live} = "0";
-    }
     my $subtitled = $b->findvalue( 'pro_publish[1]/ppu_subtext_type' );
     if( $subtitled eq "TTV" ) {
       push @{$extra->{qualifiers}}, "CC";
@@ -337,17 +328,30 @@ sub ImportContent {
     $ce->{title} = "end-of-transmission" if $ce->{title} =~ /^Udsendelsesoph.*r/i;
     $ce->{category} = "Movies" if defined($ce->{program_type}) and $ce->{program_type} eq "movie" and (defined($ce->{category}) and $ce->{category} eq "Series");
 
+    # repeat
+    my $rerun = $b->findvalue( 'pro_publish[1]/ppu_isrerun' );
+    if($rerun eq "TRUE"){
+      $ce->{new} = 0;
+      push @{$extra->{qualifiers}}, "repeat";
+    } else {
+      $ce->{new} = 1;
+      push @{$extra->{qualifiers}}, "new";
+    }
+
+    # live
+    my $live = $b->findvalue( 'pro_publish[1]/ppu_islive' );
+    if($live eq "TRUE"){
+      $ce->{live} = 1;
+      push @{$extra->{qualifiers}}, "live";
+    } else {
+      $ce->{live} = 0;
+    }
+
+
     p($start." $ce->{title}");
     $ce->{extra} = $extra;
 
-    # Sports
-    if($ce->{title} =~ /^(FIFA VM \d\d\d\d)\:/i) {
-      $ce->{program_type} = "sports";
-    }
-
-    #$ds->AddProgramme( $ce );
-    try { $ds->AddProgramme( $ce ); }
-    catch { print("error: $_"); next; };
+    $ds->AddProgramme( $ce );
   }
 
   return 1;
@@ -402,8 +406,6 @@ sub Object2Url {
                      $self->{UrlRoot}, $chd->{grabber_info},
                      $date);
 
-
-  print("Fetching $url\n");
 
   return( $url, undef );
 }
