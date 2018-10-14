@@ -226,6 +226,12 @@ sub ImportContent
         start_time  => $start2->hms(':'),
       };
 
+      # Extra
+      my $extra = {};
+      $extra->{descriptions} = [];
+      $extra->{qualifiers} = [];
+      $extra->{images} = [];
+
 
       if( defined( $production_year ) and ($production_year =~ /(\d\d\d\d)/) )
       {
@@ -317,6 +323,26 @@ sub ImportContent
       if($durat > 100 and $subtitle eq "" and not defined($ce->{episode}) and $xmltvid ne "eurosport.sbsdiscovery.no") {
           $ce->{program_type} = 'movie';
       }
+
+      # Rerun
+      if($rerun eq "true"){
+        $ce->{new} = 0;
+        push @{$extra->{qualifiers}}, "repeat";
+      } else {
+        $ce->{new} = 1;
+        push @{$extra->{qualifiers}}, "new";
+      }
+
+      # live
+      my $live = $sc->findvalue( 'islive' );
+      if($live eq "1"){
+        $ce->{live} = 1;
+        push @{$extra->{qualifiers}}, "live";
+      } else {
+        $ce->{live} = 0;
+      }
+
+      $ce->{extra} = $extra;
 
       $dsh->AddProgramme( $ce );
     }

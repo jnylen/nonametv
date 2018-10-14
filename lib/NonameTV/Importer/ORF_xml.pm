@@ -74,7 +74,7 @@ sub Object2Url {
   my( $objectname, $chd ) = @_;
 
   my( $year, $month, $day ) = ( $objectname =~ /(\d+)-(\d+)-(\d+)$/ );
- 
+
   my( $channel, @flags ) = split( /,\s*/, $chd->{grabber_info} );
 
   my $url = $self->{UrlRoot} .
@@ -96,7 +96,7 @@ sub FilterContent {
       $orf2europe = 1;
     }
   }
-  
+
 
   my $doc;
   $$cref =~ s|encoding="LATIN1"|encoding="windows-1252"|;
@@ -161,6 +161,32 @@ my %genrewords = (
 	'Telenovela' => 1,
 	'Unterhaltungsserie' => 1,
 	'Zeichentrickserie' => 1,
+	'Theater & Fernsehlegenden' => 1
+);
+
+my %genrewords2 = (
+	'Abenteuerserie' => 1,
+	'Actionserie' => 1,
+	'Action-Drama-Serie' => 1,
+	'Animation' => 1,
+	'Anwaltsserie' => 1,
+	'Comedyserie' => 1,
+	'Familienserie' => 1,
+	'Jugendserie' => 1,
+	'Kriminalserie' => 1,
+	'Krimiserie' => 1,
+	'Medical Daily' => 1,
+	'Mysteryserie' => 1,
+	'Ratespiel mit Elton' => 1,
+	'Serie' => 1,
+	'Sitcom' => 1,
+	'Stop Motion Trick' => 1,
+	'Talk-Show mit Barbara Karlich' => 1,
+	'Telenovela' => 1,
+	'Unterhaltungsserie' => 1,
+	'Zeichentrickserie' => 1,
+	'Theater & Fernsehlegenden' => 1,
+	'Fernsehen wie damals' => 1
 );
 
 
@@ -172,10 +198,10 @@ sub ImportContent
 
   my $ds = $self->{datastore};
   my $dsh = $self->{datastorehelper};
-  
+
   $ds->{SILENCE_END_START_OVERLAP}=1;
   $ds->{SILENCE_DUPLICATE_SKIP}=1;
- 
+
   my $xml = XML::LibXML->new;
   my $doc;
   eval { $doc = $xml->parse_string($$cref); };
@@ -184,121 +210,122 @@ sub ImportContent
     f "Failed to parse $@";
     return 0;
   }
-  	my( $date ) = ($batch_id =~ /_(.*)$/);
-	
-	$dsh->StartDate( $date , "00:00" );
- 
- 	 # Find all "z:row"-entries.
- 	 my $ns = $doc->find( "//sendung" );
 
- 	 if( $ns->size() == 0 )
- 	 {
+	# Data
+  my( $date ) = ($batch_id =~ /_(.*)$/);
+	$dsh->StartDate( $date , "00:00" );
+
+ 	# Find all "z:row"-entries.
+ 	my $ns = $doc->find( "//sendung" );
+
+ 	if( $ns->size() == 0 )
+ 	{
  	   f "No data found";
  	   return 0;
- 	 }
-  
-  	 
- 	 foreach my $sc ($ns->get_nodelist)
-  	{
+ 	}
 
-	
-	my $title = $sc->findvalue( './titel' );
-	
-
-   	 my $time = ParseTime( $sc->findvalue( './zeit' ) );
+ 	foreach my $sc ($ns->get_nodelist)
+  {
+		my $title = $sc->findvalue( './titel' );
+		my $subtitle = $sc->findvalue( './subtitel' );
+   	my $time = ParseTime( $sc->findvalue( './zeit' ) );
 
 
 		d( "ORF_xml: $chd->{xmltvid}: $time - $title" );
 
-  		my $ce = {
-  	      title 	  => norm($title),
- 	      start_time  => $time,
-   		};
-   	 
-  	  	my @descnodes = $sc->findnodes( './info' );
-                foreach my $node (@descnodes) {
-                my $desc = $node->textContent();
-		# strip repeat
-		$desc =~ s|\(Wh\..+?\)||;
-		my( $genre, $countries, $year )=( $desc =~ m|\((.+?), (\S+) (\d{4})\)| );
-		if( $year ){
-			$desc =~ s|\(.+?, .+? \d{4}\)||;
-			$ce->{production_date} = $year . '-01-01';
+  	my $ce = {
+  	  title 	  	=> norm($title),
+ 	    start_time  => $time,
+   	};
 
-			# split optional "original title - genre"
-			$genre =~ s|^.+ - (.+?)$|$1|;
-			my ( $program_type, $categ ) = $self->{datastore}->LookupCat( "ORF", $genre );
-			# set category, unless category is already set!
-			AddCategory( $ce, $program_type, $categ );
-			AddCategory( $ce, 'movie', undef );
-		}else{
-			my( $genreword )=( $desc =~ m/^(.*?)(?:\n|$)/s );
-			if( $genreword ){
-				if( $genrewords{$genreword} ) {
-					$desc =~ s/^.*?(?:\n|$)//s;
-					my ( $program_type, $categ ) = $self->{datastore}->LookupCat( "ORF", $genreword );
-					AddCategory( $ce, $program_type, $categ );
+  	my @descnodes = $sc->findnodes( './info' );
+    foreach my $node (@descnodes) {
+    	my $desc = $node->textContent();
+
+			# strip repeat
+			$desc =~ s|\(Wh\..+?\)||;
+
+			my( $genre, $countries, $year )=( $desc =~ m|\((.+?), (\S+) (\d{4})\)| );
+			if( $year ){
+				$desc =~ s|\(.+?, .+? \d{4}\)||;
+				$ce->{production_date} = $year . '-01-01';
+
+				# split optional "original title - genre"
+				$genre =~ s|^.+ - (.+?)$|$1|;
+				my ( $program_type, $categ ) = $self->{datastore}->LookupCat( "ORF", $genre );
+				# set category, unless category is already set!
+				AddCategory( $ce, $program_type, $categ );
+				AddCategory( $ce, 'movie', undef );
+			}else{
+				my( $genreword )=( $desc =~ m/^(.*?)(?:\n|$)/s );
+				if( $genreword ){
+					if( $genrewords{$genreword} ) {
+						$desc =~ s/^.*?(?:\n|$)//s;
+						my ( $program_type, $categ ) = $self->{datastore}->LookupCat( "ORF", $genreword );
+						AddCategory( $ce, $program_type, $categ );
+					}
 				}
 			}
-		}
 
-		# TODO handle more jobs
-		# Analytiker: Günther Neukirchner
-		# Buch: Verena Kurth
-		# Co-Kommentator: Alexander Wurz
-		# Kommentator: Ernst Hausleitner
-		# Moderation: Markus Mooslechner
-		# Präsentator: Boris Kastner-Jirka
-		# Ratespiel mit Elton Co-Produktion ZDF/ORF
-		# 
+			# TODO handle more jobs
+			# Analytiker: Günther Neukirchner
+			# Buch: Verena Kurth
+			# Co-Kommentator: Alexander Wurz
+			# Kommentator: Ernst Hausleitner
+			# Moderation: Markus Mooslechner
+			# Präsentator: Boris Kastner-Jirka
+			# Ratespiel mit Elton Co-Produktion ZDF/ORF
+			#
 
-		# not actors: Mit welchen Psychotricks werden wir beeinflusst, ohne es zu merken?
-		my( $actors )=( $desc =~ m|^M[Ii]t ([A-Z].+?)$|m );
-		if( $actors ){
-			$desc =~ s|^M[Ii]t .+?$||m;
-			$actors =~ s| u\.a\.$||;
-			# TODO clean up the list of actors
-                        $actors =~ s|,\s*,|,|g; # remove empty elements from the list
-			$ce->{actors} = parse_person_list($actors);
-		}
-		my( $directors )=( $desc =~ m|^Regie:\s+(.+?)$|m );
-		if( $directors ){
-			$desc =~ s|^Regie:\s+.+?$||m;
-			# TODO clean up the list of directors
-                        $directors = norm( $directors );
-			$ce->{directors} = parse_person_list($directors);
-		}
-		my( $running_time )=( $desc =~ m|^(\d+\.\d+)$|m );
-		if( $running_time ){
-			$desc =~ s|^\d+\.\d+$||m;
-			# TODO do we want to add running time?
-		}
-		( $running_time )=( $desc =~ m|^ca. (\d+)\'$|m );
-		if( $running_time ){
-			$desc =~ s|^ca. \d+\'$||m;
-			# TODO do we want to add running time?
-		}
-                # just a remark, not a programm description => remove it
-                if( $desc =~ m|^\s*\(.*\)\s*$| ){
-                        $desc = '';
-                }
-                if( $desc ) {
-                       if( $desc =~ m|^\s*Details folgen!\s*$| ) {
-                              $desc = undef;
-                       }
-                }
-                if( $desc ){
-                       $ce->{description} = norm($desc);
-                }
-                }
+			# not actors: Mit welchen Psychotricks werden wir beeinflusst, ohne es zu merken?
+			my( $actors )=( $desc =~ m|^M[Ii]t ([A-Z].+?)$|m );
+			if( $actors ){
+				$desc =~ s|^M[Ii]t .+?$||m;
+				$actors =~ s| u\.a\.$||;
+				# TODO clean up the list of actors
+													$actors =~ s|,\s*,|,|g; # remove empty elements from the list
+				$ce->{actors} = parse_person_list($actors);
+			}
 
-		my $subtitle =  $sc->findvalue( './subtitel' );
-                if( $subtitle =~ m|\s+/\s+ENTFALLEN$| ){
-                        $ce->{title} = 'end-of-transmission';
-                        $subtitle =~ s|\s+/\s+ENTFALLEN$||;
-                }
-                $subtitle =~ s|\s+\(Wh\.\)$||;
-                $subtitle =~ s|^\s*Titel folgt\s*$||;
+			my( $directors )=( $desc =~ m|^Regie:\s+(.+?)$|m );
+			if( $directors ){
+				$desc =~ s|^Regie:\s+.+?$||m;
+				# TODO clean up the list of directors
+													$directors = norm( $directors );
+				$ce->{directors} = parse_person_list($directors);
+			}
+
+			my( $running_time )=( $desc =~ m|^(\d+\.\d+)$|m );
+			if( $running_time ){
+				$desc =~ s|^\d+\.\d+$||m;
+				# TODO do we want to add running time?
+			}
+			( $running_time )=( $desc =~ m|^ca. (\d+)\'$|m );
+			if( $running_time ){
+				$desc =~ s|^ca. \d+\'$||m;
+				# TODO do we want to add running time?
+			}
+    
+			# just a remark, not a programm description => remove it
+    	if( $desc =~ m|^\s*\(.*\)\s*$| ){
+        $desc = '';
+      }
+      if( $desc ) {
+        if( $desc =~ m|^\s*Details folgen!\s*$| ) {
+        	$desc = undef;
+        }
+      }
+    	if( $desc ){
+        $ce->{description} = norm($desc);
+      }
+    }
+
+    if( $subtitle =~ m|\s+/\s+ENTFALLEN$| ){
+      $ce->{title} = 'end-of-transmission';
+      $subtitle =~ s|\s+/\s+ENTFALLEN$||;
+    }
+    $subtitle =~ s|\s+\(Wh\.\)$||;
+    $subtitle =~ s|^\s*Titel folgt\s*$||;
 		if( $subtitle =~ m/^(?:Folge|Kapitel|Teil)\s+\d+\s+-\s+.+$/ ){
 			my( $episodenum, $episodetitle )=( $subtitle =~ m/^(?:Folge|Kapitel|Teil)\s+(\d+)\s+-\s+(.+)$/ );
 			$ce->{episode} = '. ' . ($episodenum - 1) . ' .';
@@ -309,7 +336,7 @@ sub ImportContent
 		}elsif( $subtitle ){
 	   	 	$ce->{subtitle} = norm( $subtitle );
 		}
-	
+
 		my $stereo =  $sc->findvalue( './m' );
 		if( $stereo eq 'True' ){
    	 		$ce->{stereo} = 'mono';
@@ -347,14 +374,19 @@ sub ImportContent
 #   	 		$ce->{captions} = 'teletext';
 #		}
 
+		if( defined($subtitle) and norm($subtitle) ne "" and $genrewords2{norm($title)} ) {
+			$ce->{title} = norm($subtitle);
+			$ce->{subtitle} = undef;
+		}
+
 		# TODO how does ORF signal HD? just slap quality=HDTV on everything on channels with xmltvid hd.*
 		if( $chd->{xmltvid} =~ m|^hd\.| ){
 			$ce->{quality} = 'HDTV';
 		}
-	
+
   	  $dsh->AddProgramme( $ce );
  	 }
-  
+
   # Success
   return 1;
 }
@@ -381,8 +413,8 @@ sub ParseTime {
   if( $text =~ /^\d+:\d+$/ ){
     ( $hour , $min ) = ( $text =~ /^(\d+):(\d+)$/ );
   }
-  
+
   return sprintf( "%02d:%02d", $hour, $min );
 }
-    
+
 1;

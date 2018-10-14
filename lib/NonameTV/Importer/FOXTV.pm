@@ -130,6 +130,7 @@ sub ImportXLS {
             $columns{'HD'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /High Definition/i );
             $columns{'169'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /16:9 Format/i );
             $columns{'Premiere'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Premiere/i );
+            $columns{'Repeat'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Repeat/i );
 
             if($chd->{xmltvid} eq "natgeo.lt" or $chd->{xmltvid} eq "natgeo.lv") {
               $columns{'Time'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Baltics Time/i );
@@ -256,6 +257,9 @@ sub ImportXLS {
           description => norm($desc)
       };
 
+      my $extra = {};
+      $extra->{qualifiers} = [];
+
       if( defined( $yr ) and ($yr =~ /(\d\d\d\d)/) )
       {
         $ce->{production_date} = "$1-01-01";
@@ -315,11 +319,15 @@ sub ImportXLS {
       if( $premiere eq "Premiere" )
       {
         $ce->{new} = "1";
+        push @{$extra->{qualifiers}}, "new";
       }
       else
       {
         $ce->{new} = "0";
+        push @{$extra->{qualifiers}}, "repeat";
       }
+
+      $ce->{extra} = $extra;
 
       progress( "FOXTV: $chd->{xmltvid}: $start - $title" );
       $dsh->AddProgramme( $ce );

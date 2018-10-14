@@ -261,6 +261,8 @@ sub ImportContent
         $ce->{program_type} = "series";
       } elsif($viasat_type eq "sport") {
         $ce->{program_type} = "sports";
+      } elsif($viasat_type eq "sport-series" and $desc !~ /Highlight/i) {
+        $ce->{program_type} = "sports";
       }
     }
 

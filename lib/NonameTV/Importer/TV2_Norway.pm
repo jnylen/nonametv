@@ -248,6 +248,25 @@ sub ImportContent
       $ce->{program_type} = 'series';
     }
 
+    # repeat
+    my $rerun = $sc->findvalue( 'episode-num[@system="dd_replay"]' );
+    if($rerun eq "true"){
+      $ce->{new} = 0;
+      push @{$extra->{qualifiers}}, "repeat";
+    } else {
+      $ce->{new} = 1;
+      push @{$extra->{qualifiers}}, "new";
+    }
+
+    # live
+    my $live = $sc->findvalue( 'episode-num[@system="dd_live"]' );
+    if($live eq "true"){
+      $ce->{live} = 1;
+      push @{$extra->{qualifiers}}, "live";
+    } else {
+      $ce->{live} = 0;
+    }
+
     $ce->{extra} = $extra;
 
     $ce->{subtitle} = undef;
