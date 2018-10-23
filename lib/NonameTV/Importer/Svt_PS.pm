@@ -29,7 +29,7 @@ use Text::Unidecode;
 use File::Slurp;
 use Encode;
 
-use NonameTV qw/ParseXml norm normLatin1 normUtf8 AddCategory MonthNumber ParseDescCatSwe AddCategory/;
+use NonameTV qw/ParseXml ParseXmlFile norm normLatin1 normUtf8 AddCategory MonthNumber ParseDescCatSwe AddCategory/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error/;
 use NonameTV::Config qw/ReadConfig/;
@@ -92,12 +92,17 @@ sub ImportXML
 
   # Perl don't seem to be able to have multiple namespaces with different urls
   my $cref=`cat \"$file\"`;
+
+  $cref =~ s|
+  ||g;
+
   $cref =~ s|http://common.tv.se/material/v4_0|http://common.tv.se/content/v4_0|g;
   $cref =~ s|http://common.tv.se/event/v4_0|http://common.tv.se/content/v4_0|g;
 
   # Parse it
   my $doc;
   my $xml = XML::LibXML->new;
+  $xml->load_ext_dtd(0);
   eval { $doc = $xml->parse_string($cref); };
 
   if( not defined( $doc ) ) {
@@ -236,6 +241,9 @@ sub ImportXML
         start_time   => $start->hms(":"),
         end_time     => $end->hms(":"),
     };
+
+    my $extra = {};
+    $extra->{qualifiers} = [];
 
     # Production year
     if( defined( $prodyear ) and ($prodyear =~ /(\d\d\d\d)/) )
@@ -433,13 +441,6 @@ sub ImportXML
         delete($ce->{episode});
     }
 
-    # Live?
-    if($is_live eq "true") {
-        $ce->{live} = "1";
-    } else {
-        $ce->{live} = "0";
-    }
-
     # Keywords / Genres
     if(defined($keywords)) {
         foreach my $keyword (split(/\|\|/, $keywords)) {
@@ -447,6 +448,25 @@ sub ImportXML
             AddCategory( $ce, $pty, $cat );
         }
     }
+
+    # repeat
+    if($is_rerun eq "true"){
+      $ce->{new} = 0;
+      push @{$extra->{qualifiers}}, "repeat";
+    } else {
+      $ce->{new} = 1;
+      push @{$extra->{qualifiers}}, "new";
+    }
+
+    # live
+    if($is_live eq "true"){
+      $ce->{live} = 1;
+      push @{$extra->{qualifiers}}, "live";
+    } else {
+      $ce->{live} = 0;
+    }
+
+    $ce->{extra} = $extra;
 
     #my ( $program_type, $category ) = ParseDescCatSwe( $desc );
   	#AddCategory( $ce, $program_type, $category );

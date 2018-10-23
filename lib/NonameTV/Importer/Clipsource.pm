@@ -292,6 +292,15 @@ sub ImportContent
       push @{$extra->{qualifiers}}, "smallscreen";
     }
 
+    # Rerun
+    if($rerun eq "true"){
+      $ce->{new} = 0;
+      push @{$extra->{qualifiers}}, "repeat";
+    } else {
+      $ce->{new} = 1;
+      push @{$extra->{qualifiers}}, "new";
+    }
+
     # credits
     ParseCredits( $ce, 'actors',     'actor',    $xpc, 'creditList/credit' );
     ParseCredits( $ce, 'directors',  'director', $xpc, 'creditList/credit' );
