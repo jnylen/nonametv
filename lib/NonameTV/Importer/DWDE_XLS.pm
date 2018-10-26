@@ -15,13 +15,7 @@ Features:
 use utf8;
 
 use DateTime;
-use Spreadsheet::ParseExcel;
-use Spreadsheet::Read;
 use Archive::Zip qw/:ERROR_CODES/;
-
-use Spreadsheet::XLSX;
-use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt ExcelLocaltime LocaltimeExcel);
-use Spreadsheet::Read;
 
 use Text::Iconv;
 my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
@@ -30,7 +24,7 @@ my $converter = Text::Iconv -> new ("utf-8", "windows-1251");
 use Data::Dumper;
 use File::Temp qw/tempfile/;
 
-use NonameTV qw/norm normLatin1 AddCategory/;
+use NonameTV qw/norm normLatin1 ParseExcel formattedCell AddCategory/;
 use NonameTV::DataStore::Helper;
 use NonameTV::Log qw/progress error d p w f/;
 
@@ -99,8 +93,8 @@ sub ImportContentFile {
     my $content = $zip->contents( $files[0] );
 
     open (MYFILE, '>>'.$filename);
-	print MYFILE $content;
-	close (MYFILE);
+    print MYFILE $content;
+    close (MYFILE);
 
     $self->ImportXLS( $filename, $chd );
     unlink $filename; # remove file
@@ -131,63 +125,63 @@ sub ImportXLS {
   my $date;
   my $currdate = "x";
   if($xmltvid eq "deutschplus.dw.de") {
-    $coldate  = 0;
-    $coltime  = 1;
-    $coltitle = 2;
-    $colsubtitle = 3;
-    $coldesc  = 4;
-  } elsif($xmltvid eq "la.dw.de") {
     $coldate  = 1;
     $coltime  = 2;
     $coltitle = 3;
     $colsubtitle = 4;
     $coldesc  = 5;
-  }elsif($xmltvid eq "asien.dw.de") {
-    $coldate  = 1;
-    $coltime  = 2;
+  } elsif($xmltvid eq "la.dw.de") {
+    $coldate  = 2;
+    $coltime  = 3;
     $coltitle = 4;
     $colsubtitle = 5;
     $coldesc  = 6;
+  }elsif($xmltvid eq "asien.dw.de") {
+    $coldate  = 2;
+    $coltime  = 3;
+    $coltitle = 5;
+    $colsubtitle = 6;
+    $coldesc  = 7;
   }else {
-    $coldate  = 0;
-    $coltime  = 1;
-    $coltitle = 3;
-    $colgenre = 6;
-    $coldesc  = 5;
+    $coldate  = 1;
+    $coltime  = 2;
+    $coltitle = 4;
+    $colgenre = 7;
+    $coldesc  = 6;
   }
 
 
-  my $oBook;
+  my $doc = ParseExcel($file);
 
-  if ( $file =~ /\.xlsx$/i ){ progress( "using .xlsx" );  $oBook = Spreadsheet::XLSX -> new ($file, $converter); }
-  else { $oBook = Spreadsheet::ParseExcel::Workbook->Parse( $file );  }
+  if( not defined( $doc ) ) {
+    error( "Ginx: $file: Failed to parse excel" );
+    return;
+  }
 
   # main loop
-  for(my $iSheet=0; $iSheet < $oBook->{SheetCount} ; $iSheet++) {
+  for(my $iSheet=1; $iSheet <= $doc->[0]->{sheets} ; $iSheet++) {
 
-    my $oWkS = $oBook->{Worksheet}[$iSheet];
-    if( $oWkS->{Name} !~ /1/ ){
-      progress( "DWDE_XLS: Skipping other sheet: $oWkS->{Name}" );
+    my $oWkS = $doc->sheet($iSheet);
+
+    if( $oWkS->{label} !~ /1/ ){
+      progress( "DWDE_XLS: Skipping other sheet: $oWkS->{label}" );
       next;
     }
 
-    progress( "DWDE_XLS: Processing worksheet: $oWkS->{Name}" );
+    progress( "DWDE_XLS: Processing worksheet: $oWkS->{label}" );
 
-	my $foundcolumns = 0;
+	  my $foundcolumns = 0;
+
     # browse through rows
-    for(my $iR = 2 ; defined $oWkS->{MaxRow} && $iR <= $oWkS->{MaxRow} ; $iR++) {
+    for(my $iR = 1 ; defined $oWkS->{maxrow} && $iR <= $oWkS->{maxrow} ; $iR++) {
       if(!defined($coldate)) {
         f "No date found,";
         return;
       }
 
-      my $oWkC;
-
       # date
-      $oWkC = $oWkS->{Cells}[$iR][$coldate];
-      next if( ! $oWkC );
 
-      $date = ParseDate( ExcelFmt('yyyy-mm-dd', $oWkC->Value ) );
+      $date = ParseDate( formattedCell($oWkS, $coldate, $iR) );
       next if( ! $date );
 
       if( $date ne $currdate ){
@@ -205,35 +199,21 @@ sub ImportXLS {
       }
 
       # time
-      $oWkC = $oWkS->{Cells}[$iR][$coltime];
-      next if( ! $oWkC );
-
-
-
-      my $time = 0;  # fix for  12:00AM
-      $time=$oWkC->{Val} if( $oWkC->Value );
-
-	  #Convert Excel Time -> localtime
-      $time = ExcelFmt('hh:mm', $time);
-      $time =~ s/_/:/g; # They fail sometimes
+      my $time = formattedCell($oWkS, $coltime, $iR);
 
       # Desc
-      $oWkC = $oWkS->{Cells}[$iR][$coldesc];
-      my $desc = norm(normLatin1($oWkC->Value)) if( $oWkC );
+      my $desc = norm(formattedCell($oWkS, $coldesc, $iR));
 
       # genre
-      $oWkC = $oWkS->{Cells}[$iR][$colgenre] if defined($colgenre);
-      my $genre = norm(normLatin1($oWkC->Value)) if( $oWkC and defined($colgenre) );
+      my $genre = norm(formattedCell($oWkS, $colgenre, $iR)) if(defined($colgenre));
 
       # title
-      $oWkC = $oWkS->{Cells}[$iR][$coltitle];
-      next if( ! $oWkC );
-      my $title = $oWkC->Value if( $oWkC->Value );
+      my $title = formattedCell($oWkS, $coltitle, $iR);
 
       my $ce = {
         channel_id => $channel_id,
         start_time => $time,
-        title	     => norm(normLatin1($title)),
+        title	     => norm($title),
         aspect     => '16:9',
       };
 
@@ -245,7 +225,7 @@ sub ImportXLS {
       #	AddCategory( $ce, $program_type2, $category2 );
       }
 
-	  progress("$xmltvid: $time - $title") if $title;
+	    progress("$xmltvid: $time - $title") if $title;
       $dsh->AddProgramme( $ce ) if $title;
     }
 
@@ -260,7 +240,7 @@ sub ParseDate
 {
   my ( $dinfo ) = @_;
 
-  print Dumper($dinfo);
+  #print Dumper($dinfo);
 
   my( $month, $day, $year );
 #      progress("Mdatum $dinfo");
