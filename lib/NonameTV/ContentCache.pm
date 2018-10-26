@@ -81,7 +81,7 @@ sub new {
 
   eval {
     require WWW::Mechanize::GZip;
-    $self->{ua} = WWW::Mechanize::GZip->new( onerror => \&d );
+    $self->{ua} = WWW::Mechanize::GZip->new( onerror => \&d, cookie_jar => {} );
   };
 
   if( not defined $self->{ua} ) {
