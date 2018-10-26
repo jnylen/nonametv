@@ -36,7 +36,7 @@ sub new {
   bless ($self, $class);
 
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "UTC" );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "CET" );
   $self->{datastorehelper} = $dsh;
 
   #$self->{datastore}->{augment} = 1;
@@ -55,7 +55,7 @@ sub ImportContentFile {
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
 
-  if( $file =~ /\.xlsx$/i ){
+  if( $file =~ /\.(xlsx|xls)$/i ){
     $self->ImportXLS( $file, $chd );
   }
 
@@ -104,13 +104,14 @@ sub ImportXLS {
         for(my $iC = 1 ; defined $oWkS->{maxcol} && $iC <= $oWkS->{maxcol} ; $iC++) {
           # Does the cell exist?
           if($oWkS->cell($iC, $iR)) {
-            $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Date/i );
-            $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Start Time \(UTC\)/i );
-            $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Program Title/i );
-            $columns{'Ep No'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Series/i );
-            $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Comment/i );
+            $columns{'Date'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /Date$/i );
+            $columns{'Time'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Start Time/i );
+            $columns{'Title'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Program Title/i );
+            $columns{'Sea No'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Series/i );
+            $columns{'Ep No'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Episode/i );
+            $columns{'Synopsis'} = $iC if( norm($oWkS->cell($iC, $iR)) =~ /^Comment/i );
 
-            $foundcolumns = 1 if( $oWkS->cell($iC, $iR) =~ /^Date/i ); # Only import if date is found
+            $foundcolumns = 1 if( norm($oWkS->cell($iC, $iR)) =~ /Date$/i ); # Only import if date is found
           }
         }
 
