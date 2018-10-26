@@ -62,24 +62,24 @@ my $ds = CreateDataStore();
 
 my $root = "/content/maildir/filtered/";
 my @folders = qw(
-     GlobalListings
-		 France24
-		 CNBC
-		 FuelTV
-		 LuxeTV
-		 GodTV
-		 Kanal10
-		 Bloomberg
-		 Motors
-		 LifestyleTV
-		 Gmail
-		 Hustler
-		 YaS
-     Fatstone
-     Disney
-     Trace
-     Nova
-     KinoPolska
+      GlobalListings
+      France24
+      CNBC
+      FuelTV
+      LuxeTV
+      GodTV
+      Kanal10
+      Bloomberg
+      Motors
+      LifestyleTV
+      Gmail
+      Hustler
+      YaS
+      Fatstone
+      Disney
+      Trace
+      Nova
+      KinoPolska
 		 );
 # Flag messages AFTER they have been processed. Then I normally
 # only have to move the message to the correct folder.
@@ -302,6 +302,7 @@ sub guess_channel
     return "foxtv.se"       if $filename =~ /^fox\s*sweden/i and $filename =~ /\.(xls|xlsx)$/i;
     return "foxtv.no"       if $filename =~ /^fox_norway/i and $filename =~ /\.(xls|xlsx)$/i;
     return "foxtv.se"       if $filename =~ /^fox_sweden/i and $filename =~ /\.(xls|xlsx)$/i;
+    return "foxtv.se"       if $filename =~ /^FOX SWE/i and $filename =~ /\.(xls|xlsx)$/i;
     return "foxtv.ee"       if $filename =~ /FOX/i and $filename =~ /Latvia/i and $filename =~ /\.(xls|xlsx)$/i;
     return "foxtv.ee"       if $filename =~ /FOX/i and $filename =~ /Estonia/i and $filename =~ /\.(xls|xlsx)$/i;
     return "foxtv.ee"       if $filename =~ /FOX/i and $filename =~ /Est-Lat/i and $filename =~ /\.(xls|xlsx)$/i;
@@ -352,7 +353,7 @@ sub guess_channel
     return "wild.natgeo.pl"             if $filename =~ /^NGWPol/i and $filename =~ /\.doc$/i;
     return "wild.natgeo.pl"             if $filename =~ /^NGW\(CEE\)Pol/i and $filename =~ /\.doc$/i;
 
-
+    return "ginx.tv" if $filename =~ /^Ginx/i and $filename =~ /\.xls$/i;
  }
 
  if( $dir =~ /Kanal10/ and ($filename =~ /\.doc$/i or $filename =~ /\.(xls|xlsx|ods)$/i) and $from =~ /\@kanal10.se/i ) {
@@ -497,7 +498,7 @@ sub guess_channel
  }
 
  # Not added
- if($filename =~ /\.(xml|xls|xlsx|txt|doc|rtf|docx)/i) {
+ if($filename =~ /\.(xml|xls|xlsx|txt|doc|rtf|docx)/i and $from =~ /fox/) {
   print("Not added: dir: $dir -> from: $from -> subject: $subject -> file: $filename\n");
  }
 
