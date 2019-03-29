@@ -41,7 +41,7 @@ $NONAMETV Viasat $1 $2 $3
 $NONAMETV ViasatDK $1 $2 $3
 $NONAMETV ViasatNO $1 $2 $3
 $NONAMETV ViasatFI $1 $2 $3 # EET
-$NONAMETV ViasatHU $1 $2 $3
+#$NONAMETV ViasatHU $1 $2 $3
 $NONAMETV ViasatWorld $1 $2 $3 # CET
 $NONAMETV ViasatWorld_Finland $1 $2 $3 # EET
 $NONAMETV TV2 $1 $2 $3
