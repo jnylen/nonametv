@@ -79,8 +79,7 @@ my @folders = qw(
       Disney
       Trace
       Nova
-      KinoPolska
-		 );
+      KinoPolska		 );
 # Flag messages AFTER they have been processed. Then I normally
 # only have to move the message to the correct folder.
 
@@ -360,7 +359,7 @@ sub guess_channel
      return "kanal10.se";
  }
 
- if( $dir =~ /Kanal10/ and $filename =~ /\.xlsx$/i and $from =~ /\@kanal10.no/i ) {
+ if( $dir =~ /Kanal10/ and $filename =~ /\.xlsx$/i and $subject =~ /Norge/i ) {
     return "kanal10.no";
  }
 
@@ -498,7 +497,7 @@ sub guess_channel
  }
 
  # Not added
- if($filename =~ /\.(xml|xls|xlsx|txt|doc|rtf|docx)/i and $from =~ /fox/) {
+ if($filename =~ /\.(xml|xls|xlsx|txt|doc|rtf|docx)/i) {
   print("Not added: dir: $dir -> from: $from -> subject: $subject -> file: $filename\n");
  }
 
