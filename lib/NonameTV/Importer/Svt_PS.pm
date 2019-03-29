@@ -21,6 +21,8 @@ but the same schedule), SVTB, 24, SVTK (Kunskapskanalen).
 use utf8;
 
 use DateTime;
+use DateTime::Duration;
+
 use XML::LibXML;
 use XML::LibXML::XPathContext;
 use IO::Scalar;
@@ -195,8 +197,10 @@ sub ImportXML
     }
 
     # Events - Date
-    my $start   = $self->create_dt($xpc->findvalue( 'v41:timeList/v41:time/v41:startTime' ));
-    my $end     = $self->create_dt($xpc->findvalue( 'v41:timeList/v41:time/v41:endTime' ));
+    my $start = $self->create_dt($xpc->findvalue( 'v41:timeList/v41:time/v41:startTime' ));
+    #my $end     = $self->create_dt($xpc->findvalue( 'v41:timeList/v41:time/v41:endTime' ));
+    my $end   = $self->add_duration($start, $xpc->findvalue( 'v41:timeList/v41:time/v41:duration' ));
+
     my $date    = $start->ymd("-");
 
     if($date ne $currdate ) {
@@ -507,6 +511,24 @@ sub create_dt
   #$dt->set_time_zone( "Europe/Stockholm" );
 
   return $dt;
+}
+
+sub add_duration
+{
+  my $self = shift;
+  my ($dt, $duration) = @_;
+  
+  my( $hour, $minute, $second, $ms ) = split( ":", $duration );
+  
+  my $dur = DateTime::Duration->new(
+    hours       => $hour,
+    minutes     => $minute
+  );
+
+  my $new_dt = $dt->clone()->add_duration($dur);
+  print Dumper("dur: $duration, $new_dt");
+
+  return $new_dt;
 }
 
 # From SVT_WEB
