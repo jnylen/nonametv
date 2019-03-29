@@ -217,6 +217,7 @@ sub guess_channel
     if($filename =~ /\.xlsx$/i) {
     	return "classic.vh1.se" if $filename =~ /vh1.*euro.*classic/i;
     	return "classic.vh1.se" if $filename =~ /vh1euroclassic/i;
+      return "hits.mtv.se" if $filename =~ /hits/i;
 
     	if($filename =~ /^mtv.*live/i) {
     	    return "hd.mtv.se";
@@ -226,6 +227,7 @@ sub guess_channel
     # excel (XLS)
     if($filename =~ /\.xls$/i) {
       return "classic.vh1.se" if $filename =~ /vh1.*euro.*classic/i;
+      return "hits.mtv.se" if $filename =~ /hits/i;
 
       if($filename =~ /^mtv.*live/i) {
     	  return "hd.mtv.se" if $filename =~ /listings/i;
@@ -250,7 +252,7 @@ sub guess_channel
  }
 
  # BBC
- if( $dir =~ /EBS/ and $filename =~ /\.xls$/i ) {
+ if( $dir =~ /EBS/ and $filename =~ /\.(xls|xlsx)$/i ) {
     # ENT. (BRIT) NORDIC
     return "bbcentertainment.com" if $filename =~ /brit\s+scandi/i;
 
@@ -270,6 +272,9 @@ sub guess_channel
 
     # Lifestyle
     return "bbclifestyle.com" if $filename =~ /lifestyle\s+scandi/i;
+
+    # Bloomberg
+    return "europe.bloomberg.com" if $filename =~ /bloomberg\s+pan\s+eu/i;
  }
 
  # Discovery
@@ -437,17 +442,9 @@ sub guess_channel
      return "classic.uptown.dk" if $filename =~ /classic/i;
  }
 
- if( $dir =~ /RTVE/ ) {
-   return "canal24h.rtve.es" if $subject =~ /canal 24 horas/i and $filename =~ /\.html$/i;
-   return "clan.rtve.es" if $subject =~ /clan tve/i and $filename =~ /\.html$/i;
-   return "asia.tve.es" if $filename =~ /^ASI/i and $filename =~ /\.xml$/i;
-   return "europa.tve.es" if $filename =~ /^INT/i and $filename =~ /\.xml$/i;
- }
-
- if( $dir =~ /ERR/ and $filename =~ /\.xml$/i ) {
-   return "etv1.err.ee" if $filename =~ /etv1/i;
-   return "etv2.err.ee" if $filename =~ /etv2/i;
-   return "etvplus.err.ee" if $filename =~ /etv\+/i;
+ # Not added
+ if($filename =~ /\.(xml|xls|xlsx|txt|doc|rtf|docx)/i) {
+  print("Not added: dir: $dir -> from: $from -> subject: $subject -> file: $filename\n");
  }
 
   return undef;

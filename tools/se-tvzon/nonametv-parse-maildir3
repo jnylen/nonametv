@@ -189,9 +189,10 @@ sub guess_channel
     my( $dir, $from, $subject, $filename, $type, $size ) = @_;
 
     if( $dir =~ /RTVE/ ) {
-        return "canal24h.rtve.es" if $subject =~ /canal 24 horas/i and $filename =~ /\.html$/i;
+        return "canal24h.rtve.es" if $filename =~ /^24H/i and $filename =~ /\.xml$/i;
         return "clan.rtve.es" if $subject =~ /clan tve/i and $filename =~ /\.html$/i;
         return "asia.tve.es" if $filename =~ /^ASI/i and $filename =~ /\.xml$/i;
+        return "asia.tve.es" if $filename =~ /^AME/i and $filename =~ /\.xml$/i;
         return "europa.tve.es" if $filename =~ /^INT/i and $filename =~ /\.xml$/i;
     }
 
@@ -216,11 +217,12 @@ sub guess_channel
     }
 
     if( $dir =~ /Playboy/ ) {
-        return "europe.playboytv.com" if $filename =~ /^playboy/i and $filename =~ /\.doc$/i;
-        return "europe.playboytv.com" if $filename =~ /^playboy/i and $filename =~ /\.xlsx$/i;
-        return "adultchannel.co.uk" if $filename =~ /^the\s*adult/i and $filename =~ /\.doc$/i;
-        return "brazzerstveurope.com" if $filename =~ /^brazzers/i and $filename =~ /\.doc$/i;
-        return "europe.realitykings.com" if $filename =~ /^rktv/i and $filename =~ /\.doc$/i;
+        #return "europe.playboytv.com"    if $filename =~ /^playboy/i and $filename =~ /\.doc$/i;
+        return "europe.playboytv.com"     if $filename =~ /^playboy/i and $filename =~ /\.xml$/i;
+        return "adultchannel.co.uk"       if $filename =~ /^the\s*adult/i and $filename =~ /\.doc$/i;
+        return "brazzerstveurope.com"     if $filename =~ /^brazzers/i and $filename =~ /\.doc$/i;
+        return "europe.realitykings.com"  if $filename =~ /^rktv/i and $filename =~ /\.(xls|xlsx)$/i;
+        return "bangutv.com"              if $filename =~ /^bangu/i and $filename =~ /\.(xls|xlsx)$/i;
     }
 
     if( $dir =~ /AZMedien/ and $filename =~ /\.xml$/i ) {
