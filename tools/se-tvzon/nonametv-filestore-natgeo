@@ -46,6 +46,7 @@ $channel_data{ "WILD_DK" } = "wild.natgeo.dk";
 
 # NG People
 $channel_data{ "NGP_DK" } = "people.natgeo.dk";
+$channel_data{ "XEE_DK" } = "xee.fox.com";
 
 # list files inside of the channel directory and check when they have been touched
 opendir(DIR, "/content/ftp/foxng/");
