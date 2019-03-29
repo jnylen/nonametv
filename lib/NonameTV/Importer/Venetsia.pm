@@ -32,6 +32,7 @@ use XML::LibXML;
 use IO::Scalar;
 use Data::Dumper;
 use File::Basename;
+use Try::Tiny;
 
 use NonameTV qw/norm normLatin1 ParseXml AddCategory/;
 use NonameTV::DataStore::Helper;
@@ -52,7 +53,7 @@ sub new {
 
   $self->{FileStore} = $conf->{FileStore};
 
-  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore} );
+  my $dsh = NonameTV::DataStore::Helper->new( $self->{datastore}, "UTC" );
   $self->{datastorehelper} = $dsh;
 
   # use augment
@@ -86,7 +87,6 @@ sub ImportXML
   my( $file, $chd ) = @_;
 
   my $filename = fileparse($file);
-  my ( $id, $filedate ) = split(/_/, $filename);
 
   my $dsh = $self->{datastorehelper};
   my $ds = $self->{datastore};
@@ -119,7 +119,11 @@ sub ImportXML
     return;
   }
 
+  my($year, $month, $day) = ($filename =~ /(\d\d\d\d)(\d\d)(\d\d)/ );
+  my $filedate = sprintf( "%04d-%02d-%02d", $year, $month, $day );
+
   $dsh->StartBatch( $chd->{xmltvid}."_".$filedate , $chd->{id} );
+
   foreach my $row ($rows->get_nodelist) {
     my $time        = norm($row->findvalue( './/ProgramInformation/tva:ProgramDescription/tva:ProgramLocationTable/tva:BroadcastEvent/tva:PublishedStartTime' ));
     my $endtime     = norm($row->findvalue( './/ProgramInformation/tva:ProgramDescription/tva:ProgramLocationTable/tva:BroadcastEvent/tva:PublishedEndTime' ));
@@ -170,7 +174,7 @@ sub ImportXML
       }
 
       #my $batchid = $chd->{xmltvid} . "_" . $date;
-      $dsh->StartDate( $date , "06:00" );
+      $dsh->StartDate( $date , "00:00" );
       $currdate = $date;
 
       progress("Venetsia: Date is: $date");
@@ -180,7 +184,8 @@ sub ImportXML
     my $ce = {
       channel_id  => $chd->{id},
       title       => norm($title),
-      start_time  => $start,
+      start_time  => $start->hms(":"),
+      end_time    => $end->hms(":"),
     };
 
     #      end_time    => $end,
@@ -596,9 +601,9 @@ sub ImportXML
     $ce->{description} =~ s/^\.//;
     $ce->{description} = norm($ce->{description});
 
-    $ds->AddProgramme( $ce );
+    $dsh->AddProgramme( $ce );
     progress( "Venetsia: $chd->{xmltvid}: $start - $title" );
-
+    
   } # next row
 
   #  $column = undef;
@@ -620,15 +625,19 @@ sub create_dt
 
 
   my $dt = DateTime->new( year      => $year,
-  month     => $month,
-  day       => $day,
-  hour      => $hour,
-  minute    => $minute,
-  time_zone => 'Europe/Helsinki'
+    month     => $month,
+    day       => $day,
+    hour      => $hour,
+    minute    => $minute,
+    #time_zone => 'Europe/Helsinki'
   );
+
+  $dt->subtract( hours => $timezone_hour );
+  $dt->subtract( minutes => $timezone_minute );
 
 
   $dt->set_time_zone( "UTC" );
+
   return $dt;
 }
 
