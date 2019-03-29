@@ -151,6 +151,14 @@ sub ImportXML
 
   foreach my $ci ($cis->get_nodelist) {
     my $cid = $ci->findvalue( 'v41:contentId' );
+    my $title = norm($ci->findvalue( 'v41:titleList/v41:title[@type="season"]' ));
+
+    # Custom rule for Dox
+    if($title =~ /^Dox/i) {
+      $title = norm($ci->findvalue( 'v41:titleList/v41:title[@type="content"]' ));
+      $title = ($title =~ s/^Dox\: //i);
+    }
+
 
     my $c = {
       seasonNumber      => norm($ci->findvalue( 'v41:seasonNumber' )),
@@ -158,7 +166,7 @@ sub ImportXML
       numberOfEpisodes  => norm($ci->findvalue( 'v41:numberOfEpisodes' )),
       productionYear    => norm($ci->findvalue( 'v41:productionYear' )),
       countryOfOrigin   => join("||", ParseIt($ci, 'v41:countryOfOriginList/v41:country')),
-      title             => norm($ci->findvalue( 'v41:titleList/v41:title[@type="season"]' )),
+      title             => $title,
       description_med   => norm($ci->findvalue( 'v41:descriptionList/v41:description[@length="medium"]' )),
       keywords          => join("||", ParseIt($ci, 'v41:categoryList/v41:category/v41:treeNode')),
     };
