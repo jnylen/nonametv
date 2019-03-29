@@ -63,3 +63,4 @@ tools/nonametv-import RTVE $1 $2 $3
 tools/nonametv-import Welt $1 $2 $3
 tools/nonametv-import MediasetIT $1 $2 $3
 tools/nonametv-import AMB $1 $2 $3
+tools/nonametv-import VH1_xls $1 $2 $3
