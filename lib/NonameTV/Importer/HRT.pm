@@ -114,6 +114,8 @@ sub ImportContent
     # description
     #
     my $desc  = $sc->getElementsByTagName('desc');
+    $desc =~ s/&#8195;//g;
+    $desc =~ s/&#224;//g;
 
     #
     # genre
