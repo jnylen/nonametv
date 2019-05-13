@@ -102,7 +102,7 @@ sub ImportXLS {
           # Does the cell exist?
           if($oWkS->cell($iC, $iR)) {
             $columns{'Date'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Date/i );
-            $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^CET/i );
+            $columns{'Time'} = $iC if( $oWkS->cell($iC, $iR) =~ /^(CET|CEST)/i );
             $columns{'Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Show/i );
             $columns{'Ep Title'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Episode Title/i );
             $columns{'Synopsis'} = $iC if( $oWkS->cell($iC, $iR) =~ /^Synopsis/i );
