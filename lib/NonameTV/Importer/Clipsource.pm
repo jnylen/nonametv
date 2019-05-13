@@ -19,7 +19,7 @@ use IO::Uncompress::Unzip qw/unzip/;
 use Data::Dumper;
 use Encode qw/encode decode/;
 
-use NonameTV qw/ParseXml norm AddCountry AddCategory FixSubtitle/;
+use NonameTV qw/MyGet ParseXml norm AddCountry AddCategory FixSubtitle/;
 use NonameTV::Log qw/progress error/;
 
 use NonameTV::DataStore::Helper;
@@ -54,6 +54,7 @@ sub ImportContent
   my( $batch_id, $cref, $chd ) = @_;
   my $ds = $self->{datastore};
   my $dsh = $self->{datastorehelper};
+  my( $channel_id, $language ) = split( /:/, $chd->{grabber_info} );
 
   my $doc = ParseXml( \$cref );
 
@@ -79,7 +80,8 @@ sub ImportContent
       endTime         => norm($ei->findvalue( 'timeList/time/endTime' )),
       live            => norm($ei->findvalue( 'live' )),
       rerun           => norm($ei->findvalue( 'rerun' )),
-      materialIdRef   => norm($ei->findvalue( 'materialIdRef' ))
+      materialIdRef   => norm($ei->findvalue( 'materialIdRef' )),
+      previous_events => $ei->findnodes( "previousEventList/event" )->size()
     };
 
     #print Dumper($e);
@@ -157,6 +159,7 @@ sub ImportContent
 
     my $live       = $ed->{live};
     my $rerun      = $ed->{rerun};
+    my $prevs      = $ed->{previous_events};
 
     # material
     my $md         = $materials{$cid};
@@ -166,16 +169,18 @@ sub ImportContent
     my $v_format   = $md->{videoFormat};
 
     # content
-    my $desc    = $xpc->findvalue( 'descriptionList/description[@type="content"][@length="long"][1]' );
-    $desc     ||= $xpc->findvalue( 'descriptionList/description[@type="content"][@length="medium"][1]' );
-    $desc     ||= $xpc->findvalue( 'descriptionList/description[@type="season"][1]' );
-    $desc     ||= $xpc->findvalue( 'descriptionList/description[@type="series"][1]' );
+    my $desc    = $xpc->findvalue( 'descriptionList/description[@type="content"][@length="long"][@language="' . $language . '"][1]' );
+    $desc     ||= $xpc->findvalue( 'descriptionList/description[@type="content"][@length="medium"][@language="' . $language . '"][1]' );
+    $desc     ||= $xpc->findvalue( 'descriptionList/description[@type="season"][@language="' . $language . '"][1]' );
+    $desc     ||= $xpc->findvalue( 'descriptionList/description[@type="series"][@language="' . $language . '"][1]' );
 
-    my $title        = $xpc->findvalue( 'genericTitleList/title[@type="series"][1]' );
-    $title         ||= $xpc->findvalue( 'genericTitleList/title[@type="content"][1]' );
-    $title         ||= $xpc->findvalue( 'titleList/title[@type="series"][1]' );
-    $title         ||= $xpc->findvalue( 'titleList/title[@type="content"][1]' );
+    my $title        = $xpc->findvalue( 'genericTitleList/title[@type="series"][@language="' . $language . '"][1]' );
+    $title         ||= $xpc->findvalue( 'genericTitleList/title[@type="content"][@language="' . $language . '"][1]' );
+    $title         ||= $xpc->findvalue( 'titleList/title[@type="series"][@language="' . $language . '"][1]' );
+    $title         ||= $xpc->findvalue( 'titleList/title[@type="content"][@language="' . $language . '"][1]' );
     my $titles       = $xpc->findnodes( 'titleList/title' );
+
+    my $titlecontent = $xpc->findvalue( 'titleList/title[@type="content"][1]' );
 
     if($title =~ /^S.ndningsuppeh.ll$/i) {
       $title = "end-of-transmission";
@@ -260,14 +265,16 @@ sub ImportContent
       if($viasat_type eq "series") {
         $ce->{program_type} = "series";
       } elsif($viasat_type eq "sport") {
+        $ce->{subtitle} = norm($titlecontent) if(defined($titlecontent) and norm($titlecontent) ne "" and norm($titlecontent) ne $title and $titlecontent !~ /Highlight/i);
         $ce->{program_type} = "sports";
-      } elsif($viasat_type eq "sport-series" and $desc !~ /Highlight/i) {
+      } elsif($viasat_type eq "sport-series" and ($title !~ /Highlight/i and $desc !~ /Highlight/i and $titlecontent !~ /Highlight/i)) {
+        $ce->{subtitle} = norm($titlecontent) if(defined($titlecontent) and norm($titlecontent) ne "" and norm($titlecontent) ne $title and $titlecontent !~ /Highlight/i);
         $ce->{program_type} = "sports";
       }
     }
 
     # Live?
-    if($live eq "true") {
+    if($live eq "true" and $prevs == 0) {
       $ce->{live} = "1";
       push @{$extra->{qualifiers}}, "live";
     } else {
@@ -293,7 +300,7 @@ sub ImportContent
     }
 
     # Rerun
-    if($rerun eq "true"){
+    if($rerun eq "true" or $prevs > 0){
       $ce->{new} = 0;
       push @{$extra->{qualifiers}}, "repeat";
     } else {
@@ -390,10 +397,9 @@ sub Object2Url {
   my( $batch_id, $data ) = @_;
 
   my( $date ) = ($batch_id =~ /_(.*)/);
+  my( $channel_id, $language ) = split( /:/, $data->{grabber_info} );
 
-  my $url = sprintf( "http://clipsource.se/epg/api/v4.2.0?key=%s&date=%s&channelId=%s", $self->{ApiKey}, $date, $data->{grabber_info});
-  #my $url = sprintf( "http://clipsource.se/epg/xml/%s/%s/%s/download", $date, $date, $data->{grabber_info} );
-  #my $url = "http://converter.xmltv.se/contentcache/Clipsource/dev.kanal5.se_2015-08-22.content.zip";
+  my $url = sprintf( "https://api.clipsource.com/epg/v4.2.0?key=%s&date=%s&channelId=%s&2", $self->{ApiKey}, $date, $channel_id );
 
  progress("Fetching $url...");
 
@@ -417,6 +423,7 @@ sub FilterContent {
   $cref =~ s| xmlns="http://common.tv.se/content/v4_2_0"||g;
   $cref =~ s| xmlns="http://common.tv.se/material/v4_2_0"||g;
   $cref =~ s| xs="http://www.w3.org/2001/XMLSchema"||g;
+  $cref =~ s| timestamp=\"[^\"]+\"||g;
 
   my $doc = ParseXml( \$cref );
 
