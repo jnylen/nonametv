@@ -81,12 +81,12 @@ sub new {
 
   eval {
     require WWW::Mechanize::GZip;
-    $self->{ua} = WWW::Mechanize::GZip->new( onerror => \&d, cookie_jar => {} );
+    $self->{ua} = WWW::Mechanize::GZip->new( agent => "XMLTV.se (http://xmltv.se)", onerror => \&d, cookie_jar => {} );
   };
 
   if( not defined $self->{ua} ) {
     require LWP::UserAgent;
-    $self->{ua} = LWP::UserAgent->new( cookie_jar => {} );
+    $self->{ua} = LWP::UserAgent->new( agent => "XMLTV.se (http://xmltv.se)", cookie_jar => {} );
   }
 
   my $can_accept = HTTP::Message::decodable;
