@@ -178,14 +178,21 @@ sub ImportContent {
     	next;
     }
 
+    my $live = $b->findvalue( "isLive" );
+
+
     my( $start, $start_dummy ) = ( $starttime =~ /(\d+:\d+):(\d+)/ );
     #my $stoptime = $b->findvalue( "sluttid" );
     #my( $stop, $stop_dummy ) = ( $stoptime =~ /(\d+:\d+):(\d+)/ );
 
 
     # Descr. and genre
-    my $desc = $b->findvalue( "shortDescription" );
-    $desc =~ s/:\|apostrofe\|;/'/g;
+    my $desc2 = $b->findvalue( "shortDescription" );
+    $desc2 =~ s/:\|apostrofe\|;/'/g;
+    my $desc3 = $b->findvalue( "ptekst1" );
+    $desc3 =~ s/:\|apostrofe\|;/'/g;
+    
+    my $desc = $desc2 || $desc3;
 
     # Episode title
     my $subtitle = $b->findvalue( "pressoriginalepisodetitle" );
@@ -374,6 +381,12 @@ sub ImportContent {
         $ce->{original_title} =~ s/, The$//i;
         $ce->{original_title} = "The ".$ce->{original_title};
     }
+
+    # SBS DK Doesnt tag it as a movie sometimes
+    if(!defined($ce->{episode}) and $live ne "true" and $xmltvid ne "eurosport.sbstv.dk") {
+      $ce->{program_type} = 'movie';
+    }
+
 
     $ce->{quality} = "HDTV" if $hd eq "yes";
 
