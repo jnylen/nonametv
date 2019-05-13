@@ -62,6 +62,7 @@ sub ImportContentFile {
   $cref =~ s|
   ||g;
   $cref =~ s| xmlns="http://www.mtg.se/xml/weeklisting"||;
+  $cref =~ s| & | &amp; |;
 
   my $xml = XML::LibXML->new;
   $xml->load_ext_dtd(0);
