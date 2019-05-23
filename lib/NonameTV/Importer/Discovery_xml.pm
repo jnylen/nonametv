@@ -155,7 +155,7 @@ sub ParseDateTime {
   my( $str, $grabber_info ) = @_;
 
   my( $year, $month, $day, $hour, $minute ) =
-      ($str =~ /^(\d+)-(\d+)-(\d+)T(\d+):(\d+)$/ );
+      ($str =~ /^(\d+)-(\d+)-(\d+) (\d+):(\d+)$/ );
 
   # Select grabber info
   my $timezone = "Europe/Stockholm";
